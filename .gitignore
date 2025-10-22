@@ -1,0 +1,59 @@
+# Node
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+server/.env
+server/.env.*
+
+# Build outputs
+dist/
+**/dist/
+build/
+**/build/
+.vite/
+**/.vite/
+
+# Vercel
+.vercel/
+
+# Logs
+logs
+*.log
+*.log.*
+log/
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Editor & OS junk
+.vscode/
+.idea/
+*.swp
+*.swo
+*.orig
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Coverage & caches
+coverage/
+.nyc_output/
+.eslintcache
+.cache/
+.parcel-cache/
+.node_repl_history
+
+# Temp
+tmp/
+temp/
+.temp/
