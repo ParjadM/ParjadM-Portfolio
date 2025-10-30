@@ -1918,6 +1918,41 @@ const Layout = ({ theme, toggleTheme, toast, setToast }) => {
         } catch {}
     }, [location?.pathname, visitorId])
 
+    // Basic SEO: update title/meta on route change
+    useEffect(() => {
+        const path = location.pathname || '/'
+        const titleMap = {
+          '/': 'Parjad Minooei — Web Developer Portfolio',
+          '/about': 'About — Parjad Minooei',
+          '/projects': 'Projects — Parjad Minooei',
+          '/blog': 'Blog — Parjad Minooei',
+          '/contact': 'Contact — Parjad Minooei',
+        }
+        const descMap = {
+          '/': 'Web Developer building beautiful, fast, user‑centric web apps.',
+          '/about': 'Learn about Parjad’s background and skills.',
+          '/projects': 'Selected projects with code and live demos.',
+          '/blog': 'Articles on web development and learning.',
+          '/contact': 'Get in touch for opportunities and collaborations.',
+        }
+        const t = titleMap[path] || 'Parjad Minooei'
+        const d = descMap[path] || descMap['/']
+        document.title = t
+        const ensure = (selector, attrs) => {
+          let el = document.head.querySelector(selector)
+          if (!el) { el = document.createElement('meta'); Object.keys(attrs).forEach(k=> el.setAttribute(k, attrs[k])); document.head.appendChild(el); return el }
+          return el
+        }
+        const m = ensure('meta[name="description"]', { name: 'description' })
+        m.setAttribute('content', d)
+        const ogt = ensure('meta[property="og:title"]', { property: 'og:title' })
+        ogt.setAttribute('content', t)
+        const ogd = ensure('meta[property="og:description"]', { property: 'og:description' })
+        ogd.setAttribute('content', d)
+        const ogu = ensure('meta[property="og:url"]', { property: 'og:url' })
+        ogu.setAttribute('content', `https://parjad-m-portfolio.vercel.app${path}`)
+    }, [location.pathname])
+
     return (
         <div className="bg-gradient-to-br from-emerald-900 via-teal-900 to-cyan-900 text-white font-sans">
             <style>{`
@@ -1983,47 +2018,12 @@ const Layout = ({ theme, toggleTheme, toast, setToast }) => {
 export default function App() {
   const [theme, setTheme] = useState('green'); // 'pink' or 'green'
   const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
-  const location = useLocation();
 
   const toggleTheme = () => {
       setTheme(prevTheme => prevTheme === 'pink' ? 'green' : 'pink');
       setToast({ isVisible: true, message: `Switched to ${theme === 'pink' ? 'Green' : 'Pink'} theme!`, type: 'success' });
   };
 
-  // Basic SEO: update title and meta description per route
-  useEffect(() => {
-    const path = location.pathname || '/'
-    const titleMap = {
-      '/': 'Parjad Minooei — Web Developer Portfolio',
-      '/about': 'About — Parjad Minooei',
-      '/projects': 'Projects — Parjad Minooei',
-      '/blog': 'Blog — Parjad Minooei',
-      '/contact': 'Contact — Parjad Minooei',
-    }
-    const descMap = {
-      '/': 'Web Developer building beautiful, fast, user‑centric web apps.',
-      '/about': 'Learn about Parjad’s background and skills.',
-      '/projects': 'Selected projects with code and live demos.',
-      '/blog': 'Articles on web development and learning.',
-      '/contact': 'Get in touch for opportunities and collaborations.',
-    }
-    const t = titleMap[path] || 'Parjad Minooei'
-    const d = descMap[path] || descMap['/']
-    document.title = t
-    const ensure = (selector, attrs) => {
-      let el = document.head.querySelector(selector)
-      if (!el) { el = document.createElement('meta'); Object.keys(attrs).forEach(k=> el.setAttribute(k, attrs[k])); document.head.appendChild(el); return el }
-      return el
-    }
-    const m = ensure('meta[name="description"]', { name: 'description' })
-    m.setAttribute('content', d)
-    const ogt = ensure('meta[property="og:title"]', { property: 'og:title' })
-    ogt.setAttribute('content', t)
-    const ogd = ensure('meta[property="og:description"]', { property: 'og:description' })
-    ogd.setAttribute('content', d)
-    const ogu = ensure('meta[property="og:url"]', { property: 'og:url' })
-    ogu.setAttribute('content', `https://parjad-m-portfolio.vercel.app${path}`)
-  }, [location.pathname])
 
   return (
       <Router>
