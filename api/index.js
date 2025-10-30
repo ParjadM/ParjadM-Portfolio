@@ -1,7 +1,7 @@
 import { createApp } from '../server/src/app.js'
 
-// Ensure Node runtime (not Edge) and a modern version
-export const config = { runtime: 'nodejs20.x' }
+// Ensure Node runtime (not Edge)
+export const config = { runtime: 'nodejs' }
 
 let appPromise
 
