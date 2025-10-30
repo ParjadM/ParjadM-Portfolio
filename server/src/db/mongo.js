@@ -148,31 +148,4 @@ const VisitorDayPathSchema = new mongoose.Schema(
 VisitorDayPathSchema.index({ date: 1, path: 1, visitorId: 1 }, { unique: true })
 export const VisitorDayPath = mongoose.models.VisitorDayPath || mongoose.model('VisitorDayPath', VisitorDayPathSchema, 'visitor_day_path')
 
-// --- Time-series and per-path analytics ---
-const AnalyticsDailySchema = new mongoose.Schema(
-  {
-    date: { type: String, required: true }, // YYYY-MM-DD
-    key: { type: String, required: true }, // 'global' or `path:/route`
-    pageviews: { type: Number, default: 0 },
-    uniqueVisitors: { type: Number, default: 0 },
-  },
-  { timestamps: true }
-)
-AnalyticsDailySchema.index({ date: 1, key: 1 }, { unique: true })
-export const AnalyticsDaily = mongoose.models.AnalyticsDaily || mongoose.model('AnalyticsDaily', AnalyticsDailySchema, 'analytics_daily')
-
-const VisitorDaySchema = new mongoose.Schema(
-  { date: { type: String, required: true }, visitorId: { type: String, required: true } },
-  { timestamps: true }
-)
-VisitorDaySchema.index({ date: 1, visitorId: 1 }, { unique: true })
-export const VisitorDay = mongoose.models.VisitorDay || mongoose.model('VisitorDay', VisitorDaySchema, 'visitor_day')
-
-const VisitorDayPathSchema = new mongoose.Schema(
-  { date: { type: String, required: true }, path: { type: String, required: true }, visitorId: { type: String, required: true } },
-  { timestamps: true }
-)
-VisitorDayPathSchema.index({ date: 1, path: 1, visitorId: 1 }, { unique: true })
-export const VisitorDayPath = mongoose.models.VisitorDayPath || mongoose.model('VisitorDayPath', VisitorDayPathSchema, 'visitor_day_path')
-
 
