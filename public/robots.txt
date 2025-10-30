@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://parjad-m-portfolio.vercel.app/sitemap.xml
+
+
