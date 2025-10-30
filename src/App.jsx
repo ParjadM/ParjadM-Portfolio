@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import ParjadImage from './Images/Parjad.jpg';
+import ParjadM from './Images/ParjadM.png';
+import Logo from './Images/Logo.png';
 import CodeQuestImage from './Images/CodeQuest.jpg';
 import BinaryGeneratorImage from './Images/Binary 1010 Generator.jpg';
 import SpaceShooterImage from './Images/SpaceShooter.jpg';
@@ -105,6 +107,297 @@ const GlassCard = ({ children, className = '', theme = 'green' }) => {
       <div className="relative z-10 group-hover:drop-shadow-lg">
         {children}
       </div>
+    </div>
+  );
+};
+
+// --- Admin Blog Manager ---
+const AdminBlogManager = ({ theme }) => {
+  const token = getAuthToken();
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [editing, setEditing] = useState(null); // id or 'new'
+  const [form, setForm] = useState({ title: '', excerpt: '', content: '', tags: '', status: 'draft', publishAt: '', category: 'personal' });
+
+  const load = async () => {
+    setLoading(true); setError('');
+    try {
+      const res = await fetch('/api/admin/blog', { headers: { Authorization: `Bearer ${token}` } });
+      const data = await res.json();
+      setPosts(Array.isArray(data.posts) ? data.posts : []);
+    } catch {
+      setError('Failed to load posts');
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => { load(); }, []);
+
+  const startNew = () => {
+    setEditing('new');
+    setForm({ title: '', excerpt: '', content: '', tags: '', status: 'draft', publishAt: new Date().toISOString().slice(0,10), category: 'personal' });
+  };
+  const startEdit = (p) => {
+    setEditing(p.id);
+    setForm({ title: p.title, excerpt: p.excerpt, content: p.content, tags: (p.tags||[]).join(','), status: p.status || 'draft', publishAt: (p.publishAt ? new Date(p.publishAt).toISOString().slice(0,10) : p.date), category: p.category || 'personal' });
+  };
+  const cancel = () => { setEditing(null); };
+  const onChange = (e) => { const { name, value } = e.target; setForm(prev => ({ ...prev, [name]: value })); };
+
+  const save = async () => {
+    const body = {
+      title: form.title,
+      excerpt: form.excerpt,
+      content: form.content,
+      tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
+      status: form.status,
+      publishAt: form.publishAt,
+      category: form.category,
+    };
+    const opts = {
+      method: editing === 'new' ? 'POST' : 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(body)
+    };
+    const url = editing === 'new' ? '/api/admin/blog' : `/api/admin/blog/${editing}`;
+    const res = await fetch(url, opts);
+    if (!res.ok) { setError('Save failed'); return; }
+    setEditing(null); load();
+  };
+
+  const publish = async (id) => {
+    await fetch(`/api/admin/blog/${id}/publish`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ publishAt: new Date().toISOString() }) });
+    load();
+  };
+
+  const remove = async (id) => {
+    if (!confirm('Delete this post?')) return;
+    await fetch(`/api/admin/blog/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+    load();
+  };
+
+  return (
+    <div className="text-gray-300">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-xl text-white font-bold">Blog</h3>
+        <button onClick={startNew} className="px-3 py-2 rounded bg-white/10 hover:bg-white/20">New Post</button>
+      </div>
+      {loading && <div>Loading...</div>}
+      {error && <div className="text-red-300 mb-2">{error}</div>}
+
+      {editing ? (
+        <div className="space-y-4">
+          <input name="title" value={form.title} onChange={onChange} placeholder="Title" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded" />
+          <input name="excerpt" value={form.excerpt} onChange={onChange} placeholder="Excerpt" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded" />
+          <textarea name="content" value={form.content} onChange={onChange} rows={8} placeholder="Content" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded" />
+          <input name="tags" value={form.tags} onChange={onChange} placeholder="tags (comma separated)" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded" />
+          <div className="grid grid-cols-2 gap-3">
+            <select name="status" value={form.status} onChange={onChange} className="px-3 py-2 bg-white/5 border border-white/10 rounded">
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+            </select>
+            <input type="date" name="publishAt" value={form.publishAt} onChange={onChange} className="px-3 py-2 bg-white/5 border border-white/10 rounded" />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-300 mb-2">Category</label>
+            <select name="category" value={form.category} onChange={onChange} className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded">
+              <option value="technology">Technology</option>
+              <option value="tutorial">Tutorial</option>
+              <option value="personal">Personal</option>
+            </select>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={save} className="px-4 py-2 rounded bg-emerald-600/80">Save</button>
+            <button onClick={cancel} className="px-4 py-2 rounded bg-white/10">Cancel</button>
+          </div>
+          {/* Preview */}
+          <div className="mt-6">
+            <h4 className="text-white font-semibold mb-2">Preview</h4>
+            <div className="p-4 bg-white/5 rounded border border-white/10 whitespace-pre-wrap">{form.content}</div>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {posts.map(p => (
+            <div key={p.id} className="flex items-center justify-between bg-white/5 rounded px-3 py-2">
+              <div>
+                <div className="text-white font-medium">{p.title}</div>
+                <div className="text-xs text-gray-400">{p.status || 'draft'} • {p.date}</div>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => startEdit(p)} className="px-2 py-1 rounded bg-white/10">Edit</button>
+                {p.status !== 'published' && <button onClick={() => publish(p.id)} className="px-2 py-1 rounded bg-emerald-600/80">Publish</button>}
+                <button onClick={() => remove(p.id)} className="px-2 py-1 rounded bg-red-600/70">Delete</button>
+              </div>
+            </div>
+          ))}
+          {posts.length === 0 && !loading && <div className="text-gray-400">No posts yet.</div>}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// --- Admin Projects Manager ---
+const AdminProjectsManager = ({ theme }) => {
+  const navigate = useNavigate();
+  const token = getAuthToken();
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [editing, setEditing] = useState(null); // id or 'new'
+  const [form, setForm] = useState({ title: '', description: '', tags: '', liveUrl: '', githubUrl: '', image: '', featured: false });
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const load = async () => {
+    setLoading(true); setError('');
+    try {
+      const res = await fetch('/api/admin/projects', { headers: { Authorization: `Bearer ${token}` } });
+      const data = await res.json();
+      setProjects(Array.isArray(data.projects) ? data.projects : []);
+    } catch {
+      setError('Failed to load projects');
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => { load(); }, []);
+
+  const startNew = () => { setEditing('new'); setForm({ title: '', description: '', tags: '', liveUrl: '', githubUrl: '', image: '', featured: false }); };
+  const startEdit = (p) => { setEditing(p.id); setForm({ title: p.title, description: p.description || '', tags: (p.tags||[]).join(','), liveUrl: p.liveUrl||'', githubUrl: p.githubUrl||'', image: p.image||'', featured: !!p.featured }); };
+  const cancel = () => setEditing(null);
+  const onChange = (e) => { const { name, value, type, checked } = e.target; setForm(prev => ({ ...prev, [name]: type==='checkbox' ? checked : value })); };
+
+  const uploadToCloudinary = async (file) => {
+    setUploading(true);
+    try {
+      // Ask server for signature (protected under admin)
+      const sigRes = await fetch('/api/admin/cloudinary-sign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ folder: 'projects' })
+      })
+      if (sigRes.status === 401) {
+        try { localStorage.removeItem('authToken'); } catch {}
+        setError('Session expired. Please sign in again.');
+        setUploading(false);
+        navigate('/admin/login', { replace: true });
+        return;
+      }
+      if (!sigRes.ok) {
+        const errText = await sigRes.text().catch(()=> '')
+        throw new Error(errText || 'Signature failed')
+      }
+      const { signature, timestamp, apiKey, cloudName, folder } = await sigRes.json()
+
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('api_key', apiKey)
+      formData.append('timestamp', timestamp)
+      formData.append('signature', signature)
+      formData.append('folder', folder)
+
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: 'POST', body: formData })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        const msg = (data && (data.error?.message || data.message)) || 'Upload failed'
+        throw new Error(msg)
+      }
+      setForm(prev => ({ ...prev, image: data.secure_url }))
+    } catch (e) {
+      setError(`Image upload failed: ${e.message || e}`)
+    } finally {
+      setUploading(false)
+    }
+  };
+
+  const save = async () => {
+    const body = { ...form, tags: form.tags.split(',').map(t => t.trim()).filter(Boolean) };
+    const opts = { method: editing==='new' ? 'POST' : 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(body) };
+    const url = editing==='new' ? '/api/admin/projects' : `/api/admin/projects/${editing}`;
+    const res = await fetch(url, opts);
+    if (!res.ok) { setError('Save failed'); return; }
+    setEditing(null); load();
+  };
+
+  const remove = async (id) => { if (!confirm('Delete this project?')) return; await fetch(`/api/admin/projects/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } }); load(); };
+  const feature = async (id, featured) => { await fetch(`/api/admin/projects/${id}/feature`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ featured }) }); load(); };
+  const move = async (fromIdx, toIdx) => {
+    const arr = [...projects];
+    const [spliced] = arr.splice(fromIdx, 1);
+    arr.splice(toIdx, 0, spliced);
+    setProjects(arr);
+    const ids = arr.map(p => p.id);
+    await fetch('/api/admin/projects/reorder', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ ids }) });
+  };
+
+  return (
+    <div className="text-gray-300">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-xl text-white font-bold">Projects</h3>
+        <div className="flex gap-2">
+          <button onClick={async () => { await fetch('/api/admin/seed-projects', { method: 'POST', headers: { Authorization: `Bearer ${token}` } }); load(); }} className="px-3 py-2 rounded bg-white/10 hover:bg-white/20">Seed demo</button>
+          <button onClick={startNew} className="px-3 py-2 rounded bg-white/10 hover:bg-white/20">New Project</button>
+        </div>
+      </div>
+      {loading && <div>Loading...</div>}
+      {error && <div className="text-red-300 mb-2">{error}</div>}
+
+      {editing ? (
+        <div className="space-y-4">
+          <input name="title" value={form.title} onChange={onChange} placeholder="Title" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded" />
+          <textarea name="description" value={form.description} onChange={onChange} rows={5} placeholder="Description" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded" />
+          <input name="tags" value={form.tags} onChange={onChange} placeholder="tags (comma separated)" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded" />
+          <div className="grid grid-cols-2 gap-3">
+            <input name="liveUrl" value={form.liveUrl} onChange={onChange} placeholder="Live URL" className="px-3 py-2 bg-white/5 border border-white/10 rounded" />
+            <input name="githubUrl" value={form.githubUrl} onChange={onChange} placeholder="GitHub URL" className="px-3 py-2 bg-white/5 border border-white/10 rounded" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-center">
+            <input name="image" value={form.image} onChange={onChange} placeholder="Image URL" className="md:col-span-2 w-full px-3 py-2 bg-white/5 border border-white/10 rounded" />
+            <div>
+              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(e)=>{ const file=e.target.files && e.target.files[0]; if (file) uploadToCloudinary(file); e.target.value=''; }} />
+              <button type="button" onClick={()=>fileInputRef.current && fileInputRef.current.click()} className="w-full px-3 py-2 rounded bg-white/10 hover:bg-white/20">
+                {uploading ? 'Uploading...' : 'Upload image'}
+              </button>
+            </div>
+          </div>
+          {form.image && (
+            <div className="mt-3 flex items-start gap-4">
+              <img src={form.image} alt="Preview" className="w-40 h-28 object-cover rounded" />
+              <div className="flex flex-col gap-2">
+                <button type="button" onClick={()=>fileInputRef.current && fileInputRef.current.click()} className="px-3 py-2 rounded bg-white/10 hover:bg-white/20">Change image</button>
+                <button type="button" onClick={()=>setForm(prev=>({...prev, image: ''}))} className="px-3 py-2 rounded bg-red-600/70">Remove image</button>
+              </div>
+            </div>
+          )}
+          <label className="inline-flex items-center gap-2"><input type="checkbox" name="featured" checked={form.featured} onChange={onChange} /> Featured</label>
+          <div className="flex gap-2">
+            <button onClick={save} className="px-4 py-2 rounded bg-emerald-600/80">Save</button>
+            <button onClick={cancel} className="px-4 py-2 rounded bg-white/10">Cancel</button>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {projects.map((p, idx) => (
+            <div key={p.id} className="flex items-center justify-between bg-white/5 rounded px-3 py-2">
+              <div>
+                <div className="text-white font-medium">{p.title}</div>
+                <div className="text-xs text-gray-400">{p.featured ? 'Featured • ' : ''}{(p.tags||[]).join(', ')}</div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={() => p.featured ? feature(p.id, false) : feature(p.id, true)} className="px-2 py-1 rounded bg-white/10">{p.featured ? 'Unfeature' : 'Feature'}</button>
+                <button disabled={idx===0} onClick={() => move(idx, idx-1)} className="px-2 py-1 rounded bg-white/10 disabled:opacity-40">Up</button>
+                <button disabled={idx===projects.length-1} onClick={() => move(idx, idx+1)} className="px-2 py-1 rounded bg-white/10 disabled:opacity-40">Down</button>
+                <button onClick={() => startEdit(p)} className="px-2 py-1 rounded bg-white/10">Edit</button>
+                <button onClick={() => remove(p.id)} className="px-2 py-1 rounded bg-red-600/70">Delete</button>
+              </div>
+            </div>
+          ))}
+          {projects.length === 0 && !loading && <div className="text-gray-400">No projects yet.</div>}
+        </div>
+      )}
     </div>
   );
 };
@@ -220,8 +513,8 @@ const Header = ({ toggleTheme, theme }) => {
     return (
         <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
             <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
-                <Link to="/" className="text-2xl font-bold text-white tracking-wider">
-                    PM
+                <Link to="/" className="text-2xl font-bold text-white tracking-wider inline-flex items-center">
+                    <img src={Logo} alt="Logo" className="h-[4.5rem] w-auto" />
                 </Link>
                 
                 {/* Desktop Menu */}
@@ -301,25 +594,37 @@ const HomeSection = ({ theme }) => {
   const navigate = useNavigate();
   
   return (
-  <section id="home" className="min-h-screen flex items-center justify-center text-center text-white relative overflow-hidden">
-    <div className="z-10 flex flex-col items-center p-6">
-      <h1 className={`text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-tight bg-gradient-to-r ${theme === 'green' ? 'from-emerald-400 via-teal-400 to-cyan-400' : 'from-pink-400 via-red-400 to-purple-400'} bg-clip-text text-transparent animate-pulse`}>
-        Parjad Minooei
-      </h1>
-      <p className="mt-4 text-xl md:text-2xl text-gray-300 max-w-2xl">
-        A creative <span className={theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}>Software Engineer</span> with a passion for building beautiful, functional, and user-centric web applications.
-      </p>
-      <div className="mt-8 flex space-x-6">
-        <a href="https://github.com/ParjadM" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110"><Github size={32} /></a>
-        <a href="https://www.linkedin.com/in/parjadminooei" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110"><Linkedin size={32} /></a>
+  <section id="home" className="min-h-screen flex items-center text-white relative overflow-hidden">
+    <div className="z-10 container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+      {/* Left: Text content */}
+      <div className="p-6 md:p-0 text-left">
+        <h1 className={`text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-tight bg-gradient-to-r ${theme === 'green' ? 'from-emerald-400 via-teal-400 to-cyan-400' : 'from-pink-400 via-red-400 to-purple-400'} bg-clip-text text-transparent animate-pulse`}>
+          Parjad Minooei
+        </h1>
+        <p className="mt-4 text-xl md:text-2xl text-gray-300 max-w-2xl">
+          A creative <span className={theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}>Web Developer</span> with a passion for building beautiful, functional, and user-centric web applications.
+        </p>
+        <div className="mt-8 flex justify-start space-x-6">
+          <a href="https://github.com/ParjadM" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110"><Github size={32} /></a>
+          <a href="https://www.linkedin.com/in/parjadminooei" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110"><Linkedin size={32} /></a>
+        </div>
+        <RippleButton 
+          onClick={() => navigate('/contact')} 
+          className="mt-10 px-8 py-3 rounded-full text-lg font-semibold shadow-lg"
+          theme={theme}
+        >
+          Get in Touch
+        </RippleButton>
       </div>
-       <RippleButton 
-            onClick={() => navigate('/contact')} 
-           className="mt-10 px-8 py-3 rounded-full text-lg font-semibold shadow-lg"
-           theme={theme}
-       >
-           Get in Touch
-       </RippleButton>
+
+      {/* Right: Portrait image */}
+      <div className="flex justify-center md:justify-end p-6 md:p-0">
+        <img 
+          src={ParjadM} 
+          alt="Parjad Minooei"
+          className="w-64 md:w-80 lg:w-[28rem]"
+        />
+      </div>
     </div>
   </section>
 );
@@ -438,7 +743,7 @@ const AboutSection = ({ theme }) => {
                                 />
                             </div>
                             <h3 className="text-2xl font-bold text-white mb-2">Parjad Minooei</h3>
-                            <p className="text-gray-400 mb-4">Software Developer</p>
+                            <p className="text-gray-400 mb-4">Web Developer</p>
                             <p className="text-gray-300 text-sm mb-6">
                                 Based in Scarborough, ON • Multidisciplinary background
                             </p>
@@ -500,32 +805,32 @@ const AboutSection = ({ theme }) => {
 
 
 const ProjectsSection = ({ theme }) => {
-    const projects = [
-        {
-            title: "CodeQuest",
-            description: "A game to test your JavaScript knowledge.",
-            tags: ["JavaScript", "Game", "Education"],
-            liveUrl: "https://parjadm.github.io/CodeQuest/",
-            githubUrl: "https://github.com/ParjadM/CodeQuest",
-            image: CodeQuestImage
-        },
-        {
-            title: "Binary 1010 Generator",
-            description: "1 True & 0 False generator.",
-            tags: ["JavaScript", "Random Generator", "Binary"],
-            liveUrl: "http://binary1010generator.somee.com/",
-            githubUrl: "https://github.com/ParjadM/Binary1010Generator",
-            image: BinaryGeneratorImage
-        },
-        {
-            title: "SpaceShooter",
-            description: "SpaceShooter",
-            tags: ["JavaScript", "Game", "Canvas"],
-            liveUrl: "https://parjadm.github.io/SpaceShooter/",
-            githubUrl: "https://github.com/ParjadM/SpaceShooter",
-            image: SpaceShooterImage
-        }
-    ];
+    const [projects, setProjects] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    // Map known titles to local images to keep visuals after API switch
+    const imageMap = {
+        'CodeQuest': CodeQuestImage,
+        'Binary 1010 Generator': BinaryGeneratorImage,
+        'SpaceShooter': SpaceShooterImage,
+    };
+
+    useEffect(() => {
+        const load = async () => {
+            setLoading(true); setError('');
+            try {
+                const res = await fetch('/api/projects');
+                const data = await res.json();
+                setProjects(Array.isArray(data.projects) ? data.projects : []);
+            } catch (e) {
+                setError('Failed to load projects');
+            } finally {
+                setLoading(false);
+            }
+        };
+        load();
+    }, []);
 
     const tagClasses = theme === 'pink'
         ? "bg-pink-500/20 text-pink-300"
@@ -534,13 +839,15 @@ const ProjectsSection = ({ theme }) => {
     return (
         <section id="projects" className="min-h-screen flex flex-col items-center justify-center py-20 px-4">
             <h2 className="text-4xl font-bold text-white mb-12 text-center">My Projects</h2>
+            {error && <div className="text-red-300 mb-4">{error}</div>}
+            {loading && <div className="text-gray-300">Loading...</div>}
             <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {projects.map((project, index) => (
-                    <GlassCard key={index} className="p-0 flex flex-col overflow-hidden">
+                {projects.map((project) => (
+                    <GlassCard key={project.id || project.title} className="p-0 flex flex-col overflow-hidden">
                         {/* Project Image */}
                         <div className="w-full h-48 bg-gradient-to-br from-white/5 to-white/10 flex items-center justify-center overflow-hidden">
                             <img 
-                                src={project.image || `https://placehold.co/600x400/${theme === 'pink' ? 'E94560' : '10B981'}/FFFFFF?text=${encodeURIComponent(project.title)}`}
+                                src={project.image || imageMap[project.title] || `https://placehold.co/600x400/${theme === 'pink' ? 'E94560' : '10B981'}/FFFFFF?text=${encodeURIComponent(project.title)}`}
                                 alt={project.title}
                                 className="w-full h-full object-cover opacity-80 hover:opacity-100 hover:scale-105 transition-all duration-300"
                             />
@@ -549,18 +856,21 @@ const ProjectsSection = ({ theme }) => {
                         <div className="p-6 flex flex-col flex-grow">
                         <h3 className="text-2xl font-bold text-white mb-2">{project.title}</h3>
                         <div className="flex flex-wrap gap-2 mb-4">
-                            {project.tags.map(tag => <span key={tag} className={`${tagClasses} text-xs font-semibold px-2.5 py-1 rounded-full`}>{tag}</span>)}
+                            {(project.tags || []).map(tag => <span key={tag} className={`${tagClasses} text-xs font-semibold px-2.5 py-1 rounded-full`}>{tag}</span>)}
                         </div>
                         <p className="text-gray-300 mb-6 flex-grow">{project.description}</p>
                         <div className="flex justify-end space-x-4 mt-auto">
-                           <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110"><Github size={24} /></a>
-                           <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110">
+                           {project.githubUrl && <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110"><Github size={24} /></a>}
+                           {project.liveUrl && <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                           </a>
+                           </a>}
                             </div>
                         </div>
                     </GlassCard>
                 ))}
+                {!loading && projects.length === 0 && (
+                    <div className="col-span-full text-center text-gray-400">No projects yet.</div>
+                )}
             </div>
         </section>
     );
@@ -767,7 +1077,7 @@ const BlogSection = ({ theme }) => {
 
     const categories = {
         'all': 'All Posts',
-        'tech': 'Technology',
+        'technology': 'Technology',
         'tutorial': 'Tutorials',
         'personal': 'Personal'
     };
@@ -902,6 +1212,7 @@ const BlogSection = ({ theme }) => {
 
 const BlogPostPage = ({ theme }) => {
     const { id } = useParams();
+    const navigate = useNavigate();
 
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -939,7 +1250,7 @@ const BlogPostPage = ({ theme }) => {
                 <div className="container mx-auto max-w-3xl text-center">
                     <GlassCard className="p-8">
                         <h2 className="text-2xl font-bold text-white mb-4">Post not found</h2>
-                        <Link to="/blog" className="text-emerald-400 hover:underline">Back to Blog</Link>
+                        <button type="button" onClick={() => navigate('/blog', { replace: true })} className="text-emerald-400 hover:underline">Back to Blog</button>
                     </GlassCard>
                 </div>
             </section>
@@ -952,7 +1263,7 @@ const BlogPostPage = ({ theme }) => {
         <section className="min-h-screen flex items-center justify-center py-20 px-4">
             <div className="container mx-auto max-w-3xl">
                 <div className="mb-6">
-                    <Link to="/blog" className="text-gray-300 hover:text-white">← Back to Blog</Link>
+                    <button type="button" onClick={() => navigate('/blog', { replace: true })} className="text-gray-300 hover:text-white">← Back to Blog</button>
                 </div>
                 <GlassCard className="p-8">
                     <div className="flex items-center justify-between mb-4">
@@ -967,6 +1278,170 @@ const BlogPostPage = ({ theme }) => {
             </div>
         </section>
     );
+};
+
+// --- Auth Utilities ---
+const getAuthToken = () => {
+  try { return localStorage.getItem('authToken'); } catch { return null; }
+};
+
+// --- RequireAuth Wrapper ---
+const RequireAuth = ({ children }) => {
+  const navigate = useNavigate();
+  const [checking, setChecking] = useState(true);
+  useEffect(() => {
+    const token = getAuthToken();
+    if (!token) {
+      navigate('/admin/login', { replace: true });
+      return;
+    }
+    // Validate token
+    fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } })
+      .then(res => {
+        if (res.ok) return res.json();
+        throw new Error('unauthorized');
+      })
+      .then(() => setChecking(false))
+      .catch(() => {
+        try { localStorage.removeItem('authToken'); } catch {}
+        navigate('/admin/login', { replace: true });
+      });
+  }, [navigate]);
+  if (checking) {
+    return (
+      <section className="min-h-screen flex items-center justify-center py-20 px-4">
+        <div className="text-gray-300">Checking authentication...</div>
+      </section>
+    );
+  }
+  return children;
+};
+
+// --- Admin Login Page ---
+const AdminLoginPage = ({ theme }) => {
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ username: '', password: '' });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true); setError('');
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error('Invalid credentials');
+      const data = await res.json();
+      try { localStorage.setItem('authToken', data.token); } catch {}
+      navigate('/admin', { replace: true });
+    } catch (err) {
+      setError(err.message || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const gradientClass = theme === 'pink' 
+    ? 'bg-gradient-to-r from-pink-500 to-red-500' 
+    : 'bg-gradient-to-r from-emerald-500 to-teal-500';
+
+  return (
+    <section className="min-h-screen flex items-center justify-center py-20 px-4">
+      <div className="container mx-auto max-w-md w-full">
+        <GlassCard className="p-8" theme={theme}>
+          <h2 className="text-3xl font-bold text-white mb-6 text-center">Admin Login</h2>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-sm text-gray-300 mb-2">Username</label>
+              <input name="username" value={form.username} onChange={handleChange}
+                className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-all duration-300"
+                placeholder="admin" required />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-300 mb-2">Password</label>
+              <input type="password" name="password" value={form.password} onChange={handleChange}
+                className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-all duration-300"
+                placeholder="••••••••" required />
+            </div>
+            {error && <div className="text-red-300 text-sm">{error}</div>}
+            <button type="submit" disabled={loading}
+              className={`w-full py-3 rounded-lg font-semibold text-white ${gradientClass} disabled:opacity-50`}>
+              {loading ? 'Signing in...' : 'Sign In'}
+            </button>
+          </form>
+        </GlassCard>
+      </div>
+    </section>
+  );
+};
+
+// --- Admin Dashboard ---
+const AdminDashboard = ({ theme }) => {
+  const navigate = useNavigate();
+  const [dbStatus, setDbStatus] = useState(null);
+  const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('blog'); // 'blog' | 'projects' | 'status'
+  useEffect(() => {
+    const token = getAuthToken();
+    if (!token) return;
+    fetch('/api/admin/db-status', { headers: { Authorization: `Bearer ${token}` } })
+      .then(res => res.ok ? res.json() : Promise.reject(new Error('Failed to load')))
+      .then(setDbStatus)
+      .catch(() => setError('Failed to load admin data'))
+  }, []);
+
+  const handleLogout = async () => {
+    const token = getAuthToken();
+    if (token) {
+      try { await fetch('/api/auth/logout', { method: 'POST', headers: { Authorization: `Bearer ${token}` } }); } catch {}
+      try { localStorage.removeItem('authToken'); } catch {}
+    }
+    navigate('/admin/login', { replace: true });
+  };
+
+  return (
+    <section className="min-h-screen flex items-center justify-center py-20 px-4">
+      <div className="container mx-auto max-w-3xl">
+        <GlassCard className="p-8" theme={theme}>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-white">Admin Dashboard</h2>
+            <button onClick={handleLogout} className="px-4 py-2 rounded bg-white/10 text-gray-200 hover:bg-white/20">Log out</button>
+          </div>
+          {error && <div className="text-red-300 mb-4">{error}</div>}
+
+          {/* Tabs */}
+          <div className="mb-6 flex gap-2">
+            {['blog','projects','status'].map(tab => (
+              <button key={tab} onClick={() => setActiveTab(tab)}
+                className={`px-3 py-2 rounded ${activeTab===tab ? 'bg-white/20 text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`}>
+                {tab === 'blog' ? 'Blog' : tab === 'projects' ? 'Projects' : 'System'}
+              </button>
+            ))}
+          </div>
+
+          {activeTab === 'status' && (
+            <div className="text-gray-300">
+              <div className="mb-2">DB Engine: <span className="text-white">{dbStatus?.engine || 'unknown'}</span></div>
+              {dbStatus && 'connected' in dbStatus && (
+                <div>Connected: <span className="text-white">{String(dbStatus.connected)}</span></div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'blog' && <AdminBlogManager theme={theme} />}
+          {activeTab === 'projects' && <AdminProjectsManager theme={theme} />}
+        </GlassCard>
+      </div>
+    </section>
+  );
 };
 
 const ContactSection = ({ theme }) => {
@@ -990,16 +1465,25 @@ const ContactSection = ({ theme }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
+        setSubmitStatus('');
         
-        // Simulate form submission
-        setTimeout(() => {
-            setIsSubmitting(false);
+        try {
+            const res = await fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
+            if (!res.ok) {
+                throw new Error('Failed to send');
+            }
             setSubmitStatus('success');
             setFormData({ name: '', email: '', subject: '', message: '' });
-            
-            // Reset status after 3 seconds
+        } catch (err) {
+            setSubmitStatus('error');
+        } finally {
+            setIsSubmitting(false);
             setTimeout(() => setSubmitStatus(''), 3000);
-        }, 1500);
+        }
     };
 
     const contactMethods = [
@@ -1125,6 +1609,11 @@ const ContactSection = ({ theme }) => {
                                     ✅ Message sent successfully! I'll get back to you soon.
                                 </div>
                             )}
+                            {submitStatus === 'error' && (
+                                <div className="p-4 bg-red-500/20 border border-red-500/30 rounded-lg text-red-300 text-center">
+                                    ❌ Failed to send message. Please try again later.
+                                </div>
+                            )}
                         </form>
                     </GlassCard>
 
@@ -1229,7 +1718,7 @@ const Footer = ({ theme }) => {
                             Parjad Minooei
                         </h2>
                         <p className="text-gray-300 text-base max-w-2xl mx-auto leading-relaxed">
-                            Software Developer passionate about creating beautiful, functional web applications with a focus on user experience.
+                            Web Developer passionate about creating beautiful, functional web applications with a focus on user experience.
                         </p>
                     </div>
 
@@ -1323,7 +1812,7 @@ const Layout = ({ theme, toggleTheme, toast, setToast }) => {
             <BackgroundBlobs theme={theme} />
             <Header toggleTheme={toggleTheme} theme={theme} />
             
-            <main className="transition-all duration-500">
+            <main className="transition-all duration-500 pt-20 md:pt-24">
                 <Routes>
                     <Route path="/" element={<HomeSection theme={theme} />} />
                     <Route path="/about" element={<AboutSection theme={theme} />} />
@@ -1331,6 +1820,8 @@ const Layout = ({ theme, toggleTheme, toast, setToast }) => {
                     <Route path="/blog" element={<BlogSection theme={theme} />} />
                     <Route path="/blog/:id" element={<BlogPostPage theme={theme} />} />
                     <Route path="/contact" element={<ContactSection theme={theme} />} />
+                    <Route path="/admin/login" element={<AdminLoginPage theme={theme} />} />
+                    <Route path="/admin" element={<RequireAuth><AdminDashboard theme={theme} /></RequireAuth>} />
                 </Routes>
             </main>
 

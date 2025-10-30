@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import mongoose from 'mongoose'
-import { BlogPost } from '../db/mongo.js'
+import { BlogPost, Project } from '../db/mongo.js'
+import crypto from 'crypto'
 import { currentEngine } from '../db/index.js'
 
 const router = Router()
@@ -57,6 +58,95 @@ This website is more than just a portfolio; it's a living document of my journey
   }
 })
 
+router.post('/seed-projects', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
+  try {
+    const existing = await Project.countDocuments()
+    if (existing > 0) return res.json({ ok: true, seeded: false })
+    const demo = [
+      {
+        title: 'CodeQuest',
+        description: 'A game to test your JavaScript knowledge.',
+        tags: ['JavaScript', 'Game', 'Education'],
+        liveUrl: 'https://parjadm.github.io/CodeQuest/',
+        githubUrl: 'https://github.com/ParjadM/CodeQuest',
+        image: '',
+        featured: true,
+        order: 1,
+      },
+      {
+        title: 'Binary 1010 Generator',
+        description: '1 True & 0 False generator.',
+        tags: ['JavaScript', 'Random Generator', 'Binary'],
+        liveUrl: 'http://binary1010generator.somee.com/',
+        githubUrl: 'https://github.com/ParjadM/Binary1010Generator',
+        image: '',
+        featured: false,
+        order: 2,
+      },
+      {
+        title: 'SpaceShooter',
+        description: 'SpaceShooter',
+        tags: ['JavaScript', 'Game', 'Canvas'],
+        liveUrl: 'https://parjadm.github.io/SpaceShooter/',
+        githubUrl: 'https://github.com/ParjadM/SpaceShooter',
+        image: '',
+        featured: false,
+        order: 3,
+      },
+    ]
+    await Project.insertMany(demo)
+    res.json({ ok: true, seeded: true, count: demo.length })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// Cloudinary signed upload - returns signature, timestamp, api key, and cloud name
+router.post('/cloudinary-sign', async (req, res) => {
+  try {
+    let apiKey = process.env.CLOUDINARY_API_KEY
+    let apiSecret = process.env.CLOUDINARY_API_SECRET
+    let cloudName = process.env.CLOUDINARY_CLOUD_NAME
+
+    // Fallback: parse CLOUDINARY_URL if provided (cloudinary://API_KEY:API_SECRET@CLOUD_NAME)
+    if ((!apiKey || !apiSecret || !cloudName) && process.env.CLOUDINARY_URL) {
+      try {
+        const url = process.env.CLOUDINARY_URL.trim()
+        const match = url.match(/^cloudinary:\/\/([^:]+):([^@]+)@([^\/?#]+)$/i)
+        if (match) {
+          apiKey = apiKey || match[1]
+          apiSecret = apiSecret || match[2]
+          cloudName = cloudName || match[3]
+        }
+      } catch (_) {
+        // ignore
+      }
+    }
+
+    if (!apiKey || !apiSecret || !cloudName) {
+      return res.status(400).json({ error: 'Cloudinary environment not configured' })
+    }
+
+    const timestamp = Math.floor(Date.now() / 1000)
+    const folder = (req.body && req.body.folder) || 'uploads'
+    const publicId = req.body && req.body.public_id
+
+    const params = { folder, timestamp }
+    if (publicId) params.public_id = publicId
+
+    const toSign = Object.keys(params)
+      .sort()
+      .map(k => `${k}=${params[k]}`)
+      .join('&') + apiSecret
+
+    const signature = crypto.createHash('sha1').update(toSign).digest('hex')
+    res.json({ signature, timestamp, apiKey, cloudName, folder })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
 router.post('/set-latest-blog-date', async (req, res) => {
   if (currentEngine !== 'mongo') {
     return res.status(400).json({ error: 'Not using MongoDB' })
@@ -74,5 +164,151 @@ router.post('/set-latest-blog-date', async (req, res) => {
 })
 
 export default router
+
+// --- Blog Management (Admin) ---
+router.get('/blog', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.json({ posts: [] })
+  const docs = await BlogPost.find({}).sort({ createdAt: -1 }).lean()
+  const posts = docs.map(d => ({ id: d._id.toString(), ...d }))
+  res.json({ posts })
+})
+
+router.post('/blog', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
+  const body = req.body || {}
+  try {
+    const publishAt = body.publishAt ? new Date(body.publishAt) : new Date()
+    const doc = await BlogPost.create({
+      title: body.title,
+      excerpt: body.excerpt || (body.content || '').slice(0, 160),
+      content: body.content || '',
+      category: body.category || 'personal',
+      date: (body.date || publishAt.toISOString().slice(0, 10)),
+      readTime: body.readTime || '5 min read',
+      tags: Array.isArray(body.tags) ? body.tags : [],
+      status: body.status || 'draft',
+      publishAt,
+    })
+    res.status(201).json({ id: doc._id.toString() })
+  } catch (err) {
+    res.status(400).json({ error: err.message })
+  }
+})
+
+router.put('/blog/:id', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
+  try {
+    const { id } = req.params
+    const update = { ...req.body }
+    if (update.publishAt) update.publishAt = new Date(update.publishAt)
+    if (update.date === undefined && update.publishAt) update.date = update.publishAt.toISOString().slice(0, 10)
+    await BlogPost.updateOne({ _id: id }, update)
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(400).json({ error: err.message })
+  }
+})
+
+router.delete('/blog/:id', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
+  try {
+    const { id } = req.params
+    await BlogPost.deleteOne({ _id: id })
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(400).json({ error: err.message })
+  }
+})
+
+router.post('/blog/:id/publish', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
+  try {
+    const { id } = req.params
+    const publishAt = req.body?.publishAt ? new Date(req.body.publishAt) : new Date()
+    await BlogPost.updateOne({ _id: id }, { status: 'published', publishAt, date: publishAt.toISOString().slice(0, 10) })
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(400).json({ error: err.message })
+  }
+})
+
+// --- Projects Management (Admin) ---
+router.get('/projects', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.json({ projects: [] })
+  const docs = await Project.find({}).sort({ order: 1, createdAt: -1 }).lean()
+  const projects = docs.map(d => ({ id: d._id.toString(), ...d }))
+  res.json({ projects })
+})
+
+router.post('/projects', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
+  try {
+    const body = req.body || {}
+    const doc = await Project.create({
+      title: body.title,
+      description: body.description || '',
+      tags: Array.isArray(body.tags) ? body.tags : [],
+      liveUrl: body.liveUrl || '',
+      githubUrl: body.githubUrl || '',
+      image: body.image || '',
+      featured: !!body.featured,
+      order: typeof body.order === 'number' ? body.order : Date.now(),
+    })
+    res.status(201).json({ id: doc._id.toString() })
+  } catch (err) {
+    res.status(400).json({ error: err.message })
+  }
+})
+
+router.put('/projects/:id', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
+  try {
+    const { id } = req.params
+    await Project.updateOne({ _id: id }, req.body || {})
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(400).json({ error: err.message })
+  }
+})
+
+router.delete('/projects/:id', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
+  try {
+    const { id } = req.params
+    await Project.deleteOne({ _id: id })
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(400).json({ error: err.message })
+  }
+})
+
+router.post('/projects/reorder', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
+  try {
+    const ids = Array.isArray(req.body?.ids) ? req.body.ids : []
+    let order = 1
+    for (const id of ids) {
+      // eslint-disable-next-line no-await-in-loop
+      await Project.updateOne({ _id: id }, { order })
+      order += 1
+    }
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(400).json({ error: err.message })
+  }
+})
+
+router.post('/projects/:id/feature', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
+  try {
+    const { id } = req.params
+    const featured = !!(req.body && req.body.featured)
+    await Project.updateOne({ _id: id }, { featured })
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(400).json({ error: err.message })
+  }
+})
+
 
 

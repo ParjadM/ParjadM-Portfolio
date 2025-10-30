@@ -2,9 +2,12 @@ import express from 'express'
 import cors from 'cors'
 import morgan from 'morgan'
 import adminRouter from './routes/admin.js'
+import authRouter, { requireAuth } from './auth.js'
 import itemsRouter from './routes/items.js'
 import blogRouter from './routes/blog.js'
 import { currentEngine, initDatabase } from './db/index.js'
+import projectsRouter from './routes/projects.js'
+import contactRouter from './routes/contact.js'
 
 export async function createApp() {
   const app = express()
@@ -22,9 +25,12 @@ export async function createApp() {
   })
 
   // API routes
+  app.use('/api/auth', authRouter)
   app.use('/api/items', itemsRouter)
   app.use('/api/blog', blogRouter)
-  app.use('/api/admin', adminRouter)
+  app.use('/api/projects', projectsRouter)
+  app.use('/api/admin', requireAuth, adminRouter)
+  app.use('/api/contact', contactRouter)
 
   return app
 }

@@ -18,11 +18,29 @@ const BlogPostSchema = new mongoose.Schema(
     date: { type: String, required: true },
     readTime: { type: String, default: '5 min read' },
     tags: { type: [String], default: [] },
+    status: { type: String, enum: ['draft', 'published'], default: 'draft' },
+    publishAt: { type: Date, default: () => new Date() },
   },
   { timestamps: true }
 )
 
 export const BlogPost = mongoose.models.BlogPost || mongoose.model('BlogPost', BlogPostSchema, 'blog')
+
+const ProjectSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true, trim: true },
+    description: { type: String, default: '' },
+    tags: { type: [String], default: [] },
+    liveUrl: { type: String, default: '' },
+    githubUrl: { type: String, default: '' },
+    image: { type: String, default: '' },
+    featured: { type: Boolean, default: false },
+    order: { type: Number, default: () => Date.now() },
+  },
+  { timestamps: true }
+)
+
+export const Project = mongoose.models.Project || mongoose.model('Project', ProjectSchema, 'projects')
 
 export async function connectMongo(uri) {
   if (!uri) throw new Error('Missing MONGODB_URI')
