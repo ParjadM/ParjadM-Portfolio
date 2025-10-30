@@ -592,12 +592,12 @@ const BackgroundBlobs = ({ theme }) => {
 // --- Section Components ---
 const HomeSection = ({ theme }) => {
   const navigate = useNavigate();
-  const [metrics, setMetrics] = useState({ pageviews: 0, uniqueVisitors: 0 });
+  const [visitors, setVisitors] = useState(0);
 
   useEffect(() => {
     fetch('/api/metrics')
-      .then(res => res.ok ? res.json() : { pageviews: 0, uniqueVisitors: 0 })
-      .then((d) => setMetrics({ pageviews: d.pageviews || 0, uniqueVisitors: d.uniqueVisitors || 0 }))
+      .then(res => res.ok ? res.json() : { uniqueVisitors: 0 })
+      .then((d) => setVisitors(d.uniqueVisitors || 0))
       .catch(() => {});
   }, []);
 
@@ -624,15 +624,11 @@ const HomeSection = ({ theme }) => {
           Get in Touch
         </RippleButton>
 
-        {/* Metrics */}
-        <div className="mt-10 grid grid-cols-2 gap-4 max-w-md">
-          <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-center">
-            <div className={`text-3xl font-extrabold ${theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}`}>{metrics.uniqueVisitors}</div>
+        {/* Visitors Metric (Home only) */}
+        <div className="mt-10 w-fit">
+          <div className="p-5 rounded-xl bg-white/5 border border-white/10 text-center min-w-[9rem]">
+            <div className={`text-4xl font-extrabold ${theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}`}>{visitors}</div>
             <div className="text-gray-300 text-sm">Visitors</div>
-          </div>
-          <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-center">
-            <div className={`text-3xl font-extrabold ${theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}`}>{metrics.pageviews}</div>
-            <div className="text-gray-300 text-sm">Impressions</div>
           </div>
         </div>
       </div>
