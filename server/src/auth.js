@@ -1,12 +1,15 @@
 import { Router } from 'express'
-import { randomUUID } from 'crypto'
+import jwt from 'jsonwebtoken'
 
-// In-memory session store. For production, replace with JWT or a DB-backed session.
-const sessions = new Map()
-const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
+const router = Router()
 
-function isExpired(session) {
-  return Date.now() - session.createdAt > SESSION_TTL_MS
+function getJwtSecret() {
+  const secret = process.env.JWT_SECRET
+  if (!secret) {
+    // Provide a deterministic fallback to avoid crashing in dev, but warn.
+    return 'dev-insecure-secret-change-me'
+  }
+  return secret
 }
 
 export function requireAuth(req, res, next) {
@@ -14,26 +17,13 @@ export function requireAuth(req, res, next) {
     const authHeader = req.headers.authorization || ''
     const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null
     if (!token) return res.status(401).json({ error: 'Unauthorized' })
-    const session = sessions.get(token)
-    if (!session || isExpired(session)) {
-      if (session && isExpired(session)) sessions.delete(token)
-      return res.status(401).json({ error: 'Unauthorized' })
-    }
-    req.user = { username: session.username }
-    req.authToken = token
+    const payload = jwt.verify(token, getJwtSecret())
+    req.user = { username: payload.username }
     return next()
   } catch (err) {
     return res.status(401).json({ error: 'Unauthorized' })
   }
 }
-
-function createSession(username) {
-  const token = randomUUID()
-  sessions.set(token, { username, createdAt: Date.now() })
-  return token
-}
-
-const router = Router()
 
 // POST /api/auth/login { username, password }
 router.post('/login', (req, res) => {
@@ -41,15 +31,14 @@ router.post('/login', (req, res) => {
   const adminUser = process.env.ADMIN_USERNAME || 'admin'
   const adminPass = process.env.ADMIN_PASSWORD || '1234'
   if (username === adminUser && password === adminPass) {
-    const token = createSession(username)
+    const token = jwt.sign({ username }, getJwtSecret(), { expiresIn: '7d' })
     return res.json({ token, user: { username } })
   }
   return res.status(401).json({ error: 'Invalid credentials' })
 })
 
-// POST /api/auth/logout
+// POST /api/auth/logout (no-op for JWT)
 router.post('/logout', requireAuth, (req, res) => {
-  if (req.authToken) sessions.delete(req.authToken)
   return res.json({ ok: true })
 })
 
