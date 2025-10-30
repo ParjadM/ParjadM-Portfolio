@@ -1,5 +1,6 @@
 import express from 'express'
 import nodemailer from 'nodemailer'
+import { RateLimit } from '../db/mongo.js'
 
 const router = express.Router()
 
@@ -22,12 +23,42 @@ function createTransporter() {
   })
 }
 
+async function checkRateLimit(key, limit = 5, windowMs = 60 * 60 * 1000) {
+  const now = Date.now()
+  const doc = await RateLimit.findOne({ key })
+  if (!doc) {
+    await RateLimit.create({ key, windowStart: new Date(now), count: 1 })
+    return true
+  }
+  const start = doc.windowStart?.getTime?.() || new Date(doc.windowStart).getTime()
+  if (now - start > windowMs) {
+    doc.windowStart = new Date(now)
+    doc.count = 1
+    await doc.save()
+    return true
+  }
+  if (doc.count >= limit) return false
+  doc.count += 1
+  await doc.save()
+  return true
+}
+
 router.post('/', async (req, res) => {
-  const { name, email, subject, message } = req.body || {}
+  const { name, email, subject, message, company } = req.body || {}
 
   if (!name || !email || !subject || !message) {
     return res.status(400).json({ error: 'Missing required fields' })
   }
+
+  // Honeypot (bots fill hidden 'company')
+  if (company) {
+    return res.json({ ok: true })
+  }
+
+  // Basic per-IP rate limit
+  const ip = (req.headers['x-forwarded-for'] || '').toString().split(',')[0].trim() || req.ip || 'unknown'
+  const allowed = await checkRateLimit(`contact:${ip}`, Number(process.env.CONTACT_LIMIT || 5), Number(process.env.CONTACT_WINDOW_MS || 60*60*1000))
+  if (!allowed) return res.status(429).json({ error: 'Too many requests' })
 
   try {
     const transporter = createTransporter()

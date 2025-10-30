@@ -1410,6 +1410,8 @@ const AdminDashboard = ({ theme }) => {
   const [dbStatus, setDbStatus] = useState(null);
   const [error, setError] = useState('');
   const [metrics, setMetrics] = useState(null);
+  const [range, setRange] = useState(7);
+  const [series, setSeries] = useState([]);
   const [activeTab, setActiveTab] = useState('blog'); // 'blog' | 'projects' | 'status'
   useEffect(() => {
     const token = getAuthToken();
@@ -1428,6 +1430,14 @@ const AdminDashboard = ({ theme }) => {
       .then(setMetrics)
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    // Public metrics time series
+    fetch(`/api/metrics/series?range=${range}`)
+      .then(res => res.ok ? res.json() : { series: [] })
+      .then(d => setSeries(Array.isArray(d.series) ? d.series : []))
+      .catch(() => setSeries([]))
+  }, [range]);
 
   const handleLogout = async () => {
     const token = getAuthToken();
@@ -1476,6 +1486,18 @@ const AdminDashboard = ({ theme }) => {
                   </div>
                 </div>
               )}
+
+              {/* Range toggle */}
+              <div className="mt-6 flex gap-2">
+                {[7,30].map(r => (
+                  <button key={r} onClick={() => setRange(r)} className={`px-3 py-1 rounded ${range===r ? 'bg-white/20 text-white' : 'bg-white/10 text-gray-300'}`}>{r}-day</button>
+                ))}
+              </div>
+
+              {/* Simple SVG line chart */}
+              <div className="mt-4 p-4 bg-white/5 border border-white/10 rounded">
+                <Chart theme={theme} data={series} />
+              </div>
             </div>
           )}
 
@@ -1486,6 +1508,44 @@ const AdminDashboard = ({ theme }) => {
     </section>
   );
 };
+
+// --- Tiny Line Chart Component ---
+const Chart = ({ theme, data }) => {
+  const width = 640, height = 220, padding = 32
+  const xs = data.map((_, i) => i)
+  const maxY = Math.max(1, ...data.map(d => Math.max(d.pageviews || 0, d.uniqueVisitors || 0)))
+  const x = (i) => padding + (i * (width - 2*padding)) / Math.max(1, (data.length - 1))
+  const y = (v) => height - padding - (v * (height - 2*padding)) / maxY
+  const toPath = (vals) => vals.map((v, i) => `${i===0?'M':'L'}${x(i)},${y(v)}`).join(' ')
+  const pv = toPath(data.map(d => d.pageviews || 0))
+  const uv = toPath(data.map(d => d.uniqueVisitors || 0))
+  const gridY = Array.from({length: 4}, (_,i)=>Math.round((maxY*i)/3))
+  const colorA = theme === 'pink' ? '#fb7185' : '#34d399'
+  const colorB = theme === 'pink' ? '#a78bfa' : '#22d3ee'
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto">
+      {/* axes */}
+      <line x1={padding} y1={height-padding} x2={width-padding} y2={height-padding} stroke="rgba(255,255,255,0.2)" />
+      <line x1={padding} y1={padding} x2={padding} y2={height-padding} stroke="rgba(255,255,255,0.2)" />
+      {gridY.map((gy,i)=> (
+        <g key={i}>
+          <line x1={padding} y1={y(gy)} x2={width-padding} y2={y(gy)} stroke="rgba(255,255,255,0.1)" />
+          <text x={8} y={y(gy)+4} fontSize="10" fill="rgba(255,255,255,0.6)">{gy}</text>
+        </g>
+      ))}
+      {/* lines */}
+      <path d={pv} fill="none" stroke={colorA} strokeWidth="2.5" />
+      <path d={uv} fill="none" stroke={colorB} strokeWidth="2.5" />
+      {/* legend */}
+      <g>
+        <circle cx={width-200} cy={16} r={4} fill={colorA} />
+        <text x={width-190} y={20} fontSize="12" fill="white">Impressions</text>
+        <circle cx={width-100} cy={16} r={4} fill={colorB} />
+        <text x={width-90} y={20} fontSize="12" fill="white">Visitors</text>
+      </g>
+    </svg>
+  )
+}
 
 const ContactSection = ({ theme }) => {
     const [formData, setFormData] = useState({
@@ -1567,6 +1627,13 @@ const ContactSection = ({ theme }) => {
                     <GlassCard className="p-8">
                         <h3 className="text-2xl font-bold text-white mb-6">Send me a message</h3>
                         <form onSubmit={handleSubmit} className="space-y-6">
+                            {/* Honeypot field */}
+                            <div className="hidden" aria-hidden="true">
+                                <label>
+                                    Company
+                                    <input name="company" tabIndex={-1} autoComplete="off" onChange={(e)=>setFormData(prev=>({...prev, company: e.target.value}))} />
+                                </label>
+                            </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
@@ -1821,8 +1888,11 @@ const Footer = ({ theme }) => {
 
 // --- Layout Component (wraps all pages) ---
 const Layout = ({ theme, toggleTheme, toast, setToast }) => {
+    const location = useLocation();
+    const [visitorId, setVisitorId] = useState(null);
+
     useEffect(() => {
-        // Track a visit with a stable visitorId stored locally
+        // Ensure stable visitorId
         try {
             let vid = null
             try { vid = localStorage.getItem('visitorId') } catch {}
@@ -1832,13 +1902,21 @@ const Layout = ({ theme, toggleTheme, toast, setToast }) => {
                 vid = Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('')
                 try { localStorage.setItem('visitorId', vid) } catch {}
             }
+            setVisitorId(vid)
+        } catch {}
+    }, [])
+
+    useEffect(() => {
+        // Track each route view
+        try {
+            const path = location?.pathname || '/'
             fetch('/api/metrics/visit', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ visitorId: vid || '' })
+                body: JSON.stringify({ visitorId: visitorId || '', path })
             }).catch(() => {})
         } catch {}
-    }, [])
+    }, [location?.pathname, visitorId])
 
     return (
         <div className="bg-gradient-to-br from-emerald-900 via-teal-900 to-cyan-900 text-white font-sans">

@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import mongoose from 'mongoose'
-import { BlogPost, Project, Analytics, Visitor } from '../db/mongo.js'
+import { BlogPost, Project, Analytics, Visitor, AnalyticsDaily } from '../db/mongo.js'
 import crypto from 'crypto'
 import { currentEngine } from '../db/index.js'
 
@@ -22,6 +22,25 @@ router.get('/metrics', async (req, res) => {
     const analytics = await Analytics.findOne({ key: 'global' }).lean()
     const uniqueCount = await Visitor.estimatedDocumentCount()
     res.json({ pageviews: analytics?.pageviews || 0, uniqueVisitors: analytics?.uniqueVisitors || uniqueCount || 0 })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// GET /api/admin/metrics-series?range=7|30
+router.get('/metrics-series', async (req, res) => {
+  try {
+    const range = Math.min(30, Math.max(1, Number(req.query.range || 7)))
+    const today = new Date()
+    const dates = Array.from({ length: range }).map((_, i) => {
+      const d = new Date(today)
+      d.setDate(d.getDate() - (range - 1 - i))
+      return d.toISOString().slice(0, 10)
+    })
+    const docs = await AnalyticsDaily.find({ key: 'global', date: { $in: dates } }).lean()
+    const byDate = new Map(docs.map(d => [d.date, d]))
+    const series = dates.map(d => ({ date: d, pageviews: byDate.get(d)?.pageviews || 0, uniqueVisitors: byDate.get(d)?.uniqueVisitors || 0 }))
+    res.json({ series })
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
