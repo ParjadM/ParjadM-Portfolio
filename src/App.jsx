@@ -592,7 +592,15 @@ const BackgroundBlobs = ({ theme }) => {
 // --- Section Components ---
 const HomeSection = ({ theme }) => {
   const navigate = useNavigate();
-  
+  const [metrics, setMetrics] = useState({ pageviews: 0, uniqueVisitors: 0 });
+
+  useEffect(() => {
+    fetch('/api/metrics')
+      .then(res => res.ok ? res.json() : { pageviews: 0, uniqueVisitors: 0 })
+      .then((d) => setMetrics({ pageviews: d.pageviews || 0, uniqueVisitors: d.uniqueVisitors || 0 }))
+      .catch(() => {});
+  }, []);
+
   return (
   <section id="home" className="min-h-screen flex items-center text-white relative overflow-hidden">
     <div className="z-10 container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
@@ -615,6 +623,18 @@ const HomeSection = ({ theme }) => {
         >
           Get in Touch
         </RippleButton>
+
+        {/* Metrics */}
+        <div className="mt-10 grid grid-cols-2 gap-4 max-w-md">
+          <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-center">
+            <div className={`text-3xl font-extrabold ${theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}`}>{metrics.uniqueVisitors}</div>
+            <div className="text-gray-300 text-sm">Visitors</div>
+          </div>
+          <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-center">
+            <div className={`text-3xl font-extrabold ${theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}`}>{metrics.pageviews}</div>
+            <div className="text-gray-300 text-sm">Impressions</div>
+          </div>
+        </div>
       </div>
 
       {/* Right: Portrait image */}
@@ -1388,6 +1408,7 @@ const AdminDashboard = ({ theme }) => {
   const navigate = useNavigate();
   const [dbStatus, setDbStatus] = useState(null);
   const [error, setError] = useState('');
+  const [metrics, setMetrics] = useState(null);
   const [activeTab, setActiveTab] = useState('blog'); // 'blog' | 'projects' | 'status'
   useEffect(() => {
     const token = getAuthToken();
@@ -1396,6 +1417,15 @@ const AdminDashboard = ({ theme }) => {
       .then(res => res.ok ? res.json() : Promise.reject(new Error('Failed to load')))
       .then(setDbStatus)
       .catch(() => setError('Failed to load admin data'))
+  }, []);
+
+  useEffect(() => {
+    const token = getAuthToken();
+    if (!token) return;
+    fetch('/api/admin/metrics', { headers: { Authorization: `Bearer ${token}` } })
+      .then(res => res.ok ? res.json() : Promise.reject(new Error('Failed to load')))
+      .then(setMetrics)
+      .catch(() => {});
   }, []);
 
   const handleLogout = async () => {
@@ -1431,7 +1461,19 @@ const AdminDashboard = ({ theme }) => {
             <div className="text-gray-300">
               <div className="mb-2">DB Engine: <span className="text-white">{dbStatus?.engine || 'unknown'}</span></div>
               {dbStatus && 'connected' in dbStatus && (
-                <div>Connected: <span className="text-white">{String(dbStatus.connected)}</span></div>
+                <div className="mb-4">Connected: <span className="text-white">{String(dbStatus.connected)}</span></div>
+              )}
+              {metrics && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 rounded bg-white/5 border border-white/10 text-center">
+                    <div className="text-2xl font-bold">{metrics.uniqueVisitors}</div>
+                    <div className="text-sm text-gray-300">Visitors</div>
+                  </div>
+                  <div className="p-4 rounded bg-white/5 border border-white/10 text-center">
+                    <div className="text-2xl font-bold">{metrics.pageviews}</div>
+                    <div className="text-sm text-gray-300">Impressions</div>
+                  </div>
+                </div>
               )}
             </div>
           )}
@@ -1778,6 +1820,25 @@ const Footer = ({ theme }) => {
 
 // --- Layout Component (wraps all pages) ---
 const Layout = ({ theme, toggleTheme, toast, setToast }) => {
+    useEffect(() => {
+        // Track a visit with a stable visitorId stored locally
+        try {
+            let vid = null
+            try { vid = localStorage.getItem('visitorId') } catch {}
+            if (!vid && typeof window !== 'undefined' && window.crypto?.getRandomValues) {
+                const arr = new Uint8Array(16)
+                window.crypto.getRandomValues(arr)
+                vid = Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('')
+                try { localStorage.setItem('visitorId', vid) } catch {}
+            }
+            fetch('/api/metrics/visit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ visitorId: vid || '' })
+            }).catch(() => {})
+        } catch {}
+    }, [])
+
     return (
         <div className="bg-gradient-to-br from-emerald-900 via-teal-900 to-cyan-900 text-white font-sans">
             <style>{`

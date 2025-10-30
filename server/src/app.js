@@ -8,6 +8,7 @@ import blogRouter from './routes/blog.js'
 import { currentEngine, initDatabase } from './db/index.js'
 import projectsRouter from './routes/projects.js'
 import contactRouter from './routes/contact.js'
+import metricsRouter from './routes/metrics.js'
 
 export async function createApp() {
   const app = express()
@@ -31,6 +32,7 @@ export async function createApp() {
   app.use('/api/projects', projectsRouter)
   app.use('/api/admin', requireAuth, adminRouter)
   app.use('/api/contact', contactRouter)
+  app.use('/api/metrics', metricsRouter)
 
   return app
 }

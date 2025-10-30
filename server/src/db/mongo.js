@@ -54,4 +54,28 @@ export async function connectMongo(uri) {
   return mongoose.connection
 }
 
+// --- Analytics ---
+const AnalyticsSchema = new mongoose.Schema(
+  {
+    key: { type: String, unique: true, required: true },
+    pageviews: { type: Number, default: 0 },
+    uniqueVisitors: { type: Number, default: 0 },
+  },
+  { timestamps: true }
+)
+
+export const Analytics = mongoose.models.Analytics || mongoose.model('Analytics', AnalyticsSchema, 'analytics')
+
+const VisitorSchema = new mongoose.Schema(
+  {
+    visitorId: { type: String, unique: true, required: true },
+    // optional: userAgent, ipHash etc. Skipped for simplicity
+  },
+  { timestamps: true }
+)
+
+VisitorSchema.index({ visitorId: 1 }, { unique: true })
+
+export const Visitor = mongoose.models.Visitor || mongoose.model('Visitor', VisitorSchema, 'visitors')
+
 

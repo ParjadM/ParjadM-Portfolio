@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import mongoose from 'mongoose'
-import { BlogPost, Project } from '../db/mongo.js'
+import { BlogPost, Project, Analytics, Visitor } from '../db/mongo.js'
 import crypto from 'crypto'
 import { currentEngine } from '../db/index.js'
 
@@ -13,6 +13,18 @@ router.get('/db-status', async (req, res) => {
   const state = mongoose.connection.readyState
   const states = ['disconnected', 'connected', 'connecting', 'disconnecting']
   res.json({ engine: 'mongo', connected: state === 1, state: states[state] || state })
+})
+
+// GET /api/admin/metrics - aggregated metrics
+router.get('/metrics', async (req, res) => {
+  try {
+    if (currentEngine !== 'mongo') return res.json({ pageviews: 0, uniqueVisitors: 0 })
+    const analytics = await Analytics.findOne({ key: 'global' }).lean()
+    const uniqueCount = await Visitor.estimatedDocumentCount()
+    res.json({ pageviews: analytics?.pageviews || 0, uniqueVisitors: analytics?.uniqueVisitors || uniqueCount || 0 })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
 })
 
 router.post('/create-collection/:name', async (req, res) => {
