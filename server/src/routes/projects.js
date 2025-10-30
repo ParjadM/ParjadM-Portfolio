@@ -14,7 +14,8 @@ router.get('/', async (req, res) => {
     const projects = docs.map(d => ({ id: d._id.toString(), ...d }))
     res.json({ projects })
   } catch (err) {
-    res.status(500).json({ error: err.message })
+    // Fail-soft: return empty list to avoid client crash in production
+    res.json({ projects: [] })
   }
 })
 

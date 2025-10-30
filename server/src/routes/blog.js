@@ -18,7 +18,8 @@ router.get('/', async (req, res) => {
     const posts = docs.map(d => ({ id: d._id.toString(), ...d }))
     res.json({ posts })
   } catch (err) {
-    res.status(500).json({ error: err.message })
+    // Fail-soft: return empty list to avoid client error banners in prod
+    res.json({ posts: [] })
   }
 })
 
