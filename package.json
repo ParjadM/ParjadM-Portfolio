@@ -19,7 +19,8 @@
     "cors": "^2.8.5",
     "morgan": "^1.10.0",
     "dotenv": "^16.4.5",
-    "mongoose": "^8.19.2"
+    "mongoose": "^8.19.2",
+    "nodemailer": "^6.9.15"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
