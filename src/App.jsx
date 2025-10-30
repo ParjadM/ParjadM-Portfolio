@@ -479,10 +479,10 @@ const Toast = ({ message, type = 'success', isVisible, onClose }) => {
   };
 
   return (
-    <div className={`fixed top-20 right-4 z-50 p-4 rounded-lg border backdrop-blur-lg ${typeStyles[type]} transform transition-all duration-500 translate-x-0 opacity-100`}>
+    <div role="status" aria-live="polite" aria-atomic="true" className={`fixed top-20 right-4 z-50 p-4 rounded-lg border backdrop-blur-lg ${typeStyles[type]} transform transition-all duration-500 translate-x-0 opacity-100`}>
       <div className="flex items-center space-x-3">
         <span>{message}</span>
-        <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
+        <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors" aria-label="Close notification">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -520,7 +520,9 @@ const Header = ({ toggleTheme, theme }) => {
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
-            <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
+            {/* Skip to content for screen readers/keyboard users */}
+            <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:bg-black focus:text-white focus:px-3 focus:py-2 focus:rounded">Skip to main content</a>
+            <nav className="container mx-auto px-6 py-4 flex justify-between items-center" role="navigation" aria-label="Primary">
                 <Link to="/" className="text-2xl font-bold text-white tracking-wider inline-flex items-center">
                     <img src={Logo} alt="Logo" className="h-[4.5rem] w-auto" />
                 </Link>
@@ -534,6 +536,7 @@ const Header = ({ toggleTheme, theme }) => {
                                     key={item.name}
                                     to={item.path}
                                     className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${isActive(item.path) ? 'bg-white/20 text-white' : 'text-gray-300 hover:text-white'}`}
+                                    aria-current={isActive(item.path) ? 'page' : undefined}
                                 >
                                     {item.name}
                                 </Link>
@@ -549,14 +552,14 @@ const Header = ({ toggleTheme, theme }) => {
 
                 {/* Mobile Menu Button */}
                 <div className="md:hidden">
-                    <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white">
+                    <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white" aria-controls="primary-menu" aria-expanded={isMenuOpen} aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}>
                         <Menu size={28} />
                     </button>
                 </div>
             </nav>
             {/* Mobile Menu */}
             {isMenuOpen && (
-                 <div className="md:hidden mt-2 px-6">
+                 <div className="md:hidden mt-2 px-6" id="primary-menu">
                     <GlassCard className="w-full" theme={theme}>
                         <div className="flex flex-col items-center space-y-2 p-4">
                             {navItems.map(item => (
@@ -565,6 +568,7 @@ const Header = ({ toggleTheme, theme }) => {
                                     to={item.path}
                                     onClick={handleNavClick}
                                     className={`block w-full text-center px-4 py-2 rounded-lg text-lg font-medium transition-colors duration-300 ${isActive(item.path) ? 'bg-white/20 text-white' : 'text-gray-300 hover:text-white'}`}
+                                    aria-current={isActive(item.path) ? 'page' : undefined}
                                 >
                                     {item.name}
                                 </Link>
@@ -1987,7 +1991,7 @@ const Layout = ({ theme, toggleTheme, toast, setToast }) => {
             <BackgroundBlobs theme={theme} />
             <Header toggleTheme={toggleTheme} theme={theme} />
             
-            <main className="transition-all duration-500 pt-20 md:pt-24">
+            <main id="main-content" role="main" tabIndex={-1} className="transition-all duration-500 pt-20 md:pt-24">
                 <Routes>
                     <Route path="/" element={<HomeSection theme={theme} />} />
                     <Route path="/about" element={<AboutSection theme={theme} />} />
