@@ -495,6 +495,7 @@ const Toast = ({ message, type = 'success', isVisible, onClose }) => {
 // --- Header Component ---
 const Header = ({ toggleTheme, theme }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [visitors, setVisitors] = useState(null);
     const location = useLocation();
     const navItems = [
         { name: 'Home', path: '/' },
@@ -509,6 +510,13 @@ const Header = ({ toggleTheme, theme }) => {
     };
 
     const isActive = (path) => location.pathname === path;
+
+    useEffect(() => {
+        fetch('/api/metrics')
+          .then(res => res.ok ? res.json() : { uniqueVisitors: 0 })
+          .then(d => setVisitors(d.uniqueVisitors || 0))
+          .catch(() => setVisitors(null));
+    }, []);
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
@@ -530,6 +538,11 @@ const Header = ({ toggleTheme, theme }) => {
                                     {item.name}
                                 </Link>
                             ))}
+                            {visitors !== null && (
+                              <div className="ml-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 text-gray-200 text-sm font-semibold whitespace-nowrap">
+                                {visitors} Visitors
+                              </div>
+                            )}
                         </div>
                     </GlassCard>
                 </div>
@@ -556,6 +569,11 @@ const Header = ({ toggleTheme, theme }) => {
                                     {item.name}
                                 </Link>
                             ))}
+                            {visitors !== null && (
+                              <div className="mt-2 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 text-sm w-full text-center">
+                                {visitors} Visitors
+                              </div>
+                            )}
                         </div>
                     </GlassCard>
                 </div>
@@ -592,14 +610,7 @@ const BackgroundBlobs = ({ theme }) => {
 // --- Section Components ---
 const HomeSection = ({ theme }) => {
   const navigate = useNavigate();
-  const [visitors, setVisitors] = useState(0);
-
-  useEffect(() => {
-    fetch('/api/metrics')
-      .then(res => res.ok ? res.json() : { uniqueVisitors: 0 })
-      .then((d) => setVisitors(d.uniqueVisitors || 0))
-      .catch(() => {});
-  }, []);
+  // Visitors shown in header now
 
   return (
   <section id="home" className="min-h-screen flex items-center text-white relative overflow-hidden">
@@ -624,13 +635,7 @@ const HomeSection = ({ theme }) => {
           Get in Touch
         </RippleButton>
 
-        {/* Visitors Metric (Home only) */}
-        <div className="mt-10 w-fit">
-          <div className="p-5 rounded-xl bg-white/5 border border-white/10 text-center min-w-[9rem]">
-            <div className={`text-4xl font-extrabold ${theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}`}>{visitors}</div>
-            <div className="text-gray-300 text-sm">Visitors</div>
-          </div>
-        </div>
+        
       </div>
 
       {/* Right: Portrait image */}
