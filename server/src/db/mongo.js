@@ -15,6 +15,7 @@ const BlogPostSchema = new mongoose.Schema(
     excerpt: { type: String, required: true },
     content: { type: String, required: true },
     image: { type: String, default: '' },
+    featured: { type: Boolean, default: false },
     category: { type: String, default: 'personal' },
     date: { type: String, required: true },
     readTime: { type: String, default: '5 min read' },

@@ -275,9 +275,10 @@ const AdminBlogManager = ({ theme }) => {
                   {p.image && <img src={p.image} alt="" className="w-12 h-8 object-cover rounded" />}
                   <div className="text-white font-medium">{p.title}</div>
                 </div>
-                <div className="text-xs text-gray-400">{p.status || 'draft'} • {p.date}</div>
+                <div className="text-xs text-gray-400">{p.featured ? 'Featured • ' : ''}{p.status || 'draft'} • {p.date}</div>
               </div>
               <div className="flex gap-2">
+                <button onClick={async ()=>{ await fetch(`/api/admin/blog/${p.id}/feature`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ featured: !p.featured }) }); load(); }} className="px-2 py-1 rounded bg-white/10">{p.featured ? 'Unfeature' : 'Feature'}</button>
                 <button onClick={() => startEdit(p)} className="px-2 py-1 rounded bg-white/10">Edit</button>
                 {p.status !== 'published' && <button onClick={() => publish(p.id)} className="px-2 py-1 rounded bg-emerald-600/80">Publish</button>}
                 <button onClick={() => remove(p.id)} className="px-2 py-1 rounded bg-red-600/70">Delete</button>
@@ -1177,7 +1178,7 @@ const BlogSection = ({ theme }) => {
     const filteredPosts = selectedCategory === 'all' 
         ? posts 
         : posts.filter(post => post.category === selectedCategory);
-    const featuredPost = selectedCategory === 'all' && posts.length > 0 ? posts[0] : null;
+    const featuredPost = selectedCategory === 'all' ? posts.find(p => p.featured) || null : null;
 
     const iconColor = theme === 'pink' ? "text-pink-400" : "text-emerald-400";
     const categoryBgColor = theme === 'pink' ? "bg-pink-500/20" : "bg-emerald-500/20";
@@ -1216,7 +1217,13 @@ const BlogSection = ({ theme }) => {
                     <div className="mb-12">
                         <h3 className="text-2xl font-bold text-white mb-6 text-center">Featured</h3>
                         <Link to={`/blog/${featuredPost.id}`} className="block">
-                            <GlassCard className="p-6 md:p-8 group cursor-pointer hover:scale-[1.01] transition-transform duration-300">
+                            <GlassCard className="p-0 md:p-0 group cursor-pointer hover:scale-[1.01] transition-transform duration-300 overflow-hidden">
+                                {featuredPost.image && (
+                                  <div className="w-full h-56 md:h-72 overflow-hidden">
+                                    <img src={featuredPost.image} alt="" className="w-full h-full object-cover" />
+                                  </div>
+                                )}
+                                <div className="p-6 md:p-8">
                                 <div className="flex items-center justify-between mb-3">
                                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${tagColor}`}>
                                         {categories[featuredPost.category] || 'Post'}
@@ -1236,6 +1243,7 @@ const BlogSection = ({ theme }) => {
                                         </span>
                                     ))}
                                 </div>
+                                </div>
                             </GlassCard>
                         </Link>
                     </div>
@@ -1251,7 +1259,13 @@ const BlogSection = ({ theme }) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {filteredPosts.map(post => (
                             <Link key={post.id} to={`/blog/${post.id}`} className="block">
-                            <GlassCard className="p-6 group cursor-pointer hover:scale-105 transition-transform duration-300">
+                            <GlassCard className="p-0 group cursor-pointer hover:scale-105 transition-transform duration-300 overflow-hidden">
+                                {post.image && (
+                                  <div className="w-full h-40 overflow-hidden">
+                                    <img src={post.image} alt="" className="w-full h-full object-cover" />
+                                  </div>
+                                )}
+                                <div className="p-6">
                                 <div className="flex items-center justify-between mb-3">
                                     <span className={`px-2 py-1 rounded-full text-xs font-semibold ${tagColor}`}>
                                         {categories[post.category]}
@@ -1276,6 +1290,7 @@ const BlogSection = ({ theme }) => {
                                     <span className={`text-xs font-medium ${iconColor} group-hover:translate-x-1 transition-transform duration-300`}>
                                         Read →
                                     </span>
+                                </div>
                                 </div>
                             </GlassCard>
                             </Link>
@@ -1347,6 +1362,11 @@ const BlogPostPage = ({ theme }) => {
                         <span className={`px-2 py-1 rounded-full text-xs font-semibold ${tagColor}`}>{post.category || 'personal'}</span>
                         <span className="text-gray-400 text-xs">{post.readTime} • {post.date}</span>
                     </div>
+                    {post.image && (
+                      <div className="w-full h-60 md:h-80 overflow-hidden rounded mb-6">
+                        <img src={post.image} alt="" className="w-full h-full object-cover" />
+                      </div>
+                    )}
                     <h1 className="text-3xl font-bold text-white mb-6">{post.title}</h1>
                     <div className="text-gray-300 leading-7 whitespace-pre-line">
                         {post.content}

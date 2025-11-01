@@ -219,6 +219,7 @@ router.post('/blog', async (req, res) => {
       readTime: body.readTime || '5 min read',
       tags: Array.isArray(body.tags) ? body.tags : [],
       status: body.status || 'draft',
+      featured: !!body.featured,
       publishAt,
     })
     res.status(201).json({ id: doc._id.toString() })
@@ -235,6 +236,19 @@ router.put('/blog/:id', async (req, res) => {
     if (update.publishAt) update.publishAt = new Date(update.publishAt)
     if (update.date === undefined && update.publishAt) update.date = update.publishAt.toISOString().slice(0, 10)
     await BlogPost.updateOne({ _id: id }, update)
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(400).json({ error: err.message })
+  }
+})
+
+// Feature/unfeature a blog post
+router.post('/blog/:id/feature', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
+  try {
+    const { id } = req.params
+    const featured = !!(req.body && req.body.featured)
+    await BlogPost.updateOne({ _id: id }, { featured })
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
@@ -258,6 +272,19 @@ router.post('/blog/:id/publish', async (req, res) => {
     const { id } = req.params
     const publishAt = req.body?.publishAt ? new Date(req.body.publishAt) : new Date()
     await BlogPost.updateOne({ _id: id }, { status: 'published', publishAt, date: publishAt.toISOString().slice(0, 10) })
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(400).json({ error: err.message })
+  }
+})
+
+// POST /api/admin/blog/:id/feature { featured: boolean }
+router.post('/blog/:id/feature', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
+  try {
+    const { id } = req.params
+    const featured = !!(req.body && req.body.featured)
+    await BlogPost.updateOne({ _id: id }, { featured })
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
