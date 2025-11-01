@@ -213,6 +213,7 @@ router.post('/blog', async (req, res) => {
       title: body.title,
       excerpt: body.excerpt || (body.content || '').slice(0, 160),
       content: body.content || '',
+      image: body.image || '',
       category: body.category || 'personal',
       date: (body.date || publishAt.toISOString().slice(0, 10)),
       readTime: body.readTime || '5 min read',

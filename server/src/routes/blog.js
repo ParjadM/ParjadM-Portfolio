@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
       return res.json({ posts: [] })
     }
     const now = new Date()
-    const docs = await BlogPost.find({ status: 'published', publishAt: { $lte: now } }, { title: 1, excerpt: 1, date: 1, readTime: 1, tags: 1, category: 1 })
+    const docs = await BlogPost.find({ status: 'published', publishAt: { $lte: now } }, { title: 1, excerpt: 1, date: 1, readTime: 1, tags: 1, category: 1, image: 1 })
       .sort({ publishAt: -1 })
       .lean()
     const posts = docs.map(d => ({ id: d._id.toString(), ...d }))
