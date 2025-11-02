@@ -10,6 +10,7 @@ import projectsRouter from './routes/projects.js'
 import contactRouter from './routes/contact.js'
 import metricsRouter from './routes/metrics.js'
 import githubRouter from './routes/github.js'
+import leetcodeRouter from './routes/leetcode.js'
 
 export async function createApp() {
   const app = express()
@@ -35,6 +36,7 @@ export async function createApp() {
   app.use('/api/contact', contactRouter)
   app.use('/api/metrics', metricsRouter)
   app.use('/api/github-stats', githubRouter)
+  app.use('/api/leetcode-stats', leetcodeRouter)
 
   return app
 }
