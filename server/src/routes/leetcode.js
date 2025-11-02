@@ -7,10 +7,11 @@ let cache = null
 let cacheAt = 0
 const CACHE_TTL_MS = Number(process.env.LC_CACHE_TTL_MS || 10 * 60 * 1000) // default 10m
 
-router.get('/', async (_req, res) => {
+router.get('/', async (req, res) => {
   try {
     const now = Date.now()
-    if (cache && (now - cacheAt) < CACHE_TTL_MS) {
+    const forceRefresh = String(req.query.refresh || '') === '1'
+    if (!forceRefresh && cache && (now - cacheAt) < CACHE_TTL_MS && !allZero(cache)) {
       return res.json(cache)
     }
 
@@ -23,10 +24,10 @@ router.get('/', async (_req, res) => {
     // Normalize important fields
     const normalized = {
       username,
-      totalSolved: data.totalSolved ?? data.total_solved ?? 0,
-      easySolved: data.easySolved ?? data.easy_solved ?? 0,
-      mediumSolved: data.mediumSolved ?? data.medium_solved ?? 0,
-      hardSolved: data.hardSolved ?? data.hard_solved ?? 0,
+      totalSolved: toNum(data.totalSolved ?? data.total_solved ?? 0),
+      easySolved: toNum(data.easySolved ?? data.easy_solved ?? 0),
+      mediumSolved: toNum(data.mediumSolved ?? data.medium_solved ?? 0),
+      hardSolved: toNum(data.hardSolved ?? data.hard_solved ?? 0),
       ranking: data.ranking ?? data.rank ?? null,
     }
 
@@ -37,6 +38,20 @@ router.get('/', async (_req, res) => {
     return res.status(500).json({ error: 'Failed to fetch LeetCode stats' })
   }
 })
+
+function toNum(v) {
+  const n = Number(v)
+  return Number.isFinite(n) ? n : 0
+}
+
+function allZero(obj) {
+  return (
+    (obj?.totalSolved ?? 0) === 0 &&
+    (obj?.easySolved ?? 0) === 0 &&
+    (obj?.mediumSolved ?? 0) === 0 &&
+    (obj?.hardSolved ?? 0) === 0
+  )
+}
 
 export default router
 
