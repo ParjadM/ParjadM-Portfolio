@@ -13,3 +13,6 @@ Terminal B (client):
 cd 'C:\Users\Parjad\Desktop\Portfolio\parjadm'
 npm run dev:client
 
+
+test
+
