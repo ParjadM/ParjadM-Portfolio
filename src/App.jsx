@@ -1524,6 +1524,7 @@ const AdminDashboard = ({ theme }) => {
   const [metrics, setMetrics] = useState(null);
   const [range, setRange] = useState(7);
   const [series, setSeries] = useState([]);
+  const [paths, setPaths] = useState([]);
   const [activeTab, setActiveTab] = useState('blog'); // 'blog' | 'projects' | 'status'
   useEffect(() => {
     const token = getAuthToken();
@@ -1549,6 +1550,14 @@ const AdminDashboard = ({ theme }) => {
       .then(res => res.ok ? res.json() : { series: [] })
       .then(d => setSeries(Array.isArray(d.series) ? d.series : []))
       .catch(() => setSeries([]))
+  }, [range]);
+
+  useEffect(() => {
+    // Top paths breakdown
+    fetch(`/api/metrics/paths?range=${range}`)
+      .then(res => res.ok ? res.json() : { paths: [] })
+      .then(d => setPaths(Array.isArray(d.paths) ? d.paths : []))
+      .catch(() => setPaths([]))
   }, [range]);
 
   const handleLogout = async () => {
@@ -1601,7 +1610,7 @@ const AdminDashboard = ({ theme }) => {
 
               {/* Range toggle */}
               <div className="mt-6 flex gap-2">
-                {[7,30].map(r => (
+                {[7,30,90].map(r => (
                   <button key={r} onClick={() => setRange(r)} className={`px-3 py-1 rounded ${range===r ? 'bg-white/20 text-white' : 'bg-white/10 text-gray-300'}`}>{r}-day</button>
                 ))}
               </div>
@@ -1609,6 +1618,34 @@ const AdminDashboard = ({ theme }) => {
               {/* Simple SVG line chart */}
               <div className="mt-4 p-4 bg-white/5 border border-white/10 rounded">
                 <Chart theme={theme} data={series} />
+              </div>
+
+              {/* Top pages table */}
+              <div className="mt-6 p-4 bg-white/5 border border-white/10 rounded">
+                <h4 className="text-white font-semibold mb-3">Top Pages (last {range} days)</h4>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-sm">
+                    <thead>
+                      <tr className="text-left text-gray-300">
+                        <th className="py-2 pr-4">Path</th>
+                        <th className="py-2 pr-4">Pageviews</th>
+                        <th className="py-2 pr-4">Visitors</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paths.map((p) => (
+                        <tr key={p.path} className="border-t border-white/10 text-gray-200">
+                          <td className="py-2 pr-4 font-mono">{p.path}</td>
+                          <td className="py-2 pr-4">{p.pageviews}</td>
+                          <td className="py-2 pr-4">{p.uniqueVisitors}</td>
+                        </tr>
+                      ))}
+                      {paths.length === 0 && (
+                        <tr><td colSpan={3} className="py-3 text-gray-400">No data</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
