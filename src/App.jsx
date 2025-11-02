@@ -960,15 +960,31 @@ const ProjectsSection = ({ theme }) => {
 // --- Stats Page ---
 const StatsPage = ({ theme }) => {
   return (
-    <section id="stats" className="min-h-screen flex items-center justify-center py-20 px-4">
-      <div className="container mx-auto max-w-4xl w-full">
-        <GlassCard className="p-8" theme={theme}>
-          <h2 className="text-3xl font-bold text-white mb-6 text-center">Developer Stats</h2>
-          <div className="grid grid-cols-1 gap-6">
-            <GitHubStats theme={theme} />
-            <LeetCodeStats theme={theme} />
-          </div>
-        </GlassCard>
+    <section id="stats" className="min-h-screen flex items-center justify-center py-24 px-4">
+      <div className="container mx-auto max-w-6xl w-full">
+        {/* Header */}
+        <div className="mb-10">
+          <GlassCard className="p-8 md:p-10" theme={theme}>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div>
+                <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Developer Stats</h1>
+                <p className="mt-2 text-gray-300 max-w-2xl">A quick snapshot of my open‑source presence and coding practice, updated automatically with caching for fast loads.</p>
+              </div>
+              <div className={`px-4 py-2 rounded-xl text-sm font-semibold ${theme === 'pink' ? 'bg-pink-500/20 text-pink-200' : 'bg-emerald-500/20 text-emerald-200'}`}>Auto‑refreshed</div>
+            </div>
+          </GlassCard>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+          <GitHubStats theme={theme} />
+          <LeetCodeStats theme={theme} />
+        </div>
+
+        {/* Footer note */}
+        <div className="mt-8 text-center text-gray-400 text-sm">
+          Data via GitHub API & LeetCode GraphQL • Cached to improve performance
+        </div>
       </div>
     </section>
   );
