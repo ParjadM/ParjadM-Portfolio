@@ -19,6 +19,7 @@ router.get('/', async (_req, res) => {
       return res.status(resp.status).json({ error: data?.message || 'GitHub API error' })
     }
 
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=600, stale-while-revalidate=600')
     const { login, followers, following, public_repos, public_gists, html_url, avatar_url, name, bio } = data
     return res.json({ login, followers, following, public_repos, public_gists, html_url, avatar_url, name, bio })
   } catch (err) {

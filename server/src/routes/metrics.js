@@ -65,6 +65,7 @@ router.post('/visit', async (req, res) => {
 // GET /api/metrics
 router.get('/', async (_req, res) => {
   try {
+    res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=300, stale-while-revalidate=600')
     if (currentEngine !== 'mongo') return res.json({ pageviews: 0, uniqueVisitors: 0 })
     await ensureAnalyticsDoc()
     const doc = await Analytics.findOne({ key: 'global' }).lean()
@@ -77,6 +78,7 @@ router.get('/', async (_req, res) => {
 // GET /api/metrics/series?range=7|30
 router.get('/series', async (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600')
     if (currentEngine !== 'mongo') return res.json({ series: [] })
     const range = Math.min(30, Math.max(1, Number(req.query.range || 7)))
     const today = new Date()

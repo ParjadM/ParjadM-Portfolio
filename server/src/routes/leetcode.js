@@ -72,6 +72,7 @@ router.get('/', async (req, res) => {
 
     cache = normalized
     cacheAt = now
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=600, stale-while-revalidate=600')
     return res.json(normalized)
   } catch (err) {
     return res.status(500).json({ error: 'Failed to fetch LeetCode stats' })
