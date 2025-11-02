@@ -6,7 +6,7 @@ type LcStats = {
   easySolved: number
   mediumSolved: number
   hardSolved: number
-  ranking?: number | null
+  ranking: number | null
 }
 
 export default function LeetCodeStats({ theme = 'green' as 'green' | 'pink' }) {
@@ -21,7 +21,16 @@ export default function LeetCodeStats({ theme = 'green' as 'green' | 'pink' }) {
         const res = await fetch('/api/leetcode-stats')
         const json = await res.json()
         if (!res.ok) throw new Error(json?.error || 'Failed to load')
-        setData(json)
+        // Ensure we use the exact property names from the API response
+        const mapped: LcStats = {
+          username: json.username || 'evergreat',
+          totalSolved: Number(json.totalSolved ?? 0),
+          easySolved: Number(json.easySolved ?? 0),
+          mediumSolved: Number(json.mediumSolved ?? 0),
+          hardSolved: Number(json.hardSolved ?? 0),
+          ranking: json.ranking ?? null,
+        }
+        setData(mapped)
       } catch (e: any) {
         setError(e?.message || 'Failed to load')
       } finally {
