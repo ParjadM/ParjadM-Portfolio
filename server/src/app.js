@@ -9,6 +9,7 @@ import { currentEngine, initDatabase } from './db/index.js'
 import projectsRouter from './routes/projects.js'
 import contactRouter from './routes/contact.js'
 import metricsRouter from './routes/metrics.js'
+import githubRouter from './routes/github.js'
 
 export async function createApp() {
   const app = express()
@@ -33,6 +34,7 @@ export async function createApp() {
   app.use('/api/admin', requireAuth, adminRouter)
   app.use('/api/contact', contactRouter)
   app.use('/api/metrics', metricsRouter)
+  app.use('/api/github-stats', githubRouter)
 
   return app
 }

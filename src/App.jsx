@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import ParjadImage from './Images/Parjad.jpg';
+import GitHubStats from './components/GitHubStats.tsx';
 import ParjadM from './Images/ParjadM.png';
 import Logo from './Images/Logo.png';
 import CodeQuestImage from './Images/CodeQuest.jpg';
@@ -554,6 +555,7 @@ const Header = ({ toggleTheme, theme }) => {
         { name: 'Home', path: '/' },
         { name: 'About', path: '/about' },
         { name: 'Projects', path: '/projects' },
+        { name: 'GitHub', path: '/github' },
         { name: 'Blog', path: '/blog' },
         { name: 'Contact', path: '/contact' }
     ];
@@ -952,6 +954,20 @@ const ProjectsSection = ({ theme }) => {
             </div>
         </section>
     );
+};
+
+// --- GitHub Page ---
+const GitHubPage = ({ theme }) => {
+  return (
+    <section id="github" className="min-h-screen flex items-center justify-center py-20 px-4">
+      <div className="container mx-auto max-w-4xl w-full">
+        <GlassCard className="p-8" theme={theme}>
+          <h2 className="text-3xl font-bold text-white mb-6 text-center">GitHub Stats</h2>
+          <GitHubStats theme={theme} />
+        </GlassCard>
+      </div>
+    </section>
+  );
 };
 
 const SkillsSection = ({ theme }) => {
@@ -2068,6 +2084,7 @@ const Layout = ({ theme, toggleTheme, toast, setToast }) => {
                     <Route path="/" element={<HomeSection theme={theme} />} />
                     <Route path="/about" element={<AboutSection theme={theme} />} />
                     <Route path="/projects" element={<ProjectsSection theme={theme} />} />
+                    <Route path="/github" element={<GitHubPage theme={theme} />} />
                     <Route path="/blog" element={<BlogSection theme={theme} />} />
                     <Route path="/blog/:id" element={<BlogPostPage theme={theme} />} />
                     <Route path="/contact" element={<ContactSection theme={theme} />} />
