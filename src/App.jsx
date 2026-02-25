@@ -8,6 +8,8 @@ import Logo from './Images/Logo.png';
 import CodeQuestImage from './Images/CodeQuest.jpg';
 import BinaryGeneratorImage from './Images/Binary 1010 Generator.jpg';
 import SpaceShooterImage from './Images/SpaceShooter.jpg';
+import { Reveal } from './components/Reveal.jsx';
+import { CustomCursor } from './components/CustomCursor.jsx';
 
 // ICONS - Using lucide-react for modern and clean icons
 // In a real project, you would `npm install lucide-react`
@@ -68,7 +70,7 @@ const Menu = (props) => (
 
 
 // --- Enhanced Glass Card Component ---
-const GlassCard = ({ children, className = '', theme = 'green' }) => {
+const GlassCard = ({ children, className = '', theme = 'green', onMouseEnter, onMouseLeave, onClick }) => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
 
@@ -88,8 +90,9 @@ const GlassCard = ({ children, className = '', theme = 'green' }) => {
     <div 
       className={`relative bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg transition-all duration-500 hover:border-white/30 hover:shadow-2xl group overflow-hidden ${className}`}
       onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={(e) => { setIsHovered(true); onMouseEnter && onMouseEnter(e); }}
+      onMouseLeave={(e) => { setIsHovered(false); onMouseLeave && onMouseLeave(e); }}
+      onClick={onClick}
       style={{
         background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.05), transparent 40%)`,
       }}
@@ -550,7 +553,16 @@ const Toast = ({ message, type = 'success', isVisible, onClose }) => {
 // --- Header Component ---
 const Header = ({ toggleTheme, theme }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [visitors, setVisitors] = useState(null);
+    const [visitors, setVisitors] = useState(() => {
+        try {
+            const cached = localStorage.getItem('cachedVisitors');
+            if (!cached) return null;
+            const parsed = Number(cached);
+            return Number.isFinite(parsed) ? parsed : null;
+        } catch {
+            return null;
+        }
+    });
     const location = useLocation();
     const navItems = [
         { name: 'Home', path: '/' },
@@ -568,10 +580,19 @@ const Header = ({ toggleTheme, theme }) => {
     const isActive = (path) => location.pathname === path;
 
     useEffect(() => {
-        fetch('/api/metrics')
-          .then(res => res.ok ? res.json() : { uniqueVisitors: 0 })
-          .then(d => setVisitors(d.uniqueVisitors || 0))
-          .catch(() => setVisitors(null));
+        const controller = new AbortController();
+        fetch('/api/metrics', { signal: controller.signal })
+          .then(res => res.ok ? res.json() : null)
+          .then(d => {
+            if (!d || typeof d.uniqueVisitors !== 'number') return;
+            setVisitors(d.uniqueVisitors);
+            try { localStorage.setItem('cachedVisitors', String(d.uniqueVisitors)); } catch {}
+          })
+          .catch(() => {
+            // Keep cached value on network/server errors to avoid flashing/reset.
+          });
+
+        return () => controller.abort();
     }, []);
 
     return (
@@ -677,11 +698,12 @@ const HomeSection = ({ theme }) => {
     <div className="z-10 container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
       {/* Left: Text content */}
       <div className="p-6 md:p-0 text-left">
+        <Reveal>
         <h1 className={`text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-tight bg-gradient-to-r ${theme === 'green' ? 'from-emerald-400 via-teal-400 to-cyan-400' : 'from-pink-400 via-red-400 to-purple-400'} bg-clip-text text-transparent animate-pulse`}>
           Parjad Minooei
         </h1>
         <p className="mt-4 text-xl md:text-2xl text-gray-300 max-w-2xl">
-          A creative <span className={theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}>Web Developer</span> with a passion for building beautiful, functional, and user-centric web applications.
+          A creative <span className={theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}>Software Engineer</span> with a passion for building beautiful, functional, and user-centric web applications.
         </p>
         <div className="mt-8 flex justify-start space-x-6">
           <a href="https://github.com/ParjadM" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110"><Github size={32} /></a>
@@ -694,17 +716,19 @@ const HomeSection = ({ theme }) => {
         >
           Get in Touch
         </RippleButton>
-
+        </Reveal>
         
       </div>
 
       {/* Right: Portrait image */}
       <div className="flex justify-center md:justify-end p-6 md:p-0">
+        <Reveal>
         <img 
           src={ParjadM} 
           alt="Parjad Minooei"
           className="w-64 md:w-80 lg:w-[28rem]"
         />
+        </Reveal>
       </div>
     </div>
   </section>
@@ -742,19 +766,24 @@ const AboutSection = ({ theme }) => {
             content: (
                 <div className="space-y-6">
                     <div className="border-l-4 border-white/20 pl-6">
+                        <h4 className="text-xl font-bold text-white mb-2">B.Tech in Software Engineering</h4>
+                        <p className="text-gray-400 mb-1">McMaster University | Current</p>
+                        <p className="text-gray-300">Focused on advanced software engineering principles, systems architecture, and large-scale application development. Building a deep foundation in engineering mathematics and professional software standards.</p>
+                    </div>
+                    <div className="border-l-4 border-white/20 pl-6">
                         <h4 className="text-xl font-bold text-white mb-2">Graduate Certificate in Web Development</h4>
-                        <p className="text-gray-400 mb-1">Current</p>
-                        <p className="text-gray-300">Advanced web development techniques, modern frameworks, and industry best practices.</p>
+                        <p className="text-gray-400 mb-1">Previous Technical Training</p>
+                        <p className="text-gray-300">Mastered modern frameworks (React, Node.js), responsive design, and full-stack architecture. Focused on industry best practices and deploying production-ready applications.</p>
                     </div>
                     <div className="border-l-4 border-white/20 pl-6">
                         <h4 className="text-xl font-bold text-white mb-2">Computer Programming & Analysis</h4>
-                        <p className="text-gray-400 mb-1">Previous Studies</p>
-                        <p className="text-gray-300">Comprehensive programming education covering software development and analytical problem-solving.</p>
+                        <p className="text-gray-400 mb-1">Advanced Diploma</p>
+                        <p className="text-gray-300">Comprehensive programming education covering software development, data structures, and analytical problem-solving across multiple languages and platforms.</p>
                     </div>
                     <div className="border-l-4 border-white/20 pl-6">
                         <h4 className="text-xl font-bold text-white mb-2">Psychology</h4>
-                        <p className="text-gray-400 mb-1">Previous Studies</p>
-                        <p className="text-gray-300">Understanding human behavior and cognition, providing valuable insights into user experience design.</p>
+                        <p className="text-gray-400 mb-1">Bachelor's Degree</p>
+                        <p className="text-gray-300">Focused on human behavior and cognition. This background provides a unique edge in User Experience (UX) design, understanding how users interact with technology and complex interfaces.</p>
                     </div>
                 </div>
             )
@@ -806,15 +835,18 @@ const AboutSection = ({ theme }) => {
             <div className="container mx-auto max-w-6xl">
                 {/* Header */}
                 <div className="text-center mb-16">
+                    <Reveal>
                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">About Me</h2>
                     <p className="text-gray-300 max-w-2xl mx-auto text-lg">
                         Get to know the person behind the code
                     </p>
+                    </Reveal>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                     {/* Profile Section */}
                     <div className="lg:col-span-1">
+                        <Reveal>
                         <GlassCard className="p-8 text-center" theme={theme}>
                             <div className={`w-48 h-48 mx-auto mb-6 rounded-full p-2 shadow-lg ${theme === 'pink' ? 'bg-gradient-to-br from-pink-500/50 to-red-500/50' : 'bg-gradient-to-br from-emerald-500/50 to-teal-500/50'}`}>
                                 <img 
@@ -824,7 +856,7 @@ const AboutSection = ({ theme }) => {
                                 />
                             </div>
                             <h3 className="text-2xl font-bold text-white mb-2">Parjad Minooei</h3>
-                            <p className="text-gray-400 mb-4">Web Developer</p>
+                            <p className="text-gray-400 mb-4">Software Engineer</p>
                             <p className="text-gray-300 text-sm mb-6">
                                 Based in Scarborough, ON • Multidisciplinary background
                             </p>
@@ -847,10 +879,12 @@ const AboutSection = ({ theme }) => {
                                 </a>
                             </div>
                         </GlassCard>
+                        </Reveal>
                     </div>
 
                     {/* Content Section */}
                     <div className="lg:col-span-2">
+                        <Reveal>
                         <GlassCard className="p-8" theme={theme}>
                             {/* Tab Navigation */}
                             <div className="flex flex-wrap gap-2 mb-8">
@@ -877,6 +911,7 @@ const AboutSection = ({ theme }) => {
                                 {tabContent[activeTab].content}
                             </div>
                         </GlassCard>
+                        </Reveal>
                     </div>
                 </div>
             </div>
@@ -919,12 +954,15 @@ const ProjectsSection = ({ theme }) => {
 
     return (
         <section id="projects" className="min-h-screen flex flex-col items-center justify-center py-20 px-4">
+            <Reveal>
             <h2 className="text-4xl font-bold text-white mb-12 text-center">My Projects</h2>
+            </Reveal>
             {error && <div className="text-red-300 mb-4">{error}</div>}
             {loading && <div className="text-gray-300">Loading...</div>}
             <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {projects.map((project) => (
-                    <GlassCard key={project.id || project.title} className="p-0 flex flex-col overflow-hidden">
+                    <Reveal key={project.id || project.title}>
+                    <GlassCard className="p-0 flex flex-col overflow-hidden">
                         {/* Project Image */}
                         <div className="w-full h-48 bg-gradient-to-br from-white/5 to-white/10 flex items-center justify-center overflow-hidden">
                             <img 
@@ -948,6 +986,7 @@ const ProjectsSection = ({ theme }) => {
                             </div>
                         </div>
                     </GlassCard>
+                    </Reveal>
                 ))}
                 {!loading && projects.length === 0 && (
                     <div className="col-span-full text-center text-gray-400">No projects yet.</div>
@@ -963,6 +1002,7 @@ const StatsPage = ({ theme }) => {
     <section id="stats" className="min-h-screen flex items-center justify-center py-24 px-4">
       <div className="container mx-auto max-w-6xl w-full">
         {/* Header */}
+        <Reveal>
         <div className="mb-10">
           <GlassCard className="p-8 md:p-10" theme={theme}>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
@@ -974,12 +1014,15 @@ const StatsPage = ({ theme }) => {
             </div>
           </GlassCard>
         </div>
+        </Reveal>
 
         {/* Stats Grid */}
+        <Reveal>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           <GitHubStats theme={theme} />
           <LeetCodeStats theme={theme} />
         </div>
+        </Reveal>
 
         {/* Footer note */}
         <div className="mt-8 text-center text-gray-400 text-sm">
@@ -1088,14 +1131,17 @@ const SkillsSection = ({ theme }) => {
         <section id="skills" className="min-h-screen flex flex-col items-center justify-center py-20 px-4">
             <div className="container mx-auto max-w-7xl">
                 {/* Header */}
+                <Reveal>
                 <div className="text-center mb-16">
                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Technical Skills</h2>
                     <p className="text-gray-300 max-w-2xl mx-auto text-lg">
                         A comprehensive overview of my technical expertise and proficiency levels
                     </p>
                 </div>
+                </Reveal>
 
                 {/* Category Filter */}
+                <Reveal>
                 <div className="flex flex-wrap justify-center gap-3 mb-12">
                     {Object.entries(skillCategories).map(([key, label]) => (
                         <button
@@ -1111,12 +1157,13 @@ const SkillsSection = ({ theme }) => {
                         </button>
                     ))}
                 </div>
+                </Reveal>
 
                 {/* Skills Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {filteredSkills.map((skill, index) => (
+                        <Reveal key={skill.name}>
                         <GlassCard 
-                            key={skill.name} 
                             className="p-6 relative overflow-hidden group cursor-pointer"
                             onMouseEnter={() => setHoveredSkill(skill.name)}
                             onMouseLeave={() => setHoveredSkill(null)}
@@ -1156,10 +1203,12 @@ const SkillsSection = ({ theme }) => {
                             {/* Hover Effect Overlay */}
                             <div className={`absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${theme === 'pink' ? 'from-pink-500/10' : 'from-emerald-500/10'}`}></div>
                         </GlassCard>
+                        </Reveal>
                     ))}
                 </div>
 
                 {/* Skills Summary */}
+                <Reveal className="mt-8">
                 <div>
                     <GlassCard className="p-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-center">
@@ -1178,6 +1227,7 @@ const SkillsSection = ({ theme }) => {
                         </div>
                     </GlassCard>
                 </div>
+                </Reveal>
             </div>
         </section>
     );
@@ -1224,14 +1274,17 @@ const BlogSection = ({ theme }) => {
         <section id="blog" className="min-h-screen flex flex-col items-center justify-center py-20 px-4">
             <div className="container mx-auto max-w-7xl">
                 {/* Header */}
+                <Reveal>
                 <div className="text-center mb-16">
                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Blog & Articles</h2>
                     <p className="text-gray-300 max-w-2xl mx-auto text-lg">
                         Thoughts, tutorials, and insights about technology, development, and my journey in tech
                     </p>
                 </div>
+                </Reveal>
 
                 {/* Category Filter */}
+                <Reveal>
                 <div className="flex flex-wrap justify-center gap-3 mb-12">
                     {Object.entries(categories).map(([key, label]) => (
                         <button
@@ -1247,10 +1300,11 @@ const BlogSection = ({ theme }) => {
                         </button>
                     ))}
                 </div>
+                </Reveal>
 
                 {/* Featured (Blog Section) */}
                 {selectedCategory === 'all' && featuredPost && (
-                    <div className="mb-12">
+                    <Reveal className="mb-12">
                         <h3 className="text-2xl font-bold text-white mb-6 text-center">Featured</h3>
                         <Link to={`/blog/${featuredPost.id}`} className="block">
                             <GlassCard className="p-0 md:p-0 group cursor-pointer hover:scale-[1.01] transition-transform duration-300 overflow-hidden">
@@ -1282,19 +1336,22 @@ const BlogSection = ({ theme }) => {
                                 </div>
                             </GlassCard>
                         </Link>
-                    </div>
+                    </Reveal>
                 )}
 
                 {/* Posts */}
                 <div>
+                    <Reveal>
                     <h3 className="text-2xl font-bold text-white mb-8 text-center">
                         {selectedCategory === 'all' ? 'Blog' : `${categories[selectedCategory]} Articles`}
                     </h3>
+                    </Reveal>
                     {loading && <div className="text-center text-gray-300">Loading...</div>}
                     {error && <div className="text-center text-red-300">{error}</div>}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {filteredPosts.map(post => (
-                            <Link key={post.id} to={`/blog/${post.id}`} className="block">
+                            <Reveal key={post.id}>
+                            <Link to={`/blog/${post.id}`} className="block">
                             <GlassCard className="p-0 group cursor-pointer hover:scale-105 transition-transform duration-300 overflow-hidden">
                                 {post.image && (
                                   <div className="w-full h-40 overflow-hidden">
@@ -1330,6 +1387,7 @@ const BlogSection = ({ theme }) => {
                                 </div>
                             </GlassCard>
                             </Link>
+                            </Reveal>
                         ))}
                     </div>
                 </div>
@@ -1701,7 +1759,8 @@ const ContactSection = ({ theme }) => {
         name: '',
         email: '',
         subject: '',
-        message: ''
+        message: '',
+        company: '' // honeypot
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitStatus, setSubmitStatus] = useState('');
@@ -1729,7 +1788,7 @@ const ContactSection = ({ theme }) => {
                 throw new Error('Failed to send');
             }
             setSubmitStatus('success');
-            setFormData({ name: '', email: '', subject: '', message: '' });
+            setFormData({ name: '', email: '', subject: '', message: '', company: '' });
         } catch (err) {
             setSubmitStatus('error');
         } finally {
@@ -1763,6 +1822,7 @@ const ContactSection = ({ theme }) => {
         <section id="contact" className="min-h-screen flex items-center justify-center py-20 px-4">
             <div className="container mx-auto max-w-6xl">
                 {/* Header */}
+                <Reveal>
                 <div className="text-center mb-16">
                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Let's Connect</h2>
                     <p className="text-gray-300 max-w-2xl mx-auto text-lg">
@@ -1770,9 +1830,11 @@ const ContactSection = ({ theme }) => {
                         Whether you have a question or just want to say hi, feel free to reach out.
                     </p>
                 </div>
+                </Reveal>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     {/* Contact Form */}
+                    <Reveal>
                     <GlassCard className="p-8">
                         <h3 className="text-2xl font-bold text-white mb-6">Send me a message</h3>
                         <form onSubmit={handleSubmit} className="space-y-6">
@@ -1875,9 +1937,11 @@ const ContactSection = ({ theme }) => {
                             )}
                         </form>
                     </GlassCard>
+                    </Reveal>
 
                     {/* Contact Methods */}
                     <div className="space-y-8">
+                        <Reveal>
                         <GlassCard className="p-8">
                             <h3 className="text-2xl font-bold text-white mb-6">Get in touch</h3>
                             <div className="space-y-6">
@@ -1896,43 +1960,44 @@ const ContactSection = ({ theme }) => {
                                             <h4 className="font-semibold text-white group-hover:text-white transition-colors duration-300">
                                                 {method.title}
                                             </h4>
-                                            <p className="text-gray-300 text-sm group-hover:text-gray-200 transition-colors duration-300">
-                                                {method.value}
-                                            </p>
-                                            <p className="text-gray-400 text-xs mt-1">
+                                            <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
                                                 {method.description}
                                             </p>
-                                        </div>
-                                        <div className="text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                                                <polyline points="15 3 21 3 21 9"/>
-                                                <line x1="10" y1="14" x2="21" y2="3"/>
-                                            </svg>
+                                            <p className="text-xs text-gray-500 mt-1 truncate">
+                                                {method.value}
+                                            </p>
                                         </div>
                                     </a>
                                 ))}
                             </div>
                         </GlassCard>
-
-                        {/* Quick Stats */}
-                        <GlassCard className="p-8">
-                            <h3 className="text-2xl font-bold text-white mb-6">Quick facts</h3>
-                            <div className="grid grid-cols-2 gap-6">
-                                <div className="text-center">
-                                    <div className={`text-3xl font-bold ${theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}`}>
-                                        &lt;24h
+                        </Reveal>
+                        
+                        <Reveal>
+                        <GlassCard className="p-8 overflow-hidden relative">
+                            <div className="relative z-10">
+                                <h3 className="text-2xl font-bold text-white mb-4">Availability</h3>
+                                <div className="flex items-center space-x-4">
+                                    <div className="relative">
+                                        <div className={`w-4 h-4 rounded-full ${theme === 'pink' ? 'bg-pink-500' : 'bg-emerald-500'} animate-ping absolute`}></div>
+                                        <div className={`w-4 h-4 rounded-full ${theme === 'pink' ? 'bg-pink-500' : 'bg-emerald-500'} relative`}></div>
                                     </div>
-                                    <div className="text-gray-300 text-sm">Response time</div>
+                                    <p className="text-gray-300">Open to new opportunities</p>
                                 </div>
-                                <div className="text-center">
-                                    <div className={`text-3xl font-bold ${theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}`}>
-                                        100%
-                                    </div>
-                                    <div className="text-gray-300 text-sm">Availability</div>
+                                <div className="mt-6 p-4 bg-white/5 rounded-lg border border-white/10 flex items-center justify-between">
+                                    <div className="text-gray-400 text-sm">Response Time</div>
+                                    <div className="text-white font-medium">Within 24 hours</div>
                                 </div>
                             </div>
+                            
+                            {/* Decorative chart-like background */}
+                            <div className="absolute bottom-0 right-0 w-32 h-32 opacity-10">
+                                <svg viewBox="0 0 100 100" className="w-full h-full fill-current text-white">
+                                    <path d="M0 100 L20 80 L40 90 L60 50 L80 60 L100 20 V100 Z" />
+                                </svg>
+                            </div>
                         </GlassCard>
+                        </Reveal>
                     </div>
                 </div>
             </div>
@@ -1977,7 +2042,7 @@ const Footer = ({ theme }) => {
                             Parjad Minooei
                         </h2>
                         <p className="text-gray-300 text-base max-w-2xl mx-auto leading-relaxed">
-                            Web Developer passionate about creating beautiful, functional web applications with a focus on user experience.
+                            Software Engineer passionate about creating beautiful, functional web applications with a focus on user experience.
                         </p>
                     </div>
 
@@ -2071,14 +2136,14 @@ const Layout = ({ theme, toggleTheme, toast, setToast }) => {
     useEffect(() => {
         const path = location.pathname || '/'
         const titleMap = {
-          '/': 'Parjad Minooei — Web Developer Portfolio',
+          '/': 'Parjad Minooei — Software Engineer Portfolio',
           '/about': 'About — Parjad Minooei',
           '/projects': 'Projects — Parjad Minooei',
           '/blog': 'Blog — Parjad Minooei',
           '/contact': 'Contact — Parjad Minooei',
         }
         const descMap = {
-          '/': 'Web Developer building beautiful, fast, user‑centric web apps.',
+          '/': 'Software Engineer building beautiful, fast, user‑centric web apps.',
           '/about': 'Learn about Parjad’s background and skills.',
           '/projects': 'Selected projects with code and live demos.',
           '/blog': 'Articles on web development and learning.',
@@ -2134,6 +2199,7 @@ const Layout = ({ theme, toggleTheme, toast, setToast }) => {
             `}</style>
 
             <BackgroundBlobs theme={theme} />
+            <CustomCursor theme={theme} />
             <Header toggleTheme={toggleTheme} theme={theme} />
             
             <main id="main-content" role="main" tabIndex={-1} className="transition-all duration-500 pt-20 md:pt-24">
@@ -2173,7 +2239,6 @@ export default function App() {
       setTheme(prevTheme => prevTheme === 'pink' ? 'green' : 'pink');
       setToast({ isVisible: true, message: `Switched to ${theme === 'pink' ? 'Green' : 'Pink'} theme!`, type: 'success' });
   };
-
 
   return (
       <Router>
