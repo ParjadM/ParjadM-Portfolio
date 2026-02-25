@@ -750,13 +750,13 @@ const AboutSection = ({ theme }) => {
             content: (
                 <div className="space-y-6">
                     <p className="text-gray-300 leading-relaxed">
-                        I am a dedicated developer based in Scarborough, ON, with a unique background blending Psychology and Computer Programming & Analysis. This combination gives me a distinct perspective on user experience and logical problem-solving.
+                        I am a Software Engineering student at McMaster University based in Scarborough, ON, with a background that uniquely blends an Advanced Diploma in Computer Programming with a degree in Psychology. This combination allows me to approach complex system architecture with a deep understanding of both logical problem-solving and user-centric design.
                     </p>
                     <p className="text-gray-300 leading-relaxed">
-                        Currently, I'm enhancing my skills with a graduate certificate in web development. My journey in tech started with curiosity about how things work, and it has evolved into a passion for creating solutions that make a difference.
+                        My path in tech has evolved from building responsive web applications to engineering scalable, high-performance software. I am currently executing a rigorous 6-week 'Visual Mastery' plan focused on Trees, Graphs, and advanced algorithms (BFS/DFS) to achieve interview-level fluency in data structures and algorithms.
                     </p>
                     <p className="text-gray-300 leading-relaxed">
-                        When I'm not coding, you can find me diving into video games, staying active at the gym, or sharpening my mind with math problems and LeetCode challenges. I thrive on continuous learning and applying my skills to create elegant and efficient software solutions.
+                        When I’m not architecting software, I’m usually at the gym, diving into complex math problems, or tackling LeetCode challenges to keep my analytical skills sharp. I thrive on continuous learning and applying my skills to create elegant and efficient software solutions.
                     </p>
                 </div>
             )
