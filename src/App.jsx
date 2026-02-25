@@ -88,7 +88,7 @@ const GlassCard = ({ children, className = '', theme = 'green', onMouseEnter, on
 
   return (
     <div 
-      className={`relative bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg transition-all duration-500 hover:border-white/30 hover:shadow-2xl group overflow-hidden ${className}`}
+      className={`relative bg-white/[0.08] backdrop-blur-lg rounded-2xl border border-white/10 shadow-md transition-all duration-300 hover:border-white/20 hover:shadow-xl group overflow-hidden ${className}`}
       onMouseMove={handleMouseMove}
       onMouseEnter={(e) => { setIsHovered(true); onMouseEnter && onMouseEnter(e); }}
       onMouseLeave={(e) => { setIsHovered(false); onMouseLeave && onMouseLeave(e); }}
@@ -98,18 +98,18 @@ const GlassCard = ({ children, className = '', theme = 'green', onMouseEnter, on
       }}
     >
       {/* Animated Gradient Border */}
-      <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${gradientClass} opacity-0 group-hover:opacity-30 transition-opacity duration-500`} style={{ padding: '1px' }}>
+      <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${gradientClass} opacity-0 group-hover:opacity-20 transition-opacity duration-300`} style={{ padding: '1px' }}>
         <div className="w-full h-full bg-transparent rounded-2xl"></div>
       </div>
       
       {/* Glass Reflection Effect */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/[0.08] via-transparent to-transparent opacity-0 group-hover:opacity-70 transition-opacity duration-300"></div>
       
       {/* Subtle Neon Glow Effect */}
-      <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${gradientClass} opacity-0 group-hover:opacity-10 blur-xl transition-all duration-500`}></div>
+      <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${gradientClass} opacity-0 group-hover:opacity-[0.08] blur-lg transition-all duration-300`}></div>
       
       {/* Content */}
-      <div className="relative z-10 group-hover:drop-shadow-lg">
+      <div className="relative z-10 group-hover:drop-shadow-sm">
         {children}
       </div>
     </div>
@@ -492,7 +492,7 @@ const RippleButton = ({ children, onClick, className = '', theme = 'green', ...p
 
   return (
     <button
-      className={`relative overflow-hidden transform transition-all duration-300 hover:scale-105 active:scale-95 ${gradientClass} ${className}`}
+      className={`relative overflow-hidden transform transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-lg active:scale-95 ${gradientClass} ${className}`}
       onClick={handleClick}
       {...props}
     >
@@ -699,15 +699,15 @@ const HomeSection = ({ theme }) => {
       {/* Left: Text content */}
       <div className="p-6 md:p-0 text-left">
         <Reveal>
-        <h1 className={`text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-tight bg-gradient-to-r ${theme === 'green' ? 'from-emerald-400 via-teal-400 to-cyan-400' : 'from-pink-400 via-red-400 to-purple-400'} bg-clip-text text-transparent animate-pulse`}>
+        <h1 className={`text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-tight bg-gradient-to-r ${theme === 'green' ? 'from-emerald-400 via-teal-400 to-cyan-400' : 'from-pink-400 via-red-400 to-purple-400'} bg-clip-text text-transparent`}>
           Parjad Minooei
         </h1>
         <p className="mt-4 text-xl md:text-2xl text-gray-300 max-w-2xl">
           A creative <span className={theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}>Software Engineer</span> with a passion for building beautiful, functional, and user-centric web applications.
         </p>
         <div className="mt-8 flex justify-start space-x-6">
-          <a href="https://github.com/ParjadM" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110"><Github size={32} /></a>
-          <a href="https://www.linkedin.com/in/parjadminooei" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110"><Linkedin size={32} /></a>
+          <a href="https://github.com/ParjadM" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:-translate-y-0.5 hover:scale-105"><Github size={32} /></a>
+          <a href="https://www.linkedin.com/in/parjadminooei" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:-translate-y-0.5 hover:scale-105"><Linkedin size={32} /></a>
         </div>
         <RippleButton 
           onClick={() => navigate('/contact')} 
