@@ -235,7 +235,10 @@ router.put('/blog/:id', async (req, res) => {
     const update = { ...req.body }
     if (update.publishAt) update.publishAt = new Date(update.publishAt)
     if (update.date === undefined && update.publishAt) update.date = update.publishAt.toISOString().slice(0, 10)
-    await BlogPost.updateOne({ _id: id }, update)
+    await BlogPost.updateOne(
+      { _id: id },
+      { $set: update, $currentDate: { updatedAt: true } }
+    )
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
@@ -271,7 +274,13 @@ router.post('/blog/:id/publish', async (req, res) => {
   try {
     const { id } = req.params
     const publishAt = req.body?.publishAt ? new Date(req.body.publishAt) : new Date()
-    await BlogPost.updateOne({ _id: id }, { status: 'published', publishAt, date: publishAt.toISOString().slice(0, 10) })
+    await BlogPost.updateOne(
+      { _id: id },
+      {
+        $set: { status: 'published', publishAt, date: publishAt.toISOString().slice(0, 10) },
+        $currentDate: { updatedAt: true },
+      }
+    )
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
