@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import ParjadImage from './Images/Parjad.jpg';
 import GitHubStats from './components/GitHubStats.tsx';
 import LeetCodeStats from './components/LeetCodeStats.tsx';
@@ -66,6 +68,34 @@ const Menu = (props) => (
         <line x1="4" x2="20" y1="6" y2="6" />
         <line x1="4" x2="20" y1="18" y2="18" />
     </svg>
+);
+
+const MarkdownContent = ({ content, className = '' }) => (
+  <div className={`text-gray-300 leading-7 ${className}`}>
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        h1: ({ ...props }) => <h1 className="text-3xl font-bold text-white mt-8 mb-4" {...props} />,
+        h2: ({ ...props }) => <h2 className="text-2xl font-semibold text-white mt-7 mb-3" {...props} />,
+        h3: ({ ...props }) => <h3 className="text-xl font-semibold text-white mt-6 mb-3" {...props} />,
+        p: ({ ...props }) => <p className="mb-4 last:mb-0" {...props} />,
+        ul: ({ ...props }) => <ul className="mb-4 list-disc pl-6 space-y-2" {...props} />,
+        ol: ({ ...props }) => <ol className="mb-4 list-decimal pl-6 space-y-2" {...props} />,
+        li: ({ ...props }) => <li className="text-gray-300" {...props} />,
+        blockquote: ({ ...props }) => <blockquote className="mb-4 border-l-4 border-white/20 pl-4 italic text-gray-300/90" {...props} />,
+        a: ({ ...props }) => <a className="text-emerald-300 hover:text-emerald-200 underline underline-offset-4" target="_blank" rel="noopener noreferrer" {...props} />,
+        pre: ({ ...props }) => <pre className="mb-4 overflow-x-auto rounded-lg bg-black/30 border border-white/10 p-4 text-sm" {...props} />,
+        code: ({ className: codeClassName, children, ...props }) =>
+          codeClassName ? (
+            <code className={`${codeClassName} text-gray-100`} {...props}>{children}</code>
+          ) : (
+            <code className="rounded bg-white/10 px-1.5 py-0.5 text-sm text-gray-100" {...props}>{children}</code>
+          ),
+      }}
+    >
+      {content || ''}
+    </ReactMarkdown>
+  </div>
 );
 
 
@@ -268,7 +298,9 @@ const AdminBlogManager = ({ theme }) => {
           {/* Preview */}
           <div className="mt-6">
             <h4 className="text-white font-semibold mb-2">Preview</h4>
-            <div className="p-4 bg-white/5 rounded border border-white/10 whitespace-pre-wrap">{form.content}</div>
+            <div className="p-4 bg-white/5 rounded border border-white/10">
+              <MarkdownContent content={form.content} />
+            </div>
           </div>
         </div>
       ) : (
@@ -1462,9 +1494,7 @@ const BlogPostPage = ({ theme }) => {
                       </div>
                     )}
                     <h1 className="text-3xl font-bold text-white mb-6">{post.title}</h1>
-                    <div className="text-gray-300 leading-7 whitespace-pre-line">
-                        {post.content}
-                    </div>
+                    <MarkdownContent content={post.content} />
                 </GlassCard>
             </div>
         </section>
