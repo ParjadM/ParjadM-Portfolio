@@ -156,6 +156,8 @@ const AdminBlogManager = ({ theme }) => {
   const [form, setForm] = useState({ title: '', excerpt: '', content: '', tags: '', status: 'draft', publishAt: '', category: 'personal', image: '' });
   const [uploading, setUploading] = useState(false);
   const blogFileInputRef = useRef(null);
+  const inlineImageInputRef = useRef(null);
+  const contentTextareaRef = useRef(null);
 
   const load = async () => {
     setLoading(true); setError('');
@@ -204,30 +206,66 @@ const AdminBlogManager = ({ theme }) => {
     setEditing(null); load();
   };
 
+  const uploadToCloudinary = async (file) => {
+    const sigRes = await fetch('/api/admin/cloudinary-sign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ folder: 'blog' })
+    })
+    if (!sigRes.ok) throw new Error('Failed to get signature')
+    const { signature, timestamp, apiKey, cloudName, folder } = await sigRes.json()
+
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('api_key', apiKey)
+    formData.append('timestamp', timestamp)
+    formData.append('signature', signature)
+    formData.append('folder', folder)
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: 'POST', body: formData })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) throw new Error((data && (data.error?.message || data.message)) || 'Upload failed')
+    return data.secure_url
+  }
+
   const uploadBlogImage = async (file) => {
     setUploading(true)
     try {
-      const sigRes = await fetch('/api/admin/cloudinary-sign', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ folder: 'blog' })
-      })
-      if (!sigRes.ok) throw new Error('Failed to get signature')
-      const { signature, timestamp, apiKey, cloudName, folder } = await sigRes.json()
-
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('api_key', apiKey)
-      formData.append('timestamp', timestamp)
-      formData.append('signature', signature)
-      formData.append('folder', folder)
-
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: 'POST', body: formData })
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error((data && (data.error?.message || data.message)) || 'Upload failed')
-      setForm(prev => ({ ...prev, image: data.secure_url }))
+      const imageUrl = await uploadToCloudinary(file)
+      setForm(prev => ({ ...prev, image: imageUrl }))
     } catch (e) {
       setError(`Image upload failed: ${e.message || e}`)
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const insertInlineImage = (imageUrl) => {
+    const textarea = contentTextareaRef.current
+    const markdownImage = `\n![Image](${imageUrl})\n`
+    const currentText = form.content || ''
+    const start = textarea ? textarea.selectionStart : currentText.length
+    const end = textarea ? textarea.selectionEnd : currentText.length
+    const nextText = `${currentText.slice(0, start)}${markdownImage}${currentText.slice(end)}`
+    const nextCursorPos = start + markdownImage.length
+
+    setForm(prev => ({ ...prev, content: nextText }))
+
+    if (textarea) {
+      requestAnimationFrame(() => {
+        textarea.focus()
+        textarea.setSelectionRange(nextCursorPos, nextCursorPos)
+      })
+    }
+  }
+
+  const uploadInlineImage = async (file) => {
+    setUploading(true)
+    try {
+      const imageUrl = await uploadToCloudinary(file)
+      insertInlineImage(imageUrl)
+    } catch (e) {
+      setError(`Inline image upload failed: ${e.message || e}`)
     } finally {
       setUploading(false)
     }
@@ -257,7 +295,29 @@ const AdminBlogManager = ({ theme }) => {
         <div className="space-y-4">
           <input name="title" value={form.title} onChange={onChange} placeholder="Title" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded" />
           <input name="excerpt" value={form.excerpt} onChange={onChange} placeholder="Excerpt" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded" />
-          <textarea name="content" value={form.content} onChange={onChange} rows={8} placeholder="Content" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded" />
+          <textarea ref={contentTextareaRef} name="content" value={form.content} onChange={onChange} rows={8} placeholder="Content (Markdown supported)" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded" />
+          <div className="flex items-center gap-3">
+            <input
+              ref={inlineImageInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files && e.target.files[0];
+                if (f) uploadInlineImage(f);
+                e.target.value = '';
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => inlineImageInputRef.current && inlineImageInputRef.current.click()}
+              className="px-3 py-2 rounded bg-white/10 hover:bg-white/20 disabled:opacity-50"
+              disabled={uploading}
+            >
+              {uploading ? 'Uploading...' : 'Insert Inline Image'}
+            </button>
+            <span className="text-xs text-gray-400">Image markdown will be inserted at cursor.</span>
+          </div>
           {/* Optional Cover Image */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-center">
             <input name="image" value={form.image} onChange={onChange} placeholder="Cover image URL (optional)" className="md:col-span-2 w-full px-3 py-2 bg-white/5 border border-white/10 rounded" />
