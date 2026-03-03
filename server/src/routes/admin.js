@@ -6,6 +6,25 @@ import { currentEngine } from '../db/index.js'
 
 const router = Router()
 
+async function ensureLqftBenchmarkProject() {
+  await Project.updateOne(
+    { liveUrl: '/projects/lqftBenchmark' },
+    {
+      $setOnInsert: {
+        title: 'LQFT Benchmark',
+        description: 'Interactive browser benchmark and LQFT demo app inspired by app.py workflows (CRUD, comparison, memory density, and complexity views).',
+        tags: ['Python', 'Benchmark', 'Data Structures', 'Browser Demo'],
+        liveUrl: '/projects/lqftBenchmark',
+        githubUrl: '',
+        image: '',
+        featured: true,
+        order: Date.now(),
+      },
+    },
+    { upsert: true }
+  )
+}
+
 router.get('/db-status', async (req, res) => {
   if (currentEngine !== 'mongo') {
     return res.json({ engine: currentEngine, connected: false, info: 'Using in-memory store' })
@@ -303,7 +322,8 @@ router.post('/blog/:id/feature', async (req, res) => {
 // --- Projects Management (Admin) ---
 router.get('/projects', async (req, res) => {
   if (currentEngine !== 'mongo') return res.json({ projects: [] })
-  const docs = await Project.find({}).sort({ order: 1, createdAt: -1 }).lean()
+  await ensureLqftBenchmarkProject()
+  const docs = await Project.find({}).sort({ featured: -1, createdAt: -1 }).lean()
   const projects = docs.map(d => ({ id: d._id.toString(), ...d }))
   res.json({ projects })
 })
