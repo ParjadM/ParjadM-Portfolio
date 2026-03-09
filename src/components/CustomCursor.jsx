@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-export const CustomCursor = ({ theme }) => {
+export const CustomCursor = ({ theme, darkMode = true }) => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -41,7 +41,9 @@ export const CustomCursor = ({ theme }) => {
   }
 
   const color = theme === 'pink' ? 'rgba(244, 114, 182, 0.5)' : 'rgba(52, 211, 153, 0.5)';
-  const ringColor = theme === 'pink' ? 'rgba(244, 114, 182, 1)' : 'rgba(52, 211, 153, 1)';
+  const ringColor = theme === 'pink'
+    ? (darkMode ? 'rgba(244, 114, 182, 1)' : 'rgba(219, 39, 119, 1)')
+    : (darkMode ? 'rgba(52, 211, 153, 1)' : 'rgba(5, 150, 105, 1)');
 
   return (
     <>

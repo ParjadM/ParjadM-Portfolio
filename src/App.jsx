@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -67,6 +68,19 @@ const Menu = (props) => (
         <line x1="4" x2="20" y1="12" y2="12" />
         <line x1="4" x2="20" y1="6" y2="6" />
         <line x1="4" x2="20" y1="18" y2="18" />
+    </svg>
+);
+
+const Sun = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+    </svg>
+);
+
+const Moon = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
     </svg>
 );
 
@@ -642,9 +656,110 @@ const Toast = ({ message, type = 'success', isVisible, onClose }) => {
   );
 };
 
+// --- News Feed (rotating blog titles + dropdown) ---
+const NewsFeed = ({ posts, theme, onNavigate, compact, darkMode = true }) => {
+    const [index, setIndex] = useState(0);
+    const [isOpen, setIsOpen] = useState(false);
+    const [dropdownRect, setDropdownRect] = useState(null);
+    const triggerRef = useRef(null);
+    const dropdownRef = useRef(null);
+
+    useEffect(() => {
+        if (!posts?.length) return;
+        const id = setInterval(() => setIndex(i => (i + 1) % posts.length), 10000);
+        return () => clearInterval(id);
+    }, [posts?.length]);
+
+    useEffect(() => {
+        if (isOpen && triggerRef.current && typeof window !== 'undefined') {
+            const rect = triggerRef.current.getBoundingClientRect();
+            const w = 220;
+            const left = compact ? Math.max(8, rect.right - w) : Math.max(8, Math.min(rect.left + (rect.width / 2) - (w / 2), window.innerWidth - w - 8));
+            setDropdownRect({ top: rect.bottom + 8, left, width: w });
+        } else {
+            setDropdownRect(null);
+        }
+    }, [isOpen, compact]);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (dropdownRef.current?.contains(e.target) || triggerRef.current?.contains(e.target)) return;
+            setIsOpen(false);
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    if (!posts?.length) return null;
+    const title = posts[index]?.title ?? '';
+    const latest5 = posts.slice(0, 5);
+
+    const dropdownClasses = darkMode
+        ? 'bg-emerald-900/90 backdrop-blur-lg border border-emerald-700/40 shadow-2xl'
+        : 'bg-emerald-50/98 backdrop-blur-lg border border-emerald-200/80 shadow-2xl';
+    const headerClasses = darkMode ? 'text-emerald-200/90' : 'text-gray-500';
+    const linkClasses = darkMode
+        ? 'text-emerald-100 hover:bg-emerald-700/30'
+        : 'text-gray-800 hover:bg-emerald-100/80';
+    const dividerClasses = darkMode ? 'border-emerald-700/30' : 'border-emerald-200/60';
+    const viewAllClasses = darkMode
+        ? `${theme === 'pink' ? 'text-pink-400 hover:bg-emerald-700/30' : 'text-emerald-300 hover:bg-emerald-700/30'}`
+        : `${theme === 'pink' ? 'text-pink-600 hover:bg-emerald-100/80' : 'text-emerald-600 hover:bg-emerald-100/80'}`;
+
+    const dropdownEl = isOpen && dropdownRect && typeof document !== 'undefined' && createPortal(
+        <div
+            ref={dropdownRef}
+            className={`fixed z-[9999] min-w-[220px] max-w-[320px] rounded-xl overflow-hidden ${dropdownClasses}`}
+            style={{ top: dropdownRect.top, left: dropdownRect.left }}
+        >
+            <div className="py-2 max-h-[280px] overflow-y-auto">
+                <div className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wider ${headerClasses}`}>Latest posts</div>
+                {latest5.map((p) => (
+                    <Link
+                        key={p.id}
+                        to={`/blog/${p.id}`}
+                        onClick={() => { setIsOpen(false); onNavigate?.(); }}
+                        className={`block px-3 py-2 text-sm truncate ${linkClasses}`}
+                    >
+                        {p.title}
+                    </Link>
+                ))}
+                <div className={`my-1 border-t ${dividerClasses}`} />
+                <Link
+                    to="/blog"
+                    onClick={() => { setIsOpen(false); onNavigate?.(); }}
+                    className={`block px-3 py-2.5 text-sm font-medium truncate ${viewAllClasses}`}
+                >
+                    View all posts →
+                </Link>
+            </div>
+        </div>,
+        document.body
+    );
+
+    return (
+        <div className={`relative inline-block ${compact ? '' : 'w-full flex justify-center'}`}>
+            <button
+                ref={triggerRef}
+                type="button"
+                onClick={() => setIsOpen(o => !o)}
+                className={`px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-gray-200 text-sm font-medium hover:text-white hover:bg-white/15 transition-colors duration-300 block truncate text-left w-full ${compact ? 'ml-2 max-w-[180px]' : 'w-full max-w-[260px] mx-auto'}`}
+                title={title}
+                aria-expanded={isOpen}
+                aria-haspopup="true"
+            >
+                <span className={`text-xs font-semibold mr-1.5 ${theme === 'pink' ? 'text-pink-400/90' : 'text-emerald-400/90'}`}>Latest:</span>
+                {title}
+            </button>
+            {dropdownEl}
+        </div>
+    );
+};
+
 // --- Header Component ---
-const Header = ({ toggleTheme, theme }) => {
+const Header = ({ toggleTheme, toggleDarkMode, theme, darkMode = true }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [blogPosts, setBlogPosts] = useState([]);
     const [visitors, setVisitors] = useState(() => {
         try {
             const cached = localStorage.getItem('cachedVisitors');
@@ -687,6 +802,18 @@ const Header = ({ toggleTheme, theme }) => {
         return () => controller.abort();
     }, []);
 
+    useEffect(() => {
+        const controller = new AbortController();
+        fetch('/api/blog', { signal: controller.signal })
+          .then(res => res.ok ? res.json() : null)
+          .then(d => {
+            const posts = Array.isArray(d?.posts) ? d.posts : [];
+            setBlogPosts(posts.filter(p => p.id && p.title).map(p => ({ id: p.id, title: p.title })));
+          })
+          .catch(() => {});
+        return () => controller.abort();
+    }, []);
+
     return (
         <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
             {/* Skip to content for screen readers/keyboard users */}
@@ -701,20 +828,29 @@ const Header = ({ toggleTheme, theme }) => {
                      <GlassCard className="!rounded-full" theme={theme}>
                         <div className="flex items-center space-x-1 px-3 py-2">
                             {navItems.map(item => (
-                                <Link
-                                    key={item.name}
-                                    to={item.path}
-                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${isActive(item.path) ? 'bg-white/20 text-white' : 'text-gray-300 hover:text-white'}`}
-                                    aria-current={isActive(item.path) ? 'page' : undefined}
-                                >
-                                    {item.name}
-                                </Link>
+                                <React.Fragment key={item.name}>
+                                    <Link
+                                        to={item.path}
+                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${isActive(item.path) ? 'bg-white/20 text-white' : 'text-gray-300 hover:text-white'}`}
+                                        aria-current={isActive(item.path) ? 'page' : undefined}
+                                    >
+                                        {item.name}
+                                    </Link>
+                                    {item.name === 'Contact' && <NewsFeed posts={blogPosts} theme={theme} darkMode={darkMode} compact />}
+                                </React.Fragment>
                             ))}
                             {visitors !== null && (
                               <div className="ml-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 text-gray-200 text-sm font-semibold whitespace-nowrap">
                                 {visitors} Visitors
                               </div>
                             )}
+                            <button
+                                onClick={toggleDarkMode}
+                                className="ml-2 p-2 rounded-full bg-white/10 border border-white/10 text-gray-300 hover:text-white hover:bg-white/15 transition-colors duration-300"
+                                aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+                            >
+                                {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                            </button>
                         </div>
                     </GlassCard>
                 </div>
@@ -732,21 +868,35 @@ const Header = ({ toggleTheme, theme }) => {
                     <GlassCard className="w-full" theme={theme}>
                         <div className="flex flex-col items-center space-y-2 p-4">
                             {navItems.map(item => (
-                                <Link
-                                    key={item.name}
-                                    to={item.path}
-                                    onClick={handleNavClick}
-                                    className={`block w-full text-center px-4 py-2 rounded-lg text-lg font-medium transition-colors duration-300 ${isActive(item.path) ? 'bg-white/20 text-white' : 'text-gray-300 hover:text-white'}`}
-                                    aria-current={isActive(item.path) ? 'page' : undefined}
-                                >
-                                    {item.name}
-                                </Link>
+                                <React.Fragment key={item.name}>
+                                    <Link
+                                        to={item.path}
+                                        onClick={handleNavClick}
+                                        className={`block w-full text-center px-4 py-2 rounded-lg text-lg font-medium transition-colors duration-300 ${isActive(item.path) ? 'bg-white/20 text-white' : 'text-gray-300 hover:text-white'}`}
+                                        aria-current={isActive(item.path) ? 'page' : undefined}
+                                    >
+                                        {item.name}
+                                    </Link>
+                                    {item.name === 'Contact' && (
+                                        <div className="w-full flex justify-center">
+                                            <NewsFeed posts={blogPosts} theme={theme} darkMode={darkMode} onNavigate={handleNavClick} />
+                                        </div>
+                                    )}
+                                </React.Fragment>
                             ))}
                             {visitors !== null && (
                               <div className="mt-2 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 text-sm w-full text-center">
                                 {visitors} Visitors
                               </div>
                             )}
+                            <button
+                                onClick={toggleDarkMode}
+                                className="mt-2 w-full py-2 px-4 rounded-lg bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 flex items-center justify-center gap-2"
+                                aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+                            >
+                                {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                                <span>{darkMode ? 'Light mode' : 'Dark mode'}</span>
+                            </button>
                         </div>
                     </GlassCard>
                 </div>
@@ -757,17 +907,13 @@ const Header = ({ toggleTheme, theme }) => {
 
 
 // --- Background Blobs ---
-const BackgroundBlobs = ({ theme }) => {
-    const pinkThemeClasses = {
-        blob1: "bg-pink-500/30",
-        blob2: "bg-red-500/30",
-        blob3: "bg-purple-500/20",
-    };
-    const greenThemeClasses = {
-        blob1: "bg-emerald-500/30",
-        blob2: "bg-teal-500/30",
-        blob3: "bg-cyan-500/20",
-    };
+const BackgroundBlobs = ({ theme, darkMode = true }) => {
+    const pinkThemeClasses = darkMode
+        ? { blob1: "bg-pink-500/30", blob2: "bg-red-500/30", blob3: "bg-purple-500/20" }
+        : { blob1: "bg-pink-400/20", blob2: "bg-red-400/20", blob3: "bg-purple-400/15" };
+    const greenThemeClasses = darkMode
+        ? { blob1: "bg-emerald-500/30", blob2: "bg-teal-500/30", blob3: "bg-cyan-500/20" }
+        : { blob1: "bg-emerald-400/25", blob2: "bg-teal-400/25", blob3: "bg-cyan-400/20" };
     const themeClasses = theme === 'green' ? greenThemeClasses : pinkThemeClasses;
 
     return (
@@ -2999,8 +3145,50 @@ const Footer = ({ theme }) => {
     );
 };
 
+// --- 404 Not Found Page ---
+const NotFoundPage = ({ theme }) => {
+    const navigate = useNavigate();
+    useEffect(() => {
+        document.title = 'Page not found — Parjad Minooei';
+        return () => { document.title = 'Parjad Minooei'; };
+    }, []);
+    const gradientClass = theme === 'pink'
+        ? 'bg-gradient-to-r from-pink-500 to-red-500'
+        : 'bg-gradient-to-r from-emerald-500 to-teal-500';
+
+    return (
+        <section className="min-h-screen flex items-center justify-center py-20 px-4">
+            <div className="container mx-auto max-w-2xl text-center">
+                <Reveal>
+                <GlassCard className="p-12 md:p-16" theme={theme}>
+                    <div className={`text-8xl md:text-9xl font-extrabold ${theme === 'pink' ? 'text-pink-400/30' : 'text-emerald-400/30'}`}>404</div>
+                    <h1 className="text-2xl md:text-3xl font-bold text-white mt-4">Page not found</h1>
+                    <p className="text-gray-300 mt-2 max-w-md mx-auto">
+                        The link you followed doesn't exist on parjadm.ca. It may have been moved or removed.
+                    </p>
+                    <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                        <button
+                            onClick={() => navigate('/')}
+                            className={`px-6 py-3 rounded-full font-semibold text-white ${gradientClass} hover:opacity-90 transition-opacity`}
+                        >
+                            Go home
+                        </button>
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="px-6 py-3 rounded-full font-semibold bg-white/10 border border-white/20 text-gray-300 hover:bg-white/15 hover:text-white transition-colors"
+                        >
+                            Go back
+                        </button>
+                    </div>
+                </GlassCard>
+                </Reveal>
+            </div>
+        </section>
+    );
+};
+
 // --- Layout Component (wraps all pages) ---
-const Layout = ({ theme, toggleTheme, toast, setToast }) => {
+const Layout = ({ theme, toggleTheme, darkMode, toggleDarkMode, toast, setToast }) => {
     const location = useLocation();
     const [visitorId, setVisitorId] = useState(null);
 
@@ -3069,43 +3257,49 @@ const Layout = ({ theme, toggleTheme, toast, setToast }) => {
     }, [location.pathname])
 
     return (
-        <div className="bg-gradient-to-br from-emerald-900 via-teal-900 to-cyan-900 text-white font-sans">
+        <div className={`font-sans transition-colors duration-500 ${
+            darkMode
+                ? 'bg-gradient-to-br from-emerald-900 via-teal-900 to-cyan-900 text-white'
+                : 'bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 text-gray-900'
+        } ${!darkMode ? 'light-mode' : ''}`}>
             <style>{`
-                body {
-                    font-family: 'Inter', sans-serif;
-                }
-                .lqft-select option {
-                    color: #0f172a;
-                    background: #f8fafc;
-                }
-                .animate-blob {
-                    animation: blob 7s infinite;
-                }
-                .animation-delay-2000 {
-                    animation-delay: 2s;
-                }
-                .animation-delay-4000 {
-                    animation-delay: 4s;
-                }
+                body { font-family: 'Inter', sans-serif; }
+                .lqft-select option { color: #0f172a; background: #f8fafc; }
+                .animate-blob { animation: blob 7s infinite; }
+                .animation-delay-2000 { animation-delay: 2s; }
+                .animation-delay-4000 { animation-delay: 4s; }
                 @keyframes blob {
-                    0% {
-                        transform: translate(0px, 0px) scale(1);
-                    }
-                    33% {
-                        transform: translate(30px, -50px) scale(1.1);
-                    }
-                    66% {
-                        transform: translate(-20px, 20px) scale(0.9);
-                    }
-                    100% {
-                        transform: translate(0px, 0px) scale(1);
-                    }
+                    0% { transform: translate(0px, 0px) scale(1); }
+                    33% { transform: translate(30px, -50px) scale(1.1); }
+                    66% { transform: translate(-20px, 20px) scale(0.9); }
+                    100% { transform: translate(0px, 0px) scale(1); }
                 }
+                .light-mode .text-white { color: rgb(17 24 39) !important; }
+                .light-mode .text-gray-300 { color: rgb(75 85 99) !important; }
+                .light-mode .text-gray-400 { color: rgb(107 114 128) !important; }
+                .light-mode .text-gray-500 { color: rgb(107 114 128) !important; }
+                .light-mode [class*="bg-white/"] { --tw-bg-opacity: 0.06; background-color: rgb(0 0 0 / var(--tw-bg-opacity)) !important; }
+                .light-mode [class*="border-white/"] { border-color: rgb(229 231 235 / 0.8) !important; }
+                .light-mode .border-white\\/10 { border-color: rgb(229 231 235) !important; }
+                .light-mode .hover\\:border-white\\/20:hover { border-color: rgb(156 163 175) !important; }
+                .light-mode .hover\\:border-white\\/40:focus { border-color: rgb(107 114 128) !important; }
+                .light-mode .focus\\:border-white\\/40:focus { border-color: rgb(107 114 128) !important; }
+                .light-mode .placeholder-gray-400::placeholder { color: rgb(156 163 175); }
+                .light-mode header a, .light-mode header button { color: rgb(17 24 39) !important; }
+                .light-mode header nav a:hover { color: rgb(17 24 39) !important; }
+                .light-mode header nav a[aria-current="page"] { background-color: rgba(16 185 129 / 0.2) !important; color: rgb(5 150 105) !important; }
+                .light-mode header img[alt="Logo"] { filter: brightness(0); }
+                .light-mode .text-gray-200 { color: rgb(55 65 81) !important; }
+                .light-mode footer .text-gray-300 { color: rgb(75 85 99) !important; }
+                .light-mode footer .text-gray-500 { color: rgb(107 114 128) !important; }
+                .light-mode footer a { color: rgb(75 85 99) !important; }
+                .light-mode footer a:hover { color: rgb(34 197 94) !important; }
+                .light-mode ::placeholder { color: rgb(156 163 175); opacity: 1; }
             `}</style>
 
-            <BackgroundBlobs theme={theme} />
-            <CustomCursor theme={theme} />
-            <Header toggleTheme={toggleTheme} theme={theme} />
+            <BackgroundBlobs theme={theme} darkMode={darkMode} />
+            <CustomCursor theme={theme} darkMode={darkMode} />
+            <Header toggleTheme={toggleTheme} toggleDarkMode={toggleDarkMode} theme={theme} darkMode={darkMode} />
             
             <main id="main-content" role="main" tabIndex={-1} className="transition-all duration-500 pt-20 md:pt-24">
                 <Routes>
@@ -3119,6 +3313,7 @@ const Layout = ({ theme, toggleTheme, toast, setToast }) => {
                     <Route path="/contact" element={<ContactSection theme={theme} />} />
                     <Route path="/admin/login" element={<AdminLoginPage theme={theme} />} />
                     <Route path="/admin" element={<RequireAuth><AdminDashboard theme={theme} /></RequireAuth>} />
+                    <Route path="*" element={<NotFoundPage theme={theme} />} />
                 </Routes>
             </main>
 
@@ -3139,6 +3334,12 @@ const Layout = ({ theme, toggleTheme, toast, setToast }) => {
 // --- Main App Component ---
 export default function App() {
   const [theme, setTheme] = useState('green'); // 'pink' or 'green'
+  const [darkMode, setDarkMode] = useState(() => {
+    try {
+      const stored = localStorage.getItem('darkMode');
+      return stored === null ? true : stored === 'true';
+    } catch { return true; }
+  });
   const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
 
   const toggleTheme = () => {
@@ -3146,9 +3347,18 @@ export default function App() {
       setToast({ isVisible: true, message: `Switched to ${theme === 'pink' ? 'Green' : 'Pink'} theme!`, type: 'success' });
   };
 
+  const toggleDarkMode = () => {
+    setDarkMode(prev => {
+      const next = !prev;
+      try { localStorage.setItem('darkMode', String(next)); } catch {}
+      setToast({ isVisible: true, message: `Switched to ${next ? 'Dark' : 'Light'} mode`, type: 'success' });
+      return next;
+    });
+  };
+
   return (
       <Router>
-          <Layout theme={theme} toggleTheme={toggleTheme} toast={toast} setToast={setToast} />
+          <Layout theme={theme} toggleTheme={toggleTheme} darkMode={darkMode} toggleDarkMode={toggleDarkMode} toast={toast} setToast={setToast} />
       </Router>
     );
 }
