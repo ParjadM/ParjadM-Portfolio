@@ -9,6 +9,7 @@ import { currentEngine, initDatabase } from './db/index.js'
 import projectsRouter from './routes/projects.js'
 import contactRouter from './routes/contact.js'
 import metricsRouter from './routes/metrics.js'
+import clickupRouter from './routes/clickup.js'
 import githubRouter from './routes/github.js'
 import leetcodeRouter from './routes/leetcode.js'
 
@@ -35,6 +36,7 @@ export async function createApp() {
   app.use('/api/admin', requireAuth, adminRouter)
   app.use('/api/contact', contactRouter)
   app.use('/api/metrics', metricsRouter)
+  app.use('/api/clickup', clickupRouter)
   app.use('/api/github-stats', githubRouter)
   app.use('/api/leetcode-stats', leetcodeRouter)
 

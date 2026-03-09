@@ -150,4 +150,11 @@ const VisitorDayPathSchema = new mongoose.Schema(
 VisitorDayPathSchema.index({ date: 1, path: 1, visitorId: 1 }, { unique: true })
 export const VisitorDayPath = mongoose.models.VisitorDayPath || mongoose.model('VisitorDayPath', VisitorDayPathSchema, 'visitor_day_path')
 
+// ClickUp - fun interactive counter (anyone who clicks adds +1)
+const ClickUpSchema = new mongoose.Schema(
+  { key: { type: String, unique: true, default: 'global' }, count: { type: Number, default: 0 } },
+  { timestamps: true }
+)
+export const ClickUp = mongoose.models.ClickUp || mongoose.model('ClickUp', ClickUpSchema, 'clickup')
+
 
