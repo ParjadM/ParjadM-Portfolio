@@ -64,7 +64,12 @@ export const ComplexityAnalyzer = ({ theme = 'emerald' }) => {
 
     const handleCopy = () => {
         if (analysis) {
-            const textToCopy = `Time Complexity: ${analysis.time}\nMemory Complexity: ${analysis.memory}`;
+            const time = analysis.timeWithoutConstant || analysis.time || 'N/A';
+            const mem = analysis.memoryWithoutConstant || analysis.memory || 'N/A';
+            const exactTime = analysis.timeWithConstant ? ` (Exact: ${analysis.timeWithConstant})` : '';
+            const exactMem = analysis.memoryWithConstant ? ` (Exact: ${analysis.memoryWithConstant})` : '';
+            
+            const textToCopy = `Time Complexity: ${time}${exactTime}\nMemory Complexity: ${mem}${exactMem}`;
             navigator.clipboard.writeText(textToCopy);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
@@ -117,17 +122,26 @@ export const ComplexityAnalyzer = ({ theme = 'emerald' }) => {
                     
                     <div className={`flex-1 rounded-xl border p-6 flex flex-col justify-center items-center text-center transition-all duration-500 relative ${bgOpacityClass}`}>
                         {error ? (
-                            <div className="text-red-400">{error}</div>
+                            <div className="text-red-400 font-mono text-sm max-w-full overflow-hidden text-ellipsis px-4 py-2 bg-red-900/20 rounded border border-red-500/30">
+                                <span className="font-bold text-red-500 mb-1 block">Error:</span>
+                                {error}
+                            </div>
                         ) : analysis ? (
                             <>
-                                <div className="grid grid-cols-2 gap-4 w-full mb-6">
-                                    <div className="p-4 bg-black/40 rounded-lg border border-white/5">
-                                        <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Time Complexity</div>
-                                        <div className={`text-3xl font-black ${textGradientClass}`}>{analysis.time}</div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mb-6">
+                                    <div className="p-4 bg-black/40 rounded-lg border border-white/5 flex flex-col justify-between">
+                                        <div className="text-xs text-gray-400 uppercase tracking-wider mb-2">Time Complexity</div>
+                                        <div className={`text-2xl font-black ${textGradientClass}`}>{analysis.timeWithoutConstant || analysis.time}</div>
+                                        <div className="text-xs text-gray-500 mt-2 font-mono" title="Exact complexity including constants">
+                                            Exact: {analysis.timeWithConstant || 'N/A'}
+                                        </div>
                                     </div>
-                                    <div className="p-4 bg-black/40 rounded-lg border border-white/5">
-                                        <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Memory Complexity</div>
-                                        <div className={`text-3xl font-black ${textGradientClass}`}>{analysis.memory}</div>
+                                    <div className="p-4 bg-black/40 rounded-lg border border-white/5 flex flex-col justify-between">
+                                        <div className="text-xs text-gray-400 uppercase tracking-wider mb-2">Space Complexity</div>
+                                        <div className={`text-2xl font-black ${textGradientClass}`}>{analysis.memoryWithoutConstant || analysis.memory}</div>
+                                        <div className="text-xs text-gray-500 mt-2 font-mono" title="Exact complexity including constants">
+                                            Exact: {analysis.memoryWithConstant || 'N/A'}
+                                        </div>
                                     </div>
                                 </div>
                                 <p className="text-sm text-gray-300 max-w-md">

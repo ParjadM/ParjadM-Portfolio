@@ -90,7 +90,7 @@ router.post('/complexity', async (req, res) => {
     if (redisClient) {
       try {
         const hash = crypto.createHash('sha256').update(code).digest('hex')
-        cacheKey = `ai_complexity:${hash}`
+        cacheKey = `ai_complexity_v2:${hash}`
         const cachedResponse = await redisClient.get(cacheKey)
         if (cachedResponse) {
           // Parse JSON if it was stored as string, Upstash auto-parses, but let's handle both
@@ -108,13 +108,16 @@ router.post('/complexity', async (req, res) => {
 
     const ai = new GoogleGenAI({ apiKey })
 
-    const systemInstruction = `You are an expert static analyzer for Big-O complexity.
-Analyze the following source code and determine its Time Complexity and Space (Memory) Complexity in Big-O notation.
+    const systemInstruction = `You are an expert static analyzer for code complexity.
+Analyze the following source code and determine its Time Complexity and Space (Memory) Complexity.
+Provide the complexity BOTH with constants (exact operations/space count, e.g., O(3N + 2)) and without constants (Big-O notation, e.g., O(N)).
 Respond EXCLUSIVELY in valid JSON format using the following schema:
 {
-  "time": "O(...)",
-  "memory": "O(...)",
-  "explanation": "A concise 1-2 sentence explanation of why."
+  "timeWithConstant": "...",
+  "timeWithoutConstant": "...",
+  "memoryWithConstant": "...",
+  "memoryWithoutConstant": "...",
+  "explanation": "A concise explanation."
 }`
 
     const response = await ai.models.generateContent({
@@ -131,8 +134,8 @@ Respond EXCLUSIVELY in valid JSON format using the following schema:
       replyData = JSON.parse(response.text)
     } catch (e) {
       replyData = {
-        time: "O(?)",
-        memory: "O(?)",
+        timeWithoutConstant: "O(?)",
+        memoryWithoutConstant: "O(?)",
         explanation: "Could not parse AI response."
       }
     }
@@ -149,7 +152,8 @@ Respond EXCLUSIVELY in valid JSON format using the following schema:
     res.json(replyData)
   } catch (err) {
     console.error('AI Complexity Error:', err)
-    res.status(500).json({ error: 'Failed to analyze code complexity' })
+    // Send back actual error message to debug Vercel issues
+    res.status(500).json({ error: err.message || 'Failed to analyze code complexity' })
   }
 })
 
