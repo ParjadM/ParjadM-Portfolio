@@ -53,17 +53,29 @@ ${knowledgeContent ? knowledgeContent : "No specific knowledge provided yet. Ple
 ${context ? `\n\nAdditional Context: ${context}` : ''}
 If asked something outside of this scope, you can politely decline or say you don't know.`
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: messages,
-      config: {
-        systemInstruction: systemInstruction,
+    let replyText = ''
+    try {
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: messages,
+        config: { systemInstruction }
+      })
+      replyText = response.text
+    } catch (err) {
+      if (err.message && (err.message.includes('429') || err.message.includes('quota'))) {
+        console.warn('Gemini 2.5 Flash rate limit hit, falling back to Gemini 1.5 Flash...')
+        const response = await ai.models.generateContent({
+          model: 'gemini-1.5-flash',
+          contents: messages,
+          config: { systemInstruction }
+        })
+        replyText = response.text
+      } else {
+        throw err
       }
-    })
+    }
 
-    const replyText = response.text
-
-    if (redisClient && cacheKey) {
+    if (redisClient && cacheKey && replyText) {
       try {
         // Cache for 24 hours (86400 seconds)
         await redisClient.set(cacheKey, replyText, { ex: 86400 })
@@ -75,7 +87,14 @@ If asked something outside of this scope, you can politely decline or say you do
     res.json({ reply: replyText })
   } catch (err) {
     console.error('AI Chat Error:', err)
-    res.status(500).json({ error: err.message || 'Failed to generate AI response' })
+    
+    // Cleanly parse rate limit errors so the chatbot speaks a friendly message
+    let errorMessage = err.message || 'Failed to generate AI response'
+    if (errorMessage.includes('429') || errorMessage.includes('quota') || errorMessage.includes('RESOURCE_EXHAUSTED')) {
+      errorMessage = "I've been answering a lot of questions lately and need a quick breather! Please wait about a minute and ask me again."
+    }
+    
+    res.status(500).json({ error: errorMessage })
   }
 })
 
