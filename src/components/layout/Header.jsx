@@ -121,125 +121,142 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
         <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
             {/* Skip to content for screen readers/keyboard users */}
             <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:bg-black focus:text-white focus:px-3 focus:py-2 focus:rounded">Skip to main content</a>
-            <nav className="container mx-auto px-6 py-4 flex justify-between items-center" role="navigation" aria-label="Primary">
-                <Link to="/" className="text-2xl font-bold text-white tracking-wider inline-flex items-center">
-                    <img src={Logo} alt="Logo" className="h-[4.5rem] w-auto" />
+            
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex container mx-auto px-6 py-4 justify-between items-center" role="navigation" aria-label="Primary">
+                <Link to="/" className="text-2xl font-bold text-white tracking-wider inline-flex items-center transition-transform hover:scale-105">
+                    <img src={Logo} alt="Logo" className="h-[4.5rem] w-auto drop-shadow-lg" />
                 </Link>
                 
-                {/* Desktop Menu */}
-                <div className="hidden lg:block">
-                     <GlassCard className="!rounded-full border border-white/10 shadow-lg backdrop-blur-md" theme={theme}>
-                        <div className="flex items-center px-2 py-1.5">
-                            {/* Navigation Links */}
-                            <div className="flex items-center space-x-1 pr-4 border-r border-white/10">
-                                {navItems.map(item => {
-                                    const isItemActive = isActive(item.path);
-                                    return (
+                <GlassCard className="!rounded-full border border-white/10 shadow-lg backdrop-blur-md" theme={theme}>
+                    <div className="flex items-center px-2 py-1.5">
+                        {/* Navigation Links */}
+                        <div className="flex items-center space-x-1 pr-4 border-r border-white/10">
+                            {navItems.map(item => {
+                                const isItemActive = isActive(item.path);
+                                return (
+                                    <Link
+                                        key={item.name}
+                                        to={item.path}
+                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                                            isItemActive 
+                                            ? (theme === 'pink' ? 'bg-pink-500/20 text-pink-200 border border-pink-500/20' : 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/20') 
+                                            : 'text-gray-300 hover:text-white hover:bg-white/10 border border-transparent'
+                                        }`}
+                                        aria-current={isItemActive ? 'page' : undefined}
+                                    >
+                                        {item.name}
+                                    </Link>
+                                );
+                            })}
+                        </div>
+
+                        {/* Utility Actions */}
+                        <div className="flex items-center pl-4 space-x-3">
+                            {visitors !== null && (
+                                <div className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 shadow-inner" title="Unique Visitors">
+                                    <div className={`w-2 h-2 rounded-full animate-pulse ${theme === 'pink' ? 'bg-pink-400' : 'bg-emerald-400'}`}></div>
+                                    <span className="text-gray-300 text-xs font-semibold tracking-wide whitespace-nowrap">
+                                        {t('nav.Visitors', { count: visitors })}
+                                    </span>
+                                </div>
+                            )}
+                            
+                            <LanguageSwitcher />
+                            
+                            <div className="relative">
+                                <button
+                                    ref={paletteTriggerRef}
+                                    onClick={() => setIsPaletteOpen(!isPaletteOpen)}
+                                    className="p-2 rounded-full bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/20 transition-all duration-300"
+                                    aria-label="Theme Palette"
+                                >
+                                    <Palette className="w-4 h-4" />
+                                </button>
+                                {paletteEl}
+                            </div>
+                        </div>
+                    </div>
+                </GlassCard>
+            </nav>
+
+            {/* Mobile & Tablet Navigation */}
+            <nav className="lg:hidden px-4 py-3" role="navigation" aria-label="Mobile Primary">
+                <GlassCard className="!rounded-2xl border border-white/10 shadow-lg backdrop-blur-md px-4 py-2" theme={theme}>
+                    <div className="flex justify-between items-center">
+                        <Link to="/" className="inline-flex items-center">
+                            <img src={Logo} alt="Logo" className="h-8 w-auto drop-shadow-md" />
+                        </Link>
+                        
+                        <div className="flex items-center space-x-3">
+                            <LanguageSwitcher />
+                            <button 
+                                onClick={() => setIsMenuOpen(!isMenuOpen)} 
+                                className={`p-2 rounded-xl transition-all duration-300 ${isMenuOpen ? 'bg-white/10 text-white' : 'bg-white/5 text-gray-300 hover:text-white hover:bg-white/20'}`}
+                                aria-controls="primary-menu" 
+                                aria-expanded={isMenuOpen} 
+                                aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+                            >
+                                <Menu size={20} />
+                            </button>
+                        </div>
+                    </div>
+                </GlassCard>
+
+                {/* Mobile Menu Dropdown */}
+                {isMenuOpen && (
+                    <div className="mt-2" id="primary-menu">
+                        <GlassCard className="w-full !rounded-2xl border border-white/10 shadow-xl overflow-hidden" theme={theme}>
+                            <div className="flex flex-col p-3 space-y-1">
+                                {navItems.map(item => (
+                                    <React.Fragment key={item.name}>
                                         <Link
-                                            key={item.name}
                                             to={item.path}
-                                            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                                                isItemActive 
-                                                ? (theme === 'pink' ? 'bg-pink-500/20 text-pink-200 border border-pink-500/20' : 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/20') 
-                                                : 'text-gray-300 hover:text-white hover:bg-white/10 border border-transparent'
-                                            }`}
-                                            aria-current={isItemActive ? 'page' : undefined}
+                                            onClick={handleNavClick}
+                                            className={`block w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${isActive(item.path) ? (theme === 'pink' ? 'bg-pink-500/20 text-pink-200' : 'bg-emerald-500/20 text-emerald-200') : 'text-gray-300 hover:text-white hover:bg-white/5'}`}
+                                            aria-current={isActive(item.path) ? 'page' : undefined}
                                         >
                                             {item.name}
                                         </Link>
-                                    );
-                                })}
-                            </div>
-
-                            {/* Utility Actions */}
-                            <div className="flex items-center pl-4 space-x-3">
+                                        {item.path === '/contact' && (
+                                            <div className="w-full py-1">
+                                                <NewsFeed posts={blogPosts} theme={theme} darkMode={darkMode} onNavigate={handleNavClick} />
+                                            </div>
+                                        )}
+                                    </React.Fragment>
+                                ))}
+                                
                                 {visitors !== null && (
-                                    <div className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 shadow-inner" title="Unique Visitors">
+                                    <div className="mt-2 flex items-center justify-center space-x-2 px-4 py-3 rounded-xl bg-white/5 border border-white/5">
                                         <div className={`w-2 h-2 rounded-full animate-pulse ${theme === 'pink' ? 'bg-pink-400' : 'bg-emerald-400'}`}></div>
-                                        <span className="text-gray-300 text-xs font-semibold tracking-wide whitespace-nowrap">
+                                        <span className="text-gray-300 text-xs font-semibold tracking-wide">
                                             {t('nav.Visitors', { count: visitors })}
                                         </span>
                                     </div>
                                 )}
                                 
-                                <LanguageSwitcher />
-                                
-                                <div className="relative">
-                                    <button
-                                        ref={paletteTriggerRef}
-                                        onClick={() => setIsPaletteOpen(!isPaletteOpen)}
-                                        className="p-2 rounded-full bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/20 transition-all duration-300"
-                                        aria-label="Theme Palette"
-                                    >
-                                        <Palette className="w-4 h-4" />
-                                    </button>
-                                    {paletteEl}
+                                <div className="mt-2 pt-3 border-t border-white/10">
+                                    <div className="px-2 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Themes</div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {Object.values(THEMES).map((t) => (
+                                            <button
+                                                key={t.id}
+                                                onClick={() => {
+                                                    setThemeId(t.id);
+                                                    handleNavClick();
+                                                }}
+                                                className={`text-center px-3 py-2 rounded-xl text-xs font-medium transition-colors ${currentThemeId === t.id ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10'}`}
+                                            >
+                                                {t.name}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </GlassCard>
-                </div>
-
-                {/* Mobile Menu Button */}
-                <div className="md:hidden">
-                    <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white" aria-controls="primary-menu" aria-expanded={isMenuOpen} aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}>
-                        <Menu size={28} />
-                    </button>
-                </div>
+                        </GlassCard>
+                    </div>
+                )}
             </nav>
-            {/* Mobile Menu */}
-            {isMenuOpen && (
-                 <div className="md:hidden mt-2 px-6" id="primary-menu">
-                    <GlassCard className="w-full" theme={theme}>
-                        <div className="flex flex-col items-center space-y-2 p-4">
-                            {navItems.map(item => (
-                                <React.Fragment key={item.name}>
-                                    <Link
-                                        to={item.path}
-                                        onClick={handleNavClick}
-                                        className={`block w-full text-center px-4 py-2 rounded-lg text-lg font-medium transition-colors duration-300 ${isActive(item.path) ? 'bg-white/20 text-white' : 'text-gray-300 hover:text-white'}`}
-                                        aria-current={isActive(item.path) ? 'page' : undefined}
-                                    >
-                                        {item.name}
-                                    </Link>
-                                    {item.path === '/contact' && (
-                                        <div className="w-full flex justify-center">
-                                            <NewsFeed posts={blogPosts} theme={theme} darkMode={darkMode} onNavigate={handleNavClick} />
-                                        </div>
-                                    )}
-                                </React.Fragment>
-                            ))}
-                            {visitors !== null && (
-                              <div className="mt-2 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 text-sm w-full text-center">
-                                {t('nav.Visitors', { count: visitors })}
-                              </div>
-                            )}
-                            
-                            <div className="mt-2 w-full flex justify-center">
-                                <LanguageSwitcher />
-                            </div>
-                            
-                            <div className="mt-2 w-full">
-                                <div className="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center">Themes</div>
-                                <div className="grid grid-cols-1 gap-2 mt-1">
-                                    {Object.values(THEMES).map((t) => (
-                                        <button
-                                            key={t.id}
-                                            onClick={() => {
-                                                setThemeId(t.id);
-                                                handleNavClick();
-                                            }}
-                                            className={`w-full text-center px-4 py-2 rounded-lg text-sm transition-colors ${currentThemeId === t.id ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10'}`}
-                                        >
-                                            {t.name}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </GlassCard>
-                </div>
-            )}
         </header>
     );
 };
