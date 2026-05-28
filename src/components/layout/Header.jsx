@@ -127,39 +127,54 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
                 </Link>
                 
                 {/* Desktop Menu */}
-                <div className="hidden md:block">
-                     <GlassCard className="!rounded-full" theme={theme}>
-                        <div className="flex items-center space-x-1 px-3 py-2">
-                            {navItems.map(item => (
-                                <React.Fragment key={item.name}>
-                                    <Link
-                                        to={item.path}
-                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${isActive(item.path) ? 'bg-white/20 text-white' : 'text-gray-300 hover:text-white'}`}
-                                        aria-current={isActive(item.path) ? 'page' : undefined}
-                                    >
-                                        {item.name}
-                                    </Link>
-                                    {item.name === 'Contact' && <NewsFeed posts={blogPosts} theme={theme} darkMode={darkMode} compact />}
-                                </React.Fragment>
-                            ))}
-                            {visitors !== null && (
-                              <div className="ml-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 text-gray-200 text-sm font-semibold whitespace-nowrap">
-                                {t('nav.Visitors', { count: visitors })}
-                              </div>
-                            )}
-                            <div className="ml-2 flex items-center">
-                                <LanguageSwitcher />
+                <div className="hidden lg:block">
+                     <GlassCard className="!rounded-full border border-white/10 shadow-lg backdrop-blur-md" theme={theme}>
+                        <div className="flex items-center px-2 py-1.5">
+                            {/* Navigation Links */}
+                            <div className="flex items-center space-x-1 pr-4 border-r border-white/10">
+                                {navItems.map(item => {
+                                    const isItemActive = isActive(item.path);
+                                    return (
+                                        <Link
+                                            key={item.name}
+                                            to={item.path}
+                                            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                                                isItemActive 
+                                                ? (theme === 'pink' ? 'bg-pink-500/20 text-pink-200 border border-pink-500/20' : 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/20') 
+                                                : 'text-gray-300 hover:text-white hover:bg-white/10 border border-transparent'
+                                            }`}
+                                            aria-current={isItemActive ? 'page' : undefined}
+                                        >
+                                            {item.name}
+                                        </Link>
+                                    );
+                                })}
                             </div>
-                            <div className="relative ml-2">
-                                <button
-                                    ref={paletteTriggerRef}
-                                    onClick={() => setIsPaletteOpen(!isPaletteOpen)}
-                                    className="p-2 rounded-full bg-white/10 border border-white/10 text-gray-300 hover:text-white hover:bg-white/15 transition-colors duration-300"
-                                    aria-label="Theme Palette"
-                                >
-                                    <Palette className="w-5 h-5" />
-                                </button>
-                                {paletteEl}
+
+                            {/* Utility Actions */}
+                            <div className="flex items-center pl-4 space-x-3">
+                                {visitors !== null && (
+                                    <div className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 shadow-inner" title="Unique Visitors">
+                                        <div className={`w-2 h-2 rounded-full animate-pulse ${theme === 'pink' ? 'bg-pink-400' : 'bg-emerald-400'}`}></div>
+                                        <span className="text-gray-300 text-xs font-semibold tracking-wide whitespace-nowrap">
+                                            {t('nav.Visitors', { count: visitors })}
+                                        </span>
+                                    </div>
+                                )}
+                                
+                                <LanguageSwitcher />
+                                
+                                <div className="relative">
+                                    <button
+                                        ref={paletteTriggerRef}
+                                        onClick={() => setIsPaletteOpen(!isPaletteOpen)}
+                                        className="p-2 rounded-full bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/20 transition-all duration-300"
+                                        aria-label="Theme Palette"
+                                    >
+                                        <Palette className="w-4 h-4" />
+                                    </button>
+                                    {paletteEl}
+                                </div>
                             </div>
                         </div>
                     </GlassCard>
@@ -187,7 +202,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
                                     >
                                         {item.name}
                                     </Link>
-                                    {item.name === 'Contact' && (
+                                    {item.path === '/contact' && (
                                         <div className="w-full flex justify-center">
                                             <NewsFeed posts={blogPosts} theme={theme} darkMode={darkMode} onNavigate={handleNavClick} />
                                         </div>
