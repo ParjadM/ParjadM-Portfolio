@@ -54,26 +54,14 @@ ${context ? `\n\nAdditional Context: ${context}` : ''}
 If asked something outside of this scope, you can politely decline or say you don't know.`
 
     let replyText = ''
-    try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: messages,
-        config: { systemInstruction }
-      })
-      replyText = response.text
-    } catch (err) {
-      if (err.message && (err.message.includes('429') || err.message.includes('quota'))) {
-        console.warn('Gemini 2.5 Flash rate limit hit, falling back to Gemini 1.5 Flash...')
-        const response = await ai.models.generateContent({
-          model: 'gemini-1.5-flash',
-          contents: messages,
-          config: { systemInstruction }
-        })
-        replyText = response.text
-      } else {
-        throw err
-      }
-    }
+    
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: messages,
+      config: { systemInstruction }
+    })
+    
+    replyText = response.text
 
     if (redisClient && cacheKey && replyText) {
       try {
