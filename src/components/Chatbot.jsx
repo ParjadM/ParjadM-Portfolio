@@ -1,6 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
+import 'regenerator-runtime/runtime';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+
+// ... (icons remain the same) ...
+
 const BotIcon = (props) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M12 8V4H8" />
@@ -50,11 +55,10 @@ const Chatbot = ({ theme = 'green' }) => {
   const [loading, setLoading] = useState(false);
   
   // Voice state
-  const [isListening, setIsListening] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
   
   const messagesEndRef = useRef(null);
-  const recognitionRef = useRef(null);
   const location = useLocation();
 
   // Initialize greeting based on page
@@ -84,65 +88,26 @@ const Chatbot = ({ theme = 'green' }) => {
     scrollToBottom();
   }, [messages, isOpen]);
 
+  // Sync react-speech-recognition transcript to input field
+  useEffect(() => {
+    if (listening && transcript) {
+      setInput(transcript);
+    }
+  }, [transcript, listening]);
+
   const toggleListening = (e) => {
     e.preventDefault();
-    if (isListening) {
-      recognitionRef.current?.stop();
-      setIsListening(false);
+    if (!browserSupportsSpeechRecognition) {
+      alert("Voice input is not supported in this browser.");
+      return;
+    }
+    
+    if (listening) {
+      SpeechRecognition.stopListening();
     } else {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRecognition) {
-        try {
-          const recognition = new SpeechRecognition();
-          recognition.continuous = true;
-          recognition.interimResults = true;
-          recognition.lang = 'en-US';
-          
-          let finalTranscript = input;
-
-          recognition.onresult = (event) => {
-            let interimTranscript = '';
-            let newFinal = '';
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-              if (event.results[i].isFinal) {
-                newFinal += event.results[i][0].transcript;
-              } else {
-                interimTranscript += event.results[i][0].transcript;
-              }
-            }
-            if (newFinal) {
-              finalTranscript += (finalTranscript ? ' ' : '') + newFinal;
-              setInput(finalTranscript);
-            } else {
-              setInput(finalTranscript + (finalTranscript ? ' ' : '') + interimTranscript);
-            }
-          };
-          
-          recognition.onerror = (event) => {
-            console.error("Speech recognition error:", event.error);
-            if (event.error === 'not-allowed') {
-              alert("Microphone access was denied. Please allow microphone permissions in your browser.");
-            } else if (event.error !== 'no-speech') {
-              setInput(`(Microphone Error: ${event.error})`);
-            }
-            setIsListening(false);
-          };
-          
-          recognition.onend = () => {
-            setIsListening(false);
-          };
-          
-          recognitionRef.current = recognition;
-          recognition.start();
-          setIsListening(true);
-        } catch (err) {
-          console.error("Speech recognition startup error:", err);
-          alert("Could not start voice input. Another app might be using the microphone.");
-          setIsListening(false);
-        }
-      } else {
-        alert("Voice input is not supported in this browser.");
-      }
+      resetTranscript();
+      setInput('');
+      SpeechRecognition.startListening({ continuous: true, language: 'en-US' });
     }
   };
 
@@ -171,9 +136,8 @@ const Chatbot = ({ theme = 'green' }) => {
     e?.preventDefault();
     if (!input.trim() || loading) return;
 
-    if (isListening) {
-      recognitionRef.current?.stop();
-      setIsListening(false);
+    if (listening) {
+      SpeechRecognition.stopListening();
     }
 
     const userMessage = { role: 'user', parts: [{ text: input }] };
@@ -279,8 +243,8 @@ const Chatbot = ({ theme = 'green' }) => {
               <button
                 type="button"
                 onClick={toggleListening}
-                className={`p-2 rounded-full transition-all ${isListening ? 'bg-red-500/20 text-red-400 animate-pulse' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-                title={isListening ? "Stop listening" : "Start Voice Input"}
+                className={`p-2 rounded-full transition-all ${listening ? 'bg-red-500/20 text-red-400 animate-pulse' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+                title={listening ? "Stop listening" : "Start Voice Input"}
               >
                 <MicIcon className="w-5 h-5" />
               </button>
@@ -288,7 +252,7 @@ const Chatbot = ({ theme = 'green' }) => {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={isListening ? "Listening..." : "Ask me anything..."}
+                placeholder={listening ? "Listening..." : "Ask me anything..."}
                 className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-white/30 transition-all"
               />
               <button

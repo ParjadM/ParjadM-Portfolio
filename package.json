@@ -28,6 +28,8 @@
     "react-i18next": "^17.0.8",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.9.4",
+    "react-speech-recognition": "^4.0.1",
+    "regenerator-runtime": "^0.14.1",
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {

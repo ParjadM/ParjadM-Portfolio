@@ -90,7 +90,7 @@ Respond EXCLUSIVELY in valid JSON format using the following schema:
       setTimeout(() => reject(new Error('Gemini API timeout after 60 seconds')), 60000)
     );
 
-    const apiPromise = ai.models.generateContent({
+    const makeRequest = () => ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: [{ role: 'user', parts: [{ text: combinedCode }] }],
       config: {
@@ -99,7 +99,21 @@ Respond EXCLUSIVELY in valid JSON format using the following schema:
       }
     });
 
-    const response = await Promise.race([apiPromise, timeoutPromise]);
+    let apiPromise = makeRequest();
+    let response;
+    
+    try {
+      response = await Promise.race([apiPromise, timeoutPromise]);
+    } catch (err) {
+      if (err.message.includes('429') || err.message.includes('RESOURCE_EXHAUSTED') || err.message.includes('quota')) {
+        console.log('Hit Gemini rate limit. Waiting 10 seconds and retrying...');
+        await new Promise(resolve => setTimeout(resolve, 10000));
+        apiPromise = makeRequest();
+        response = await Promise.race([apiPromise, timeoutPromise]);
+      } else {
+        throw err;
+      }
+    }
 
     const replyData = JSON.parse(response.text);
     
