@@ -75,7 +75,7 @@ If asked something outside of this scope, you can politely decline or say you do
     res.json({ reply: replyText })
   } catch (err) {
     console.error('AI Chat Error:', err)
-    res.status(500).json({ error: 'Failed to generate AI response' })
+    res.status(500).json({ error: err.message || 'Failed to generate AI response' })
   }
 })
 

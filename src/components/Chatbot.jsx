@@ -105,28 +105,19 @@ const Chatbot = ({ theme = 'green' }) => {
 
       const recognition = new SpeechRecognition();
       recognition.continuous = true;
-      recognition.interimResults = true;
+      recognition.interimResults = false;
       recognition.lang = 'en-US';
       
-      let currentInput = input;
-
       recognition.onresult = (event) => {
         let finalStr = '';
-        let interimStr = '';
-        
         for (let i = event.resultIndex; i < event.results.length; i++) {
           if (event.results[i].isFinal) {
             finalStr += event.results[i][0].transcript;
-          } else {
-            interimStr += event.results[i][0].transcript;
           }
         }
         
         if (finalStr) {
-          currentInput = currentInput + (currentInput ? ' ' : '') + finalStr;
-          setInput(currentInput);
-        } else {
-          setInput(currentInput + (currentInput ? ' ' : '') + interimStr);
+          setInput(prev => prev + (prev ? ' ' : '') + finalStr);
         }
       };
 
@@ -135,7 +126,7 @@ const Chatbot = ({ theme = 'green' }) => {
         if (event.error === 'not-allowed') {
           setVoiceError('Microphone blocked');
           alert("Microphone access was denied. Please click the lock icon in your URL bar and allow microphone permissions.");
-        } else {
+        } else if (event.error !== 'no-speech') {
           setVoiceError('Error: ' + event.error);
         }
         setListening(false);
@@ -191,7 +182,8 @@ const Chatbot = ({ theme = 'green' }) => {
     if (!input.trim() || loading) return;
 
     if (listening) {
-      SpeechRecognition.stopListening();
+      recognitionRef.current?.stop();
+      setListening(false);
     }
 
     const userMessage = { role: 'user', parts: [{ text: input }] };
@@ -215,12 +207,12 @@ const Chatbot = ({ theme = 'green' }) => {
         setMessages((prev) => [...prev, { role: 'model', parts: [{ text: data.reply }] }]);
         speakText(data.reply);
       } else {
-        const errorMsg = "Sorry, I'm having trouble connecting right now.";
+        const errorMsg = `Connection Error: ${data.error || "Please try again later."}`;
         setMessages((prev) => [...prev, { role: 'model', parts: [{ text: errorMsg }] }]);
         speakText(errorMsg);
       }
     } catch (error) {
-      const errorMsg = "Sorry, something went wrong.";
+      const errorMsg = "Sorry, something went wrong with the network.";
       setMessages((prev) => [...prev, { role: 'model', parts: [{ text: errorMsg }] }]);
       speakText(errorMsg);
     } finally {
