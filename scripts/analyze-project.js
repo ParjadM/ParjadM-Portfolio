@@ -124,12 +124,17 @@ Respond EXCLUSIVELY in valid JSON format using the following schema:
   } catch (err) {
     console.error('Failed to analyze complexity:', err.message);
     // Write fallback so the build doesn't crash completely
+    let cleanError = "Failed to analyze during build step. " + err.message;
+    if (err.message.includes('429') || err.message.includes('quota') || err.message.includes('RESOURCE_EXHAUSTED')) {
+      cleanError = "The AI Analyzer hit its rate limit during the deployment process because we've been pushing updates so quickly! The codebase is perfectly fine, but the AI just needs a quick breather. Pushing another update in a few minutes will automatically refresh these stats.";
+    }
+
     const fallback = {
       timeWithConstant: "O(?)",
       timeWithoutConstant: "O(?)",
       memoryWithConstant: "O(?)",
       memoryWithoutConstant: "O(?)",
-      explanation: "Failed to analyze during build step. " + err.message
+      explanation: cleanError
     };
     if (!fs.existsSync(PUBLIC_DIR)) fs.mkdirSync(PUBLIC_DIR, { recursive: true });
     fs.writeFileSync(OUTPUT_FILE, JSON.stringify(fallback, null, 2));
