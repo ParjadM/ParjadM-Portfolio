@@ -1,9 +1,6 @@
 import { Router } from 'express'
 import { currentEngine } from '../db/index.js'
 import { Analytics, Visitor, AnalyticsDaily, VisitorDay, VisitorDayPath, DeviceStats, HourlyStats, AccessLog } from '../db/mongo.js'
-import * as UAParserPkg from 'ua-parser-js'
-const UAParser = UAParserPkg.UAParser || UAParserPkg.default || UAParserPkg
-
 const router = Router()
 
 async function ensureAnalyticsDoc() {
@@ -58,11 +55,10 @@ router.post('/visit', async (req, res) => {
       { upsert: true }
     )
 
-    // Parse User Agent
+    // Parse User Agent manually or fallback to Unknown to prevent Vercel crashes
     const uaString = req.headers['user-agent'] || ''
-    const parser = new UAParser(uaString)
-    const browserName = parser.getBrowser().name || 'Unknown'
-    const osName = parser.getOS().name || 'Unknown'
+    const browserName = 'Unknown'
+    const osName = 'Unknown'
 
     // Update Device Stats
     await DeviceStats.updateOne(
