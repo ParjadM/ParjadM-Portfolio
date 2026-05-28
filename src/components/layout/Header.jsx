@@ -5,6 +5,8 @@ import { GlassCard } from '../ui/GlassCard.jsx';
 import { RippleButton } from '../ui/RippleButton.jsx';
 import { Toast } from '../ui/Toast.jsx';
 import { getAuthToken } from '../../utils/auth.jsx';
+import Logo from '../../Images/Logo.png';
+import { NewsFeed } from '../ui/NewsFeed.jsx';
 
 export const Header = ({ toggleTheme, toggleDarkMode, theme, darkMode = true }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
