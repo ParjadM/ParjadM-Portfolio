@@ -9,8 +9,11 @@ import Logo from '../../Images/Logo.png';
 import { NewsFeed } from '../ui/NewsFeed.jsx';
 import { THEMES } from '../../utils/themeConfig.js';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '../ui/LanguageSwitcher.jsx';
 
 export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) => {
+    const { t } = useTranslation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
     const [paletteRect, setPaletteRect] = useState(null);
@@ -29,12 +32,12 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
     });
     const location = useLocation();
     const navItems = [
-        { name: 'Home', path: '/' },
-        { name: 'About', path: '/about' },
-        { name: 'Projects', path: '/projects' },
-        { name: 'Stats', path: '/stats' },
-        { name: 'Blog', path: '/blog' },
-        { name: 'Contact', path: '/contact' }
+        { name: t('nav.Home'), path: '/' },
+        { name: t('nav.About'), path: '/about' },
+        { name: t('nav.Projects'), path: '/projects' },
+        { name: t('nav.Stats'), path: '/stats' },
+        { name: t('nav.Blog'), path: '/blog' },
+        { name: t('nav.Contact'), path: '/contact' }
     ];
 
     const handleNavClick = () => {
@@ -141,9 +144,12 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
                             ))}
                             {visitors !== null && (
                               <div className="ml-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 text-gray-200 text-sm font-semibold whitespace-nowrap">
-                                {visitors} Visitors
+                                {t('nav.Visitors', { count: visitors })}
                               </div>
                             )}
+                            <div className="ml-2 flex items-center">
+                                <LanguageSwitcher />
+                            </div>
                             <div className="relative ml-2">
                                 <button
                                     ref={paletteTriggerRef}
@@ -190,9 +196,13 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
                             ))}
                             {visitors !== null && (
                               <div className="mt-2 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 text-sm w-full text-center">
-                                {visitors} Visitors
+                                {t('nav.Visitors', { count: visitors })}
                               </div>
                             )}
+                            
+                            <div className="mt-2 w-full flex justify-center">
+                                <LanguageSwitcher />
+                            </div>
                             
                             <div className="mt-2 w-full">
                                 <div className="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center">Themes</div>

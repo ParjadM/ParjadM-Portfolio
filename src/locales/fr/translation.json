@@ -1,0 +1,33 @@
+{
+  "nav": {
+    "Home": "Accueil",
+    "About": "À propos",
+    "Projects": "Projets",
+    "Stats": "Statistiques",
+    "Blog": "Blog",
+    "Contact": "Contact",
+    "Visitors": "{{count}} Visiteurs"
+  },
+  "home": {
+    "title": "Parjad Minooei",
+    "subtitle1": "Un ",
+    "subtitle2": "Ingénieur Logiciel",
+    "subtitle3": " créatif passionné par la création d'applications web magnifiques, fonctionnelles et centrées sur l'utilisateur.",
+    "cta": "Contactez-moi"
+  },
+  "about": {
+    "title": "À propos de moi",
+    "subtitle": "Apprenez à connaître la personne derrière le code",
+    "role": "Ingénieur Logiciel",
+    "location": "Basé à Scarborough, ON • Profil multidisciplinaire",
+    "yearsLearning": "Années d'apprentissage",
+    "tabs": {
+      "story": "Mon Histoire",
+      "education": "Éducation",
+      "interests": "Intérêts"
+    },
+    "storyText1": "Je suis étudiant en génie logiciel à l'Université McMaster, basé à Scarborough, ON, avec une formation qui combine de manière unique un diplôme avancé en programmation informatique avec un diplôme en psychologie. Cette combinaison me permet d'aborder l'architecture de systèmes complexes avec une compréhension approfondie de la résolution de problèmes logiques et de la conception centrée sur l'utilisateur.",
+    "storyText2": "Mon parcours dans la technologie a évolué, passant de la création d'applications web réactives à l'ingénierie de logiciels évolutifs et performants. J'exécute actuellement un plan rigoureux de 6 semaines axé sur les arbres, les graphes et les algorithmes avancés (BFS/DFS) pour atteindre un niveau d'aisance de niveau entretien dans les structures de données et les algorithmes.",
+    "storyText3": "Quand je ne conçois pas de logiciels, je suis généralement à la salle de sport, je me plonge dans des problèmes mathématiques complexes ou je relève des défis LeetCode pour garder mon esprit d'analyse affûté. Je m'épanouis dans l'apprentissage continu et l'application de mes compétences pour créer des solutions logicielles élégantes et efficaces."
+  }
+}

@@ -8,7 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Reveal } from '../components/Reveal.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
-
+import { useTranslation } from 'react-i18next';
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 import ParjadImage from '../Images/Parjad.jpg';
 import GitHubStats from '../components/GitHubStats.tsx';
@@ -21,6 +21,7 @@ import SpaceShooterImage from '../Images/SpaceShooter.jpg';
 
 export const HomeSection = ({ theme }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   // Visitors shown in header now
 
   return (
@@ -30,10 +31,10 @@ export const HomeSection = ({ theme }) => {
       <div className="p-6 md:p-0 text-left">
         <Reveal>
         <h1 className={`text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-tight bg-gradient-to-r ${theme !== 'pink' ? 'from-emerald-400 via-teal-400 to-cyan-400' : 'from-pink-400 via-red-400 to-purple-400'} bg-clip-text text-transparent`}>
-          Parjad Minooei
+          {t('home.title')}
         </h1>
         <p className="mt-4 text-xl md:text-2xl text-gray-300 max-w-2xl">
-          A creative <span className={theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}>Software Engineer</span> with a passion for building beautiful, functional, and user-centric web applications.
+          {t('home.subtitle1')}<span className={theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}>{t('home.subtitle2')}</span>{t('home.subtitle3')}
         </p>
         <div className="mt-8 flex justify-start space-x-6">
           <a href="https://github.com/ParjadM" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:-translate-y-0.5 hover:scale-105"><Github size={32} /></a>
@@ -44,7 +45,7 @@ export const HomeSection = ({ theme }) => {
           className="mt-10 px-8 py-3 rounded-full text-lg font-semibold shadow-lg"
           theme={theme}
         >
-          Get in Touch
+          {t('home.cta')}
         </RippleButton>
         </Reveal>
         

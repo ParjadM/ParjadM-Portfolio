@@ -8,7 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Reveal } from '../components/Reveal.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
-
+import { useTranslation } from 'react-i18next';
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 import ParjadImage from '../Images/Parjad.jpg';
 import GitHubStats from '../components/GitHubStats.tsx';
@@ -20,12 +20,13 @@ import BinaryGeneratorImage from '../Images/Binary 1010 Generator.jpg';
 import SpaceShooterImage from '../Images/SpaceShooter.jpg';
 
 export const AboutSection = ({ theme }) => {
+    const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState('story');
 
     const tabs = [
-        { id: 'story', label: 'My Story' },
-        { id: 'education', label: 'Education' },
-        { id: 'interests', label: 'Interests' }
+        { id: 'story', label: t('about.tabs.story') },
+        { id: 'education', label: t('about.tabs.education') },
+        { id: 'interests', label: t('about.tabs.interests') }
     ];
 
     const tabContent = {
@@ -34,13 +35,13 @@ export const AboutSection = ({ theme }) => {
             content: (
                 <div className="space-y-6">
                     <p className="text-gray-300 leading-relaxed">
-                        I am a Software Engineering student at McMaster University based in Scarborough, ON, with a background that uniquely blends an Advanced Diploma in Computer Programming with a degree in Psychology. This combination allows me to approach complex system architecture with a deep understanding of both logical problem-solving and user-centric design.
+                        {t('about.storyText1')}
                     </p>
                     <p className="text-gray-300 leading-relaxed">
-                        My path in tech has evolved from building responsive web applications to engineering scalable, high-performance software. I am currently executing a rigorous 6-week 'Visual Mastery' plan focused on Trees, Graphs, and advanced algorithms (BFS/DFS) to achieve interview-level fluency in data structures and algorithms.
+                        {t('about.storyText2')}
                     </p>
                     <p className="text-gray-300 leading-relaxed">
-                        When I’m not architecting software, I’m usually at the gym, diving into complex math problems, or tackling LeetCode challenges to keep my analytical skills sharp. I thrive on continuous learning and applying my skills to create elegant and efficient software solutions.
+                        {t('about.storyText3')}
                     </p>
                 </div>
             )
@@ -120,9 +121,9 @@ export const AboutSection = ({ theme }) => {
                 {/* Header */}
                 <div className="text-center mb-16">
                     <Reveal>
-                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">About Me</h2>
+                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">{t('about.title')}</h2>
                     <p className="text-gray-300 max-w-2xl mx-auto text-lg">
-                        Get to know the person behind the code
+                        {t('about.subtitle')}
                     </p>
                     </Reveal>
                 </div>
@@ -140,16 +141,16 @@ export const AboutSection = ({ theme }) => {
                                 />
                             </div>
                             <h3 className="text-2xl font-bold text-white mb-2">Parjad Minooei</h3>
-                            <p className="text-gray-400 mb-4">Software Engineer</p>
+                            <p className="text-gray-400 mb-4">{t('about.role')}</p>
                             <p className="text-gray-300 text-sm mb-6">
-                                Based in Scarborough, ON • Multidisciplinary background
+                                {t('about.location')}
                             </p>
                             
                             {/* Quick Stats */}
                             <div className="grid grid-cols-1 gap-4 mb-6">
                                 <div className="text-center">
                                     <div className={`text-2xl font-bold ${iconColor}`}>3+</div>
-                                    <div className="text-gray-400 text-sm">Years Learning</div>
+                                    <div className="text-gray-400 text-sm">{t('about.yearsLearning')}</div>
                                 </div>
                             </div>
 
