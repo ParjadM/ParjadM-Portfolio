@@ -64,7 +64,7 @@ const Chatbot = ({ theme = 'green' }) => {
     }
   };
 
-  const gradientClass = theme === 'green' 
+  const gradientClass = theme !== 'pink' 
     ? 'bg-gradient-to-r from-emerald-500 to-teal-500' 
     : 'bg-gradient-to-r from-pink-500 to-red-500';
 

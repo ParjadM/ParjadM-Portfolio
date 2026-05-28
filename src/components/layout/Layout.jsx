@@ -8,6 +8,8 @@ import Chatbot from '../Chatbot.jsx';
 import { Toast } from '../ui/Toast.jsx';
 import { getAuthToken, RequireAuth } from '../../utils/auth.jsx';
 
+import { getThemeConfig } from '../../utils/themeConfig.js';
+
 const HomeSection = React.lazy(() => import('../../pages/HomeSection.jsx').then(m => ({default: m.HomeSection})));
 const AboutSection = React.lazy(() => import('../../pages/AboutSection.jsx').then(m => ({default: m.AboutSection})));
 const ProjectsSection = React.lazy(() => import('../../pages/ProjectsSection.jsx').then(m => ({default: m.ProjectsSection})));
@@ -19,9 +21,10 @@ const ContactSection = React.lazy(() => import('../../pages/ContactSection.jsx')
 const AdminLoginPage = React.lazy(() => import('../../pages/admin/AdminLoginPage.jsx').then(m => ({default: m.AdminLoginPage})));
 const AdminDashboard = React.lazy(() => import('../../pages/admin/AdminDashboard.jsx').then(m => ({default: m.AdminDashboard})));
 const NotFoundPage = React.lazy(() => import('../../pages/NotFoundPage.jsx').then(m => ({default: m.NotFoundPage})));
-export const Layout = ({ theme, toggleTheme, darkMode, toggleDarkMode, toast, setToast }) => {
+export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
     const location = useLocation();
     const [visitorId, setVisitorId] = useState(null);
+    const themeConfig = getThemeConfig(themeId);
 
     useEffect(() => {
         // Ensure stable visitorId
@@ -65,7 +68,7 @@ export const Layout = ({ theme, toggleTheme, darkMode, toggleDarkMode, toast, se
           '/': 'Software Engineer building beautiful, fast, user‑centric web apps.',
           '/about': 'Learn about Parjad’s background and skills.',
           '/projects': 'Selected projects with code and live demos.',
-          '/projects/lqftBenchmark': 'Run the interactive LQFT benchmark demo in your browser and compare fixed-depth routed lookups with baseline map operations.',
+          '/projects/lqftBenchmark': 'Run the interactive LQFT Benchmark demo in your browser.',
           '/blog': 'Articles on web development and learning.',
           '/contact': 'Get in touch for opportunities and collaborations.',
         }
@@ -89,10 +92,8 @@ export const Layout = ({ theme, toggleTheme, darkMode, toggleDarkMode, toast, se
 
     return (
         <div className={`font-sans transition-colors duration-500 ${
-            darkMode
-                ? 'bg-gradient-to-br from-emerald-900 via-teal-900 to-cyan-900 text-white'
-                : 'bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 text-gray-900'
-        } ${!darkMode ? 'light-mode' : ''}`}>
+            themeConfig.backgroundClass
+        } ${!themeConfig.isDark ? 'light-mode text-gray-900' : 'text-white'} ${themeConfig.isTerminal ? 'terminal-mode' : ''}`}>
             <style>{`
                 body { font-family: 'Inter', sans-serif; }
                 .lqft-select option { color: #0f172a; background: #f8fafc; }
@@ -126,11 +127,17 @@ export const Layout = ({ theme, toggleTheme, darkMode, toggleDarkMode, toast, se
                 .light-mode footer a { color: rgb(75 85 99) !important; }
                 .light-mode footer a:hover { color: rgb(34 197 94) !important; }
                 .light-mode ::placeholder { color: rgb(156 163 175); opacity: 1; }
+
+                .terminal-mode { color: #4ade80 !important; }
+                .terminal-mode .text-white, .terminal-mode .text-gray-300, .terminal-mode .text-gray-400, .terminal-mode .text-gray-500 { color: #4ade80 !important; }
+                .terminal-mode [class*="bg-white/"] { background-color: rgba(74, 222, 128, 0.05) !important; }
+                .terminal-mode [class*="border-white/"] { border-color: rgba(74, 222, 128, 0.3) !important; }
+                .terminal-mode header img[alt="Logo"] { filter: sepia(100%) hue-rotate(80deg) saturate(400%) brightness(1.2); }
             `}</style>
 
-            <BackgroundBlobs theme={theme} darkMode={darkMode} />
-            <CustomCursor theme={theme} darkMode={darkMode} />
-            <Header toggleTheme={toggleTheme} toggleDarkMode={toggleDarkMode} theme={theme} darkMode={darkMode} />
+            <BackgroundBlobs theme={themeConfig.accentPrefix} darkMode={themeConfig.isDark} customBlobClasses={themeConfig.blobClasses} />
+            <CustomCursor theme={themeConfig.accentPrefix} darkMode={themeConfig.isDark} />
+            <Header setThemeId={setThemeId} currentThemeId={themeId} theme={themeConfig.accentPrefix} darkMode={themeConfig.isDark} />
             
             <main id="main-content" role="main" tabIndex={-1} className="transition-all duration-500 pt-20 md:pt-24">
                 <Suspense fallback={
@@ -139,26 +146,26 @@ export const Layout = ({ theme, toggleTheme, darkMode, toggleDarkMode, toast, se
                     </div>
                 }>
                     <Routes>
-                        <Route path="/" element={<HomeSection theme={theme} />} />
-                        <Route path="/about" element={<AboutSection theme={theme} />} />
-                        <Route path="/projects" element={<ProjectsSection theme={theme} />} />
-                        <Route path="/projects/lqftBenchmark" element={<LQFTBenchmarkPage theme={theme} />} />
-                        <Route path="/stats" element={<StatsPage theme={theme} />} />
-                        <Route path="/blog" element={<BlogSection theme={theme} />} />
-                        <Route path="/blog/:id" element={<BlogPostPage theme={theme} />} />
-                        <Route path="/contact" element={<ContactSection theme={theme} />} />
-                        <Route path="/admin/login" element={<AdminLoginPage theme={theme} />} />
-                        <Route path="/admin" element={<RequireAuth><AdminDashboard theme={theme} /></RequireAuth>} />
-                        <Route path="*" element={<NotFoundPage theme={theme} />} />
+                        <Route path="/" element={<HomeSection theme={themeConfig.accentPrefix} />} />
+                        <Route path="/about" element={<AboutSection theme={themeConfig.accentPrefix} />} />
+                        <Route path="/projects" element={<ProjectsSection theme={themeConfig.accentPrefix} />} />
+                        <Route path="/projects/lqftBenchmark" element={<LQFTBenchmarkPage theme={themeConfig.accentPrefix} />} />
+                        <Route path="/stats" element={<StatsPage theme={themeConfig.accentPrefix} />} />
+                        <Route path="/blog" element={<BlogSection theme={themeConfig.accentPrefix} />} />
+                        <Route path="/blog/:id" element={<BlogPostPage theme={themeConfig.accentPrefix} />} />
+                        <Route path="/contact" element={<ContactSection theme={themeConfig.accentPrefix} />} />
+                        <Route path="/admin/login" element={<AdminLoginPage theme={themeConfig.accentPrefix} />} />
+                        <Route path="/admin" element={<RequireAuth><AdminDashboard theme={themeConfig.accentPrefix} /></RequireAuth>} />
+                        <Route path="*" element={<NotFoundPage theme={themeConfig.accentPrefix} />} />
                     </Routes>
                 </Suspense>
             </main>
 
             {/* Footer */}
-            <Footer theme={theme} />
+            <Footer theme={themeConfig.accentPrefix} />
             
             {/* AI Chatbot */}
-            <Chatbot theme={theme} />
+            <Chatbot theme={themeConfig.accentPrefix} />
             
             {/* Toast Notifications */}
             <Toast 

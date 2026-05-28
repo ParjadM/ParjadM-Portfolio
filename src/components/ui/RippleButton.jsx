@@ -25,7 +25,7 @@ export const RippleButton = ({ children, onClick, className = '', theme = 'green
     if (onClick) onClick(e);
   };
 
-  const gradientClass = theme === 'green' 
+  const gradientClass = theme !== 'pink' 
     ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400' 
     : 'bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-400 hover:to-red-400';
 

@@ -1,0 +1,40 @@
+export const THEMES = {
+    'emerald-dark': {
+        id: 'emerald-dark',
+        name: 'System Default',
+        isDark: true,
+        backgroundClass: 'bg-gradient-to-br from-emerald-900 via-teal-900 to-cyan-900',
+        blobClasses: { blob1: "bg-emerald-500/30", blob2: "bg-teal-500/30", blob3: "bg-cyan-500/20" },
+        accentPrefix: 'emerald', // Used for old `theme === green` fallback if needed
+        isTerminal: false,
+    },
+    'emerald-light': {
+        id: 'emerald-light',
+        name: 'High Contrast Light',
+        isDark: false,
+        backgroundClass: 'bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50',
+        blobClasses: { blob1: "bg-emerald-400/25", blob2: "bg-teal-400/25", blob3: "bg-cyan-400/20" },
+        accentPrefix: 'emerald',
+        isTerminal: false,
+    },
+    'crimson-dark': {
+        id: 'crimson-dark',
+        name: 'Crimson / Rose',
+        isDark: true,
+        backgroundClass: 'bg-gradient-to-br from-rose-900 via-pink-900 to-red-900',
+        blobClasses: { blob1: "bg-pink-500/30", blob2: "bg-red-500/30", blob3: "bg-purple-500/20" },
+        accentPrefix: 'pink',
+        isTerminal: false,
+    },
+    'terminal': {
+        id: 'terminal',
+        name: 'Terminal Hacker',
+        isDark: true,
+        backgroundClass: 'bg-black',
+        blobClasses: { blob1: "bg-green-500/10", blob2: "bg-green-400/10", blob3: "bg-lime-500/10" },
+        accentPrefix: 'green',
+        isTerminal: true,
+    }
+};
+
+export const getThemeConfig = (themeId) => THEMES[themeId] || THEMES['emerald-dark'];

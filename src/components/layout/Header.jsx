@@ -7,9 +7,11 @@ import { Toast } from '../ui/Toast.jsx';
 import { getAuthToken } from '../../utils/auth.jsx';
 import Logo from '../../Images/Logo.png';
 import { NewsFeed } from '../ui/NewsFeed.jsx';
+import { THEMES } from '../../utils/themeConfig.js';
 
-export const Header = ({ toggleTheme, toggleDarkMode, theme, darkMode = true }) => {
+export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isPaletteOpen, setIsPaletteOpen] = useState(false);
     const [blogPosts, setBlogPosts] = useState([]);
     const [visitors, setVisitors] = useState(() => {
         try {
@@ -95,13 +97,32 @@ export const Header = ({ toggleTheme, toggleDarkMode, theme, darkMode = true }) 
                                 {visitors} Visitors
                               </div>
                             )}
-                            <button
-                                onClick={toggleDarkMode}
-                                className="ml-2 p-2 rounded-full bg-white/10 border border-white/10 text-gray-300 hover:text-white hover:bg-white/15 transition-colors duration-300"
-                                aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-                            >
-                                {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                            </button>
+                            <div className="relative ml-2">
+                                <button
+                                    onClick={() => setIsPaletteOpen(!isPaletteOpen)}
+                                    className="p-2 rounded-full bg-white/10 border border-white/10 text-gray-300 hover:text-white hover:bg-white/15 transition-colors duration-300"
+                                    aria-label="Theme Palette"
+                                >
+                                    <Palette className="w-5 h-5" />
+                                </button>
+                                {isPaletteOpen && (
+                                    <div className="absolute right-0 mt-2 w-48 rounded-xl bg-gray-900 border border-gray-700 shadow-2xl overflow-hidden z-50">
+                                        <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Themes</div>
+                                        {Object.values(THEMES).map((t) => (
+                                            <button
+                                                key={t.id}
+                                                onClick={() => {
+                                                    setThemeId(t.id);
+                                                    setIsPaletteOpen(false);
+                                                }}
+                                                className={`w-full text-left px-4 py-2 text-sm transition-colors ${currentThemeId === t.id ? 'bg-emerald-500/20 text-emerald-300' : 'text-gray-300 hover:bg-gray-800'}`}
+                                            >
+                                                {t.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </GlassCard>
                 </div>
@@ -140,14 +161,24 @@ export const Header = ({ toggleTheme, toggleDarkMode, theme, darkMode = true }) 
                                 {visitors} Visitors
                               </div>
                             )}
-                            <button
-                                onClick={toggleDarkMode}
-                                className="mt-2 w-full py-2 px-4 rounded-lg bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 flex items-center justify-center gap-2"
-                                aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-                            >
-                                {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                                <span>{darkMode ? 'Light mode' : 'Dark mode'}</span>
-                            </button>
+                            
+                            <div className="mt-2 w-full">
+                                <div className="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center">Themes</div>
+                                <div className="grid grid-cols-1 gap-2 mt-1">
+                                    {Object.values(THEMES).map((t) => (
+                                        <button
+                                            key={t.id}
+                                            onClick={() => {
+                                                setThemeId(t.id);
+                                                handleNavClick();
+                                            }}
+                                            className={`w-full text-center px-4 py-2 rounded-lg text-sm transition-colors ${currentThemeId === t.id ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10'}`}
+                                        >
+                                            {t.name}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </GlassCard>
                 </div>

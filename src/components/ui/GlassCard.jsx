@@ -12,7 +12,7 @@ export const GlassCard = ({ children, className = '', theme = 'green', onMouseEn
     });
   };
 
-  const gradientClass = theme === 'green' 
+  const gradientClass = theme !== 'pink' 
     ? 'from-emerald-400 via-teal-400 to-cyan-400' 
     : 'from-pink-400 via-red-400 to-purple-400';
 

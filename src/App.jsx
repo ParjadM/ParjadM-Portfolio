@@ -4,36 +4,27 @@ import { Layout } from './components/layout/Layout.jsx';
 
 // --- Main App Component ---
 function App() {
-    // Theme State
-    const [darkMode, setDarkMode] = useState(true);
-    const [theme, setTheme] = useState('green'); // 'green' or 'pink'
+    const [currentThemeId, setCurrentThemeId] = useState('emerald-dark');
     const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
 
     // Load theme preference on mount
     useEffect(() => {
-        const savedTheme = localStorage.getItem('portfolio_theme');
+        const savedTheme = localStorage.getItem('portfolio_theme_id');
         if (savedTheme) {
-            setTheme(savedTheme);
+            setCurrentThemeId(savedTheme);
         }
     }, []);
 
-    const toggleTheme = () => {
-        const newTheme = theme === 'green' ? 'pink' : 'green';
-        setTheme(newTheme);
-        localStorage.setItem('portfolio_theme', newTheme);
-    };
-
-    const toggleDarkMode = () => {
-        setDarkMode(!darkMode);
+    const updateTheme = (newThemeId) => {
+        setCurrentThemeId(newThemeId);
+        localStorage.setItem('portfolio_theme_id', newThemeId);
     };
 
     return (
         <Router>
             <Layout 
-                theme={theme}
-                toggleTheme={toggleTheme}
-                darkMode={darkMode}
-                toggleDarkMode={toggleDarkMode}
+                themeId={currentThemeId}
+                setThemeId={updateTheme}
                 toast={toast}
                 setToast={setToast}
             />
