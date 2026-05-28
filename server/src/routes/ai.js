@@ -56,7 +56,7 @@ If asked something outside of this scope, you can politely decline or say you do
     let replyText = ''
     
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.0-flash',
       contents: messages,
       config: { systemInstruction }
     })
@@ -129,7 +129,7 @@ Respond EXCLUSIVELY in valid JSON format using the following schema:
 }`
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.0-flash',
       contents: [{ role: 'user', parts: [{ text: code }] }],
       config: {
         systemInstruction: systemInstruction,

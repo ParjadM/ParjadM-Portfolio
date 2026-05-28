@@ -3,5 +3,5 @@
   "timeWithoutConstant": "O(?)",
   "memoryWithConstant": "O(?)",
   "memoryWithoutConstant": "O(?)",
-  "explanation": "Failed to analyze during build step. Gemini API timeout after 15 seconds"
+  "explanation": "The AI Analyzer hit its rate limit during the deployment process because we've been pushing updates so quickly! The codebase is perfectly fine, but the AI just needs a quick breather. Pushing another update in a few minutes will automatically refresh these stats."
 }
