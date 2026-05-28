@@ -8,6 +8,7 @@ import { MarkdownContent } from '../components/ui/MarkdownContent.jsx';
 import GitHubStats from '../components/GitHubStats.tsx';
 import LeetCodeStats from '../components/LeetCodeStats.tsx';
 import { ClickUpSection } from '../components/ClickUpSection.jsx';
+import { ComplexityAnalyzer } from '../components/ComplexityAnalyzer.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
 import { useTranslation } from 'react-i18next';
 
@@ -36,6 +37,13 @@ export const StatsPage = ({ theme }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           <GitHubStats theme={theme} />
           <LeetCodeStats theme={theme} />
+        </div>
+        </Reveal>
+
+        {/* Complexity Analyzer */}
+        <Reveal>
+        <div className="mt-8">
+          <ComplexityAnalyzer theme={theme} />
         </div>
         </Reveal>
 

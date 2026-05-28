@@ -78,4 +78,79 @@ If asked something outside of this scope, you can politely decline or say you do
   }
 })
 
+router.post('/complexity', async (req, res) => {
+  try {
+    const { code } = req.body
+    
+    if (!code || typeof code !== 'string') {
+      return res.status(400).json({ error: 'Code string is required' })
+    }
+
+    let cacheKey = null
+    if (redisClient) {
+      try {
+        const hash = crypto.createHash('sha256').update(code).digest('hex')
+        cacheKey = `ai_complexity:${hash}`
+        const cachedResponse = await redisClient.get(cacheKey)
+        if (cachedResponse) {
+          // Parse JSON if it was stored as string, Upstash auto-parses, but let's handle both
+          return res.json(typeof cachedResponse === 'string' ? JSON.parse(cachedResponse) : cachedResponse)
+        }
+      } catch (err) {
+        console.error('Redis cache retrieval error:', err)
+      }
+    }
+
+    const apiKey = process.env.GEMINI_API_KEY
+    if (!apiKey) {
+      return res.status(500).json({ error: 'GEMINI_API_KEY is not configured' })
+    }
+
+    const ai = new GoogleGenAI({ apiKey })
+
+    const systemInstruction = `You are an expert static analyzer for Big-O complexity.
+Analyze the following source code and determine its Time Complexity and Space (Memory) Complexity in Big-O notation.
+Respond EXCLUSIVELY in valid JSON format using the following schema:
+{
+  "time": "O(...)",
+  "memory": "O(...)",
+  "explanation": "A concise 1-2 sentence explanation of why."
+}`
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: [{ role: 'user', parts: [{ text: code }] }],
+      config: {
+        systemInstruction: systemInstruction,
+        responseMimeType: "application/json",
+      }
+    })
+
+    let replyData;
+    try {
+      replyData = JSON.parse(response.text)
+    } catch (e) {
+      replyData = {
+        time: "O(?)",
+        memory: "O(?)",
+        explanation: "Could not parse AI response."
+      }
+    }
+
+    if (redisClient && cacheKey) {
+      try {
+        // Cache for 7 days
+        await redisClient.set(cacheKey, JSON.stringify(replyData), { ex: 604800 })
+      } catch (err) {
+        console.error('Redis cache save error:', err)
+      }
+    }
+
+    res.json(replyData)
+  } catch (err) {
+    console.error('AI Complexity Error:', err)
+    res.status(500).json({ error: 'Failed to analyze code complexity' })
+  }
+})
+
 export default router
