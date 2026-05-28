@@ -19,48 +19,33 @@ function useDebounce(value, delay) {
 
 export const ComplexityAnalyzer = ({ theme = 'emerald' }) => {
     const { t } = useTranslation();
-    const [code, setCode] = useState('function sumArray(arr) {\n  let sum = 0;\n  for(let i = 0; i < arr.length; i++) {\n    sum += arr[i];\n  }\n  return sum;\n}');
-    const debouncedCode = useDebounce(code, 1000);
     const [analysis, setAnalysis] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [copied, setCopied] = useState(false);
 
     useEffect(() => {
-        const analyzeCode = async () => {
-            if (!debouncedCode || !debouncedCode.trim()) {
-                setAnalysis(null);
-                return;
-            }
-            
-            setLoading(true);
-            setError('');
-            
+        const fetchComplexity = async () => {
             try {
-                const response = await fetch('/api/ai/complexity', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code: debouncedCode })
-                });
+                // Fetch the build-time generated JSON file
+                const response = await fetch('/complexity.json');
+                
+                if (!response.ok) {
+                    throw new Error('Analysis file not found');
+                }
                 
                 const data = await response.json();
-                
-                if (response.ok) {
-                    setAnalysis(data);
-                } else {
-                    setError(data.error || 'Failed to analyze code.');
-                    setAnalysis(null);
-                }
+                setAnalysis(data);
             } catch (err) {
-                setError('Network error analyzing code.');
-                setAnalysis(null);
+                console.error("Failed to load project complexity:", err);
+                setError('Failed to load project complexity analysis.');
             } finally {
                 setLoading(false);
             }
         };
 
-        analyzeCode();
-    }, [debouncedCode]);
+        fetchComplexity();
+    }, []);
 
     const handleCopy = () => {
         if (analysis) {
@@ -69,7 +54,7 @@ export const ComplexityAnalyzer = ({ theme = 'emerald' }) => {
             const exactTime = analysis.timeWithConstant ? ` (Exact: ${analysis.timeWithConstant})` : '';
             const exactMem = analysis.memoryWithConstant ? ` (Exact: ${analysis.memoryWithConstant})` : '';
             
-            const textToCopy = `Time Complexity: ${time}${exactTime}\nMemory Complexity: ${mem}${exactMem}`;
+            const textToCopy = `Website Time Complexity: ${time}${exactTime}\nWebsite Memory Complexity: ${mem}${exactMem}`;
             navigator.clipboard.writeText(textToCopy);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
@@ -87,86 +72,56 @@ export const ComplexityAnalyzer = ({ theme = 'emerald' }) => {
                     <BrainCircuit size={24} />
                 </div>
                 <div>
-                    <h3 className="text-2xl font-bold text-white">AI Complexity Analyzer</h3>
-                    <p className="text-sm text-gray-400">Real-time Time and Space Complexity Analysis</p>
+                    <h3 className="text-2xl font-bold text-white">Project Complexity Analysis</h3>
+                    <p className="text-sm text-gray-400">Architectural Time and Space Complexity of the entire Website</p>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Code Editor Area */}
-                <div className="flex flex-col">
-                    <label className="text-sm font-semibold text-gray-300 mb-2 flex items-center gap-2">
-                        <Code size={16} /> Source Code
-                    </label>
-                    <textarea 
-                        className="w-full flex-1 min-h-[250px] p-4 bg-[#0d1117] text-gray-200 border border-white/10 rounded-xl focus:border-white/30 focus:outline-none transition-all font-mono text-sm leading-relaxed resize-y"
-                        value={code}
-                        onChange={(e) => setCode(e.target.value)}
-                        placeholder="Paste your code here..."
-                        spellCheck="false"
-                    />
-                </div>
-
-                {/* Analysis Result Area */}
-                <div className="flex flex-col">
-                    <div className="flex items-center justify-between mb-2">
-                        <label className="text-sm font-semibold text-gray-300 flex items-center gap-2">
-                            <BrainCircuit size={16} /> Analysis Result
-                        </label>
-                        {loading && (
-                            <div className="flex items-center gap-2 text-xs text-gray-400">
-                                <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span> Analyzing...
-                            </div>
-                        )}
+            <div className={`w-full rounded-xl border p-6 md:p-10 flex flex-col justify-center items-center text-center transition-all duration-500 relative ${bgOpacityClass}`}>
+                {loading ? (
+                    <div className="flex items-center gap-2 text-gray-400 py-10">
+                        <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span> Loading architectural analysis...
                     </div>
-                    
-                    <div className={`flex-1 rounded-xl border p-6 flex flex-col justify-center items-center text-center transition-all duration-500 relative ${bgOpacityClass}`}>
-                        {error ? (
-                            <div className="text-red-400 font-mono text-sm max-w-full overflow-hidden text-ellipsis px-4 py-2 bg-red-900/20 rounded border border-red-500/30">
-                                <span className="font-bold text-red-500 mb-1 block">Error:</span>
-                                {error}
-                            </div>
-                        ) : analysis ? (
-                            <>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mb-6">
-                                    <div className="p-4 bg-black/40 rounded-lg border border-white/5 flex flex-col justify-between">
-                                        <div className="text-xs text-gray-400 uppercase tracking-wider mb-2">Time Complexity</div>
-                                        <div className={`text-2xl font-black ${textGradientClass}`}>{analysis.timeWithoutConstant || analysis.time}</div>
-                                        <div className="text-xs text-gray-500 mt-2 font-mono" title="Exact complexity including constants">
-                                            Exact: {analysis.timeWithConstant || 'N/A'}
-                                        </div>
-                                    </div>
-                                    <div className="p-4 bg-black/40 rounded-lg border border-white/5 flex flex-col justify-between">
-                                        <div className="text-xs text-gray-400 uppercase tracking-wider mb-2">Space Complexity</div>
-                                        <div className={`text-2xl font-black ${textGradientClass}`}>{analysis.memoryWithoutConstant || analysis.memory}</div>
-                                        <div className="text-xs text-gray-500 mt-2 font-mono" title="Exact complexity including constants">
-                                            Exact: {analysis.memoryWithConstant || 'N/A'}
-                                        </div>
-                                    </div>
+                ) : error ? (
+                    <div className="text-red-400 font-mono text-sm max-w-full overflow-hidden text-ellipsis px-4 py-2 bg-red-900/20 rounded border border-red-500/30">
+                        <span className="font-bold text-red-500 mb-1 block">Error:</span>
+                        {error}
+                    </div>
+                ) : analysis ? (
+                    <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl mb-8">
+                            <div className="p-6 bg-black/40 rounded-xl border border-white/5 flex flex-col justify-between">
+                                <div className="text-xs text-gray-400 uppercase tracking-wider mb-2">Overall Time Complexity</div>
+                                <div className={`text-3xl font-black ${textGradientClass} mb-2`}>{analysis.timeWithoutConstant || analysis.time}</div>
+                                <div className="text-sm text-gray-500 font-mono" title="Exact complexity including constants">
+                                    Exact: {analysis.timeWithConstant || 'N/A'}
                                 </div>
-                                <p className="text-sm text-gray-300 max-w-md">
-                                    {analysis.explanation}
-                                </p>
-                                
-                                {/* Copy Button */}
-                                <button 
-                                    onClick={handleCopy}
-                                    className={`absolute top-4 right-4 px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1 transition-all ${copied ? 'bg-green-500/20 text-green-300 border border-green-500/30' : 'bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10'}`}
-                                >
-                                    {copied ? (
-                                        <>Copied!</>
-                                    ) : (
-                                        <>Copy</>
-                                    )}
-                                </button>
-                            </>
-                        ) : (
-                            <div className="text-gray-500">
-                                {loading ? 'Analyzing your code...' : 'Awaiting code input...'}
                             </div>
-                        )}
-                    </div>
-                </div>
+                            <div className="p-6 bg-black/40 rounded-xl border border-white/5 flex flex-col justify-between">
+                                <div className="text-xs text-gray-400 uppercase tracking-wider mb-2">Overall Space Complexity</div>
+                                <div className={`text-3xl font-black ${textGradientClass} mb-2`}>{analysis.memoryWithoutConstant || analysis.memory}</div>
+                                <div className="text-sm text-gray-500 font-mono" title="Exact complexity including constants">
+                                    Exact: {analysis.memoryWithConstant || 'N/A'}
+                                </div>
+                            </div>
+                        </div>
+                        <p className="text-base text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                            {analysis.explanation}
+                        </p>
+                        
+                        {/* Copy Button */}
+                        <button 
+                            onClick={handleCopy}
+                            className={`absolute top-4 right-4 px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1 transition-all ${copied ? 'bg-green-500/20 text-green-300 border border-green-500/30' : 'bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10'}`}
+                        >
+                            {copied ? (
+                                <>Copied!</>
+                            ) : (
+                                <>Copy</>
+                            )}
+                        </button>
+                    </>
+                ) : null}
             </div>
         </GlassCard>
     );
