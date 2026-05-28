@@ -286,19 +286,11 @@ const Chatbot = ({ theme = 'green' }) => {
           {/* Input Area */}
           <div className="p-3 border-t border-white/10 bg-black/20">
             <form onSubmit={handleSend} className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={toggleListening}
-                className={`p-2 rounded-full transition-all ${listening ? 'bg-red-500/20 text-red-400 animate-pulse' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-                title={listening ? "Stop listening" : "Start Voice Input"}
-              >
-                <MicIcon className="w-5 h-5" />
-              </button>
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={voiceError ? voiceError : (listening ? "Listening..." : "Ask me anything...")}
+                placeholder="Ask me anything..."
                 className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-white/30 transition-all"
               />
               <button
