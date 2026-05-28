@@ -7,6 +7,7 @@ import { Toast } from '../components/ui/Toast.jsx';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Reveal } from '../components/Reveal.jsx';
+import { MarkdownContent } from '../components/ui/MarkdownContent.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
 
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.

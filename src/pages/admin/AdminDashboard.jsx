@@ -4,6 +4,10 @@ import { Mail, Github, Linkedin, Code, BrainCircuit, Palette, Menu, Sun, Moon } 
 import { GlassCard } from '../../components/ui/GlassCard.jsx';
 import { RippleButton } from '../../components/ui/RippleButton.jsx';
 import { Toast } from '../../components/ui/Toast.jsx';
+import { Chart } from '../../components/ui/Chart.jsx';
+import { AdminBlogManager } from './AdminBlogManager.jsx';
+import { AdminProjectsManager } from './AdminProjectsManager.jsx';
+import { AdminAIManager } from './AdminAIManager.jsx';
 import { getAuthToken } from '../../utils/auth.jsx';
 
 export const AdminDashboard = ({ theme }) => {

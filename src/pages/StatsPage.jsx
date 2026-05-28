@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation, Link, Routes, Route } from 'react-router-dom';
+import { useNavigate, useLocation, Link, Routes, Route, useParams } from 'react-router-dom';
 import { Mail, Github, Linkedin, Code, BrainCircuit, Palette, Menu, Sun, Moon } from '../components/ui/Icons.jsx';
 import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { RippleButton } from '../components/ui/RippleButton.jsx';
-import { Toast } from '../components/ui/Toast.jsx';
+import { Reveal } from '../components/Reveal.jsx';
+import { MarkdownContent } from '../components/ui/MarkdownContent.jsx';
+import GitHubStats from '../components/GitHubStats.tsx';
+import LeetCodeStats from '../components/LeetCodeStats.tsx';
+import { ClickUpSection } from '../components/ClickUpSection.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
 
 export const StatsPage = ({ theme }) => {
