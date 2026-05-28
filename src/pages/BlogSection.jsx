@@ -8,7 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Reveal } from '../components/Reveal.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
-
+import { useTranslation } from 'react-i18next';
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 import ParjadImage from '../Images/Parjad.jpg';
 import GitHubStats from '../components/GitHubStats.tsx';
@@ -20,16 +20,17 @@ import BinaryGeneratorImage from '../Images/Binary 1010 Generator.jpg';
 import SpaceShooterImage from '../Images/SpaceShooter.jpg';
 
 export const BlogSection = ({ theme }) => {
+    const { t } = useTranslation();
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
     const categories = {
-        'all': 'All Posts',
-        'technology': 'Technology',
-        'tutorial': 'Tutorials',
-        'personal': 'Personal'
+        'all': t('blog.categories.all'),
+        'technology': t('blog.categories.technology'),
+        'tutorial': t('blog.categories.tutorial'),
+        'personal': t('blog.categories.personal')
     };
 
     useEffect(() => {
@@ -39,7 +40,7 @@ export const BlogSection = ({ theme }) => {
                 const data = await res.json();
                 setPosts(Array.isArray(data.posts) ? data.posts : []);
             } catch (e) {
-                setError('Failed to load posts');
+                setError(t('blog.error'));
             } finally {
                 setLoading(false);
             }
@@ -62,9 +63,9 @@ export const BlogSection = ({ theme }) => {
                 {/* Header */}
                 <Reveal>
                 <div className="text-center mb-16">
-                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Blog & Articles</h2>
+                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">{t('blog.title')}</h2>
                     <p className="text-gray-300 max-w-2xl mx-auto text-lg">
-                        Thoughts, tutorials, and insights about technology, development, and my journey in tech
+                        {t('blog.subtitle')}
                     </p>
                 </div>
                 </Reveal>
@@ -91,7 +92,7 @@ export const BlogSection = ({ theme }) => {
                 {/* Featured (Blog Section) */}
                 {selectedCategory === 'all' && featuredPost && (
                     <Reveal className="mb-12">
-                        <h3 className="text-2xl font-bold text-white mb-6 text-center">Featured</h3>
+                        <h3 className="text-2xl font-bold text-white mb-6 text-center">{t('blog.featured')}</h3>
                         <Link to={`/blog/${featuredPost.id}`} className="block">
                             <GlassCard className="p-0 md:p-0 group cursor-pointer hover:scale-[1.01] transition-transform duration-300 overflow-hidden">
                                 {featuredPost.image && (
@@ -129,10 +130,10 @@ export const BlogSection = ({ theme }) => {
                 <div>
                     <Reveal>
                     <h3 className="text-2xl font-bold text-white mb-8 text-center">
-                        {selectedCategory === 'all' ? 'Blog' : `${categories[selectedCategory]} Articles`}
+                        {selectedCategory === 'all' ? t('blog.blogLabel') : `${categories[selectedCategory]} ${t('blog.articlesLabel')}`}
                     </h3>
                     </Reveal>
-                    {loading && <div className="text-center text-gray-300">Loading...</div>}
+                    {loading && <div className="text-center text-gray-300">{t('blog.loading')}</div>}
                     {error && <div className="text-center text-red-300">{error}</div>}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {filteredPosts.map(post => (
@@ -167,7 +168,7 @@ export const BlogSection = ({ theme }) => {
                                 <div className="flex items-center justify-between">
                                     <span className="text-gray-400 text-xs">{post.date}</span>
                                     <span className={`text-xs font-medium ${iconColor} group-hover:translate-x-1 transition-transform duration-300`}>
-                                        Read →
+                                        {t('blog.read')}
                                     </span>
                                 </div>
                                 </div>

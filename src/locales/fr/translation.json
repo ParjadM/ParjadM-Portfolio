@@ -29,5 +29,86 @@
     "storyText1": "Je suis étudiant en génie logiciel à l'Université McMaster, basé à Scarborough, ON, avec une formation qui combine de manière unique un diplôme avancé en programmation informatique avec un diplôme en psychologie. Cette combinaison me permet d'aborder l'architecture de systèmes complexes avec une compréhension approfondie de la résolution de problèmes logiques et de la conception centrée sur l'utilisateur.",
     "storyText2": "Mon parcours dans la technologie a évolué, passant de la création d'applications web réactives à l'ingénierie de logiciels évolutifs et performants. J'exécute actuellement un plan rigoureux de 6 semaines axé sur les arbres, les graphes et les algorithmes avancés (BFS/DFS) pour atteindre un niveau d'aisance de niveau entretien dans les structures de données et les algorithmes.",
     "storyText3": "Quand je ne conçois pas de logiciels, je suis généralement à la salle de sport, je me plonge dans des problèmes mathématiques complexes ou je relève des défis LeetCode pour garder mon esprit d'analyse affûté. Je m'épanouis dans l'apprentissage continu et l'application de mes compétences pour créer des solutions logicielles élégantes et efficaces."
+  },
+  "projects": {
+    "title": "Mes Projets",
+    "loading": "Chargement...",
+    "error": "Échec du chargement des projets",
+    "empty": "Aucun projet pour le moment."
+  },
+  "contact": {
+    "title": "Restons en contact",
+    "subtitle": "Je suis actuellement à la recherche de nouvelles opportunités et je suis ouvert à la collaboration. Que vous ayez une question ou que vous vouliez simplement dire bonjour, n'hésitez pas à me contacter.",
+    "form": {
+      "title": "Envoyez-moi un message",
+      "nameLabel": "Nom *",
+      "namePlaceholder": "Votre nom",
+      "emailLabel": "E-mail *",
+      "emailPlaceholder": "votre.email@exemple.com",
+      "subjectLabel": "Sujet *",
+      "subjectPlaceholder": "De quoi s'agit-il ?",
+      "messageLabel": "Message *",
+      "messagePlaceholder": "Parlez-moi de votre projet ou dites simplement bonjour !",
+      "sending": "Envoi...",
+      "send": "Envoyer le message",
+      "success": "✅ Message envoyé avec succès ! Je vous répondrai bientôt.",
+      "error": "❌ Échec de l'envoi du message. Veuillez réessayer plus tard."
+    },
+    "info": {
+      "title": "Contactez-moi",
+      "githubDesc": "Consultez mon code",
+      "linkedinDesc": "Connectons-nous professionnellement",
+      "availability": "Disponibilité",
+      "availabilityStatus": "Ouvert à de nouvelles opportunités",
+      "responseTime": "Temps de réponse",
+      "responseTimeValue": "Dans les 24 heures"
+    }
+  },
+  "blog": {
+    "title": "Blog & Articles",
+    "subtitle": "Pensées, tutoriels et réflexions sur la technologie, le développement et mon parcours dans la tech",
+    "categories": {
+      "all": "Tous les articles",
+      "technology": "Technologie",
+      "tutorial": "Tutoriels",
+      "personal": "Personnel"
+    },
+    "featured": "En vedette",
+    "read": "Lire →",
+    "loading": "Chargement...",
+    "error": "Échec du chargement des articles",
+    "blogLabel": "Blog",
+    "articlesLabel": "Articles",
+    "notFound": "Article introuvable",
+    "backToBlog": "← Retour au Blog"
+  },
+  "stats": {
+    "title": "Statistiques de développeur",
+    "subtitle": "Un aperçu rapide de ma présence open-source et de ma pratique du code, mis à jour automatiquement avec mise en cache pour des chargements rapides.",
+    "autoRefreshed": "Actualisé automatiquement",
+    "footer": "Données via l'API GitHub et LeetCode GraphQL • Mis en cache pour améliorer les performances"
+  },
+  "skills": {
+    "title": "Compétences Techniques",
+    "subtitle": "Un aperçu complet de mon expertise technique et de mes niveaux de compétence",
+    "categories": {
+      "all": "Toutes les compétences",
+      "frontend": "Frontend",
+      "backend": "Backend",
+      "tools": "Outils et autres"
+    },
+    "proficiency": "Compétence",
+    "technologies": "Technologies",
+    "yearsExperience": "Années d'expérience"
+  },
+  "footer": {
+    "desc": "Ingénieur logiciel passionné par la création d'applications web belles et fonctionnelles, axées sur l'expérience utilisateur.",
+    "rights": "© {{year}} Tous droits réservés."
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "desc": "Le lien que vous avez suivi n'existe pas sur parjadm.ca. Il a peut-être été déplacé ou supprimé.",
+    "home": "Accueil",
+    "back": "Retour"
   }
 }

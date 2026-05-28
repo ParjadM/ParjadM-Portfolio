@@ -9,6 +9,7 @@ import remarkGfm from 'remark-gfm';
 import { Reveal } from '../components/Reveal.jsx';
 import { MarkdownContent } from '../components/ui/MarkdownContent.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
+import { useTranslation } from 'react-i18next';
 
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 import ParjadImage from '../Images/Parjad.jpg';
@@ -21,6 +22,7 @@ import BinaryGeneratorImage from '../Images/Binary 1010 Generator.jpg';
 import SpaceShooterImage from '../Images/SpaceShooter.jpg';
 
 export const BlogPostPage = ({ theme }) => {
+    const { t } = useTranslation();
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -72,7 +74,7 @@ export const BlogPostPage = ({ theme }) => {
     if (loading) {
         return (
             <section className="min-h-screen flex items-center justify-center py-20 px-4">
-                <div className="text-gray-300">Loading...</div>
+                <div className="text-gray-300">{t('blog.loading')}</div>
             </section>
         );
     }
@@ -82,8 +84,8 @@ export const BlogPostPage = ({ theme }) => {
             <section className="min-h-screen flex items-center justify-center py-20 px-4">
                 <div className="container mx-auto max-w-3xl text-center">
                     <GlassCard className="p-8">
-                        <h2 className="text-2xl font-bold text-white mb-4">Post not found</h2>
-                        <button type="button" onClick={() => navigate('/blog', { replace: true })} className="text-emerald-400 hover:underline">Back to Blog</button>
+                        <h2 className="text-2xl font-bold text-white mb-4">{t('blog.notFound')}</h2>
+                        <button type="button" onClick={() => navigate('/blog', { replace: true })} className="text-emerald-400 hover:underline">{t('blog.backToBlog').replace('← ', '')}</button>
                     </GlassCard>
                 </div>
             </section>
@@ -96,7 +98,7 @@ export const BlogPostPage = ({ theme }) => {
         <section className="min-h-screen flex items-center justify-center py-20 px-4">
             <div className="container mx-auto max-w-3xl">
                 <div className="mb-6">
-                    <button type="button" onClick={() => navigate('/blog', { replace: true })} className="text-gray-300 hover:text-white">← Back to Blog</button>
+                    <button type="button" onClick={() => navigate('/blog', { replace: true })} className="text-gray-300 hover:text-white">{t('blog.backToBlog')}</button>
                 </div>
                 <GlassCard className="p-8">
                     <div className="flex items-center justify-between mb-4">

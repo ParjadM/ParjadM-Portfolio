@@ -9,8 +9,10 @@ import GitHubStats from '../components/GitHubStats.tsx';
 import LeetCodeStats from '../components/LeetCodeStats.tsx';
 import { ClickUpSection } from '../components/ClickUpSection.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
+import { useTranslation } from 'react-i18next';
 
 export const StatsPage = ({ theme }) => {
+  const { t } = useTranslation();
   return (
     <section id="stats" className="min-h-screen flex items-center justify-center py-24 px-4">
       <div className="container mx-auto max-w-6xl w-full">
@@ -20,10 +22,10 @@ export const StatsPage = ({ theme }) => {
           <GlassCard className="p-8 md:p-10" theme={theme}>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
               <div>
-                <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Developer Stats</h1>
-                <p className="mt-2 text-gray-300 max-w-2xl">A quick snapshot of my open‑source presence and coding practice, updated automatically with caching for fast loads.</p>
+                <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">{t('stats.title')}</h1>
+                <p className="mt-2 text-gray-300 max-w-2xl">{t('stats.subtitle')}</p>
               </div>
-              <div className={`px-4 py-2 rounded-xl text-sm font-semibold ${theme === 'pink' ? 'bg-pink-500/20 text-pink-200' : 'bg-emerald-500/20 text-emerald-200'}`}>Auto‑refreshed</div>
+              <div className={`px-4 py-2 rounded-xl text-sm font-semibold ${theme === 'pink' ? 'bg-pink-500/20 text-pink-200' : 'bg-emerald-500/20 text-emerald-200'}`}>{t('stats.autoRefreshed')}</div>
             </div>
           </GlassCard>
         </div>
@@ -46,7 +48,7 @@ export const StatsPage = ({ theme }) => {
 
         {/* Footer note */}
         <div className="mt-8 text-center text-gray-400 text-sm">
-          Data via GitHub API & LeetCode GraphQL • Cached to improve performance
+          {t('stats.footer')}
         </div>
       </div>
     </section>
@@ -54,14 +56,15 @@ export const StatsPage = ({ theme }) => {
 };
 
 export const SkillsSection = ({ theme }) => {
+    const { t } = useTranslation();
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [hoveredSkill, setHoveredSkill] = useState(null);
 
     const skillCategories = {
-        'all': 'All Skills',
-        'frontend': 'Frontend',
-        'backend': 'Backend',
-        'tools': 'Tools & Others'
+        'all': t('skills.categories.all'),
+        'frontend': t('skills.categories.frontend'),
+        'backend': t('skills.categories.backend'),
+        'tools': t('skills.categories.tools')
     };
 
     const skills = [
@@ -153,9 +156,9 @@ export const SkillsSection = ({ theme }) => {
                 {/* Header */}
                 <Reveal>
                 <div className="text-center mb-16">
-                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Technical Skills</h2>
+                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">{t('skills.title')}</h2>
                     <p className="text-gray-300 max-w-2xl mx-auto text-lg">
-                        A comprehensive overview of my technical expertise and proficiency levels
+                        {t('skills.subtitle')}
                     </p>
                 </div>
                 </Reveal>
@@ -204,7 +207,7 @@ export const SkillsSection = ({ theme }) => {
                             {/* Progress Bar */}
                             <div className="mb-4">
                                 <div className="flex justify-between items-center mb-2">
-                                    <span className="text-sm text-gray-300">Proficiency</span>
+                                    <span className="text-sm text-gray-300">{t('skills.proficiency')}</span>
                                     <span className="text-sm font-medium text-white">{skill.level}%</span>
                                 </div>
                                 <div className="w-full bg-white/10 rounded-full h-2">
@@ -236,13 +239,13 @@ export const SkillsSection = ({ theme }) => {
                                 <div className={`text-4xl font-bold mb-2 ${iconColor}`}>
                                     {skills.length}+
                                 </div>
-                                <div className="text-gray-300">Technologies</div>
+                                <div className="text-gray-300">{t('skills.technologies')}</div>
                             </div>
                             <div>
                                 <div className={`text-4xl font-bold mb-2 ${iconColor}`}>
                                     3+
                                 </div>
-                                <div className="text-gray-300">Years Experience</div>
+                                <div className="text-gray-300">{t('skills.yearsExperience')}</div>
                             </div>
                         </div>
                     </GlassCard>

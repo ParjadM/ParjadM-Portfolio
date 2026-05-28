@@ -5,8 +5,10 @@ import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { RippleButton } from '../components/ui/RippleButton.jsx';
 import { Toast } from '../components/ui/Toast.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
+import { useTranslation } from 'react-i18next';
 
 export const NotFoundPage = ({ theme }) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     useEffect(() => {
         document.title = 'Page not found — Parjad Minooei';
@@ -22,22 +24,22 @@ export const NotFoundPage = ({ theme }) => {
                 <Reveal>
                 <GlassCard className="p-12 md:p-16" theme={theme}>
                     <div className={`text-8xl md:text-9xl font-extrabold ${theme === 'pink' ? 'text-pink-400/30' : 'text-emerald-400/30'}`}>404</div>
-                    <h1 className="text-2xl md:text-3xl font-bold text-white mt-4">Page not found</h1>
+                    <h1 className="text-2xl md:text-3xl font-bold text-white mt-4">{t('notFound.title')}</h1>
                     <p className="text-gray-300 mt-2 max-w-md mx-auto">
-                        The link you followed doesn't exist on parjadm.ca. It may have been moved or removed.
+                        {t('notFound.desc')}
                     </p>
                     <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                         <button
                             onClick={() => navigate('/')}
                             className={`px-6 py-3 rounded-full font-semibold text-white ${gradientClass} hover:opacity-90 transition-opacity`}
                         >
-                            Go home
+                            {t('notFound.home')}
                         </button>
                         <button
                             onClick={() => navigate(-1)}
                             className="px-6 py-3 rounded-full font-semibold bg-white/10 border border-white/20 text-gray-300 hover:bg-white/15 hover:text-white transition-colors"
                         >
-                            Go back
+                            {t('notFound.back')}
                         </button>
                     </div>
                 </GlassCard>

@@ -29,5 +29,86 @@
     "storyText1": "I am a Software Engineering student at McMaster University based in Scarborough, ON, with a background that uniquely blends an Advanced Diploma in Computer Programming with a degree in Psychology. This combination allows me to approach complex system architecture with a deep understanding of both logical problem-solving and user-centric design.",
     "storyText2": "My path in tech has evolved from building responsive web applications to engineering scalable, high-performance software. I am currently executing a rigorous 6-week 'Visual Mastery' plan focused on Trees, Graphs, and advanced algorithms (BFS/DFS) to achieve interview-level fluency in data structures and algorithms.",
     "storyText3": "When I’m not architecting software, I’m usually at the gym, diving into complex math problems, or tackling LeetCode challenges to keep my analytical skills sharp. I thrive on continuous learning and applying my skills to create elegant and efficient software solutions."
+  },
+  "projects": {
+    "title": "My Projects",
+    "loading": "Loading...",
+    "error": "Failed to load projects",
+    "empty": "No projects yet."
+  },
+  "contact": {
+    "title": "Let's Connect",
+    "subtitle": "I'm currently seeking new opportunities and am open to collaboration. Whether you have a question or just want to say hi, feel free to reach out.",
+    "form": {
+      "title": "Send me a message",
+      "nameLabel": "Name *",
+      "namePlaceholder": "Your name",
+      "emailLabel": "Email *",
+      "emailPlaceholder": "your.email@example.com",
+      "subjectLabel": "Subject *",
+      "subjectPlaceholder": "What's this about?",
+      "messageLabel": "Message *",
+      "messagePlaceholder": "Tell me about your project or just say hello!",
+      "sending": "Sending...",
+      "send": "Send Message",
+      "success": "✅ Message sent successfully! I'll get back to you soon.",
+      "error": "❌ Failed to send message. Please try again later."
+    },
+    "info": {
+      "title": "Get in touch",
+      "githubDesc": "Check out my code",
+      "linkedinDesc": "Connect professionally",
+      "availability": "Availability",
+      "availabilityStatus": "Open to new opportunities",
+      "responseTime": "Response Time",
+      "responseTimeValue": "Within 24 hours"
+    }
+  },
+  "blog": {
+    "title": "Blog & Articles",
+    "subtitle": "Thoughts, tutorials, and insights about technology, development, and my journey in tech",
+    "categories": {
+      "all": "All Posts",
+      "technology": "Technology",
+      "tutorial": "Tutorials",
+      "personal": "Personal"
+    },
+    "featured": "Featured",
+    "read": "Read →",
+    "loading": "Loading...",
+    "error": "Failed to load posts",
+    "blogLabel": "Blog",
+    "articlesLabel": "Articles",
+    "notFound": "Post not found",
+    "backToBlog": "← Back to Blog"
+  },
+  "stats": {
+    "title": "Developer Stats",
+    "subtitle": "A quick snapshot of my open‑source presence and coding practice, updated automatically with caching for fast loads.",
+    "autoRefreshed": "Auto‑refreshed",
+    "footer": "Data via GitHub API & LeetCode GraphQL • Cached to improve performance"
+  },
+  "skills": {
+    "title": "Technical Skills",
+    "subtitle": "A comprehensive overview of my technical expertise and proficiency levels",
+    "categories": {
+      "all": "All Skills",
+      "frontend": "Frontend",
+      "backend": "Backend",
+      "tools": "Tools & Others"
+    },
+    "proficiency": "Proficiency",
+    "technologies": "Technologies",
+    "yearsExperience": "Years Experience"
+  },
+  "footer": {
+    "desc": "Software Engineer passionate about creating beautiful, functional web applications with a focus on user experience.",
+    "rights": "© {{year}} All rights reserved."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "desc": "The link you followed doesn't exist on parjadm.ca. It may have been moved or removed.",
+    "home": "Go home",
+    "back": "Go back"
   }
 }

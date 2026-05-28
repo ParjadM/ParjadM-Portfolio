@@ -8,7 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Reveal } from '../components/Reveal.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
-
+import { useTranslation } from 'react-i18next';
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 import ParjadImage from '../Images/Parjad.jpg';
 import GitHubStats from '../components/GitHubStats.tsx';
@@ -20,6 +20,7 @@ import BinaryGeneratorImage from '../Images/Binary 1010 Generator.jpg';
 import SpaceShooterImage from '../Images/SpaceShooter.jpg';
 
 export const ContactSection = ({ theme }) => {
+    const { t } = useTranslation();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -68,14 +69,14 @@ export const ContactSection = ({ theme }) => {
             title: "GitHub",
             value: "github.com/ParjadM",
             href: "https://github.com/ParjadM",
-            description: "Check out my code"
+            description: t('contact.info.githubDesc')
         },
         {
             icon: <Linkedin size={24} />,
             title: "LinkedIn",
             value: "linkedin.com/in/parjadminooei",
             href: "https://www.linkedin.com/in/parjadminooei",
-            description: "Connect professionally"
+            description: t('contact.info.linkedinDesc')
         }
     ];
 
@@ -89,10 +90,9 @@ export const ContactSection = ({ theme }) => {
                 {/* Header */}
                 <Reveal>
                 <div className="text-center mb-16">
-                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Let's Connect</h2>
+                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">{t('contact.title')}</h2>
                     <p className="text-gray-300 max-w-2xl mx-auto text-lg">
-                        I'm currently seeking new opportunities and am open to collaboration. 
-                        Whether you have a question or just want to say hi, feel free to reach out.
+                        {t('contact.subtitle')}
                     </p>
                 </div>
                 </Reveal>
@@ -101,7 +101,7 @@ export const ContactSection = ({ theme }) => {
                     {/* Contact Form */}
                     <Reveal>
                     <GlassCard className="p-8">
-                        <h3 className="text-2xl font-bold text-white mb-6">Send me a message</h3>
+                        <h3 className="text-2xl font-bold text-white mb-6">{t('contact.form.title')}</h3>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             {/* Honeypot field */}
                             <div className="hidden" aria-hidden="true">
@@ -113,7 +113,7 @@ export const ContactSection = ({ theme }) => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
-                                        Name *
+                                        {t('contact.form.nameLabel')}
                                     </label>
                                     <input
                                         type="text"
@@ -123,12 +123,12 @@ export const ContactSection = ({ theme }) => {
                                         onChange={handleInputChange}
                                         required
                                         className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-all duration-300"
-                                        placeholder="Your name"
+                                        placeholder={t('contact.form.namePlaceholder')}
                                     />
                                 </div>
                                 <div>
                                     <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                                        Email *
+                                        {t('contact.form.emailLabel')}
                                     </label>
                                     <input
                                         type="email"
@@ -138,14 +138,14 @@ export const ContactSection = ({ theme }) => {
                                         onChange={handleInputChange}
                                         required
                                         className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-all duration-300"
-                                        placeholder="your.email@example.com"
+                                        placeholder={t('contact.form.emailPlaceholder')}
                                     />
                                 </div>
                             </div>
                             
                             <div>
                                 <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-2">
-                                    Subject *
+                                    {t('contact.form.subjectLabel')}
                                 </label>
                                 <input
                                     type="text"
@@ -155,13 +155,13 @@ export const ContactSection = ({ theme }) => {
                                     onChange={handleInputChange}
                                     required
                                     className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-all duration-300"
-                                    placeholder="What's this about?"
+                                    placeholder={t('contact.form.subjectPlaceholder')}
                                 />
                             </div>
                             
                             <div>
                                 <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">
-                                    Message *
+                                    {t('contact.form.messageLabel')}
                                 </label>
                                 <textarea
                                     id="message"
@@ -171,7 +171,7 @@ export const ContactSection = ({ theme }) => {
                                     required
                                     rows={6}
                                     className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-all duration-300 resize-none"
-                                    placeholder="Tell me about your project or just say hello!"
+                                    placeholder={t('contact.form.messagePlaceholder')}
                                 />
                             </div>
                             
@@ -183,21 +183,21 @@ export const ContactSection = ({ theme }) => {
                                 {isSubmitting ? (
                                     <div className="flex items-center justify-center">
                                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                                        Sending...
+                                        {t('contact.form.sending')}
                                     </div>
                                 ) : (
-                                    'Send Message'
+                                    t('contact.form.send')
                                 )}
                             </button>
                             
                             {submitStatus === 'success' && (
                                 <div className="p-4 bg-green-500/20 border border-green-500/30 rounded-lg text-green-300 text-center">
-                                    ✅ Message sent successfully! I'll get back to you soon.
+                                    {t('contact.form.success')}
                                 </div>
                             )}
                             {submitStatus === 'error' && (
                                 <div className="p-4 bg-red-500/20 border border-red-500/30 rounded-lg text-red-300 text-center">
-                                    ❌ Failed to send message. Please try again later.
+                                    {t('contact.form.error')}
                                 </div>
                             )}
                         </form>
@@ -208,7 +208,7 @@ export const ContactSection = ({ theme }) => {
                     <div className="space-y-8">
                         <Reveal>
                         <GlassCard className="p-8">
-                            <h3 className="text-2xl font-bold text-white mb-6">Get in touch</h3>
+                            <h3 className="text-2xl font-bold text-white mb-6">{t('contact.info.title')}</h3>
                             <div className="space-y-6">
                                 {contactMethods.map((method, index) => (
                                     <a
@@ -241,17 +241,17 @@ export const ContactSection = ({ theme }) => {
                         <Reveal>
                         <GlassCard className="p-8 overflow-hidden relative">
                             <div className="relative z-10">
-                                <h3 className="text-2xl font-bold text-white mb-4">Availability</h3>
+                                <h3 className="text-2xl font-bold text-white mb-4">{t('contact.info.availability')}</h3>
                                 <div className="flex items-center space-x-4">
                                     <div className="relative">
                                         <div className={`w-4 h-4 rounded-full ${theme === 'pink' ? 'bg-pink-500' : 'bg-emerald-500'} animate-ping absolute`}></div>
                                         <div className={`w-4 h-4 rounded-full ${theme === 'pink' ? 'bg-pink-500' : 'bg-emerald-500'} relative`}></div>
                                     </div>
-                                    <p className="text-gray-300">Open to new opportunities</p>
+                                    <p className="text-gray-300">{t('contact.info.availabilityStatus')}</p>
                                 </div>
                                 <div className="mt-6 p-4 bg-white/5 rounded-lg border border-white/10 flex items-center justify-between">
-                                    <div className="text-gray-400 text-sm">Response Time</div>
-                                    <div className="text-white font-medium">Within 24 hours</div>
+                                    <div className="text-gray-400 text-sm">{t('contact.info.responseTime')}</div>
+                                    <div className="text-white font-medium">{t('contact.info.responseTimeValue')}</div>
                                 </div>
                             </div>
                             

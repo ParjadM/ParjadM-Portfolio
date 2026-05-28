@@ -5,13 +5,15 @@ import { GlassCard } from '../ui/GlassCard.jsx';
 import { RippleButton } from '../ui/RippleButton.jsx';
 import { Toast } from '../ui/Toast.jsx';
 import { getAuthToken } from '../../utils/auth.jsx';
+import { useTranslation } from 'react-i18next';
 
 export const Footer = ({ theme }) => {
+    const { t } = useTranslation();
     const navLinks = [
-        { name: 'Home', path: '/' },
-        { name: 'About', path: '/about' },
-        { name: 'Projects', path: '/projects' },
-        { name: 'Contact', path: '/contact' }
+        { name: t('nav.Home'), path: '/' },
+        { name: t('nav.About'), path: '/about' },
+        { name: t('nav.Projects'), path: '/projects' },
+        { name: t('nav.Contact'), path: '/contact' }
     ];
 
     const socialLinks = [
@@ -41,7 +43,7 @@ export const Footer = ({ theme }) => {
                             Parjad Minooei
                         </h2>
                         <p className="text-gray-300 text-base max-w-2xl mx-auto leading-relaxed">
-                            Software Engineer passionate about creating beautiful, functional web applications with a focus on user experience.
+                            {t('footer.desc')}
                         </p>
                     </div>
 
@@ -90,7 +92,7 @@ export const Footer = ({ theme }) => {
                     {/* Copyright */}
                     <div className="text-center">
                         <p className="text-gray-500 text-sm">
-                            © {new Date().getFullYear()} All rights reserved.
+                            {t('footer.rights', { year: new Date().getFullYear() })}
                         </p>
                     </div>
                 </div>

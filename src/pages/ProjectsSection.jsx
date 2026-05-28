@@ -8,7 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Reveal } from '../components/Reveal.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
-
+import { useTranslation } from 'react-i18next';
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 import ParjadImage from '../Images/Parjad.jpg';
 import GitHubStats from '../components/GitHubStats.tsx';
@@ -20,6 +20,7 @@ import BinaryGeneratorImage from '../Images/Binary 1010 Generator.jpg';
 import SpaceShooterImage from '../Images/SpaceShooter.jpg';
 
 export const ProjectsSection = ({ theme }) => {
+    const { t } = useTranslation();
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -39,7 +40,7 @@ export const ProjectsSection = ({ theme }) => {
                 const data = await res.json();
                 setProjects(Array.isArray(data.projects) ? data.projects : []);
             } catch (e) {
-                setError('Failed to load projects');
+                setError(t('projects.error'));
             } finally {
                 setLoading(false);
             }
@@ -54,10 +55,10 @@ export const ProjectsSection = ({ theme }) => {
     return (
         <section id="projects" className="min-h-screen flex flex-col items-center justify-center py-20 px-4">
             <Reveal>
-            <h2 className="text-4xl font-bold text-white mb-12 text-center">My Projects</h2>
+            <h2 className="text-4xl font-bold text-white mb-12 text-center">{t('projects.title')}</h2>
             </Reveal>
             {error && <div className="text-red-300 mb-4">{error}</div>}
-            {loading && <div className="text-gray-300">Loading...</div>}
+            {loading && <div className="text-gray-300">{t('projects.loading')}</div>}
             <div className="container mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {projects.map((project) => (
@@ -89,7 +90,7 @@ export const ProjectsSection = ({ theme }) => {
                     </Reveal>
                 ))}
                 {!loading && projects.length === 0 && (
-                    <div className="col-span-full text-center text-gray-400">No projects yet.</div>
+                    <div className="col-span-full text-center text-gray-400">{t('projects.empty')}</div>
                 )}
                 </div>
             </div>
