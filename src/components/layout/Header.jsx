@@ -8,10 +8,14 @@ import { getAuthToken } from '../../utils/auth.jsx';
 import Logo from '../../Images/Logo.png';
 import { NewsFeed } from '../ui/NewsFeed.jsx';
 import { THEMES } from '../../utils/themeConfig.js';
+import { createPortal } from 'react-dom';
 
 export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+    const [paletteRect, setPaletteRect] = useState(null);
+    const paletteTriggerRef = useRef(null);
+    const paletteDropdownRef = useRef(null);
     const [blogPosts, setBlogPosts] = useState([]);
     const [visitors, setVisitors] = useState(() => {
         try {
@@ -64,8 +68,51 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
             setBlogPosts(posts.filter(p => p.id && p.title).map(p => ({ id: p.id, title: p.title })));
           })
           .catch(() => {});
+
         return () => controller.abort();
     }, []);
+
+    useEffect(() => {
+        if (isPaletteOpen && paletteTriggerRef.current && typeof window !== 'undefined') {
+            const rect = paletteTriggerRef.current.getBoundingClientRect();
+            const w = 192; // w-48
+            setPaletteRect({ top: rect.bottom + 8, left: rect.right - w });
+        } else {
+            setPaletteRect(null);
+        }
+    }, [isPaletteOpen]);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (paletteDropdownRef.current?.contains(e.target) || paletteTriggerRef.current?.contains(e.target)) return;
+            setIsPaletteOpen(false);
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const paletteEl = isPaletteOpen && paletteRect && typeof document !== 'undefined' && createPortal(
+        <div
+            ref={paletteDropdownRef}
+            className="fixed z-[9999] w-48 rounded-xl bg-gray-900 border border-gray-700 shadow-2xl overflow-hidden"
+            style={{ top: paletteRect.top, left: paletteRect.left }}
+        >
+            <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Themes</div>
+            {Object.values(THEMES).map((t) => (
+                <button
+                    key={t.id}
+                    onClick={() => {
+                        setThemeId(t.id);
+                        setIsPaletteOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 text-sm transition-colors ${currentThemeId === t.id ? 'bg-emerald-500/20 text-emerald-300' : 'text-gray-300 hover:bg-gray-800'}`}
+                >
+                    {t.name}
+                </button>
+            ))}
+        </div>,
+        document.body
+    );
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
@@ -99,29 +146,14 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
                             )}
                             <div className="relative ml-2">
                                 <button
+                                    ref={paletteTriggerRef}
                                     onClick={() => setIsPaletteOpen(!isPaletteOpen)}
                                     className="p-2 rounded-full bg-white/10 border border-white/10 text-gray-300 hover:text-white hover:bg-white/15 transition-colors duration-300"
                                     aria-label="Theme Palette"
                                 >
                                     <Palette className="w-5 h-5" />
                                 </button>
-                                {isPaletteOpen && (
-                                    <div className="absolute right-0 mt-2 w-48 rounded-xl bg-gray-900 border border-gray-700 shadow-2xl overflow-hidden z-50">
-                                        <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Themes</div>
-                                        {Object.values(THEMES).map((t) => (
-                                            <button
-                                                key={t.id}
-                                                onClick={() => {
-                                                    setThemeId(t.id);
-                                                    setIsPaletteOpen(false);
-                                                }}
-                                                className={`w-full text-left px-4 py-2 text-sm transition-colors ${currentThemeId === t.id ? 'bg-emerald-500/20 text-emerald-300' : 'text-gray-300 hover:bg-gray-800'}`}
-                                            >
-                                                {t.name}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
+                                {paletteEl}
                             </div>
                         </div>
                     </GlassCard>
