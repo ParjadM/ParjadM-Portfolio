@@ -53,6 +53,7 @@ const Chatbot = ({ theme = 'green' }) => {
   const [loading, setLoading] = useState(false);
   
   const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const messagesEndRef = useRef(null);
   const location = useLocation();
 
   // Initialize greeting based on page
@@ -305,7 +306,7 @@ const Chatbot = ({ theme = 'green' }) => {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={listening ? "Listening..." : "Ask me anything..."}
+                placeholder={voiceError ? voiceError : (listening ? "Listening..." : "Ask me anything...")}
                 className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-white/30 transition-all"
               />
               <button
