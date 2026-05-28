@@ -157,4 +157,13 @@ const ClickUpSchema = new mongoose.Schema(
 )
 export const ClickUp = mongoose.models.ClickUp || mongoose.model('ClickUp', ClickUpSchema, 'clickup')
 
+const AiKnowledgeSchema = new mongoose.Schema(
+  {
+    key: { type: String, unique: true, default: 'global' },
+    content: { type: String, default: '' },
+  },
+  { timestamps: true }
+)
+
+export const AiKnowledge = mongoose.models.AiKnowledge || mongoose.model('AiKnowledge', AiKnowledgeSchema, 'ai_knowledge')
 

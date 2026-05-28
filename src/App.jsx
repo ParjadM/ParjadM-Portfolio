@@ -13,6 +13,7 @@ import BinaryGeneratorImage from './Images/Binary 1010 Generator.jpg';
 import SpaceShooterImage from './Images/SpaceShooter.jpg';
 import { Reveal } from './components/Reveal.jsx';
 import { CustomCursor } from './components/CustomCursor.jsx';
+import Chatbot from './components/Chatbot.jsx';
 
 // ICONS - Using lucide-react for modern and clean icons
 // In a real project, you would `npm install lucide-react`
@@ -2673,6 +2674,62 @@ const AdminLoginPage = ({ theme }) => {
   );
 };
 
+// --- Admin AI Manager ---
+const AdminAIManager = ({ theme }) => {
+  const token = getAuthToken();
+  const [content, setContent] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/admin/ai-knowledge', { headers: { Authorization: `Bearer ${token}` } })
+      .then(res => res.ok ? res.json() : Promise.reject(new Error('Failed')))
+      .then(d => setContent(d.content || ''))
+      .catch(() => setError('Failed to load AI knowledge'))
+      .finally(() => setLoading(false));
+  }, [token]);
+
+  const save = async () => {
+    setSaving(true); setError('');
+    try {
+      const res = await fetch('/api/admin/ai-knowledge', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ content })
+      });
+      if (!res.ok) throw new Error('Failed');
+      alert('Saved successfully!');
+    } catch {
+      setError('Save failed');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="text-gray-300">
+      <h3 className="text-xl text-white font-bold mb-4">AI Knowledge Base</h3>
+      <p className="mb-4 text-sm text-gray-400">Feed information about yourself here. The chatbot will use this text to answer questions about you.</p>
+      {loading ? <div>Loading...</div> : (
+        <div className="space-y-4">
+          {error && <div className="text-red-300">{error}</div>}
+          <textarea 
+            value={content} 
+            onChange={(e) => setContent(e.target.value)} 
+            rows={15} 
+            placeholder="Hi, I am Parjad. I am a web developer..." 
+            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded font-sans" 
+          />
+          <button onClick={save} disabled={saving} className="px-4 py-2 rounded bg-emerald-600/80 disabled:opacity-50">
+            {saving ? 'Saving...' : 'Save Knowledge'}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // --- Admin Dashboard ---
 const AdminDashboard = ({ theme }) => {
   const navigate = useNavigate();
@@ -2738,10 +2795,10 @@ const AdminDashboard = ({ theme }) => {
 
           {/* Tabs */}
           <div className="mb-6 flex gap-2">
-            {['blog','projects','status'].map(tab => (
+            {['blog','projects','status','ai'].map(tab => (
               <button key={tab} onClick={() => setActiveTab(tab)}
                 className={`px-3 py-2 rounded ${activeTab===tab ? 'bg-white/20 text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`}>
-                {tab === 'blog' ? 'Blog' : tab === 'projects' ? 'Projects' : 'System'}
+                {tab === 'blog' ? 'Blog' : tab === 'projects' ? 'Projects' : tab === 'status' ? 'System' : 'AI Context'}
               </button>
             ))}
           </div>
@@ -2809,6 +2866,7 @@ const AdminDashboard = ({ theme }) => {
 
           {activeTab === 'blog' && <AdminBlogManager theme={theme} />}
           {activeTab === 'projects' && <AdminProjectsManager theme={theme} />}
+          {activeTab === 'ai' && <AdminAIManager theme={theme} />}
         </GlassCard>
       </div>
     </section>
@@ -3373,6 +3431,9 @@ const Layout = ({ theme, toggleTheme, darkMode, toggleDarkMode, toast, setToast 
 
             {/* Footer */}
             <Footer theme={theme} />
+            
+            {/* AI Chatbot */}
+            <Chatbot theme={theme} />
             
             {/* Toast Notifications */}
             <Toast 

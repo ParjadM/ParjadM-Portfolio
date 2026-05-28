@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import mongoose from 'mongoose'
-import { BlogPost, Project, Analytics, Visitor, AnalyticsDaily } from '../db/mongo.js'
+import { BlogPost, Project, Analytics, Visitor, AnalyticsDaily, AiKnowledge } from '../db/mongo.js'
 import crypto from 'crypto'
 import { currentEngine } from '../db/index.js'
 
@@ -398,5 +398,28 @@ router.post('/projects/:id/feature', async (req, res) => {
   }
 })
 
+// --- AI Knowledge Management (Admin) ---
+router.get('/ai-knowledge', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.json({ content: '' })
+  try {
+    const doc = await AiKnowledge.findOne({ key: 'global' }).lean()
+    res.json({ content: doc ? doc.content : '' })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
 
-
+router.put('/ai-knowledge', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
+  try {
+    const { content } = req.body || {}
+    await AiKnowledge.updateOne(
+      { key: 'global' },
+      { $set: { content: content || '' } },
+      { upsert: true }
+    )
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(400).json({ error: err.message })
+  }
+})

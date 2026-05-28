@@ -12,6 +12,7 @@ import metricsRouter from './routes/metrics.js'
 import clickupRouter from './routes/clickup.js'
 import githubRouter from './routes/github.js'
 import leetcodeRouter from './routes/leetcode.js'
+import aiRouter from './routes/ai.js'
 
 export async function createApp() {
   const app = express()
@@ -39,6 +40,7 @@ export async function createApp() {
   app.use('/api/clickup', clickupRouter)
   app.use('/api/github-stats', githubRouter)
   app.use('/api/leetcode-stats', leetcodeRouter)
+  app.use('/api/ai', aiRouter)
 
   return app
 }
