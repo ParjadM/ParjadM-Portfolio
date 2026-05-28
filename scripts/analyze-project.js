@@ -39,14 +39,14 @@ function getAllFiles(dirPath, arrayOfFiles = []) {
 async function analyzeProject() {
   console.log('Starting Project Complexity Analysis...');
   
-  if (!process.env.GEMINI_API_KEY) {
-    console.error('Warning: GEMINI_API_KEY not found. Skipping complexity analysis.');
+  if (!process.env.GEMINI_API_KEY || process.env.VERCEL) {
+    console.log('Skipping complexity analysis (no API key or running on Vercel).');
     const fallback = {
       timeWithConstant: "N/A",
       timeWithoutConstant: "N/A",
       memoryWithConstant: "N/A",
       memoryWithoutConstant: "N/A",
-      explanation: "GEMINI_API_KEY not found during build."
+      explanation: "Skipped analysis during Vercel build."
     };
     if (!fs.existsSync(PUBLIC_DIR)) fs.mkdirSync(PUBLIC_DIR, { recursive: true });
     fs.writeFileSync(OUTPUT_FILE, JSON.stringify(fallback, null, 2));
@@ -86,7 +86,11 @@ Respond EXCLUSIVELY in valid JSON format using the following schema:
 }`;
 
   try {
-    const response = await ai.models.generateContent({
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Gemini API timeout after 15 seconds')), 15000)
+    );
+
+    const apiPromise = ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: [{ role: 'user', parts: [{ text: combinedCode }] }],
       config: {
@@ -95,6 +99,8 @@ Respond EXCLUSIVELY in valid JSON format using the following schema:
       }
     });
 
+    const response = await Promise.race([apiPromise, timeoutPromise]);
+
     const replyData = JSON.parse(response.text);
     
     if (!fs.existsSync(PUBLIC_DIR)) fs.mkdirSync(PUBLIC_DIR, { recursive: true });
@@ -102,18 +108,18 @@ Respond EXCLUSIVELY in valid JSON format using the following schema:
     
     console.log('Successfully generated complexity.json');
   } catch (err) {
-    console.error('Failed to analyze complexity:', err);
+    console.error('Failed to analyze complexity:', err.message);
     // Write fallback so the build doesn't crash completely
     const fallback = {
       timeWithConstant: "O(?)",
       timeWithoutConstant: "O(?)",
       memoryWithConstant: "O(?)",
       memoryWithoutConstant: "O(?)",
-      explanation: "Failed to analyze during build step."
+      explanation: "Failed to analyze during build step. " + err.message
     };
     if (!fs.existsSync(PUBLIC_DIR)) fs.mkdirSync(PUBLIC_DIR, { recursive: true });
     fs.writeFileSync(OUTPUT_FILE, JSON.stringify(fallback, null, 2));
   }
 }
 
-analyzeProject();
+analyzeProject().then(() => process.exit(0));
