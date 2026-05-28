@@ -6,6 +6,7 @@ import { RippleButton } from '../components/ui/RippleButton.jsx';
 import { Toast } from '../components/ui/Toast.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
 import { useTranslation } from 'react-i18next';
+import { Reveal } from '../components/Reveal.jsx';
 
 export const NotFoundPage = ({ theme }) => {
     const { t } = useTranslation();
