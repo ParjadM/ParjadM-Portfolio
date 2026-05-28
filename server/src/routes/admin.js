@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import { BlogPost, Project, Analytics, Visitor, AnalyticsDaily, AiKnowledge } from '../db/mongo.js'
 import crypto from 'crypto'
 import { currentEngine } from '../db/index.js'
+import { redisClient } from '../db/redis.js'
 
 const router = Router()
 
@@ -418,6 +419,13 @@ router.put('/ai-knowledge', async (req, res) => {
       { $set: { content: content || '' } },
       { upsert: true }
     )
+    if (redisClient) {
+      try {
+        await redisClient.flushall()
+      } catch (err) {
+        console.error('Failed to flush Redis cache:', err)
+      }
+    }
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
