@@ -167,3 +167,43 @@ const AiKnowledgeSchema = new mongoose.Schema(
 
 export const AiKnowledge = mongoose.models.AiKnowledge || mongoose.model('AiKnowledge', AiKnowledgeSchema, 'ai_knowledge')
 
+// Premium Analytics Schemas
+const DeviceStatsSchema = new mongoose.Schema(
+  {
+    type: { type: String, enum: ['browser', 'os'], required: true },
+    name: { type: String, required: true },
+    count: { type: Number, default: 0 },
+  },
+  { timestamps: true }
+)
+DeviceStatsSchema.index({ type: 1, name: 1 }, { unique: true })
+export const DeviceStats = mongoose.models.DeviceStats || mongoose.model('DeviceStats', DeviceStatsSchema, 'device_stats')
+
+const HourlyStatsSchema = new mongoose.Schema(
+  {
+    date: { type: String, index: true, required: true }, // YYYY-MM-DD
+    hour: { type: Number, index: true, required: true }, // 0-23
+    pageviews: { type: Number, default: 0 },
+    uniqueVisitors: { type: Number, default: 0 },
+  },
+  { timestamps: true }
+)
+HourlyStatsSchema.index({ date: 1, hour: 1 }, { unique: true })
+export const HourlyStats = mongoose.models.HourlyStats || mongoose.model('HourlyStats', HourlyStatsSchema, 'hourly_stats')
+
+const AccessLogSchema = new mongoose.Schema(
+  {
+    timestamp: { type: Date, default: () => new Date(), index: true },
+    path: { type: String, required: true },
+    method: { type: String, default: 'GET' },
+    visitorId: { type: String },
+    userAgent: { type: String },
+    browser: { type: String },
+    os: { type: String },
+  },
+  { 
+    timestamps: true,
+    capped: { size: 5242880, max: 1000 } // Capped at ~5MB or 1000 docs for live logs
+  }
+)
+export const AccessLog = mongoose.models.AccessLog || mongoose.model('AccessLog', AccessLogSchema, 'access_logs')

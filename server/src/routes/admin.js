@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import mongoose from 'mongoose'
-import { BlogPost, Project, Analytics, Visitor, AnalyticsDaily, AiKnowledge } from '../db/mongo.js'
+import { BlogPost, Project, Analytics, Visitor, AnalyticsDaily, AiKnowledge, DeviceStats, HourlyStats, AccessLog } from '../db/mongo.js'
 import crypto from 'crypto'
 import { currentEngine } from '../db/index.js'
 import { redisClient } from '../db/redis.js'
@@ -429,5 +429,44 @@ router.put('/ai-knowledge', async (req, res) => {
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
+  }
+})
+
+// --- Premium Analytics (Admin) ---
+router.get('/metrics/devices', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.json({ browsers: [], os: [] })
+  try {
+    const browsers = await DeviceStats.find({ type: 'browser' }).sort({ count: -1 }).lean()
+    const osList = await DeviceStats.find({ type: 'os' }).sort({ count: -1 }).lean()
+    res.json({ browsers, os: osList })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+router.get('/metrics/hourly', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.json({ heatmap: [] })
+  try {
+    // Get last 7 days of hourly stats
+    const dates = Array.from({ length: 7 }).map((_, i) => {
+      const d = new Date()
+      d.setDate(d.getDate() - i)
+      return d.toISOString().slice(0, 10)
+    })
+    const docs = await HourlyStats.find({ date: { $in: dates } }).sort({ date: 1, hour: 1 }).lean()
+    res.json({ heatmap: docs })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+router.get('/metrics/logs', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.json({ logs: [] })
+  try {
+    // Get last 100 access logs
+    const logs = await AccessLog.find({}).sort({ timestamp: -1 }).limit(100).lean()
+    res.json({ logs })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
   }
 })

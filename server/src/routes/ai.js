@@ -9,7 +9,7 @@ const router = Router()
 
 router.post('/chat', async (req, res) => {
   try {
-    const { messages } = req.body
+    const { messages, context } = req.body
     
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ error: 'Messages array is required' })
@@ -50,6 +50,7 @@ router.post('/chat', async (req, res) => {
     const systemInstruction = `You are a helpful AI assistant for Parjad's portfolio website. 
 You answer questions about Parjad based on the following information:
 ${knowledgeContent ? knowledgeContent : "No specific knowledge provided yet. Please direct them to the contact page."}
+${context ? `\n\nAdditional Context: ${context}` : ''}
 If asked something outside of this scope, you can politely decline or say you don't know.`
 
     const response = await ai.models.generateContent({

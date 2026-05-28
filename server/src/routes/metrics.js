@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { currentEngine } from '../db/index.js'
-import { Analytics, Visitor, AnalyticsDaily, VisitorDay, VisitorDayPath } from '../db/mongo.js'
+import { Analytics, Visitor, AnalyticsDaily, VisitorDay, VisitorDayPath, DeviceStats, HourlyStats, AccessLog } from '../db/mongo.js'
+import UAParser from 'ua-parser-js'
 
 const router = Router()
 
@@ -55,6 +56,48 @@ router.post('/visit', async (req, res) => {
       { $setOnInsert: { date: today, key: `path:${path}` }, $inc: { pageviews: 1, uniqueVisitors: pathIncUnique } },
       { upsert: true }
     )
+
+    // Parse User Agent
+    const uaString = req.headers['user-agent'] || ''
+    const parser = new UAParser(uaString)
+    const browserName = parser.getBrowser().name || 'Unknown'
+    const osName = parser.getOS().name || 'Unknown'
+
+    // Update Device Stats
+    await DeviceStats.updateOne(
+      { type: 'browser', name: browserName },
+      { $inc: { count: 1 } },
+      { upsert: true }
+    )
+    await DeviceStats.updateOne(
+      { type: 'os', name: osName },
+      { $inc: { count: 1 } },
+      { upsert: true }
+    )
+
+    // Update Hourly Stats
+    const currentHour = new Date().getHours()
+    await HourlyStats.updateOne(
+      { date: today, hour: currentHour },
+      { $setOnInsert: { date: today, hour: currentHour }, $inc: { pageviews: 1, uniqueVisitors: dayIncUnique } },
+      { upsert: true }
+    )
+
+    // Insert Access Log (capped collection handles truncation)
+    // Only attempt insert if we successfully parsed the connection
+    try {
+      await AccessLog.create({
+        path: path,
+        method: req.method || 'POST',
+        visitorId: visitorId,
+        userAgent: uaString,
+        browser: browserName,
+        os: osName
+      })
+    } catch (logErr) {
+      // Ignore log insertion errors if capped collection isn't initialized properly
+      console.error("Access log error:", logErr.message)
+    }
 
     res.json({ ok: true, pageviews: updated?.pageviews || 0, uniqueVisitors: updated?.uniqueVisitors || 0 })
   } catch (err) {

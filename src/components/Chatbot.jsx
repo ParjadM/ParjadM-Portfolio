@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const BotIcon = (props) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -18,14 +19,62 @@ const UserIcon = (props) => (
   </svg>
 );
 
+const MicIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+    <line x1="12" x2="12" y1="19" y2="22" />
+  </svg>
+);
+
+const SpeakerIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+  </svg>
+);
+
+const SpeakerOffIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+    <line x1="23" y1="9" x2="17" y2="15" />
+    <line x1="17" y1="9" x2="23" y2="15" />
+  </svg>
+);
+
 const Chatbot = ({ theme = 'green' }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    { role: 'model', parts: [{ text: "Hi! I'm Parjad's AI assistant. How can I help you today?" }] }
-  ]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  // Voice state
+  const [isListening, setIsListening] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  
   const messagesEndRef = useRef(null);
+  const recognitionRef = useRef(null);
+  const location = useLocation();
+
+  // Initialize greeting based on page
+  useEffect(() => {
+    let greeting = "Hi! I'm Parjad's AI assistant. How can I help you today?";
+    const path = location.pathname;
+    
+    if (path.includes('lqftBenchmark')) {
+      greeting = "Hi! I see you're checking out the LQFT Benchmark. Need any help understanding persistent tree structures or algorithm complexity?";
+    } else if (path.includes('admin')) {
+      greeting = "Welcome to the Admin Dashboard! Let me know if you need help analyzing the traffic metrics or managing content.";
+    } else if (path.includes('projects')) {
+      greeting = "Hi! Exploring the projects? Feel free to ask me specific questions about the tech stack.";
+    }
+    
+    // Reset conversation if it's the first time or if they change major contexts
+    if (messages.length <= 1) {
+      setMessages([{ role: 'model', parts: [{ text: greeting }] }]);
+    }
+  }, [location.pathname]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -35,9 +84,73 @@ const Chatbot = ({ theme = 'green' }) => {
     scrollToBottom();
   }, [messages, isOpen]);
 
+  // Setup Speech Recognition
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+      
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setInput(prev => prev + (prev ? ' ' : '') + transcript);
+      };
+      
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error", event.error);
+        setIsListening(false);
+      };
+      
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+      
+      recognitionRef.current = recognition;
+    }
+  }, []);
+
+  const toggleListening = (e) => {
+    e.preventDefault();
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    } else {
+      recognitionRef.current?.start();
+      setIsListening(true);
+    }
+  };
+
+  const speakText = (text) => {
+    if (!voiceEnabled || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel(); // Stop current speech
+    const utterance = new SpeechSynthesisUtterance(text);
+    // Try to find a good English voice
+    const voices = window.speechSynthesis.getVoices();
+    const voice = voices.find(v => v.lang.includes('en-US') && v.name.includes('Google')) || voices.find(v => v.lang.includes('en'));
+    if (voice) utterance.voice = voice;
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const toggleVoice = () => {
+    setVoiceEnabled(prev => {
+      const newState = !prev;
+      if (!newState) {
+        window.speechSynthesis?.cancel(); // Stop talking immediately if turned off
+      }
+      return newState;
+    });
+  };
+
   const handleSend = async (e) => {
     e?.preventDefault();
     if (!input.trim() || loading) return;
+
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    }
 
     const userMessage = { role: 'user', parts: [{ text: input }] };
     setMessages((prev) => [...prev, userMessage]);
@@ -45,20 +158,29 @@ const Chatbot = ({ theme = 'green' }) => {
     setLoading(true);
 
     try {
+      // Pass the current page context to the backend
       const response = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [...messages, userMessage] })
+        body: JSON.stringify({ 
+          messages: [...messages, userMessage],
+          context: `The user is currently browsing the page: ${location.pathname}.`
+        })
       });
       const data = await response.json();
       
       if (response.ok && data.reply) {
         setMessages((prev) => [...prev, { role: 'model', parts: [{ text: data.reply }] }]);
+        speakText(data.reply);
       } else {
-        setMessages((prev) => [...prev, { role: 'model', parts: [{ text: "Sorry, I'm having trouble connecting right now." }] }]);
+        const errorMsg = "Sorry, I'm having trouble connecting right now.";
+        setMessages((prev) => [...prev, { role: 'model', parts: [{ text: errorMsg }] }]);
+        speakText(errorMsg);
       }
     } catch (error) {
-      setMessages((prev) => [...prev, { role: 'model', parts: [{ text: "Sorry, something went wrong." }] }]);
+      const errorMsg = "Sorry, something went wrong.";
+      setMessages((prev) => [...prev, { role: 'model', parts: [{ text: errorMsg }] }]);
+      speakText(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -79,19 +201,28 @@ const Chatbot = ({ theme = 'green' }) => {
               <BotIcon className="w-5 h-5" />
               <span className="font-semibold">AI Assistant</span>
             </div>
-            <button onClick={() => setIsOpen(false)} className="text-white hover:text-white/80 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={toggleVoice} 
+                className="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                title={voiceEnabled ? "Voice Output On" : "Voice Output Off"}
+              >
+                {voiceEnabled ? <SpeakerIcon className="w-4 h-4" /> : <SpeakerOffIcon className="w-4 h-4" />}
+              </button>
+              <button onClick={() => setIsOpen(false)} className="p-1 text-white hover:text-white/80 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
           </div>
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`flex max-w-[80%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'} gap-2`}>
+                <div className={`flex max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'} gap-2`}>
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${msg.role === 'user' ? 'bg-white/10 text-white' : gradientClass + ' text-white'}`}>
                     {msg.role === 'user' ? <UserIcon className="w-4 h-4" /> : <BotIcon className="w-4 h-4" />}
                   </div>
@@ -119,13 +250,21 @@ const Chatbot = ({ theme = 'green' }) => {
           </div>
 
           {/* Input Area */}
-          <div className="p-4 border-t border-white/10 bg-black/20">
+          <div className="p-3 border-t border-white/10 bg-black/20">
             <form onSubmit={handleSend} className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={toggleListening}
+                className={`p-2 rounded-full transition-all ${isListening ? 'bg-red-500/20 text-red-400 animate-pulse' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+                title={isListening ? "Stop listening" : "Start Voice Input"}
+              >
+                <MicIcon className="w-5 h-5" />
+              </button>
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask me anything..."
+                placeholder={isListening ? "Listening..." : "Ask me anything..."}
                 className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-white/30 transition-all"
               />
               <button
