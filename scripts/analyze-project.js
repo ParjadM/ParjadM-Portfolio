@@ -39,8 +39,8 @@ function getAllFiles(dirPath, arrayOfFiles = []) {
 async function analyzeProject() {
   console.log('Starting Project Complexity Analysis...');
   
-  if (!process.env.GEMINI_API_KEY || process.env.VERCEL) {
-    console.log('Skipping complexity analysis (no API key or running on Vercel).');
+  if (!process.env.GEMINI_API_KEY) {
+    console.log('Skipping complexity analysis (no API key).');
     const fallback = {
       timeWithConstant: "N/A",
       timeWithoutConstant: "N/A",
