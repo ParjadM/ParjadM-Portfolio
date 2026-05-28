@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import 'regenerator-runtime/runtime';
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 // ... (icons remain the same) ...
 
@@ -54,11 +52,7 @@ const Chatbot = ({ theme = 'green' }) => {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   
-  // Voice state
   const [voiceEnabled, setVoiceEnabled] = useState(false);
-  const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
-  
-  const messagesEndRef = useRef(null);
   const location = useLocation();
 
   // Initialize greeting based on page
@@ -88,26 +82,85 @@ const Chatbot = ({ theme = 'green' }) => {
     scrollToBottom();
   }, [messages, isOpen]);
 
-  // Sync react-speech-recognition transcript to input field
-  useEffect(() => {
-    if (listening && transcript) {
-      setInput(transcript);
+  // Robust Native Voice State
+  const [listening, setListening] = useState(false);
+  const [voiceError, setVoiceError] = useState('');
+  const recognitionRef = useRef(null);
+
+  // Initialize native speech recognition on demand
+  const startNativeListening = () => {
+    setVoiceError('');
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (!SpeechRecognition) {
+      alert("Voice input is not supported in this browser. Try Chrome or Edge.");
+      return;
     }
-  }, [transcript, listening]);
+
+    try {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+      
+      let currentInput = input;
+
+      recognition.onresult = (event) => {
+        let finalStr = '';
+        let interimStr = '';
+        
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            finalStr += event.results[i][0].transcript;
+          } else {
+            interimStr += event.results[i][0].transcript;
+          }
+        }
+        
+        if (finalStr) {
+          currentInput = currentInput + (currentInput ? ' ' : '') + finalStr;
+          setInput(currentInput);
+        } else {
+          setInput(currentInput + (currentInput ? ' ' : '') + interimStr);
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.error("Native Speech Error:", event.error);
+        if (event.error === 'not-allowed') {
+          setVoiceError('Microphone blocked');
+          alert("Microphone access was denied. Please click the lock icon in your URL bar and allow microphone permissions.");
+        } else {
+          setVoiceError('Error: ' + event.error);
+        }
+        setListening(false);
+      };
+
+      recognition.onend = () => {
+        setListening(false);
+      };
+
+      recognition.start();
+      recognitionRef.current = recognition;
+      setListening(true);
+    } catch (err) {
+      console.error("Speech start error:", err);
+      setVoiceError('Failed to start');
+      setListening(false);
+    }
+  };
 
   const toggleListening = (e) => {
     e.preventDefault();
-    if (!browserSupportsSpeechRecognition) {
-      alert("Voice input is not supported in this browser.");
-      return;
-    }
-    
     if (listening) {
-      SpeechRecognition.stopListening();
+      recognitionRef.current?.stop();
+      setListening(false);
     } else {
-      resetTranscript();
-      setInput('');
-      SpeechRecognition.startListening({ continuous: true, language: 'en-US' });
+      startNativeListening();
     }
   };
 
