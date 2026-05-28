@@ -76,7 +76,7 @@ const VisitorSchema = new mongoose.Schema(
   { timestamps: true }
 )
 
-VisitorSchema.index({ visitorId: 1 }, { unique: true })
+
 
 export const Visitor = mongoose.models.Visitor || mongoose.model('Visitor', VisitorSchema, 'visitors')
 
