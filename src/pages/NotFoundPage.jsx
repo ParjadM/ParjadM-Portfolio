@@ -1,0 +1,49 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation, Link, Routes, Route } from 'react-router-dom';
+import { Mail, Github, Linkedin, Code, BrainCircuit, Palette, Menu, Sun, Moon } from '../components/ui/Icons.jsx';
+import { GlassCard } from '../components/ui/GlassCard.jsx';
+import { RippleButton } from '../components/ui/RippleButton.jsx';
+import { Toast } from '../components/ui/Toast.jsx';
+import { getAuthToken } from '../utils/auth.jsx';
+
+export const NotFoundPage = ({ theme }) => {
+    const navigate = useNavigate();
+    useEffect(() => {
+        document.title = 'Page not found — Parjad Minooei';
+        return () => { document.title = 'Parjad Minooei'; };
+    }, []);
+    const gradientClass = theme === 'pink'
+        ? 'bg-gradient-to-r from-pink-500 to-red-500'
+        : 'bg-gradient-to-r from-emerald-500 to-teal-500';
+
+    return (
+        <section className="min-h-screen flex items-center justify-center py-20 px-4">
+            <div className="container mx-auto max-w-2xl text-center">
+                <Reveal>
+                <GlassCard className="p-12 md:p-16" theme={theme}>
+                    <div className={`text-8xl md:text-9xl font-extrabold ${theme === 'pink' ? 'text-pink-400/30' : 'text-emerald-400/30'}`}>404</div>
+                    <h1 className="text-2xl md:text-3xl font-bold text-white mt-4">Page not found</h1>
+                    <p className="text-gray-300 mt-2 max-w-md mx-auto">
+                        The link you followed doesn't exist on parjadm.ca. It may have been moved or removed.
+                    </p>
+                    <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                        <button
+                            onClick={() => navigate('/')}
+                            className={`px-6 py-3 rounded-full font-semibold text-white ${gradientClass} hover:opacity-90 transition-opacity`}
+                        >
+                            Go home
+                        </button>
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="px-6 py-3 rounded-full font-semibold bg-white/10 border border-white/20 text-gray-300 hover:bg-white/15 hover:text-white transition-colors"
+                        >
+                            Go back
+                        </button>
+                    </div>
+                </GlassCard>
+                </Reveal>
+            </div>
+        </section>
+    );
+};
+

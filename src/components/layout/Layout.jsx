@@ -1,0 +1,173 @@
+import React, { useState, useEffect, useRef, Suspense } from 'react';
+import { useNavigate, useLocation, Link, Routes, Route } from 'react-router-dom';
+import { BackgroundBlobs } from '../ui/BackgroundBlobs.jsx';
+import { CustomCursor } from '../CustomCursor.jsx';
+import { Header } from './Header.jsx';
+import { Footer } from './Footer.jsx';
+import Chatbot from '../Chatbot.jsx';
+import { Toast } from '../ui/Toast.jsx';
+import { getAuthToken, RequireAuth } from '../../utils/auth.jsx';
+
+const HomeSection = React.lazy(() => import('../../pages/HomeSection.jsx').then(m => ({default: m.HomeSection})));
+const AboutSection = React.lazy(() => import('../../pages/AboutSection.jsx').then(m => ({default: m.AboutSection})));
+const ProjectsSection = React.lazy(() => import('../../pages/ProjectsSection.jsx').then(m => ({default: m.ProjectsSection})));
+const LQFTBenchmarkPage = React.lazy(() => import('../../pages/LQFTBenchmarkPage.jsx').then(m => ({default: m.LQFTBenchmarkPage})));
+const StatsPage = React.lazy(() => import('../../pages/StatsPage.jsx').then(m => ({default: m.StatsPage})));
+const BlogSection = React.lazy(() => import('../../pages/BlogSection.jsx').then(m => ({default: m.BlogSection})));
+const BlogPostPage = React.lazy(() => import('../../pages/BlogPostPage.jsx').then(m => ({default: m.BlogPostPage})));
+const ContactSection = React.lazy(() => import('../../pages/ContactSection.jsx').then(m => ({default: m.ContactSection})));
+const AdminLoginPage = React.lazy(() => import('../../pages/admin/AdminLoginPage.jsx').then(m => ({default: m.AdminLoginPage})));
+const AdminDashboard = React.lazy(() => import('../../pages/admin/AdminDashboard.jsx').then(m => ({default: m.AdminDashboard})));
+const NotFoundPage = React.lazy(() => import('../../pages/NotFoundPage.jsx').then(m => ({default: m.NotFoundPage})));
+export const Layout = ({ theme, toggleTheme, darkMode, toggleDarkMode, toast, setToast }) => {
+    const location = useLocation();
+    const [visitorId, setVisitorId] = useState(null);
+
+    useEffect(() => {
+        // Ensure stable visitorId
+        try {
+            let vid = null
+            try { vid = localStorage.getItem('visitorId') } catch {}
+            if (!vid && typeof window !== 'undefined' && window.crypto?.getRandomValues) {
+                const arr = new Uint8Array(16)
+                window.crypto.getRandomValues(arr)
+                vid = Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('')
+                try { localStorage.setItem('visitorId', vid) } catch {}
+            }
+            setVisitorId(vid)
+        } catch {}
+    }, [])
+
+    useEffect(() => {
+        // Track each route view
+        try {
+            const path = location?.pathname || '/'
+            fetch('/api/metrics/visit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ visitorId: visitorId || '', path })
+            }).catch(() => {})
+        } catch {}
+    }, [location?.pathname, visitorId])
+
+    // Basic SEO: update title/meta on route change
+    useEffect(() => {
+        const path = location.pathname || '/'
+        const titleMap = {
+          '/': 'Parjad Minooei — Software Engineer Portfolio',
+          '/about': 'About — Parjad Minooei',
+          '/projects': 'Projects — Parjad Minooei',
+          '/projects/lqftBenchmark': 'LQFT Benchmark — Parjad Minooei',
+          '/blog': 'Blog — Parjad Minooei',
+          '/contact': 'Contact — Parjad Minooei',
+        }
+        const descMap = {
+          '/': 'Software Engineer building beautiful, fast, user‑centric web apps.',
+          '/about': 'Learn about Parjad’s background and skills.',
+          '/projects': 'Selected projects with code and live demos.',
+          '/projects/lqftBenchmark': 'Run the interactive LQFT benchmark demo in your browser and compare fixed-depth routed lookups with baseline map operations.',
+          '/blog': 'Articles on web development and learning.',
+          '/contact': 'Get in touch for opportunities and collaborations.',
+        }
+        const t = titleMap[path] || 'Parjad Minooei'
+        const d = descMap[path] || descMap['/']
+        document.title = t
+        const ensure = (selector, attrs) => {
+          let el = document.head.querySelector(selector)
+          if (!el) { el = document.createElement('meta'); Object.keys(attrs).forEach(k=> el.setAttribute(k, attrs[k])); document.head.appendChild(el); return el }
+          return el
+        }
+        const m = ensure('meta[name="description"]', { name: 'description' })
+        m.setAttribute('content', d)
+        const ogt = ensure('meta[property="og:title"]', { property: 'og:title' })
+        ogt.setAttribute('content', t)
+        const ogd = ensure('meta[property="og:description"]', { property: 'og:description' })
+        ogd.setAttribute('content', d)
+        const ogu = ensure('meta[property="og:url"]', { property: 'og:url' })
+        ogu.setAttribute('content', `https://parjad-m-portfolio.vercel.app${path}`)
+    }, [location.pathname])
+
+    return (
+        <div className={`font-sans transition-colors duration-500 ${
+            darkMode
+                ? 'bg-gradient-to-br from-emerald-900 via-teal-900 to-cyan-900 text-white'
+                : 'bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 text-gray-900'
+        } ${!darkMode ? 'light-mode' : ''}`}>
+            <style>{`
+                body { font-family: 'Inter', sans-serif; }
+                .lqft-select option { color: #0f172a; background: #f8fafc; }
+                .animate-blob { animation: blob 7s infinite; }
+                .animation-delay-2000 { animation-delay: 2s; }
+                .animation-delay-4000 { animation-delay: 4s; }
+                @keyframes blob {
+                    0% { transform: translate(0px, 0px) scale(1); }
+                    33% { transform: translate(30px, -50px) scale(1.1); }
+                    66% { transform: translate(-20px, 20px) scale(0.9); }
+                    100% { transform: translate(0px, 0px) scale(1); }
+                }
+                .light-mode .text-white { color: rgb(17 24 39) !important; }
+                .light-mode .text-gray-300 { color: rgb(75 85 99) !important; }
+                .light-mode .text-gray-400 { color: rgb(107 114 128) !important; }
+                .light-mode .text-gray-500 { color: rgb(107 114 128) !important; }
+                .light-mode [class*="bg-white/"] { --tw-bg-opacity: 0.06; background-color: rgb(0 0 0 / var(--tw-bg-opacity)) !important; }
+                .light-mode [class*="border-white/"] { border-color: rgb(229 231 235 / 0.8) !important; }
+                .light-mode .border-white\\/10 { border-color: rgb(229 231 235) !important; }
+                .light-mode .hover\\:border-white\\/20:hover { border-color: rgb(156 163 175) !important; }
+                .light-mode .hover\\:border-white\\/40:focus { border-color: rgb(107 114 128) !important; }
+                .light-mode .focus\\:border-white\\/40:focus { border-color: rgb(107 114 128) !important; }
+                .light-mode .placeholder-gray-400::placeholder { color: rgb(156 163 175); }
+                .light-mode header a, .light-mode header button { color: rgb(17 24 39) !important; }
+                .light-mode header nav a:hover { color: rgb(17 24 39) !important; }
+                .light-mode header nav a[aria-current="page"] { background-color: rgba(16 185 129 / 0.2) !important; color: rgb(5 150 105) !important; }
+                .light-mode header img[alt="Logo"] { filter: brightness(0); }
+                .light-mode .text-gray-200 { color: rgb(55 65 81) !important; }
+                .light-mode footer .text-gray-300 { color: rgb(75 85 99) !important; }
+                .light-mode footer .text-gray-500 { color: rgb(107 114 128) !important; }
+                .light-mode footer a { color: rgb(75 85 99) !important; }
+                .light-mode footer a:hover { color: rgb(34 197 94) !important; }
+                .light-mode ::placeholder { color: rgb(156 163 175); opacity: 1; }
+            `}</style>
+
+            <BackgroundBlobs theme={theme} darkMode={darkMode} />
+            <CustomCursor theme={theme} darkMode={darkMode} />
+            <Header toggleTheme={toggleTheme} toggleDarkMode={toggleDarkMode} theme={theme} darkMode={darkMode} />
+            
+            <main id="main-content" role="main" tabIndex={-1} className="transition-all duration-500 pt-20 md:pt-24">
+                <Suspense fallback={
+                    <div className="min-h-screen flex items-center justify-center py-20 px-4 text-gray-300">
+                        Loading...
+                    </div>
+                }>
+                    <Routes>
+                        <Route path="/" element={<HomeSection theme={theme} />} />
+                        <Route path="/about" element={<AboutSection theme={theme} />} />
+                        <Route path="/projects" element={<ProjectsSection theme={theme} />} />
+                        <Route path="/projects/lqftBenchmark" element={<LQFTBenchmarkPage theme={theme} />} />
+                        <Route path="/stats" element={<StatsPage theme={theme} />} />
+                        <Route path="/blog" element={<BlogSection theme={theme} />} />
+                        <Route path="/blog/:id" element={<BlogPostPage theme={theme} />} />
+                        <Route path="/contact" element={<ContactSection theme={theme} />} />
+                        <Route path="/admin/login" element={<AdminLoginPage theme={theme} />} />
+                        <Route path="/admin" element={<RequireAuth><AdminDashboard theme={theme} /></RequireAuth>} />
+                        <Route path="*" element={<NotFoundPage theme={theme} />} />
+                    </Routes>
+                </Suspense>
+            </main>
+
+            {/* Footer */}
+            <Footer theme={theme} />
+            
+            {/* AI Chatbot */}
+            <Chatbot theme={theme} />
+            
+            {/* Toast Notifications */}
+            <Toast 
+                isVisible={toast.isVisible} 
+                message={toast.message} 
+                type={toast.type} 
+                onClose={() => setToast({ ...toast, isVisible: false })} 
+            />
+        </div>
+    );
+};
+

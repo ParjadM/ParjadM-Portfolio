@@ -1,0 +1,98 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation, Link, Routes, Route, useParams } from 'react-router-dom';
+import { Mail, Github, Linkedin, Code, BrainCircuit, Palette, Menu, Sun, Moon } from '../components/ui/Icons.jsx';
+import { GlassCard } from '../components/ui/GlassCard.jsx';
+import { RippleButton } from '../components/ui/RippleButton.jsx';
+import { Toast } from '../components/ui/Toast.jsx';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { Reveal } from '../components/Reveal.jsx';
+import { getAuthToken } from '../utils/auth.jsx';
+
+// Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
+import ParjadImage from '../Images/Parjad.jpg';
+import GitHubStats from '../components/GitHubStats.tsx';
+import LeetCodeStats from '../components/LeetCodeStats.tsx';
+import ParjadM from '../Images/ParjadM.png';
+import Logo from '../Images/Logo.png';
+import CodeQuestImage from '../Images/CodeQuest.jpg';
+import BinaryGeneratorImage from '../Images/Binary 1010 Generator.jpg';
+import SpaceShooterImage from '../Images/SpaceShooter.jpg';
+
+export const ProjectsSection = ({ theme }) => {
+    const [projects, setProjects] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    // Map known titles to local images to keep visuals after API switch
+    const imageMap = {
+        'CodeQuest': CodeQuestImage,
+        'Binary 1010 Generator': BinaryGeneratorImage,
+        'SpaceShooter': SpaceShooterImage,
+    };
+
+    useEffect(() => {
+        const load = async () => {
+            setLoading(true); setError('');
+            try {
+                const res = await fetch('/api/projects');
+                const data = await res.json();
+                setProjects(Array.isArray(data.projects) ? data.projects : []);
+            } catch (e) {
+                setError('Failed to load projects');
+            } finally {
+                setLoading(false);
+            }
+        };
+        load();
+    }, []);
+
+    const tagClasses = theme === 'pink'
+        ? "bg-pink-500/20 text-pink-300"
+        : "bg-emerald-500/20 text-emerald-300";
+
+    return (
+        <section id="projects" className="min-h-screen flex flex-col items-center justify-center py-20 px-4">
+            <Reveal>
+            <h2 className="text-4xl font-bold text-white mb-12 text-center">My Projects</h2>
+            </Reveal>
+            {error && <div className="text-red-300 mb-4">{error}</div>}
+            {loading && <div className="text-gray-300">Loading...</div>}
+            <div className="container mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {projects.map((project) => (
+                    <Reveal key={project.id || project.title}>
+                    <GlassCard className="p-0 flex flex-col overflow-hidden">
+                        {/* Project Image */}
+                        <div className="w-full h-48 bg-gradient-to-br from-white/5 to-white/10 flex items-center justify-center overflow-hidden">
+                            <img 
+                                src={project.image || imageMap[project.title] || `https://placehold.co/600x400/${theme === 'pink' ? 'E94560' : '10B981'}/FFFFFF?text=${encodeURIComponent(project.title)}`}
+                                alt={project.title}
+                                className="w-full h-full object-cover opacity-80 hover:opacity-100 hover:scale-105 transition-all duration-300"
+                            />
+                        </div>
+                        
+                        <div className="p-6 flex flex-col flex-grow">
+                        <h3 className="text-2xl font-bold text-white mb-2">{project.title}</h3>
+                        <div className="flex flex-wrap gap-2 mb-4">
+                            {(project.tags || []).map(tag => <span key={tag} className={`${tagClasses} text-xs font-semibold px-2.5 py-1 rounded-full`}>{tag}</span>)}
+                        </div>
+                        <p className="text-gray-300 mb-6 flex-grow">{project.description}</p>
+                        <div className="flex justify-end space-x-4 mt-auto">
+                           {project.githubUrl && <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110"><Github size={24} /></a>}
+                           {project.liveUrl && <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                           </a>}
+                            </div>
+                        </div>
+                    </GlassCard>
+                    </Reveal>
+                ))}
+                {!loading && projects.length === 0 && (
+                    <div className="col-span-full text-center text-gray-400">No projects yet.</div>
+                )}
+                </div>
+            </div>
+        </section>
+    );
+};
