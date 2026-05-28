@@ -1,8 +1,8 @@
 import { Router } from 'express'
 import { currentEngine } from '../db/index.js'
 import { Analytics, Visitor, AnalyticsDaily, VisitorDay, VisitorDayPath, DeviceStats, HourlyStats, AccessLog } from '../db/mongo.js'
-import UAParserPkg from 'ua-parser-js'
-const UAParser = UAParserPkg.UAParser || UAParserPkg
+import * as UAParserPkg from 'ua-parser-js'
+const UAParser = UAParserPkg.UAParser || UAParserPkg.default || UAParserPkg
 
 const router = Router()
 
