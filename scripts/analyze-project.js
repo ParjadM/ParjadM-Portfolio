@@ -87,7 +87,7 @@ Respond EXCLUSIVELY in valid JSON format using the following schema:
 
   try {
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Gemini API timeout after 15 seconds')), 15000)
+      setTimeout(() => reject(new Error('Gemini API timeout after 60 seconds')), 60000)
     );
 
     const apiPromise = ai.models.generateContent({

@@ -92,28 +92,54 @@ const Chatbot = ({ theme = 'green' }) => {
     } else {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (SpeechRecognition) {
-        const recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.lang = 'en-US';
-        
-        recognition.onresult = (event) => {
-          const transcript = event.results[0][0].transcript;
-          setInput(prev => prev + (prev ? ' ' : '') + transcript);
-        };
-        
-        recognition.onerror = (event) => {
-          console.error("Speech recognition error", event.error);
+        try {
+          const recognition = new SpeechRecognition();
+          recognition.continuous = true;
+          recognition.interimResults = true;
+          recognition.lang = 'en-US';
+          
+          let finalTranscript = input;
+
+          recognition.onresult = (event) => {
+            let interimTranscript = '';
+            let newFinal = '';
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+              if (event.results[i].isFinal) {
+                newFinal += event.results[i][0].transcript;
+              } else {
+                interimTranscript += event.results[i][0].transcript;
+              }
+            }
+            if (newFinal) {
+              finalTranscript += (finalTranscript ? ' ' : '') + newFinal;
+              setInput(finalTranscript);
+            } else {
+              setInput(finalTranscript + (finalTranscript ? ' ' : '') + interimTranscript);
+            }
+          };
+          
+          recognition.onerror = (event) => {
+            console.error("Speech recognition error:", event.error);
+            if (event.error === 'not-allowed') {
+              alert("Microphone access was denied. Please allow microphone permissions in your browser.");
+            } else if (event.error !== 'no-speech') {
+              setInput(`(Microphone Error: ${event.error})`);
+            }
+            setIsListening(false);
+          };
+          
+          recognition.onend = () => {
+            setIsListening(false);
+          };
+          
+          recognitionRef.current = recognition;
+          recognition.start();
+          setIsListening(true);
+        } catch (err) {
+          console.error("Speech recognition startup error:", err);
+          alert("Could not start voice input. Another app might be using the microphone.");
           setIsListening(false);
-        };
-        
-        recognition.onend = () => {
-          setIsListening(false);
-        };
-        
-        recognitionRef.current = recognition;
-        recognition.start();
-        setIsListening(true);
+        }
       } else {
         alert("Voice input is not supported in this browser.");
       }
