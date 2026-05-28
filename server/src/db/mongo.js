@@ -52,6 +52,7 @@ export async function connectMongo(uri) {
 
   await mongoose.connect(uri, {
     dbName: process.env.MONGO_DB_NAME || 'ParjadM',
+    serverSelectionTimeoutMS: 5000,
   })
   return mongoose.connection
 }
