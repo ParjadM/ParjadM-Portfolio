@@ -25,8 +25,8 @@ const useDecoderText = (text, delay = 0) => {
             }).join(''));
             
             if (iteration >= text.length) clearInterval(interval);
-            iteration += 1 / 2; // Speed of decoding
-        }, 30);
+            iteration += 1 / 3; // Speed of decoding adjusted for 60fps
+        }, 16);
         
         return () => clearInterval(interval);
     }, [text, start]);
@@ -47,8 +47,8 @@ const ParticleNetwork = ({ themeClass }) => {
         canvas.height = window.innerHeight;
 
         const particles = [];
-        const numParticles = 80;
-        const connectionDistance = 150;
+        const numParticles = 55; // Optimized from 80 for better FPS
+        const connectionDistance = 180; // Increased to maintain web density
         let mouse = { x: null, y: null, radius: 200 };
 
         const handleMouseMove = (e) => {
@@ -76,8 +76,8 @@ const ParticleNetwork = ({ themeClass }) => {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
                 this.size = Math.random() * 2 + 1;
-                this.speedX = Math.random() * 2 - 1;
-                this.speedY = Math.random() * 2 - 1;
+                this.speedX = Math.random() * 3 - 1.5; // Increased speed for fluidity
+                this.speedY = Math.random() * 3 - 1.5;
             }
             update() {
                 this.x += this.speedX;
