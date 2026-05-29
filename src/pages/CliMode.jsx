@@ -3,6 +3,71 @@ import { useNavigate } from 'react-router-dom';
 import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { BackgroundBlobs } from '../components/ui/BackgroundBlobs.jsx';
 
+const MatrixRain = ({ onComplete }) => {
+    const canvasRef = useRef(null);
+    const [fade, setFade] = useState(false);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%""\'#&_(),.;:?!\\|{}<>[]^~'.split('');
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        const draw = () => {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#0F0';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = characters[Math.floor(Math.random() * characters.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        };
+
+        const interval = setInterval(draw, 33);
+        
+        // Start fade out at 3.5s
+        const fadeTimeout = setTimeout(() => {
+            setFade(true);
+        }, 3500);
+
+        // Complete at 4.5s
+        const completeTimeout = setTimeout(() => {
+            clearInterval(interval);
+            onComplete();
+        }, 4500);
+
+        return () => {
+            clearInterval(interval);
+            clearTimeout(fadeTimeout);
+            clearTimeout(completeTimeout);
+        };
+    }, [onComplete]);
+
+    return (
+        <div className={`fixed inset-0 z-50 bg-black flex items-center justify-center transition-opacity duration-1000 ${fade ? 'opacity-0' : 'opacity-100'}`}>
+            <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-60"></canvas>
+            <div className="relative z-10 text-green-500 font-mono text-xl md:text-3xl text-center font-bold tracking-widest drop-shadow-[0_0_15px_rgba(0,255,0,0.8)] animate-pulse">
+                <p>WAKE UP...</p>
+                <p className="mt-4 text-sm md:text-xl text-green-700">INITIALIZING PARJADOS</p>
+            </div>
+        </div>
+    );
+};
+
 export const CliMode = ({ theme }) => {
     const navigate = useNavigate();
     const [history, setHistory] = useState([
@@ -13,6 +78,7 @@ export const CliMode = ({ theme }) => {
         { type: 'system', text: 'Type "help" or "manual" to see a list of available commands to navigate the portfolio.' }
     ]);
     const [input, setInput] = useState('');
+    const [isBooted, setIsBooted] = useState(false);
     const bottomRef = useRef(null);
 
     useEffect(() => {
@@ -86,8 +152,17 @@ export const CliMode = ({ theme }) => {
     // Keep it terminal themed locally, ignoring global theme
     const termTheme = 'terminal';
     
+    if (!isBooted) {
+        return <MatrixRain onComplete={() => setIsBooted(true)} />;
+    }
+
     return (
-        <section className="min-h-screen flex items-center justify-center py-24 px-4 bg-black relative">
+        <section className="min-h-screen flex items-center justify-center py-24 px-4 bg-black relative animate-fade-in">
+            <style>{`
+                .animate-fade-in { animation: fadeIn 1s ease-out forwards; }
+                @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+            `}</style>
+            
             {/* Terminal specific background blobs */}
             <BackgroundBlobs theme={termTheme} darkMode={true} customBlobClasses={{blob1:"bg-green-500/10", blob2:"bg-emerald-400/10", blob3:"bg-lime-500/10"}} />
             
