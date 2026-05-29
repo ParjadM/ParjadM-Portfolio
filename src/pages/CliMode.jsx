@@ -79,11 +79,17 @@ export const CliMode = ({ theme }) => {
     ]);
     const [input, setInput] = useState('');
     const [isBooted, setIsBooted] = useState(false);
+    const [isExiting, setIsExiting] = useState(false);
     const bottomRef = useRef(null);
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [history]);
+
+    const handleExit = (target = '/') => {
+        setIsExiting(true);
+        setTimeout(() => navigate(target), 650);
+    };
 
     const handleCommand = (e) => {
         e.preventDefault();
@@ -132,7 +138,7 @@ export const CliMode = ({ theme }) => {
             case 'gui':
             case 'exit':
                 newHistory.push({ type: 'system', text: '> Booting Graphical User Interface...' });
-                setTimeout(() => navigate('/'), 800);
+                handleExit('/');
                 break;
             case 'clear':
                 setHistory([{ type: 'system', text: 'Terminal cleared. Type "help" for commands.' }]);
@@ -157,10 +163,20 @@ export const CliMode = ({ theme }) => {
     }
 
     return (
-        <section className="min-h-screen flex items-center justify-center py-24 px-4 bg-black relative animate-fade-in">
+        <section className={`min-h-screen flex items-center justify-center py-24 px-4 bg-black relative ${isExiting ? 'animate-crt-off' : 'animate-fade-in'}`}>
             <style>{`
                 .animate-fade-in { animation: fadeIn 1s ease-out forwards; }
                 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+                
+                @keyframes crtTurnOff {
+                    0% { transform: scale(1, 1.3) translate3d(0, 0, 0); filter: brightness(1); }
+                    60% { transform: scale(1, 0.001) translate3d(0, 0, 0); filter: brightness(10); }
+                    100% { animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060); transform: scale(0, 0.0001) translate3d(0, 0, 0); filter: brightness(30); }
+                }
+                .animate-crt-off {
+                    animation: crtTurnOff 0.65s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+                    pointer-events: none;
+                }
             `}</style>
             
             {/* Terminal specific background blobs */}
@@ -168,7 +184,7 @@ export const CliMode = ({ theme }) => {
             
             <div className="container mx-auto max-w-4xl z-10 flex flex-col h-full">
                 <div className="mb-6">
-                    <button onClick={() => navigate(-1)} className="text-gray-400 hover:text-white transition-colors text-sm uppercase tracking-wider font-semibold">
+                    <button onClick={() => handleExit(-1)} className="text-gray-400 hover:text-white transition-colors text-sm uppercase tracking-wider font-semibold">
                         ← Exit CLI Mode
                     </button>
                 </div>
