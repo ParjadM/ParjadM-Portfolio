@@ -219,13 +219,14 @@ export const IntroCinematic = ({ theme }) => {
                 }
 
                 @keyframes warpExit {
-                    0% { transform: scale(1) translateZ(0); opacity: 1; filter: blur(0px); }
-                    20% { transform: scale(0.9) translateZ(-100px); opacity: 1; filter: blur(0px); }
-                    100% { transform: scale(4) translateZ(800px); opacity: 0; filter: blur(20px); }
+                    0% { transform: scale(1) translateZ(0); opacity: 1; }
+                    20% { transform: scale(0.9) translateZ(-100px); opacity: 1; }
+                    100% { transform: scale(5) translateZ(800px); opacity: 0; }
                 }
                 .animate-warp-exit {
                     animation: warpExit 0.9s cubic-bezier(0.5, 0, 0.1, 1) forwards;
                     pointer-events: none;
+                    will-change: transform, opacity;
                 }
 
                 .animate-fade-in { animation: fadeIn 1.5s ease-out forwards; opacity: 0; }
