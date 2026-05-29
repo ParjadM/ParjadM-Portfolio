@@ -106,8 +106,8 @@ export const CliMode = ({ theme }) => {
     const [historyIndex, setHistoryIndex] = useState(-1);
     const [currentDir, setCurrentDir] = useState('~');
     
-    // Multi-step Email State: 0=inactive, 1=name, 2=email, 3=message
     const [emailState, setEmailState] = useState({ step: 0, name: '', email: '', message: '' });
+    const [fetchedProjects, setFetchedProjects] = useState([]);
 
     const bottomRef = useRef(null);
 
@@ -145,7 +145,7 @@ export const CliMode = ({ theme }) => {
         return currentDir === '~' ? `~/${path}` : `${currentDir}/${path}`;
     };
 
-    const getAvailableCommands = () => ['help', 'about', 'skills', 'projects', 'contact', 'email', 'gui', 'clear', 'ls', 'cd', 'cat', 'pwd'];
+    const getAvailableCommands = () => ['help', 'about', 'skills', 'projects', 'contact', 'email', 'gui', 'clear', 'ls', 'cd', 'cat', 'pwd', 'open', 'run'];
 
     const handleKeyDown = (e) => {
         if (emailState.step > 0) return; // Disable history/tab in email wizard
@@ -197,8 +197,9 @@ export const CliMode = ({ theme }) => {
             const res = await fetch('/api/projects');
             const data = await res.json();
             if (data.projects && data.projects.length > 0) {
+                setFetchedProjects(data.projects);
                 const lines = data.projects.map((p, i) => `> ${i + 1}. ${p.title} - ${p.tags.join(', ')}`);
-                lines.push('> Check the /projects route in GUI mode for live demos.');
+                lines.push('> Type "open <number>" or "open <title>" to launch a project.');
                 pushToHistory('system', lines.join('\n'), true);
             } else {
                 pushToHistory('system', '> No projects found or failed to connect.');
@@ -265,7 +266,7 @@ export const CliMode = ({ theme }) => {
         switch(cmd) {
             case 'help':
             case 'manual':
-                pushToHistory('system', 'Available commands:\n  ls         - List files\n  cd         - Change directory\n  cat        - Read file\n  pwd        - Print working directory\n  about      - Read my background story\n  skills     - List technical skills\n  projects   - View my portfolio projects\n  email      - Send me an email\n  contact    - Get contact info\n  gui        - Boot Graphical Interface\n  clear      - Clear terminal');
+                pushToHistory('system', 'Available commands:\n  ls         - List files\n  cd         - Change directory\n  cat        - Read file\n  pwd        - Print working directory\n  about      - Read my background story\n  skills     - List technical skills\n  projects   - View my portfolio projects\n  open       - Launch a project (run "projects" first)\n  email      - Send me an email\n  contact    - Get contact info\n  gui        - Boot Graphical Interface\n  clear      - Clear terminal');
                 break;
             case 'pwd':
                 pushToHistory('system', currentDir);
@@ -304,6 +305,45 @@ export const CliMode = ({ theme }) => {
                     if (file.action === 'fetch_projects') fetchProjects();
                 } else {
                     pushToHistory('system', file.content, true); // Use typewriter effect for files
+                }
+                break;
+            case 'open':
+            case 'run':
+                if (!args[0]) {
+                    pushToHistory('error', `${cmd}: missing project identifier`);
+                    break;
+                }
+                if (fetchedProjects.length === 0) {
+                    pushToHistory('error', `${cmd}: no projects loaded. Run 'projects' first.`);
+                    break;
+                }
+                const searchParam = args.join(' ').toLowerCase();
+                const idx = parseInt(searchParam);
+                let targetProject = null;
+                if (!isNaN(idx) && idx > 0 && idx <= fetchedProjects.length) {
+                    targetProject = fetchedProjects[idx - 1];
+                } else {
+                    targetProject = fetchedProjects.find(p => p.title.toLowerCase().includes(searchParam));
+                }
+
+                if (targetProject) {
+                    if (targetProject.liveUrl) {
+                        pushToHistory('system', `> Opening ${targetProject.title}...`);
+                        let targetUrl = targetProject.liveUrl;
+                        if (targetUrl.startsWith('/')) {
+                            // Local route
+                            setTimeout(() => navigate(targetUrl), 500);
+                        } else {
+                            setTimeout(() => window.open(targetUrl, '_blank'), 500);
+                        }
+                    } else if (targetProject.githubUrl) {
+                        pushToHistory('system', `> No live URL found. Opening GitHub repo for ${targetProject.title}...`);
+                        setTimeout(() => window.open(targetProject.githubUrl, '_blank'), 500);
+                    } else {
+                        pushToHistory('error', `> Project ${targetProject.title} has no links available.`);
+                    }
+                } else {
+                    pushToHistory('error', `${cmd}: project not found. Use number or title from the 'projects' list.`);
                 }
                 break;
             // Global Aliases (Legacy Commands)
