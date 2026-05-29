@@ -20,6 +20,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
     const paletteTriggerRef = useRef(null);
     const paletteDropdownRef = useRef(null);
     const [isMoreOpen, setIsMoreOpen] = useState(false);
+    const [moreRect, setMoreRect] = useState(null);
     const moreDropdownRef = useRef(null);
     const [blogPosts, setBlogPosts] = useState([]);
     const [visitors, setVisitors] = useState(() => {
@@ -88,11 +89,26 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
     }, [isPaletteOpen]);
 
     useEffect(() => {
+        if (isMoreOpen && moreDropdownRef.current && typeof window !== 'undefined') {
+            const rect = moreDropdownRef.current.getBoundingClientRect();
+            setMoreRect({ top: rect.bottom + 8, left: rect.left });
+        } else {
+            setMoreRect(null);
+        }
+    }, [isMoreOpen]);
+
+    useEffect(() => {
         const handleClickOutside = (e) => {
-            if (!paletteDropdownRef.current?.contains(e.target) && !paletteTriggerRef.current?.contains(e.target)) {
+            // Check palette dropdown
+            const isPaletteClick = paletteDropdownRef.current?.contains(e.target) || paletteTriggerRef.current?.contains(e.target);
+            if (!isPaletteClick) {
                 setIsPaletteOpen(false);
             }
-            if (moreDropdownRef.current && !moreDropdownRef.current.contains(e.target)) {
+            
+            // Check more dropdown
+            const morePortalDropdown = document.getElementById('more-dropdown-portal');
+            const isMoreClick = morePortalDropdown?.contains(e.target) || moreDropdownRef.current?.contains(e.target);
+            if (!isMoreClick) {
                 setIsMoreOpen(false);
             }
         };
@@ -119,6 +135,18 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
                     {t.name}
                 </button>
             ))}
+        </div>,
+        document.body
+    );
+
+    const moreEl = isMoreOpen && moreRect && typeof document !== 'undefined' && createPortal(
+        <div
+            id="more-dropdown-portal"
+            className="fixed z-[9999] w-48 rounded-xl bg-gray-900 border border-gray-700 shadow-2xl overflow-hidden"
+            style={{ top: moreRect.top, left: moreRect.left }}
+        >
+            <Link to="/intro" onClick={() => setIsMoreOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">Intro Cinematic</Link>
+            <Link to="/cli" onClick={() => setIsMoreOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">CLI Mode</Link>
         </div>,
         document.body
     );
@@ -159,15 +187,11 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
                                 <button 
                                     onClick={() => setIsMoreOpen(!isMoreOpen)}
                                     className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 text-gray-300 hover:text-white hover:bg-white/10 border border-transparent`}
+                                    aria-expanded={isMoreOpen}
                                 >
                                     More ▾
                                 </button>
-                                {isMoreOpen && (
-                                    <div className="absolute top-full left-0 mt-2 w-48 rounded-xl bg-gray-900 border border-gray-700 shadow-2xl overflow-hidden z-[100]">
-                                        <Link to="/intro" onClick={() => setIsMoreOpen(false)} className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-800">Intro Cinematic</Link>
-                                        <Link to="/cli" onClick={() => setIsMoreOpen(false)} className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-800">CLI Mode</Link>
-                                    </div>
-                                )}
+                                {moreEl}
                             </div>
                         </div>
 
