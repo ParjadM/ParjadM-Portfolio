@@ -11,11 +11,17 @@ import { ClickUpSection } from '../components/ClickUpSection.jsx';
 import { ComplexityAnalyzer } from '../components/ComplexityAnalyzer.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
 import { useTranslation } from 'react-i18next';
+import { PageTransition } from '../components/ui/PageTransition.jsx';
+import { SEO } from '../components/SEO.jsx';
 
 export const StatsPage = ({ theme }) => {
   const { t } = useTranslation();
   return (
-    <section id="stats" className="min-h-screen flex items-center justify-center py-24 px-4">
+    <PageTransition className="min-h-screen flex items-center justify-center py-24 px-4">
+      <SEO 
+        title="Stats — Parjad Minooei"
+        description="A quick look at my open-source presence and coding practice."
+      />
       <div className="container mx-auto max-w-6xl w-full">
         {/* Header */}
         <Reveal>
@@ -59,7 +65,7 @@ export const StatsPage = ({ theme }) => {
           {t('stats.footer')}
         </div>
       </div>
-    </section>
+    </PageTransition>
   );
 };
 
@@ -302,7 +308,11 @@ export const BlogSection = ({ theme }) => {
     const tagColor = theme === 'pink' ? "bg-pink-500/20 text-pink-300" : "bg-emerald-500/20 text-emerald-300";
 
     return (
-        <section id="blog" className="min-h-screen flex flex-col items-center justify-center py-20 px-4">
+        <PageTransition className="min-h-screen flex flex-col items-center justify-center py-20 px-4">
+            <SEO 
+                title="Blog — Parjad Minooei"
+                description="Articles on web development and learning."
+            />
             <div className="container mx-auto max-w-7xl">
                 {/* Header */}
                 <Reveal>
@@ -423,7 +433,7 @@ export const BlogSection = ({ theme }) => {
                     </div>
                 </div>
             </div>
-        </section>
+        </PageTransition>
     );
 };
 
@@ -455,29 +465,34 @@ export const BlogPostPage = ({ theme }) => {
 
     if (loading) {
         return (
-            <section className="min-h-screen flex items-center justify-center py-20 px-4">
+            <PageTransition className="min-h-screen flex items-center justify-center py-20 px-4">
                 <div className="text-gray-300">Loading...</div>
-            </section>
+            </PageTransition>
         );
     }
 
     if (error || !post) {
         return (
-            <section className="min-h-screen flex items-center justify-center py-20 px-4">
+            <PageTransition className="min-h-screen flex items-center justify-center py-20 px-4">
                 <div className="container mx-auto max-w-3xl text-center">
                     <GlassCard className="p-8">
                         <h2 className="text-2xl font-bold text-white mb-4">Post not found</h2>
                         <button type="button" onClick={() => navigate('/blog', { replace: true })} className="text-emerald-400 hover:underline">Back to Blog</button>
                     </GlassCard>
                 </div>
-            </section>
+            </PageTransition>
         );
     }
 
     const tagColor = theme === 'pink' ? "bg-pink-500/20 text-pink-300" : "bg-emerald-500/20 text-emerald-300";
 
     return (
-        <section className="min-h-screen flex items-center justify-center py-20 px-4">
+        <PageTransition className="min-h-screen flex items-center justify-center py-20 px-4">
+            <SEO 
+                title={`${post.title} — Parjad Minooei`}
+                description={post.excerpt}
+                image={post.image}
+            />
             <div className="container mx-auto max-w-3xl">
                 <div className="mb-6">
                     <button type="button" onClick={() => navigate('/blog', { replace: true })} className="text-gray-300 hover:text-white">← Back to Blog</button>
@@ -496,7 +511,7 @@ export const BlogPostPage = ({ theme }) => {
                     <MarkdownContent content={post.content} />
                 </GlassCard>
             </div>
-        </section>
+        </PageTransition>
     );
 };
 

@@ -7,6 +7,7 @@ import { Footer } from './Footer.jsx';
 import Chatbot from '../Chatbot.jsx';
 import { Toast } from '../ui/Toast.jsx';
 import { getAuthToken, RequireAuth } from '../../utils/auth.jsx';
+import { AnimatePresence } from 'framer-motion';
 
 import { getThemeConfig } from '../../utils/themeConfig.js';
 
@@ -57,42 +58,7 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
         } catch {}
     }, [location?.pathname, visitorId])
 
-    // Basic SEO: update title/meta on route change
-    useEffect(() => {
-        const path = location.pathname || '/'
-        const titleMap = {
-          '/': 'Parjad Minooei — Software Engineer Portfolio',
-          '/about': 'About — Parjad Minooei',
-          '/projects': 'Projects — Parjad Minooei',
-          '/projects/lqftBenchmark': 'LQFT Benchmark — Parjad Minooei',
-          '/blog': 'Blog — Parjad Minooei',
-          '/contact': 'Contact — Parjad Minooei',
-        }
-        const descMap = {
-          '/': 'Software Engineer building beautiful, fast, user‑centric web apps.',
-          '/about': 'Learn about Parjad’s background and skills.',
-          '/projects': 'Selected projects with code and live demos.',
-          '/projects/lqftBenchmark': 'Run the interactive LQFT Benchmark demo in your browser.',
-          '/blog': 'Articles on web development and learning.',
-          '/contact': 'Get in touch for opportunities and collaborations.',
-        }
-        const t = titleMap[path] || 'Parjad Minooei'
-        const d = descMap[path] || descMap['/']
-        document.title = t
-        const ensure = (selector, attrs) => {
-          let el = document.head.querySelector(selector)
-          if (!el) { el = document.createElement('meta'); Object.keys(attrs).forEach(k=> el.setAttribute(k, attrs[k])); document.head.appendChild(el); return el }
-          return el
-        }
-        const m = ensure('meta[name="description"]', { name: 'description' })
-        m.setAttribute('content', d)
-        const ogt = ensure('meta[property="og:title"]', { property: 'og:title' })
-        ogt.setAttribute('content', t)
-        const ogd = ensure('meta[property="og:description"]', { property: 'og:description' })
-        ogd.setAttribute('content', d)
-        const ogu = ensure('meta[property="og:url"]', { property: 'og:url' })
-        ogu.setAttribute('content', `https://parjad-m-portfolio.vercel.app${path}`)
-    }, [location.pathname])
+    // Manual SEO moved to SEO.jsx component on individual pages
 
     return (
         <div className={`font-sans transition-colors duration-500 ${
@@ -152,21 +118,23 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
                         Loading...
                     </div>
                 }>
-                    <Routes>
-                        <Route path="/" element={<HomeSection theme={themeConfig.accentPrefix} />} />
-                        <Route path="/about" element={<AboutSection theme={themeConfig.accentPrefix} />} />
-                        <Route path="/projects" element={<ProjectsSection theme={themeConfig.accentPrefix} />} />
-                        <Route path="/projects/lqftBenchmark" element={<LQFTBenchmarkPage theme={themeConfig.accentPrefix} />} />
-                        <Route path="/stats" element={<StatsPage theme={themeConfig.accentPrefix} />} />
-                        <Route path="/blog" element={<BlogSection theme={themeConfig.accentPrefix} />} />
-                        <Route path="/blog/:id" element={<BlogPostPage theme={themeConfig.accentPrefix} />} />
-                        <Route path="/contact" element={<ContactSection theme={themeConfig.accentPrefix} />} />
-                        <Route path="/admin/login" element={<AdminLoginPage theme={themeConfig.accentPrefix} />} />
-                        <Route path="/admin" element={<RequireAuth><AdminDashboard theme={themeConfig.accentPrefix} /></RequireAuth>} />
-                        <Route path="/intro" element={<IntroCinematic theme={themeConfig.accentPrefix} />} />
-                        <Route path="/cli" element={<CliMode theme={themeConfig.accentPrefix} />} />
-                        <Route path="*" element={<NotFoundPage theme={themeConfig.accentPrefix} />} />
-                    </Routes>
+                    <AnimatePresence mode="wait">
+                        <Routes location={location} key={location.pathname}>
+                            <Route path="/" element={<HomeSection theme={themeConfig.accentPrefix} />} />
+                            <Route path="/about" element={<AboutSection theme={themeConfig.accentPrefix} />} />
+                            <Route path="/projects" element={<ProjectsSection theme={themeConfig.accentPrefix} />} />
+                            <Route path="/projects/lqftBenchmark" element={<LQFTBenchmarkPage theme={themeConfig.accentPrefix} />} />
+                            <Route path="/stats" element={<StatsPage theme={themeConfig.accentPrefix} />} />
+                            <Route path="/blog" element={<BlogSection theme={themeConfig.accentPrefix} />} />
+                            <Route path="/blog/:id" element={<BlogPostPage theme={themeConfig.accentPrefix} />} />
+                            <Route path="/contact" element={<ContactSection theme={themeConfig.accentPrefix} />} />
+                            <Route path="/admin/login" element={<AdminLoginPage theme={themeConfig.accentPrefix} />} />
+                            <Route path="/admin" element={<RequireAuth><AdminDashboard theme={themeConfig.accentPrefix} /></RequireAuth>} />
+                            <Route path="/intro" element={<IntroCinematic theme={themeConfig.accentPrefix} />} />
+                            <Route path="/cli" element={<CliMode theme={themeConfig.accentPrefix} />} />
+                            <Route path="*" element={<NotFoundPage theme={themeConfig.accentPrefix} />} />
+                        </Routes>
+                    </AnimatePresence>
                 </Suspense>
             </main>
 

@@ -9,6 +9,8 @@ import remarkGfm from 'remark-gfm';
 import { Reveal } from '../components/Reveal.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
 import { useTranslation } from 'react-i18next';
+import { PageTransition } from '../components/ui/PageTransition.jsx';
+import { SEO } from '../components/SEO.jsx';
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 import ParjadImage from '../Images/Parjad.jpg';
 import GitHubStats from '../components/GitHubStats.tsx';
@@ -85,7 +87,11 @@ export const ContactSection = ({ theme }) => {
         : 'bg-gradient-to-r from-emerald-500 to-teal-500';
 
     return (
-        <section id="contact" className="min-h-screen flex items-center justify-center py-20 px-4">
+        <PageTransition className="min-h-screen flex items-center justify-center py-20 px-4">
+            <SEO 
+                title="Contact — Parjad Minooei"
+                description="Get in touch for opportunities and collaborations."
+            />
             <div className="container mx-auto max-w-6xl">
                 {/* Header */}
                 <Reveal>
@@ -266,6 +272,6 @@ export const ContactSection = ({ theme }) => {
                     </div>
                 </div>
             </div>
-        </section>
+        </PageTransition>
     );
 };

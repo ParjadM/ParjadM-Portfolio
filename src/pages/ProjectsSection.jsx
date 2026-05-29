@@ -9,6 +9,8 @@ import remarkGfm from 'remark-gfm';
 import { Reveal } from '../components/Reveal.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
 import { useTranslation } from 'react-i18next';
+import { PageTransition } from '../components/ui/PageTransition.jsx';
+import { SEO } from '../components/SEO.jsx';
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 import ParjadImage from '../Images/Parjad.jpg';
 import GitHubStats from '../components/GitHubStats.tsx';
@@ -53,7 +55,11 @@ export const ProjectsSection = ({ theme }) => {
         : "bg-emerald-500/20 text-emerald-300";
 
     return (
-        <section id="projects" className="min-h-screen flex flex-col items-center justify-center py-20 px-4">
+        <PageTransition className="min-h-screen flex flex-col items-center justify-center py-20 px-4">
+            <SEO 
+                title="Projects — Parjad Minooei"
+                description="Selected projects with code and live demos."
+            />
             <Reveal>
             <h2 className="text-4xl font-bold text-white mb-12 text-center">{t('projects.title')}</h2>
             </Reveal>
@@ -94,6 +100,6 @@ export const ProjectsSection = ({ theme }) => {
                 )}
                 </div>
             </div>
-        </section>
+        </PageTransition>
     );
 };

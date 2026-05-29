@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import { Layout } from './components/layout/Layout.jsx';
 
 // --- Main App Component ---
@@ -21,14 +22,16 @@ function App() {
     };
 
     return (
-        <Router>
-            <Layout 
-                themeId={currentThemeId}
-                setThemeId={updateTheme}
-                toast={toast}
-                setToast={setToast}
-            />
-        </Router>
+        <HelmetProvider>
+            <Router>
+                <Layout 
+                    themeId={currentThemeId}
+                    setThemeId={updateTheme}
+                    toast={toast}
+                    setToast={setToast}
+                />
+            </Router>
+        </HelmetProvider>
     );
 }
 

@@ -9,6 +9,8 @@ import remarkGfm from 'remark-gfm';
 import { Reveal } from '../components/Reveal.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
 import { useTranslation } from 'react-i18next';
+import { PageTransition } from '../components/ui/PageTransition.jsx';
+import { SEO } from '../components/SEO.jsx';
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 import ParjadImage from '../Images/Parjad.jpg';
 import GitHubStats from '../components/GitHubStats.tsx';
@@ -25,7 +27,11 @@ export const HomeSection = ({ theme }) => {
   // Visitors shown in header now
 
   return (
-  <section id="home" className="min-h-screen flex items-center text-white relative overflow-hidden">
+  <PageTransition className="min-h-screen flex items-center text-white relative overflow-hidden">
+    <SEO 
+        title="Parjad Minooei — Software Engineer Portfolio"
+        description="Software Engineer building beautiful, fast, user-centric web apps."
+    />
     <div className="z-10 container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
       {/* Left: Text content */}
       <div className="p-6 md:p-0 text-left">
@@ -62,6 +68,6 @@ export const HomeSection = ({ theme }) => {
         </Reveal>
       </div>
     </div>
-  </section>
+  </PageTransition>
 );
 };

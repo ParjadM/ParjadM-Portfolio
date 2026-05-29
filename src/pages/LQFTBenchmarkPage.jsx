@@ -8,6 +8,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Reveal } from '../components/Reveal.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
+import { PageTransition } from '../components/ui/PageTransition.jsx';
+import { SEO } from '../components/SEO.jsx';
 
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 import ParjadImage from '../Images/Parjad.jpg';
@@ -448,7 +450,11 @@ export const LQFTBenchmarkPage = ({ theme }) => {
     const tabButtonClass = (tab) => `px-3 py-2 rounded text-sm font-semibold ${activeTab === tab ? (theme === 'pink' ? 'bg-pink-500/30 text-white' : 'bg-emerald-500/30 text-white') : 'bg-white/10 text-gray-300 hover:bg-white/20'}`;
 
     return (
-        <section className="min-h-screen flex items-center justify-center py-20 px-4">
+        <PageTransition className="min-h-screen flex items-center justify-center py-20 px-4">
+            <SEO 
+                title="LQFT Benchmark — Parjad Minooei"
+                description="Run the interactive LQFT Benchmark demo in your browser."
+            />
             <div className="container mx-auto max-w-6xl">
                 <div className="mb-6">
                     <Link to="/projects" className="text-gray-300 hover:text-white">← Back to Projects</Link>
@@ -822,6 +828,6 @@ export const LQFTBenchmarkPage = ({ theme }) => {
                 </div>
               </div>
             )}
-        </section>
+        </PageTransition>
     );
 };
