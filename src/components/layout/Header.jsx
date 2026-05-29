@@ -144,9 +144,9 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
             className="fixed z-[9999] w-48 rounded-xl bg-gray-900 border border-gray-700 shadow-2xl overflow-hidden"
             style={{ top: moreRect.top, left: moreRect.left }}
         >
-            <Link to="/stats" onClick={() => setIsMoreOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">{t('nav.Stats')}</Link>
             <Link to="/intro" onClick={() => setIsMoreOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">Intro Cinematic</Link>
             <Link to="/cli" onClick={() => setIsMoreOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">CLI Mode</Link>
+            <Link to="/stats" onClick={() => setIsMoreOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">{t('nav.Stats')}</Link>
         </div>,
         document.body
     );
@@ -272,9 +272,9 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
 
                                 <div className="pt-2 border-t border-white/10 mt-2">
                                     <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">More</div>
-                                    <Link to="/stats" onClick={handleNavClick} className="block w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all">{t('nav.Stats')}</Link>
                                     <Link to="/intro" onClick={handleNavClick} className="block w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all">Intro Cinematic</Link>
                                     <Link to="/cli" onClick={handleNavClick} className="block w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all">CLI Mode</Link>
+                                    <Link to="/stats" onClick={handleNavClick} className="block w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all">{t('nav.Stats')}</Link>
                                 </div>
                                 
                                 {visitors !== null && (
