@@ -28,7 +28,7 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
     const [visitorId, setVisitorId] = useState(null);
     const themeConfig = getThemeConfig(themeId);
     
-    const isFullscreenRoute = location.pathname === '/intro' || location.pathname === '/cli';
+    const isFullscreenRoute = location?.pathname === '/intro' || location?.pathname === '/cli';
 
     useEffect(() => {
         // Ensure stable visitorId

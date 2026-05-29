@@ -52,8 +52,8 @@ const ParticleNetwork = ({ themeClass }) => {
         let mouse = { x: null, y: null, radius: 200 };
 
         const handleMouseMove = (e) => {
-            mouse.x = e.x;
-            mouse.y = e.y;
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
         };
 
         const handleMouseLeave = () => {
@@ -61,12 +61,15 @@ const ParticleNetwork = ({ themeClass }) => {
             mouse.y = null;
         };
 
+        const handleResize = () => {
+            if (canvas) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+        };
         window.addEventListener('mousemove', handleMouseMove);
         window.addEventListener('mouseleave', handleMouseLeave);
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
+        window.addEventListener('resize', handleResize);
 
         class Particle {
             constructor() {
@@ -88,7 +91,7 @@ const ParticleNetwork = ({ themeClass }) => {
                     let dx = mouse.x - this.x;
                     let dy = mouse.y - this.y;
                     let distance = Math.sqrt(dx * dx + dy * dy);
-                    if (distance < mouse.radius) {
+                    if (distance > 0 && distance < mouse.radius) {
                         const forceDirectionX = dx / distance;
                         const forceDirectionY = dy / distance;
                         const force = (mouse.radius - distance) / mouse.radius;
@@ -141,6 +144,7 @@ const ParticleNetwork = ({ themeClass }) => {
         return () => {
             window.removeEventListener('mousemove', handleMouseMove);
             window.removeEventListener('mouseleave', handleMouseLeave);
+            window.removeEventListener('resize', handleResize);
             cancelAnimationFrame(animationFrameId);
         };
     }, [themeClass]);
@@ -168,6 +172,7 @@ export const IntroCinematic = ({ theme }) => {
     const handleMouseMove = (e) => {
         if (!cardRef.current || isExiting) return;
         const { left, top, width, height } = cardRef.current.getBoundingClientRect();
+        if (width === 0 || height === 0) return;
         // Calculate mouse position relative to center of card (-0.5 to 0.5)
         const x = (e.clientX - left) / width - 0.5;
         const y = (e.clientY - top) / height - 0.5;
