@@ -40,6 +40,11 @@ export const AboutSection = ({ theme }) => {
                     <p className="text-gray-300 leading-relaxed">
                         {t('about.storyText2')}
                     </p>
+                    {t('about.storyText3_title') && (
+                        <h4 className="text-lg font-bold text-white mt-8 mb-2">
+                            {t('about.storyText3_title')}
+                        </h4>
+                    )}
                     <p className="text-gray-300 leading-relaxed">
                         {t('about.storyText3')}
                     </p>

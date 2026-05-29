@@ -26,9 +26,10 @@
       "education": "Éducation",
       "interests": "Intérêts"
     },
-    "storyText1": "Je suis étudiant en génie logiciel à l'Université McMaster, basé à Scarborough, ON, avec une formation qui combine de manière unique un diplôme avancé en programmation informatique avec un diplôme en psychologie. Cette combinaison me permet d'aborder l'architecture de systèmes complexes avec une compréhension approfondie de la résolution de problèmes logiques et de la conception centrée sur l'utilisateur.",
-    "storyText2": "Mon parcours dans la technologie a évolué, passant de la création d'applications web réactives à l'ingénierie de logiciels évolutifs et performants. J'exécute actuellement un plan rigoureux de 6 semaines axé sur les arbres, les graphes et les algorithmes avancés (BFS/DFS) pour atteindre un niveau d'aisance de niveau entretien dans les structures de données et les algorithmes.",
-    "storyText3": "Quand je ne conçois pas de logiciels, je suis généralement à la salle de sport, je me plonge dans des problèmes mathématiques complexes ou je relève des défis LeetCode pour garder mon esprit d'analyse affûté. Je m'épanouis dans l'apprentissage continu et l'application de mes compétences pour créer des solutions logicielles élégantes et efficaces."
+    "storyText1": "Je comble le fossé entre le comportement humain et l'informatique complexe. Avec une formation qui combine de manière unique un diplôme en psychologie et un diplôme avancé en programmation informatique, j'envisage les logiciels sous un double prisme : une résolution de problèmes profondément logique et une conception intuitive centrée sur l'utilisateur.",
+    "storyText2": "Développant actuellement mes bases techniques en génie logiciel à l'Université McMaster, mon objectif a évolué de la création d'applications web réactives vers l'ingénierie de logiciels évolutifs et performants ainsi que d'architectures de systèmes robustes. De l'optimisation de moteurs backend sur mesure au développement de bibliothèques de structures de données open-source, je m'épanouis dans l'écriture d'un code propre, mathématiquement solide et hautement efficace.",
+    "storyText3_title": "Au-delà du code",
+    "storyText3": "Quand je ne conçois pas de systèmes, vous me trouverez généralement en train de repousser mes limites à la salle de sport, de plonger dans des casse-têtes mathématiques complexes ou d'aiguiser mes compétences algorithmiques sur LeetCode. Je suis animé par une optimisation incessante—tant dans l'IDE que dans mon développement personnel."
   },
   "projects": {
     "title": "Mes Projets",

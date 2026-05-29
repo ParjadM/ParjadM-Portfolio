@@ -26,9 +26,10 @@
       "education": "Education",
       "interests": "Interests"
     },
-    "storyText1": "I am a Software Engineering student at McMaster University based in Scarborough, ON, with a background that uniquely blends an Advanced Diploma in Computer Programming with a degree in Psychology. This combination allows me to approach complex system architecture with a deep understanding of both logical problem-solving and user-centric design.",
-    "storyText2": "My path in tech has evolved from building responsive web applications to engineering scalable, high-performance software. I am currently executing a rigorous 6-week 'Visual Mastery' plan focused on Trees, Graphs, and advanced algorithms (BFS/DFS) to achieve interview-level fluency in data structures and algorithms.",
-    "storyText3": "When I’m not architecting software, I’m usually at the gym, diving into complex math problems, or tackling LeetCode challenges to keep my analytical skills sharp. I thrive on continuous learning and applying my skills to create elegant and efficient software solutions."
+    "storyText1": "I bridge the gap between human behavior and complex computing. With a background that uniquely blends a degree in Psychology with an Advanced Diploma in Computer Programming, I look at software through a dual lens: deep logical problem-solving and intuitive, user-centric design.",
+    "storyText2": "Currently expanding my technical foundations in Software Engineering at McMaster University, my focus has evolved from building responsive web applications to engineering scalable, high-performance software and robust systems architecture. From optimizing custom backend engines to developing open-source data structure libraries, I thrive on writing clean, mathematically sound, and highly efficient code.",
+    "storyText3_title": "Beyond the Code",
+    "storyText3": "When I’m not designing systems, you’ll usually find me pushing limits at the gym, diving into complex math puzzles, or sharpening my algorithmic skills on LeetCode. I am driven by relentless optimization—both in the IDE and in personal growth."
   },
   "projects": {
     "title": "My Projects",
