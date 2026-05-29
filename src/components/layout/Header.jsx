@@ -19,6 +19,8 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
     const [paletteRect, setPaletteRect] = useState(null);
     const paletteTriggerRef = useRef(null);
     const paletteDropdownRef = useRef(null);
+    const [isMoreOpen, setIsMoreOpen] = useState(false);
+    const moreDropdownRef = useRef(null);
     const [blogPosts, setBlogPosts] = useState([]);
     const [visitors, setVisitors] = useState(() => {
         try {
@@ -87,8 +89,12 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
 
     useEffect(() => {
         const handleClickOutside = (e) => {
-            if (paletteDropdownRef.current?.contains(e.target) || paletteTriggerRef.current?.contains(e.target)) return;
-            setIsPaletteOpen(false);
+            if (!paletteDropdownRef.current?.contains(e.target) && !paletteTriggerRef.current?.contains(e.target)) {
+                setIsPaletteOpen(false);
+            }
+            if (moreDropdownRef.current && !moreDropdownRef.current.contains(e.target)) {
+                setIsMoreOpen(false);
+            }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -149,6 +155,20 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
                                     </Link>
                                 );
                             })}
+                            <div className="relative" ref={moreDropdownRef}>
+                                <button 
+                                    onClick={() => setIsMoreOpen(!isMoreOpen)}
+                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 text-gray-300 hover:text-white hover:bg-white/10 border border-transparent`}
+                                >
+                                    More ▾
+                                </button>
+                                {isMoreOpen && (
+                                    <div className="absolute top-full left-0 mt-2 w-48 rounded-xl bg-gray-900 border border-gray-700 shadow-2xl overflow-hidden z-[100]">
+                                        <Link to="/intro" onClick={() => setIsMoreOpen(false)} className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-800">Intro Cinematic</Link>
+                                        <Link to="/cli" onClick={() => setIsMoreOpen(false)} className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-800">CLI Mode</Link>
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         {/* Utility Actions */}
@@ -225,6 +245,12 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
                                         )}
                                     </React.Fragment>
                                 ))}
+
+                                <div className="pt-2 border-t border-white/10 mt-2">
+                                    <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">More</div>
+                                    <Link to="/intro" onClick={handleNavClick} className="block w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all">Intro Cinematic</Link>
+                                    <Link to="/cli" onClick={handleNavClick} className="block w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all">CLI Mode</Link>
+                                </div>
                                 
                                 {visitors !== null && (
                                     <div className="mt-2 flex items-center justify-center space-x-2 px-4 py-3 rounded-xl bg-white/5 border border-white/5">
