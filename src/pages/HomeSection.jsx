@@ -30,7 +30,7 @@ export const HomeSection = ({ theme }) => {
   <PageTransition className="min-h-screen flex items-center text-white relative overflow-hidden">
     <SEO 
         title="Parjad Minooei — Software Engineer Portfolio"
-        description="Software Engineer building beautiful, fast, user-centric web apps."
+        description="Software Engineer building beautiful, fast, user-centric apps."
     />
     <div className="z-10 container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
       {/* Left: Text content */}

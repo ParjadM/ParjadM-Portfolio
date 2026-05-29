@@ -199,7 +199,7 @@ export const CliMode = ({ theme }) => {
             if (data.projects && data.projects.length > 0) {
                 setFetchedProjects(data.projects);
                 const lines = data.projects.map((p, i) => `> ${i + 1}. ${p.title} - ${p.tags.join(', ')}`);
-                lines.push('> Type "open <number>" or "open <title>" to launch a project.');
+                lines.push('> Type a project number, name, or "open <number>" to launch it.');
                 pushToHistory('system', lines.join('\n'), true);
             } else {
                 pushToHistory('system', '> No projects found or failed to connect.');
@@ -266,7 +266,7 @@ export const CliMode = ({ theme }) => {
         switch(cmd) {
             case 'help':
             case 'manual':
-                pushToHistory('system', 'Available commands:\n  ls         - List files\n  cd         - Change directory\n  cat        - Read file\n  pwd        - Print working directory\n  about      - Read my background story\n  skills     - List technical skills\n  projects   - View my portfolio projects\n  open       - Launch a project (run "projects" first)\n  email      - Send me an email\n  contact    - Get contact info\n  gui        - Boot Graphical Interface\n  clear      - Clear terminal');
+                pushToHistory('system', 'Available commands:\n  ls         - List files\n  cd         - Change directory\n  cat        - Read file\n  pwd        - Print working directory\n  about      - Read my background story\n  skills     - List technical skills\n  projects   - View my portfolio projects\n  open       - Launch a project (e.g. "open 1" or just "1")\n  email      - Send me an email\n  contact    - Get contact info\n  gui        - Boot Graphical Interface\n  clear      - Clear terminal');
                 break;
             case 'pwd':
                 pushToHistory('system', currentDir);
@@ -387,6 +387,35 @@ export const CliMode = ({ theme }) => {
                         pushToHistory('error', `bash: ${rawCmd}: command not found`);
                     }
                 } else {
+                    // Try to auto-open if it's a project name or number
+                    if (fetchedProjects.length > 0) {
+                        const searchParam = rawCmd.toLowerCase();
+                        const idx = parseInt(searchParam);
+                        let targetProject = null;
+                        if (!isNaN(idx) && idx > 0 && idx <= fetchedProjects.length && String(idx) === searchParam) {
+                            targetProject = fetchedProjects[idx - 1];
+                        } else {
+                            targetProject = fetchedProjects.find(p => p.title.toLowerCase() === searchParam || p.title.toLowerCase().includes(searchParam));
+                        }
+
+                        if (targetProject) {
+                            if (targetProject.liveUrl) {
+                                pushToHistory('system', `> Opening ${targetProject.title}...`);
+                                let targetUrl = targetProject.liveUrl;
+                                if (targetUrl.startsWith('/')) {
+                                    setTimeout(() => navigate(targetUrl), 500);
+                                } else {
+                                    setTimeout(() => window.open(targetUrl, '_blank'), 500);
+                                }
+                            } else if (targetProject.githubUrl) {
+                                pushToHistory('system', `> No live URL found. Opening GitHub repo for ${targetProject.title}...`);
+                                setTimeout(() => window.open(targetProject.githubUrl, '_blank'), 500);
+                            } else {
+                                pushToHistory('error', `> Project ${targetProject.title} has no links available.`);
+                            }
+                            break;
+                        }
+                    }
                     pushToHistory('error', `> Command not found: ${cmd}. Type "help" for manual.`);
                 }
         }
