@@ -3,6 +3,26 @@ import { useNavigate } from 'react-router-dom';
 import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { BackgroundBlobs } from '../components/ui/BackgroundBlobs.jsx';
 
+// Typewriter component for animations
+const TypewriterText = ({ text, onComplete, speed = 10 }) => {
+    const [displayed, setDisplayed] = useState('');
+    
+    useEffect(() => {
+        let i = 0;
+        const timer = setInterval(() => {
+            setDisplayed(text.substring(0, i + 1));
+            i++;
+            if (i >= text.length) {
+                clearInterval(timer);
+                if (onComplete) onComplete();
+            }
+        }, speed);
+        return () => clearInterval(timer);
+    }, [text, speed, onComplete]);
+
+    return <span className="whitespace-pre-wrap">{displayed}</span>;
+};
+
 const MatrixRain = ({ onComplete }) => {
     const canvasRef = useRef(null);
     const [fade, setFade] = useState(false);
@@ -39,12 +59,10 @@ const MatrixRain = ({ onComplete }) => {
 
         const interval = setInterval(draw, 33);
         
-        // Start fade out at 3.5s
         const fadeTimeout = setTimeout(() => {
             setFade(true);
         }, 3500);
 
-        // Complete at 4.5s
         const completeTimeout = setTimeout(() => {
             clearInterval(interval);
             onComplete();
@@ -70,16 +88,27 @@ const MatrixRain = ({ onComplete }) => {
 
 export const CliMode = ({ theme }) => {
     const navigate = useNavigate();
+    
+    // Core State
     const [history, setHistory] = useState([
-        { type: 'system', text: 'Initializing ParjadOS v2.0.1...' },
-        { type: 'system', text: 'Kernel loaded successfully.' },
-        { type: 'system', text: '---------------------------------------------------' },
-        { type: 'system', text: 'Welcome to the CLI Mode!' },
-        { type: 'system', text: 'Type "help" or "manual" to see a list of available commands to navigate the portfolio.' }
+        { type: 'system', text: 'Initializing ParjadOS v2.0.1...', animated: false },
+        { type: 'system', text: 'Kernel loaded successfully.', animated: false },
+        { type: 'system', text: '---------------------------------------------------', animated: false },
+        { type: 'system', text: 'Welcome to the CLI Mode!', animated: false },
+        { type: 'system', text: 'Type "help" to see a list of available commands.', animated: false }
     ]);
     const [input, setInput] = useState('');
     const [isBooted, setIsBooted] = useState(false);
     const [isExiting, setIsExiting] = useState(false);
+    
+    // Advanced features State
+    const [cmdHistory, setCmdHistory] = useState([]);
+    const [historyIndex, setHistoryIndex] = useState(-1);
+    const [currentDir, setCurrentDir] = useState('~');
+    
+    // Multi-step Email State: 0=inactive, 1=name, 2=email, 3=message
+    const [emailState, setEmailState] = useState({ step: 0, name: '', email: '', message: '' });
+
     const bottomRef = useRef(null);
 
     useEffect(() => {
@@ -91,76 +120,248 @@ export const CliMode = ({ theme }) => {
         setTimeout(() => navigate(target), 650);
     };
 
-    const handleCommand = (e) => {
-        e.preventDefault();
-        const cmd = input.trim().toLowerCase();
-        if (!cmd) return;
+    const pushToHistory = (type, text, animated = false) => {
+        setHistory(prev => [...prev, { type, text, animated }]);
+    };
 
-        const newHistory = [...history, { type: 'user', text: `guest@parjadm.ca:~$ ${cmd}` }];
+    // --- Mock File System ---
+    const fileSystem = {
+        '~': {
+            'about.txt': { type: 'file', content: '> Parjad Minooei | Software Engineer\n> I am a Software Engineering student at McMaster University.\n> My background blends an Advanced Diploma in Computer Programming with a degree in Psychology.' },
+            'skills.md': { type: 'file', content: '# Skills\n- [Frontend] JavaScript, React, HTML/CSS, Tailwind\n- [Backend] Node.js, Python, SQL, MongoDB\n- [Tools & CS] Git, Algorithms' },
+            'contact.json': { type: 'file', content: '{\n  "github": "https://github.com/ParjadM",\n  "linkedin": "https://linkedin.com/in/parjadminooei"\n}' },
+            'projects': { type: 'dir' }
+        },
+        '~/projects': {
+            'list_projects.sh': { type: 'executable', action: 'fetch_projects' }
+        }
+    };
+
+    const resolvePath = (path) => {
+        if (!path) return currentDir;
+        if (path === '~') return '~';
+        if (path === '..') return currentDir === '~/projects' ? '~' : currentDir;
+        if (path.startsWith('~/')) return path;
+        return currentDir === '~' ? `~/${path}` : `${currentDir}/${path}`;
+    };
+
+    const getAvailableCommands = () => ['help', 'about', 'skills', 'projects', 'contact', 'email', 'gui', 'clear', 'ls', 'cd', 'cat', 'pwd'];
+
+    const handleKeyDown = (e) => {
+        if (emailState.step > 0) return; // Disable history/tab in email wizard
+
+        // History Navigation
+        if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (cmdHistory.length > 0) {
+                const newIdx = historyIndex < cmdHistory.length - 1 ? historyIndex + 1 : historyIndex;
+                setHistoryIndex(newIdx);
+                setInput(cmdHistory[cmdHistory.length - 1 - newIdx] || '');
+            }
+        } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (historyIndex > 0) {
+                const newIdx = historyIndex - 1;
+                setHistoryIndex(newIdx);
+                setInput(cmdHistory[cmdHistory.length - 1 - newIdx] || '');
+            } else if (historyIndex === 0) {
+                setHistoryIndex(-1);
+                setInput('');
+            }
+        } 
+        // Tab Autocompletion
+        else if (e.key === 'Tab') {
+            e.preventDefault();
+            const parts = input.split(' ');
+            const lastPart = parts[parts.length - 1];
+
+            if (parts.length === 1) {
+                // Autocomplete commands
+                const cmds = getAvailableCommands().filter(c => c.startsWith(lastPart));
+                if (cmds.length === 1) setInput(cmds[0]);
+            } else if (parts[0] === 'cd' || parts[0] === 'cat') {
+                // Autocomplete files/dirs
+                const dirContent = fileSystem[currentDir] || {};
+                const matches = Object.keys(dirContent).filter(f => f.startsWith(lastPart));
+                if (matches.length === 1) {
+                    parts[parts.length - 1] = matches[0];
+                    setInput(parts.join(' '));
+                }
+            }
+        }
+    };
+
+    const fetchProjects = async () => {
+        pushToHistory('system', '> Fetching projects from database...', true);
+        try {
+            const res = await fetch('/api/projects');
+            const data = await res.json();
+            if (data.projects && data.projects.length > 0) {
+                const lines = data.projects.map((p, i) => `> ${i + 1}. ${p.title} - ${p.tags.join(', ')}`);
+                lines.push('> Check the /projects route in GUI mode for live demos.');
+                pushToHistory('system', lines.join('\n'), true);
+            } else {
+                pushToHistory('system', '> No projects found or failed to connect.');
+            }
+        } catch (err) {
+            pushToHistory('error', '> Connection to database failed.');
+        }
+    };
+
+    const handleEmailWizard = async (val) => {
+        const step = emailState.step;
+        pushToHistory('user', `guest@parjadm.ca:${currentDir}$ ${val}`);
         
+        if (step === 1) {
+            setEmailState({ ...emailState, step: 2, name: val });
+            pushToHistory('system', 'Enter your email address:');
+        } else if (step === 2) {
+            setEmailState({ ...emailState, step: 3, email: val });
+            pushToHistory('system', 'Enter your message:');
+        } else if (step === 3) {
+            pushToHistory('system', 'Sending message...', true);
+            setEmailState({ step: 0, name: '', email: '', message: '' }); // reset
+            try {
+                const res = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: emailState.name,
+                        email: emailState.email,
+                        subject: 'CLI Contact Form',
+                        message: val
+                    })
+                });
+                if (res.ok) {
+                    pushToHistory('system', '✅ Message sent successfully.', true);
+                } else {
+                    pushToHistory('error', '❌ Failed to send message.');
+                }
+            } catch (e) {
+                pushToHistory('error', '❌ Network error sending message.');
+            }
+        }
+        setInput('');
+    };
+
+    const handleCommand = async (e) => {
+        e.preventDefault();
+        const rawCmd = input.trim();
+        if (!rawCmd) return;
+
+        if (emailState.step > 0) {
+            return handleEmailWizard(rawCmd);
+        }
+
+        const cmdParts = rawCmd.split(' ').filter(Boolean);
+        const cmd = cmdParts[0].toLowerCase();
+        const args = cmdParts.slice(1);
+
+        // Update history states
+        pushToHistory('user', `guest@parjadm.ca:${currentDir}$ ${rawCmd}`);
+        setCmdHistory(prev => [...prev, rawCmd]);
+        setHistoryIndex(-1);
+
         switch(cmd) {
             case 'help':
             case 'manual':
-                newHistory.push({ type: 'system', text: 'Available commands:' });
-                newHistory.push({ type: 'system', text: '  about      - Read my background story & education' });
-                newHistory.push({ type: 'system', text: '  skills     - List my technical skills & stack' });
-                newHistory.push({ type: 'system', text: '  projects   - View my portfolio projects' });
-                newHistory.push({ type: 'system', text: '  contact    - Get my contact information' });
-                newHistory.push({ type: 'system', text: '  gui        - Switch back to the graphical interface (Home)' });
-                newHistory.push({ type: 'system', text: '  clear      - Clear the terminal screen' });
+                pushToHistory('system', 'Available commands:\n  ls         - List files\n  cd         - Change directory\n  cat        - Read file\n  pwd        - Print working directory\n  about      - Read my background story\n  skills     - List technical skills\n  projects   - View my portfolio projects\n  email      - Send me an email\n  contact    - Get contact info\n  gui        - Boot Graphical Interface\n  clear      - Clear terminal');
                 break;
+            case 'pwd':
+                pushToHistory('system', currentDir);
+                break;
+            case 'ls':
+                const contents = fileSystem[currentDir];
+                if (contents) {
+                    const files = Object.keys(contents).map(f => contents[f].type === 'dir' ? `${f}/` : f).join('   ');
+                    pushToHistory('system', files || '(empty)');
+                } else {
+                    pushToHistory('error', 'ls: cannot access: No such file or directory');
+                }
+                break;
+            case 'cd':
+                const targetDir = resolvePath(args[0]);
+                if (targetDir === currentDir) break;
+                if (fileSystem[targetDir]) {
+                    setCurrentDir(targetDir);
+                } else if (fileSystem[currentDir]?.[args[0]]?.type === 'dir') {
+                    setCurrentDir(`${currentDir}/${args[0]}`);
+                } else {
+                    pushToHistory('error', `cd: ${args[0] || ''}: No such file or directory`);
+                }
+                break;
+            case 'cat':
+                if (!args[0]) {
+                    pushToHistory('error', 'cat: missing file operand');
+                    break;
+                }
+                const file = fileSystem[currentDir]?.[args[0]];
+                if (!file) {
+                    pushToHistory('error', `cat: ${args[0]}: No such file or directory`);
+                } else if (file.type === 'dir') {
+                    pushToHistory('error', `cat: ${args[0]}: Is a directory`);
+                } else if (file.type === 'executable') {
+                    if (file.action === 'fetch_projects') fetchProjects();
+                } else {
+                    pushToHistory('system', file.content, true); // Use typewriter effect for files
+                }
+                break;
+            // Global Aliases (Legacy Commands)
             case 'about':
-                newHistory.push({ type: 'system', text: '> Parjad Minooei | Software Engineer' });
-                newHistory.push({ type: 'system', text: '> I am a Software Engineering student at McMaster University based in Scarborough, ON.' });
-                newHistory.push({ type: 'system', text: '> My background blends an Advanced Diploma in Computer Programming with a degree in Psychology.' });
-                newHistory.push({ type: 'system', text: '> Type "gui" to view the full graphical about page.' });
+                pushToHistory('system', fileSystem['~']['about.txt'].content, true);
                 break;
             case 'skills':
-                newHistory.push({ type: 'system', text: '> Loading skill matrix...' });
-                newHistory.push({ type: 'system', text: '> [Frontend] JavaScript, React, HTML/CSS, Tailwind' });
-                newHistory.push({ type: 'system', text: '> [Backend] Node.js, Python, SQL, NoSQL (MongoDB)' });
-                newHistory.push({ type: 'system', text: '> [Tools & CS] Git, Data Structures, Algorithms (BFS/DFS, Graphs)' });
+                pushToHistory('system', fileSystem['~']['skills.md'].content, true);
                 break;
             case 'projects':
-                newHistory.push({ type: 'system', text: '> Fetching projects from database...' });
-                newHistory.push({ type: 'system', text: '> 1. CodeQuest - Interactive algorithm visualizer' });
-                newHistory.push({ type: 'system', text: '> 2. Binary 1010 Generator - Math-based puzzle engine' });
-                newHistory.push({ type: 'system', text: '> 3. SpaceShooter - Web-based arcade classic' });
-                newHistory.push({ type: 'system', text: '> Check the /projects route in GUI mode for live demos.' });
+                await fetchProjects();
                 break;
             case 'contact':
-                newHistory.push({ type: 'system', text: '> Establishing connection...' });
-                newHistory.push({ type: 'system', text: '> GitHub: https://github.com/ParjadM' });
-                newHistory.push({ type: 'system', text: '> LinkedIn: https://www.linkedin.com/in/parjadminooei' });
-                newHistory.push({ type: 'system', text: '> Open to new opportunities.' });
+                pushToHistory('system', fileSystem['~']['contact.json'].content, true);
+                break;
+            case 'email':
+                setEmailState({ step: 1, name: '', email: '', message: '' });
+                pushToHistory('system', 'Starting Email Wizard...\nEnter your name:');
                 break;
             case 'home':
             case 'gui':
             case 'exit':
-                newHistory.push({ type: 'system', text: '> Booting Graphical User Interface...' });
+                pushToHistory('system', '> Booting Graphical User Interface...', true);
                 handleExit('/');
                 break;
             case 'clear':
                 setHistory([{ type: 'system', text: 'Terminal cleared. Type "help" for commands.' }]);
-                setInput('');
-                return;
+                break;
             case 'sudo':
-                newHistory.push({ type: 'error', text: '> Permission denied. This incident will be reported.' });
+                pushToHistory('error', '> Permission denied. This incident will be reported.');
+                break;
+            case 'theme':
+                pushToHistory('system', 'Themes are managed by the GUI. Try "gui" to change themes.');
                 break;
             default:
-                newHistory.push({ type: 'error', text: `> Command not found: ${cmd}. Type "help" for manual.` });
+                if (rawCmd.startsWith('./')) {
+                    const execName = rawCmd.substring(2);
+                    if (fileSystem[currentDir]?.[execName]?.type === 'executable') {
+                        if (fileSystem[currentDir][execName].action === 'fetch_projects') fetchProjects();
+                    } else {
+                        pushToHistory('error', `bash: ${rawCmd}: command not found`);
+                    }
+                } else {
+                    pushToHistory('error', `> Command not found: ${cmd}. Type "help" for manual.`);
+                }
         }
-
-        setHistory(newHistory);
         setInput('');
     };
 
-    // Keep it terminal themed locally, ignoring global theme
     const termTheme = 'terminal';
     
     if (!isBooted) {
         return <MatrixRain onComplete={() => setIsBooted(true)} />;
     }
+
+    const promptPrefix = emailState.step === 0 
+        ? `guest@parjadm.ca:${currentDir}$` 
+        : `>`;
 
     return (
         <section className={`min-h-screen flex items-center justify-center py-24 px-4 bg-black relative ${isExiting ? 'animate-crt-off' : 'animate-fade-in'}`}>
@@ -179,7 +380,6 @@ export const CliMode = ({ theme }) => {
                 }
             `}</style>
             
-            {/* Terminal specific background blobs */}
             <BackgroundBlobs theme={termTheme} darkMode={true} customBlobClasses={{blob1:"bg-green-500/10", blob2:"bg-emerald-400/10", blob3:"bg-lime-500/10"}} />
             
             <div className="container mx-auto max-w-4xl z-10 flex flex-col h-full">
@@ -190,7 +390,7 @@ export const CliMode = ({ theme }) => {
                 </div>
 
                 <GlassCard className="p-0 border border-green-500/30 bg-black/90 shadow-[0_0_60px_rgba(74,222,128,0.15)] rounded-xl overflow-hidden font-mono flex-1 min-h-[65vh]" theme={termTheme}>
-                    {/* Terminal Header */}
+                    {/* Header */}
                     <div className="bg-gray-900 border-b border-gray-700 px-4 py-3 flex items-center gap-2">
                         <div className="flex gap-2">
                             <div className="w-3 h-3 rounded-full bg-red-500"></div>
@@ -200,15 +400,19 @@ export const CliMode = ({ theme }) => {
                         <div className="flex-1 text-center text-xs text-gray-400 font-sans tracking-widest uppercase">
                             guest@parjadm-os:~
                         </div>
-                        <div className="w-12"></div> {/* Spacer to center title */}
+                        <div className="w-12"></div>
                     </div>
 
-                    {/* Terminal Body */}
+                    {/* Body */}
                     <div className="p-6 h-[60vh] overflow-y-auto flex flex-col scrollbar-thin scrollbar-thumb-green-500/50 scrollbar-track-transparent cursor-text" onClick={() => document.getElementById('cli-input')?.focus()}>
                         <div className="flex-1 space-y-2 text-sm md:text-base">
                             {history.map((entry, idx) => (
                                 <div key={idx} className={`${entry.type === 'error' ? 'text-red-400' : entry.type === 'user' ? 'text-white font-bold' : 'text-green-400'}`}>
-                                    {entry.text}
+                                    {entry.animated && entry.type !== 'user' ? (
+                                        <TypewriterText text={entry.text} speed={10} />
+                                    ) : (
+                                        <span className="whitespace-pre-wrap">{entry.text}</span>
+                                    )}
                                 </div>
                             ))}
                             <div ref={bottomRef} />
@@ -216,12 +420,13 @@ export const CliMode = ({ theme }) => {
 
                         {/* Input Line */}
                         <form onSubmit={handleCommand} className="mt-4 flex items-center flex-wrap">
-                            <span className="mr-3 font-bold text-emerald-400 whitespace-nowrap">guest@parjadm.ca:~$</span>
+                            <span className="mr-3 font-bold text-emerald-400 whitespace-nowrap">{promptPrefix}</span>
                             <input
                                 id="cli-input"
                                 type="text"
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
+                                onKeyDown={handleKeyDown}
                                 className="flex-1 bg-transparent border-none outline-none text-white font-mono caret-green-500 min-w-[200px]"
                                 autoFocus
                                 spellCheck="false"
