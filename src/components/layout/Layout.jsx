@@ -27,6 +27,8 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
     const location = useLocation();
     const [visitorId, setVisitorId] = useState(null);
     const themeConfig = getThemeConfig(themeId);
+    
+    const isFullscreenRoute = location.pathname === '/intro' || location.pathname === '/cli';
 
     useEffect(() => {
         // Ensure stable visitorId
@@ -139,9 +141,12 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
 
             <BackgroundBlobs theme={themeConfig.accentPrefix} darkMode={themeConfig.isDark} customBlobClasses={themeConfig.blobClasses} />
             <CustomCursor theme={themeConfig.accentPrefix} darkMode={themeConfig.isDark} />
-            <Header setThemeId={setThemeId} currentThemeId={themeId} theme={themeConfig.accentPrefix} darkMode={themeConfig.isDark} />
             
-            <main id="main-content" role="main" tabIndex={-1} className="transition-all duration-500 pt-20 md:pt-24">
+            {!isFullscreenRoute && (
+                <Header setThemeId={setThemeId} currentThemeId={themeId} theme={themeConfig.accentPrefix} darkMode={themeConfig.isDark} />
+            )}
+            
+            <main id="main-content" role="main" tabIndex={-1} className={`transition-all duration-500 ${!isFullscreenRoute ? 'pt-20 md:pt-24' : ''}`}>
                 <Suspense fallback={
                     <div className="min-h-screen flex items-center justify-center py-20 px-4 text-gray-300">
                         Loading...
@@ -166,10 +171,10 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
             </main>
 
             {/* Footer */}
-            <Footer theme={themeConfig.accentPrefix} />
+            {!isFullscreenRoute && <Footer theme={themeConfig.accentPrefix} />}
             
             {/* AI Chatbot */}
-            <Chatbot theme={themeConfig.accentPrefix} />
+            {!isFullscreenRoute && <Chatbot theme={themeConfig.accentPrefix} />}
             
             {/* Toast Notifications */}
             <Toast 
