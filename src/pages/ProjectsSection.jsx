@@ -11,6 +11,7 @@ import { getAuthToken } from '../utils/auth.jsx';
 import { useTranslation } from 'react-i18next';
 import { PageTransition } from '../components/ui/PageTransition.jsx';
 import { SEO } from '../components/SEO.jsx';
+import { useFetchWithCache } from '../utils/useFetchWithCache.js';
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 import ParjadImage from '../Images/Parjad.jpg';
 import GitHubStats from '../components/GitHubStats.tsx';
@@ -23,9 +24,9 @@ import SpaceShooterImage from '../Images/SpaceShooter.jpg';
 
 export const ProjectsSection = ({ theme }) => {
     const { t } = useTranslation();
-    const [projects, setProjects] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+    const { data, isLoading: loading, error: fetchError } = useFetchWithCache('/api/projects');
+    const projects = Array.isArray(data?.projects) ? data.projects : [];
+    const error = fetchError ? t('projects.error') : '';
 
     // Map known titles to local images to keep visuals after API switch
     const imageMap = {
@@ -33,22 +34,6 @@ export const ProjectsSection = ({ theme }) => {
         'Binary 1010 Generator': BinaryGeneratorImage,
         'SpaceShooter': SpaceShooterImage,
     };
-
-    useEffect(() => {
-        const load = async () => {
-            setLoading(true); setError('');
-            try {
-                const res = await fetch('/api/projects');
-                const data = await res.json();
-                setProjects(Array.isArray(data.projects) ? data.projects : []);
-            } catch (e) {
-                setError(t('projects.error'));
-            } finally {
-                setLoading(false);
-            }
-        };
-        load();
-    }, []);
 
     const tagClasses = theme === 'pink'
         ? "bg-pink-500/20 text-pink-300"
@@ -75,6 +60,8 @@ export const ProjectsSection = ({ theme }) => {
                             <img 
                                 src={project.image || imageMap[project.title] || `https://placehold.co/600x400/${theme === 'pink' ? 'E94560' : '10B981'}/FFFFFF?text=${encodeURIComponent(project.title)}`}
                                 alt={project.title}
+                                loading="lazy"
+                                decoding="async"
                                 className="w-full h-full object-cover opacity-80 hover:opacity-100 hover:scale-105 transition-all duration-300"
                             />
                         </div>

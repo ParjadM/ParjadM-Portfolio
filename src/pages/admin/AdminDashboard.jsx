@@ -15,7 +15,7 @@ export const AdminDashboard = ({ theme }) => {
   const navigate = useNavigate();
   const [dbStatus, setDbStatus] = useState(null);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState('blog'); // 'blog' | 'projects' | 'status'
+  const [activeTab, setActiveTab] = useState('blog'); // 'blog' | 'projects' | 'analytics' | 'ai'
   useEffect(() => {
     const token = getAuthToken();
     if (!token) return;
@@ -46,15 +46,15 @@ export const AdminDashboard = ({ theme }) => {
 
           {/* Tabs */}
           <div className="mb-6 flex gap-2">
-            {['blog','projects','status','ai'].map(tab => (
+            {['blog','projects','analytics','ai'].map(tab => (
               <button key={tab} onClick={() => setActiveTab(tab)}
                 className={`px-3 py-2 rounded ${activeTab===tab ? 'bg-white/20 text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`}>
-                {tab === 'blog' ? 'Blog' : tab === 'projects' ? 'Projects' : tab === 'status' ? 'System' : 'AI Context'}
+                {tab === 'blog' ? 'Blog' : tab === 'projects' ? 'Projects' : tab === 'analytics' ? 'Analytics' : 'AI Context'}
               </button>
             ))}
           </div>
 
-          {activeTab === 'status' && (
+          {activeTab === 'analytics' && (
             <PremiumAnalytics theme={theme} dbStatus={dbStatus} />
           )}
 

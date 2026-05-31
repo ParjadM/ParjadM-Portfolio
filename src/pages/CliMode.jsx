@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { BackgroundBlobs } from '../components/ui/BackgroundBlobs.jsx';
+import { apiCache } from '../utils/useFetchWithCache.js';
 
 // Typewriter component for animations
 const TypewriterText = ({ text, onComplete, speed = 10 }) => {
@@ -192,11 +193,28 @@ export const CliMode = ({ theme }) => {
     };
 
     const fetchProjects = async () => {
+        if (fetchedProjects.length > 0) {
+            const lines = fetchedProjects.map((p, i) => `> ${i + 1}. ${p.title} - ${p.tags.join(', ')}`);
+            lines.push('> Type a project number, name, or "open <number>" to launch it.');
+            pushToHistory('system', lines.join('\n'), true);
+            return;
+        }
+
+        const cached = apiCache.get('/api/projects');
+        if (cached && Array.isArray(cached.projects) && cached.projects.length > 0) {
+            setFetchedProjects(cached.projects);
+            const lines = cached.projects.map((p, i) => `> ${i + 1}. ${p.title} - ${p.tags.join(', ')}`);
+            lines.push('> Type a project number, name, or "open <number>" to launch it.');
+            pushToHistory('system', lines.join('\n'), true);
+            return;
+        }
+
         pushToHistory('system', '> Fetching projects from database...', true);
         try {
             const res = await fetch('/api/projects');
             const data = await res.json();
             if (data.projects && data.projects.length > 0) {
+                apiCache.set('/api/projects', data);
                 setFetchedProjects(data.projects);
                 const lines = data.projects.map((p, i) => `> ${i + 1}. ${p.title} - ${p.tags.join(', ')}`);
                 lines.push('> Type a project number, name, or "open <number>" to launch it.');
