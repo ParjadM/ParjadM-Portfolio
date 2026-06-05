@@ -53,7 +53,7 @@ const Chatbot = ({ theme = 'green' }) => {
   const [loading, setLoading] = useState(false);
   
   const [voiceEnabled, setVoiceEnabled] = useState(false);
-  const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const location = useLocation();
 
   // Initialize greeting based on page
@@ -76,7 +76,12 @@ const Chatbot = ({ theme = 'green' }) => {
   }, [location.pathname]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
   };
 
   useEffect(() => {
@@ -256,7 +261,7 @@ const Chatbot = ({ theme = 'green' }) => {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`flex max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'} gap-2`}>
@@ -283,7 +288,6 @@ const Chatbot = ({ theme = 'green' }) => {
                 </div>
               </div>
             )}
-            <div ref={messagesEndRef} />
           </div>
 
           {/* Input Area */}
