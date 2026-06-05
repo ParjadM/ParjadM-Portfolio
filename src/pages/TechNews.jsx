@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { PageTransition } from '../components/ui/PageTransition.jsx';
-import { ExternalLink, User, ArrowUp } from 'lucide-react';
+import { ExternalLink, Heart, Clock, User } from 'lucide-react';
 
 export const TechNews = ({ theme }) => {
     const [stories, setStories] = useState([]);
@@ -12,20 +12,10 @@ export const TechNews = ({ theme }) => {
     useEffect(() => {
         const fetchNews = async () => {
             try {
-                // Fetch top story IDs
-                const res = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json');
-                const storyIds = await res.json();
-                
-                // Get the top 15 stories
-                const top15 = storyIds.slice(0, 15);
-                
-                // Fetch details for each story
-                const storyPromises = top15.map(id => 
-                    fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`).then(r => r.json())
-                );
-                
-                const fetchedStories = await Promise.all(storyPromises);
-                setStories(fetchedStories.filter(s => s !== null));
+                // Fetch the top daily articles from Dev.to
+                const res = await fetch('https://dev.to/api/articles?top=1&per_page=12');
+                const data = await res.json();
+                setStories(data);
             } catch (err) {
                 setError('Failed to load the latest tech news. Please try again later.');
             } finally {
@@ -45,7 +35,7 @@ export const TechNews = ({ theme }) => {
     };
 
     const cardVariants = {
-        hidden: { opacity: 0, y: 20 },
+        hidden: { opacity: 0, y: 30 },
         visible: { 
             opacity: 1, 
             y: 0,
@@ -55,7 +45,7 @@ export const TechNews = ({ theme }) => {
 
     return (
         <PageTransition>
-            <div className="container mx-auto px-4 lg:px-8 max-w-5xl">
+            <div className="container mx-auto px-4 lg:px-8 max-w-6xl pb-24">
                 <div className="mb-12 text-center md:text-left pt-8">
                     <motion.h1 
                         initial={{ opacity: 0, y: -20 }}
@@ -71,14 +61,14 @@ export const TechNews = ({ theme }) => {
                         transition={{ duration: 0.5, delay: 0.2 }}
                         className="text-gray-400 text-lg md:text-xl max-w-2xl"
                     >
-                        The top 15 trending stories right now from Hacker News. Stay sharp, stay informed.
+                        The top software engineering articles of the day, sourced directly from the global developer community.
                     </motion.p>
                 </div>
 
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-20 space-y-4">
                         <div className={`w-12 h-12 border-4 border-t-transparent rounded-full animate-spin ${theme === 'pink' ? 'border-pink-500' : 'border-emerald-500'}`}></div>
-                        <p className="text-gray-400 font-medium animate-pulse">Pulling live data...</p>
+                        <p className="text-gray-400 font-medium animate-pulse">Pulling latest articles...</p>
                     </div>
                 ) : error ? (
                     <div className="text-center py-20">
@@ -89,41 +79,80 @@ export const TechNews = ({ theme }) => {
                         variants={containerVariants}
                         initial="hidden"
                         animate="visible"
-                        className="flex flex-col space-y-3"
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
                     >
-                        {stories.map((story, idx) => {
-                            const storyUrl = story.url || `https://news.ycombinator.com/item?id=${story.id}`;
-                            const domain = story.url ? new URL(story.url).hostname.replace('www.', '') : 'news.ycombinator.com';
+                        {stories.map((story) => {
+                            const tags = story.tag_list || [];
+                            const imageUrl = story.cover_image || story.social_image;
                             
                             return (
-                                <motion.div key={story.id} variants={cardVariants}>
-                                    <a href={storyUrl} target="_blank" rel="noopener noreferrer" className="block w-full outline-none group">
+                                <motion.div key={story.id} variants={cardVariants} className="h-full">
+                                    <a href={story.url} target="_blank" rel="noopener noreferrer" className="block h-full outline-none group">
                                         <GlassCard 
                                             theme={theme} 
-                                            className="w-full flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 transition-all duration-300 group-hover:bg-white/[0.08] group-hover:border-white/30"
+                                            className="h-full flex flex-col overflow-hidden transition-all duration-300 group-hover:-translate-y-2 group-focus:-translate-y-2 group-hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] group-hover:border-white/30 p-0"
                                         >
-                                            <div className="flex items-start sm:items-center space-x-4 w-full">
-                                                <div className={`flex-shrink-0 flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-white/5 border border-white/10 ${theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}`}>
-                                                    <ArrowUp className="w-4 h-4 mb-0.5" />
-                                                    <span className="text-xs font-bold">{story.score}</span>
-                                                </div>
-                                                <div className="flex flex-col flex-grow min-w-0 pr-4">
-                                                    <h2 className="text-base sm:text-lg font-bold text-gray-200 group-hover:text-white transition-colors truncate">
-                                                        {story.title}
-                                                    </h2>
-                                                    <div className="flex items-center text-xs text-gray-500 font-medium mt-1.5 space-x-3">
-                                                        <div className="flex items-center space-x-1 flex-shrink-0">
-                                                            <User className="w-3.5 h-3.5" />
-                                                            <span className="truncate max-w-[100px]">{story.by}</span>
-                                                        </div>
-                                                        <span className="text-gray-600 hidden sm:inline">•</span>
-                                                        <span className="truncate max-w-[150px] sm:max-w-[200px]">{domain}</span>
+                                            {/* Image Header */}
+                                            <div className="relative w-full h-48 bg-gray-900/50 overflow-hidden">
+                                                {imageUrl ? (
+                                                    <img 
+                                                        src={imageUrl} 
+                                                        alt={story.title} 
+                                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                    />
+                                                ) : (
+                                                    <div className={`w-full h-full flex items-center justify-center bg-gradient-to-br ${theme === 'pink' ? 'from-pink-500/20 to-purple-500/20' : 'from-emerald-500/20 to-teal-500/20'}`}>
+                                                        <span className="text-4xl">💻</span>
                                                     </div>
+                                                )}
+                                                <div className="absolute top-3 right-3 p-2 rounded-full bg-black/50 backdrop-blur-md text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <ExternalLink className="w-4 h-4" />
                                                 </div>
                                             </div>
                                             
-                                            <div className="hidden sm:flex flex-shrink-0 ml-4 p-2 rounded-full bg-white/5 text-gray-400 group-hover:text-white group-hover:bg-white/10 transition-colors">
-                                                <ExternalLink className="w-4 h-4" />
+                                            {/* Content */}
+                                            <div className="p-6 flex flex-col flex-grow">
+                                                {/* Tags */}
+                                                <div className="flex flex-wrap gap-2 mb-3">
+                                                    {tags.slice(0, 3).map(tag => (
+                                                        <span key={tag} className={`text-xs font-medium px-2.5 py-1 rounded-full bg-white/5 border border-white/10 ${theme === 'pink' ? 'text-pink-300' : 'text-emerald-300'}`}>
+                                                            #{tag}
+                                                        </span>
+                                                    ))}
+                                                </div>
+
+                                                <h2 className="text-xl font-bold text-gray-100 group-hover:text-white transition-colors mb-3 line-clamp-3 leading-snug">
+                                                    {story.title}
+                                                </h2>
+                                                
+                                                <p className="text-sm text-gray-400 line-clamp-2 mb-6">
+                                                    {story.description}
+                                                </p>
+                                                
+                                                {/* Footer */}
+                                                <div className="mt-auto pt-4 border-t border-white/10 flex items-center justify-between">
+                                                    <div className="flex items-center space-x-3">
+                                                        {story.user.profile_image ? (
+                                                            <img src={story.user.profile_image} alt={story.user.name} className="w-8 h-8 rounded-full" />
+                                                        ) : (
+                                                            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                                                                <User className="w-4 h-4 text-gray-400" />
+                                                            </div>
+                                                        )}
+                                                        <span className="text-sm font-medium text-gray-300 truncate max-w-[100px]">{story.user.name}</span>
+                                                    </div>
+                                                    
+                                                    <div className="flex items-center space-x-4 text-xs font-medium text-gray-400">
+                                                        <div className="flex items-center space-x-1">
+                                                            <Heart className={`w-3.5 h-3.5 ${theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}`} />
+                                                            <span>{story.public_reactions_count}</span>
+                                                        </div>
+                                                        <div className="flex items-center space-x-1">
+                                                            <Clock className="w-3.5 h-3.5" />
+                                                            <span>{story.reading_time_minutes}m</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </GlassCard>
                                     </a>
