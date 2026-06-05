@@ -108,6 +108,7 @@ export const CliMode = ({ theme }) => {
     const [currentDir, setCurrentDir] = useState('~');
     
     const [emailState, setEmailState] = useState({ step: 0, name: '', email: '', message: '' });
+    const [aiState, setAiState] = useState({ active: false, messages: [] });
     const [fetchedProjects, setFetchedProjects] = useState([]);
 
     const bottomRef = useRef(null);
@@ -146,10 +147,10 @@ export const CliMode = ({ theme }) => {
         return currentDir === '~' ? `~/${path}` : `${currentDir}/${path}`;
     };
 
-    const getAvailableCommands = () => ['help', 'about', 'skills', 'projects', 'contact', 'email', 'gui', 'clear', 'ls', 'cd', 'cat', 'pwd', 'open', 'run'];
+    const getAvailableCommands = () => ['help', 'about', 'skills', 'projects', 'contact', 'email', 'ai', 'gui', 'clear', 'ls', 'cd', 'cat', 'pwd', 'open', 'run'];
 
     const handleKeyDown = (e) => {
-        if (emailState.step > 0) return; // Disable history/tab in email wizard
+        if (emailState.step > 0 || aiState.active) return; // Disable history/tab in wizards
 
         // History Navigation
         if (e.key === 'ArrowUp') {
@@ -263,6 +264,44 @@ export const CliMode = ({ theme }) => {
         setInput('');
     };
 
+    const handleAiWizard = async (val) => {
+        pushToHistory('user', `ai> ${val}`);
+        
+        if (val.toLowerCase() === 'exit' || val.toLowerCase() === 'quit') {
+            setAiState({ active: false, messages: [] });
+            pushToHistory('system', 'Exited AI Chat Mode.');
+            setInput('');
+            return;
+        }
+
+        pushToHistory('system', '> Thinking...', true);
+        
+        try {
+            const userMsg = { role: 'user', parts: [{ text: val }] };
+            const payloadMessages = [...aiState.messages, userMsg].slice(-6);
+
+            const res = await fetch('/api/ai/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: payloadMessages, context: "User is in the CLI Mode." })
+            });
+            const data = await res.json();
+            
+            if (res.ok && data.reply) {
+                pushToHistory('system', `[Parjad AI]: ${data.reply}`, true);
+                setAiState(prev => ({ 
+                    active: true, 
+                    messages: [...prev.messages, userMsg, { role: 'model', parts: [{ text: data.reply }] }] 
+                }));
+            } else {
+                pushToHistory('error', `[Error]: ${data.error || "Failed to reach AI."}`);
+            }
+        } catch (e) {
+            pushToHistory('error', '[Error]: Network error connecting to AI.');
+        }
+        setInput('');
+    };
+
     const handleCommand = async (e) => {
         e.preventDefault();
         const rawCmd = input.trim();
@@ -270,6 +309,9 @@ export const CliMode = ({ theme }) => {
 
         if (emailState.step > 0) {
             return handleEmailWizard(rawCmd);
+        }
+        if (aiState.active) {
+            return handleAiWizard(rawCmd);
         }
 
         const cmdParts = rawCmd.split(' ').filter(Boolean);
@@ -284,7 +326,7 @@ export const CliMode = ({ theme }) => {
         switch(cmd) {
             case 'help':
             case 'manual':
-                pushToHistory('system', 'Available commands:\n  ls         - List files\n  cd         - Change directory\n  cat        - Read file\n  pwd        - Print working directory\n  about      - Read my background story\n  skills     - List technical skills\n  projects   - View my portfolio projects\n  open       - Launch a project (e.g. "open 1" or just "1")\n  email      - Send me an email\n  contact    - Get contact info\n  gui        - Boot Graphical Interface\n  clear      - Clear terminal');
+                pushToHistory('system', 'Available commands:\n  ls         - List files\n  cd         - Change directory\n  cat        - Read file\n  pwd        - Print working directory\n  about      - Read my background story\n  skills     - List technical skills\n  projects   - View my portfolio projects\n  open       - Launch a project (e.g. "open 1" or just "1")\n  email      - Send me an email\n  contact    - Get contact info\n  ai         - Chat with Parjad AI\n  gui        - Boot Graphical Interface\n  clear      - Clear terminal');
                 break;
             case 'pwd':
                 pushToHistory('system', currentDir);
@@ -381,6 +423,10 @@ export const CliMode = ({ theme }) => {
                 setEmailState({ step: 1, name: '', email: '', message: '' });
                 pushToHistory('system', 'Starting Email Wizard...\nEnter your name:');
                 break;
+            case 'ai':
+                setAiState({ active: true, messages: [] });
+                pushToHistory('system', 'Starting AI Chat Mode...\nType your questions, or type "exit" to leave.');
+                break;
             case 'home':
             case 'gui':
             case 'exit':
@@ -446,9 +492,9 @@ export const CliMode = ({ theme }) => {
         return <MatrixRain onComplete={() => setIsBooted(true)} />;
     }
 
-    const promptPrefix = emailState.step === 0 
-        ? `guest@parjadm.ca:${currentDir}$` 
-        : `>`;
+    let promptPrefix = `guest@parjadm.ca:${currentDir}$`;
+    if (emailState.step > 0) promptPrefix = `>`;
+    else if (aiState.active) promptPrefix = `ai>`;
 
     return (
         <section className={`min-h-screen flex items-center justify-center py-24 px-4 bg-black relative ${isExiting ? 'animate-crt-off' : 'animate-fade-in'}`}>
