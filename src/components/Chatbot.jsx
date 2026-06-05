@@ -192,12 +192,15 @@ const Chatbot = ({ theme = 'green' }) => {
     setLoading(true);
 
     try {
+      // Truncate history to save tokens (keep last 6 messages)
+      const payloadMessages = [...messages, userMessage].slice(-6);
+
       // Pass the current page context to the backend
       const response = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          messages: [...messages, userMessage],
+          messages: payloadMessages,
           context: `The user is currently browsing the page: ${location.pathname}.`
         })
       });

@@ -77,7 +77,7 @@ If asked something outside of this scope, you can politely decline or say you do
     const response = await ai.models.generateContent({
       model: 'gemini-3.5-flash',
       contents: messages,
-      config: { systemInstruction }
+      config: { systemInstruction, maxOutputTokens: 250 }
     })
     
     replyText = response.text
@@ -158,7 +158,7 @@ Do not break character. Do not admit you are an AI assistant. You ARE Parjad. If
     const response = await ai.models.generateContent({
       model: 'gemini-3.5-flash',
       contents: messages,
-      config: { systemInstruction }
+      config: { systemInstruction, maxOutputTokens: 250 }
     })
     
     res.json({ reply: response.text })
@@ -220,6 +220,7 @@ Respond EXCLUSIVELY in valid JSON format using the following schema:
       config: {
         systemInstruction: systemInstruction,
         responseMimeType: "application/json",
+        maxOutputTokens: 300
       }
     })
 
