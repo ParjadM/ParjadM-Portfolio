@@ -403,7 +403,8 @@ router.post('/projects/:id/feature', async (req, res) => {
 router.get('/ai-knowledge', async (req, res) => {
   if (currentEngine !== 'mongo') return res.json({ content: '' })
   try {
-    const doc = await AiKnowledge.findOne({ key: 'global' }).lean()
+    const key = req.query.key || 'global'
+    const doc = await AiKnowledge.findOne({ key }).lean()
     res.json({ content: doc ? doc.content : '' })
   } catch (err) {
     res.status(500).json({ error: err.message })
@@ -413,9 +414,10 @@ router.get('/ai-knowledge', async (req, res) => {
 router.put('/ai-knowledge', async (req, res) => {
   if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
   try {
+    const key = req.query.key || 'global'
     const { content } = req.body || {}
     await AiKnowledge.updateOne(
-      { key: 'global' },
+      { key },
       { $set: { content: content || '' } },
       { upsert: true }
     )

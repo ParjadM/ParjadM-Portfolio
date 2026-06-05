@@ -146,6 +146,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
         >
             <Link to="/intro" onClick={() => setIsMoreOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">Intro Cinematic</Link>
             <Link to="/cli" onClick={() => setIsMoreOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">CLI Mode</Link>
+            <Link to="/interview" onClick={() => setIsMoreOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">Mock Interview</Link>
             <Link to="/stats" onClick={() => setIsMoreOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">{t('nav.Stats')}</Link>
         </div>,
         document.body
@@ -274,6 +275,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
                                     <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">More</div>
                                     <Link to="/intro" onClick={handleNavClick} className="block w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all">Intro Cinematic</Link>
                                     <Link to="/cli" onClick={handleNavClick} className="block w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all">CLI Mode</Link>
+                                    <Link to="/interview" onClick={handleNavClick} className="block w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all">Mock Interview</Link>
                                     <Link to="/stats" onClick={handleNavClick} className="block w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all">{t('nav.Stats')}</Link>
                                 </div>
                                 

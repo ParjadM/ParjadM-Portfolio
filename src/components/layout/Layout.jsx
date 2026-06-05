@@ -24,6 +24,7 @@ const AdminDashboard = React.lazy(() => import('../../pages/admin/AdminDashboard
 const NotFoundPage = React.lazy(() => import('../../pages/NotFoundPage.jsx').then(m => ({default: m.NotFoundPage})));
 const IntroCinematic = React.lazy(() => import('../../pages/IntroCinematic.jsx').then(m => ({default: m.IntroCinematic})));
 const CliMode = React.lazy(() => import('../../pages/CliMode.jsx').then(m => ({default: m.CliMode})));
+const MockInterviewPage = React.lazy(() => import('../../pages/MockInterviewPage.jsx').then(m => ({default: m.MockInterviewPage})));
 export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
     const location = useLocation();
     const [visitorId, setVisitorId] = useState(null);
@@ -132,6 +133,7 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
                             <Route path="/admin" element={<RequireAuth><AdminDashboard theme={themeConfig.accentPrefix} /></RequireAuth>} />
                             <Route path="/intro" element={<IntroCinematic theme={themeConfig.accentPrefix} />} />
                             <Route path="/cli" element={<CliMode theme={themeConfig.accentPrefix} />} />
+                            <Route path="/interview" element={<MockInterviewPage theme={themeConfig.accentPrefix} />} />
                             <Route path="*" element={<NotFoundPage theme={themeConfig.accentPrefix} />} />
                         </Routes>
                     </AnimatePresence>

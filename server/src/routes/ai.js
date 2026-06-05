@@ -105,6 +105,73 @@ If asked something outside of this scope, you can politely decline or say you do
   }
 })
 
+router.post('/interview', async (req, res) => {
+  try {
+    const { messages, isRecruiter } = req.body
+    
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: 'Messages array is required' })
+    }
+
+    const limit = isRecruiter ? 25 : 15;
+
+    // Rate Limiting
+    if (redisClient) {
+      try {
+        const rawIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown'
+        const ip = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : 'unknown'
+        const rateLimitKey = `rate_limit_interview:${ip}`
+        
+        const count = await redisClient.incr(rateLimitKey)
+        if (count === 1) {
+          await redisClient.expire(rateLimitKey, 86400) // 24 hours
+        }
+        if (count > limit) {
+          return res.status(429).json({ error: `You've reached your limit of ${limit} questions. If you'd like to ask more, please contact Parjad directly!` })
+        }
+      } catch (err) {
+        console.error('Redis rate limit error:', err)
+      }
+    }
+
+    const apiKey = process.env.GEMINI_API_KEY
+    if (!apiKey) {
+      return res.status(500).json({ error: 'GEMINI_API_KEY is not configured' })
+    }
+
+    const ai = new GoogleGenAI({ apiKey })
+
+    // Fetch interview knowledge base
+    let knowledgeContent = ''
+    if (currentEngine === 'mongo') {
+      const doc = await AiKnowledge.findOne({ key: 'interview' }).lean()
+      if (doc && doc.content) {
+        knowledgeContent = doc.content
+      }
+    }
+
+    const systemInstruction = `You are Parjad Minooei, a talented Software Engineer. You are currently in a technical job interview with a recruiter or hiring manager.
+Answer their questions confidently, accurately, and professionally, but let your personality shine through. Use the following facts about your background:
+${knowledgeContent ? knowledgeContent : "You are a Software Engineer with experience in React, Node.js, Python, and MongoDB."}
+Do not break character. Do not admit you are an AI assistant. You ARE Parjad. If the interview concludes, thank them for their time.`
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.5-flash',
+      contents: messages,
+      config: { systemInstruction }
+    })
+    
+    res.json({ reply: response.text })
+  } catch (err) {
+    console.error('AI Interview Error:', err)
+    let errorMessage = err.message || 'Failed to generate AI response'
+    if (errorMessage.includes('429') || errorMessage.includes('quota') || errorMessage.includes('RESOURCE_EXHAUSTED')) {
+      errorMessage = "I need a quick second to think. Please wait about a minute and ask me again."
+    }
+    res.status(500).json({ error: errorMessage })
+  }
+})
+
 router.post('/complexity', async (req, res) => {
   try {
     const { code } = req.body
