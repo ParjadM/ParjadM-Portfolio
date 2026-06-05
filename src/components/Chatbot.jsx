@@ -236,9 +236,9 @@ const Chatbot = ({ theme = 'green' }) => {
     <div className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 z-[9999] pointer-events-none">
       {/* Chat Window */}
       {isOpen && (
-        <div className="absolute inset-0 sm:inset-auto sm:bottom-0 sm:right-0 sm:mb-0 w-full h-[100dvh] sm:w-96 sm:h-[32rem] bg-gray-900/95 backdrop-blur-xl sm:border border-white/10 sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 transform origin-bottom-right pointer-events-auto">
+        <div className="absolute inset-0 sm:inset-auto sm:bottom-0 sm:right-0 sm:mb-0 w-full h-full sm:w-96 sm:h-[32rem] bg-gray-900/95 backdrop-blur-xl sm:border border-white/10 sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 transform origin-bottom-right pointer-events-auto">
           {/* Header */}
-          <div className={`p-4 flex items-center justify-between ${gradientClass}`}>
+          <div className={`p-4 pt-safe-or-4 flex items-center justify-between ${gradientClass}`}>
             <div className="flex items-center gap-2 text-white">
               <BotIcon className="w-5 h-5" />
               <span className="font-semibold">AI Assistant</span>
@@ -291,7 +291,7 @@ const Chatbot = ({ theme = 'green' }) => {
           </div>
 
           {/* Input Area */}
-          <div className="p-3 border-t border-white/10 bg-black/20">
+          <div className="p-3 pb-safe-or-3 border-t border-white/10 bg-black/20">
             <form onSubmit={handleSend} className="flex items-center gap-2">
               <input
                 type="text"
