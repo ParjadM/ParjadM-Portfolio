@@ -233,10 +233,10 @@ const Chatbot = ({ theme = 'green' }) => {
     : 'bg-gradient-to-r from-pink-500 to-red-500';
 
   return (
-    <div className="fixed bottom-6 right-6 z-[9999]">
+    <div className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 z-[9999] pointer-events-none">
       {/* Chat Window */}
       {isOpen && (
-        <div className="mb-4 w-80 sm:w-96 h-[32rem] bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 transform origin-bottom-right">
+        <div className="absolute inset-0 sm:inset-auto sm:bottom-0 sm:right-0 sm:mb-0 w-full h-[100dvh] sm:w-96 sm:h-[32rem] bg-gray-900/95 backdrop-blur-xl sm:border border-white/10 sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 transform origin-bottom-right pointer-events-auto">
           {/* Header */}
           <div className={`p-4 flex items-center justify-between ${gradientClass}`}>
             <div className="flex items-center gap-2 text-white">
@@ -319,7 +319,7 @@ const Chatbot = ({ theme = 'green' }) => {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className={`p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 shadow-emerald-500/20 ${gradientClass}`}
+          className={`absolute bottom-24 right-4 sm:bottom-0 sm:right-0 p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 shadow-emerald-500/20 pointer-events-auto ${gradientClass}`}
         >
           <BotIcon className="w-6 h-6 text-white" />
         </button>

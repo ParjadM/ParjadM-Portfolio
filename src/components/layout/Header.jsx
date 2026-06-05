@@ -12,9 +12,8 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../ui/LanguageSwitcher.jsx';
 
-export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) => {
+export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isMobileMenuOpen, setIsMobileMenuOpen }) => {
     const { t } = useTranslation();
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
     const [paletteRect, setPaletteRect] = useState(null);
     const paletteTriggerRef = useRef(null);
@@ -43,7 +42,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
     ];
 
     const handleNavClick = () => {
-        setIsMenuOpen(false);
+        if(setIsMobileMenuOpen) setIsMobileMenuOpen(false);
     };
 
     const isActive = (path) => location.pathname === path;
@@ -235,79 +234,68 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true }) =
                         
                         <div className="flex items-center space-x-3">
                             <LanguageSwitcher />
-                            <button 
-                                onClick={() => setIsMenuOpen(!isMenuOpen)} 
-                                className={`p-2 rounded-xl transition-all duration-300 ${isMenuOpen ? 'bg-white/10 text-white' : 'bg-white/5 text-gray-300 hover:text-white hover:bg-white/20'}`}
-                                aria-controls="primary-menu" 
-                                aria-expanded={isMenuOpen} 
-                                aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
-                            >
-                                <Menu size={20} />
-                            </button>
                         </div>
                     </div>
                 </GlassCard>
 
-                {/* Mobile Menu Dropdown */}
-                {isMenuOpen && (
-                    <div className="mt-2" id="primary-menu">
-                        <GlassCard className="w-full !rounded-2xl border border-white/10 shadow-xl overflow-hidden" theme={theme}>
-                            <div className="flex flex-col p-3 space-y-1">
-                                {navItems.map(item => (
-                                    <React.Fragment key={item.name}>
-                                        <Link
-                                            to={item.path}
-                                            onClick={handleNavClick}
-                                            className={`block w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${isActive(item.path) ? (theme === 'pink' ? 'bg-pink-500/20 text-pink-200' : 'bg-emerald-500/20 text-emerald-200') : 'text-gray-300 hover:text-white hover:bg-white/5'}`}
-                                            aria-current={isActive(item.path) ? 'page' : undefined}
-                                        >
-                                            {item.name}
-                                        </Link>
-                                        {item.path === '/contact' && (
-                                            <div className="w-full py-1">
-                                                <NewsFeed posts={blogPosts} theme={theme} darkMode={darkMode} onNavigate={handleNavClick} />
-                                            </div>
-                                        )}
-                                    </React.Fragment>
-                                ))}
+                {/* Full-Screen Mobile Menu Overlay */}
+                {isMobileMenuOpen && typeof document !== 'undefined' && createPortal(
+                    <div className="fixed inset-0 z-[99999] bg-gray-900/90 backdrop-blur-3xl flex flex-col items-center justify-center p-6 transition-all duration-300">
+                        <button 
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="absolute top-6 right-6 p-4 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all"
+                            aria-label="Close menu"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                        
+                        <div className="flex flex-col items-center space-y-6 w-full max-w-sm mt-10">
+                            {navItems.map(item => (
+                                <Link
+                                    key={item.name}
+                                    to={item.path}
+                                    onClick={handleNavClick}
+                                    className={`text-3xl sm:text-4xl font-extrabold tracking-tight transition-all duration-300 ${isActive(item.path) ? (theme === 'pink' ? 'text-pink-400' : 'text-emerald-400') : 'text-gray-300 hover:text-white'}`}
+                                >
+                                    {item.name}
+                                </Link>
+                            ))}
 
-                                <div className="pt-2 border-t border-white/10 mt-2">
-                                    <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">More</div>
-                                    <Link to="/intro" onClick={handleNavClick} className="block w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all">Intro Cinematic</Link>
-                                    <Link to="/cli" onClick={handleNavClick} className="block w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all">CLI Mode</Link>
-                                    <Link to="/interview" onClick={handleNavClick} className="block w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all">Mock Interview</Link>
-                                    <Link to="/stats" onClick={handleNavClick} className="block w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all">{t('nav.Stats')}</Link>
-                                </div>
-                                
-                                {visitors !== null && (
-                                    <div className="mt-2 flex items-center justify-center space-x-2 px-4 py-3 rounded-xl bg-white/5 border border-white/5">
-                                        <div className={`w-2 h-2 rounded-full animate-pulse ${theme === 'pink' ? 'bg-pink-400' : 'bg-emerald-400'}`}></div>
-                                        <span className="text-gray-300 text-xs font-semibold tracking-wide">
-                                            {t('nav.Visitors', { count: visitors })}
-                                        </span>
-                                    </div>
-                                )}
-                                
-                                <div className="mt-2 pt-3 border-t border-white/10">
-                                    <div className="px-2 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Themes</div>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        {Object.values(THEMES).map((t) => (
-                                            <button
-                                                key={t.id}
-                                                onClick={() => {
-                                                    setThemeId(t.id);
-                                                    handleNavClick();
-                                                }}
-                                                className={`text-center px-3 py-2 rounded-xl text-xs font-medium transition-colors ${currentThemeId === t.id ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10'}`}
-                                            >
-                                                {t.name}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
+                            <div className="w-full h-px bg-white/10 my-4" />
+                            
+                            <div className="flex flex-wrap justify-center gap-4 w-full">
+                                <Link to="/intro" onClick={handleNavClick} className="text-gray-400 hover:text-white font-medium">Intro</Link>
+                                <Link to="/cli" onClick={handleNavClick} className="text-gray-400 hover:text-white font-medium">CLI</Link>
+                                <Link to="/interview" onClick={handleNavClick} className="text-gray-400 hover:text-white font-medium">Interview</Link>
+                                <Link to="/stats" onClick={handleNavClick} className="text-gray-400 hover:text-white font-medium">Stats</Link>
                             </div>
-                        </GlassCard>
-                    </div>
+                            
+                            {visitors !== null && (
+                                <div className="mt-4 flex items-center justify-center space-x-2 px-4 py-3 rounded-full bg-white/5 border border-white/10">
+                                    <div className={`w-2.5 h-2.5 rounded-full animate-pulse ${theme === 'pink' ? 'bg-pink-400' : 'bg-emerald-400'}`}></div>
+                                    <span className="text-gray-300 text-sm font-semibold tracking-wide">
+                                        {t('nav.Visitors', { count: visitors })}
+                                    </span>
+                                </div>
+                            )}
+
+                            <div className="grid grid-cols-2 gap-3 w-full mt-6">
+                                {Object.values(THEMES).map((t) => (
+                                    <button
+                                        key={t.id}
+                                        onClick={() => {
+                                            setThemeId(t.id);
+                                            handleNavClick();
+                                        }}
+                                        className={`text-center px-4 py-3 rounded-2xl text-sm font-semibold transition-colors ${currentThemeId === t.id ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-white/5 border border-white/10 text-gray-300'}`}
+                                    >
+                                        {t.name}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>,
+                    document.body
                 )}
             </nav>
         </header>

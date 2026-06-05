@@ -62,7 +62,7 @@ export const ProjectsSection = ({ theme }) => {
                                 alt={project.title}
                                 loading="lazy"
                                 decoding="async"
-                                className="w-full h-full object-cover opacity-80 hover:opacity-100 hover:scale-105 transition-all duration-300"
+                                className="w-full h-full object-cover opacity-100 md:opacity-80 md:hover:opacity-100 hover:scale-105 transition-all duration-300"
                             />
                         </div>
                         

@@ -4,6 +4,7 @@ import { BackgroundBlobs } from '../ui/BackgroundBlobs.jsx';
 import { CustomCursor } from '../CustomCursor.jsx';
 import { Header } from './Header.jsx';
 import { Footer } from './Footer.jsx';
+import { BottomNav } from './BottomNav.jsx';
 import Chatbot from '../Chatbot.jsx';
 import { Toast } from '../ui/Toast.jsx';
 import { getAuthToken, RequireAuth } from '../../utils/auth.jsx';
@@ -28,6 +29,7 @@ const MockInterviewPage = React.lazy(() => import('../../pages/MockInterviewPage
 export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
     const location = useLocation();
     const [visitorId, setVisitorId] = useState(null);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const themeConfig = getThemeConfig(themeId);
     
     const isFullscreenRoute = location?.pathname === '/intro' || location?.pathname === '/cli';
@@ -110,10 +112,17 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
             <CustomCursor theme={themeConfig.accentPrefix} darkMode={themeConfig.isDark} />
             
             {!isFullscreenRoute && (
-                <Header setThemeId={setThemeId} currentThemeId={themeId} theme={themeConfig.accentPrefix} darkMode={themeConfig.isDark} />
+                <Header 
+                    setThemeId={setThemeId} 
+                    currentThemeId={themeId} 
+                    theme={themeConfig.accentPrefix} 
+                    darkMode={themeConfig.isDark} 
+                    isMobileMenuOpen={isMobileMenuOpen}
+                    setIsMobileMenuOpen={setIsMobileMenuOpen}
+                />
             )}
             
-            <main id="main-content" role="main" tabIndex={-1} className={`transition-all duration-500 ${!isFullscreenRoute ? 'pt-20 md:pt-24' : ''}`}>
+            <main id="main-content" role="main" tabIndex={-1} className={`transition-all duration-500 ${!isFullscreenRoute ? 'pt-20 md:pt-24 pb-24 lg:pb-0' : ''}`}>
                 <Suspense fallback={
                     <div className="min-h-screen flex items-center justify-center py-20 px-4 text-gray-300">
                         Loading...
@@ -142,6 +151,9 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
 
             {/* Footer */}
             {!isFullscreenRoute && <Footer theme={themeConfig.accentPrefix} />}
+            
+            {/* Mobile Bottom Navigation */}
+            {!isFullscreenRoute && <BottomNav theme={themeConfig.accentPrefix} setIsMobileMenuOpen={setIsMobileMenuOpen} />}
             
             {/* AI Chatbot */}
             {!isFullscreenRoute && <Chatbot theme={themeConfig.accentPrefix} />}
