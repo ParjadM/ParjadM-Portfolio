@@ -115,8 +115,8 @@ export const MockInterviewPage = ({ theme }) => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col pt-20 lg:pt-24 px-4 pb-4 md:px-8 max-w-5xl mx-auto w-full">
-      <div className="flex-1 bg-gray-900/60 backdrop-blur-md border border-white/10 rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+    <div className="h-[100dvh] flex flex-col pt-20 lg:pt-24 px-4 pb-4 md:px-8 max-w-5xl mx-auto w-full">
+      <div className="flex-1 bg-gray-900/60 backdrop-blur-md border border-white/10 rounded-3xl shadow-2xl flex flex-col min-h-0 overflow-hidden">
         {/* Header */}
         <div className={`p-5 flex items-center justify-between border-b border-white/10 bg-black/20`}>
           <div className="flex items-center gap-3 text-white">
