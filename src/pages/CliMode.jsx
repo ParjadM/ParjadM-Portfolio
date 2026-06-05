@@ -147,7 +147,7 @@ export const CliMode = ({ theme }) => {
         return currentDir === '~' ? `~/${path}` : `${currentDir}/${path}`;
     };
 
-    const getAvailableCommands = () => ['help', 'about', 'skills', 'projects', 'contact', 'email', 'ai', 'gui', 'clear', 'ls', 'cd', 'cat', 'pwd', 'open', 'run'];
+    const getAvailableCommands = () => ['help', 'about', 'skills', 'projects', 'contact', 'email', 'ai', 'news', 'gui', 'clear', 'ls', 'cd', 'cat', 'pwd', 'open', 'run'];
 
     const handleKeyDown = (e) => {
         if (emailState.step > 0 || aiState.active) return; // Disable history/tab in wizards
@@ -225,6 +225,23 @@ export const CliMode = ({ theme }) => {
             }
         } catch (err) {
             pushToHistory('error', '> Connection to database failed.');
+        }
+    };
+
+    const fetchNews = async () => {
+        pushToHistory('system', '> Fetching top stories from Hacker News...', true);
+        try {
+            const topRes = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json');
+            const topIds = await topRes.json();
+            const top5Ids = topIds.slice(0, 5);
+            
+            const storyPromises = top5Ids.map(id => fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`).then(r => r.json()));
+            const stories = await Promise.all(storyPromises);
+            
+            const lines = stories.map((s, i) => `> ${i + 1}. ${s.title}\n  Score: ${s.score} | by ${s.by}\n  Link: ${s.url || `https://news.ycombinator.com/item?id=${s.id}`}`);
+            pushToHistory('system', lines.join('\n\n'), true);
+        } catch (err) {
+            pushToHistory('error', '> Failed to fetch news from Hacker News API.');
         }
     };
 
@@ -326,7 +343,7 @@ export const CliMode = ({ theme }) => {
         switch(cmd) {
             case 'help':
             case 'manual':
-                pushToHistory('system', 'Available commands:\n  ls         - List files\n  cd         - Change directory\n  cat        - Read file\n  pwd        - Print working directory\n  about      - Read my background story\n  skills     - List technical skills\n  projects   - View my portfolio projects\n  open       - Launch a project (e.g. "open 1" or just "1")\n  email      - Send me an email\n  contact    - Get contact info\n  ai         - Chat with Parjad AI\n  gui        - Boot Graphical Interface\n  clear      - Clear terminal');
+                pushToHistory('system', 'Available commands:\n  ls         - List files\n  cd         - Change directory\n  cat        - Read file\n  pwd        - Print working directory\n  about      - Read my background story\n  skills     - List technical skills\n  projects   - View my portfolio projects\n  open       - Launch a project (e.g. "open 1" or just "1")\n  email      - Send me an email\n  contact    - Get contact info\n  news       - Fetch top 5 Hacker News stories\n  ai         - Chat with Parjad AI\n  gui        - Boot Graphical Interface\n  clear      - Clear terminal');
                 break;
             case 'pwd':
                 pushToHistory('system', currentDir);
@@ -426,6 +443,9 @@ export const CliMode = ({ theme }) => {
             case 'ai':
                 setAiState({ active: true, messages: [] });
                 pushToHistory('system', 'Starting AI Chat Mode...\nType your questions, or type "exit" to leave.');
+                break;
+            case 'news':
+                await fetchNews();
                 break;
             case 'home':
             case 'gui':
