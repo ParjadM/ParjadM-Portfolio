@@ -66,7 +66,7 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
             themeConfig.backgroundClass
         } ${!themeConfig.isDark ? 'light-mode text-gray-900' : 'text-white'} ${themeConfig.isTerminal ? 'terminal-mode' : ''}`}>
             <style>{`
-                body { font-family: 'Inter', sans-serif; }
+                body { font-family: 'Outfit', sans-serif; }
                 .lqft-select option { color: #0f172a; background: #f8fafc; }
                 .animate-blob { animation: blob 7s infinite; }
                 .animation-delay-2000 { animation-delay: 2s; }

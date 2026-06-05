@@ -1,43 +1,36 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 
-export const useOnScreen = (options = { threshold: 0.1 }) => {
+export const Reveal = ({ children, className = '', delay = 0, direction = 'up' }) => {
   const ref = useRef(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
 
-  useEffect(() => {
-    const currentRef = ref.current;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setIsVisible(true);
-        observer.unobserve(currentRef);
-      }
-    }, options);
-
-    if (currentRef) {
-      observer.observe(currentRef);
+  const getVariants = () => {
+    switch(direction) {
+      case 'up': return { hidden: { opacity: 0, y: 40, scale: 0.95 }, visible: { opacity: 1, y: 0, scale: 1 } };
+      case 'down': return { hidden: { opacity: 0, y: -40, scale: 0.95 }, visible: { opacity: 1, y: 0, scale: 1 } };
+      case 'left': return { hidden: { opacity: 0, x: -40, scale: 0.95 }, visible: { opacity: 1, x: 0, scale: 1 } };
+      case 'right': return { hidden: { opacity: 0, x: 40, scale: 0.95 }, visible: { opacity: 1, x: 0, scale: 1 } };
+      default: return { hidden: { opacity: 0, y: 40, scale: 0.95 }, visible: { opacity: 1, y: 0, scale: 1 } };
     }
-
-    return () => {
-      if (currentRef) observer.unobserve(currentRef);
-    };
-  }, [options]);
-
-  return [ref, isVisible];
-};
-
-export const Reveal = ({ children, className = '' }) => {
-  const [ref, isVisible] = useOnScreen();
+  };
 
   return (
-    <div
+    <motion.div
       ref={ref}
-      className={`transition-all duration-1000 ease-out transform ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-      } ${className}`}
+      variants={getVariants()}
+      initial="hidden"
+      animate={isInView ? "visible" : "hidden"}
+      transition={{ 
+        type: 'spring', 
+        stiffness: 100, 
+        damping: 20, 
+        delay: delay,
+        duration: 0.6
+      }}
+      className={className}
     >
       {children}
-    </div>
+    </motion.div>
   );
 };
-
-
