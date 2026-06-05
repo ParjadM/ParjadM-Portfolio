@@ -1,7 +1,7 @@
 {
-  "timeWithConstant": "O(N * L + T_AI)",
-  "timeWithoutConstant": "O(N)",
-  "memoryWithConstant": "O(N * L + M_db * L_db_record)",
-  "memoryWithoutConstant": "O(N)",
-  "explanation": "The application's time complexity is primarily driven by: 1. Client-side dynamic list rendering: On pages like Blog and Projects, rendering 'N' dynamic items each requiring 'L' processing time. 2. Interactive LQFT Benchmark: This component explicitly runs computational loops, performing operations on data structures. 3. External API calls: The Chatbot and Complexity Analyzer rely on external Large Language Models (LLMs), introducing 'T_AI' latency. The space (memory) complexity is dominated by: 1. Client-side state: Storing 'N' dynamic items in React's memory space. 2. Server-side database: Persistent storage of 'M_db' documents. Therefore, the overall complexity factors scale linearly O(N) with the largest dynamic data scale."
+  "timeWithConstant": "O(60N + 3P + 5B + D log D)",
+  "timeWithoutConstant": "O(N + P + B + log D)",
+  "memoryWithConstant": "O(192N + 32U + M + D)",
+  "memoryWithoutConstant": "O(N + U + M + D)",
+  "explanation": "The heaviest operations reside in the local client-side LQFT Benchmark page and server database metrics. Running the browser benchmark inserts and searches N items across several simulated 32-way branching trie representations. Each transaction performs custom hashing and up to 6 levels of node lookups, yielding a linear O(N) CPU runtime with a structural multiplier (~60N). SWR caching in the frontend stores U unique JSON payloads to ensure O(1) page transitions, while AI chat payload truncation constrains history assembly. Server-side database actions on D documents scale logarithmically O(log D) due to compound compound indexes on visitor and path tables."
 }
