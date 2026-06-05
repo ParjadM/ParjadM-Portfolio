@@ -26,6 +26,8 @@ const NotFoundPage = React.lazy(() => import('../../pages/NotFoundPage.jsx').the
 const IntroCinematic = React.lazy(() => import('../../pages/IntroCinematic.jsx').then(m => ({default: m.IntroCinematic})));
 const CliMode = React.lazy(() => import('../../pages/CliMode.jsx').then(m => ({default: m.CliMode})));
 const MockInterviewPage = React.lazy(() => import('../../pages/MockInterviewPage.jsx').then(m => ({default: m.MockInterviewPage})));
+const TechNews = React.lazy(() => import('../../pages/TechNews.jsx').then(m => ({default: m.TechNews})));
+
 export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
     const location = useLocation();
     const [visitorId, setVisitorId] = useState(null);
@@ -138,6 +140,7 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
                             <Route path="/blog" element={<BlogSection theme={themeConfig.accentPrefix} />} />
                             <Route path="/blog/:id" element={<BlogPostPage theme={themeConfig.accentPrefix} />} />
                             <Route path="/contact" element={<ContactSection theme={themeConfig.accentPrefix} />} />
+                            <Route path="/tech-news" element={<TechNews theme={themeConfig.accentPrefix} />} />
                             <Route path="/admin/login" element={<AdminLoginPage theme={themeConfig.accentPrefix} />} />
                             <Route path="/admin" element={<RequireAuth><AdminDashboard theme={themeConfig.accentPrefix} /></RequireAuth>} />
                             <Route path="/intro" element={<IntroCinematic theme={themeConfig.accentPrefix} />} />
