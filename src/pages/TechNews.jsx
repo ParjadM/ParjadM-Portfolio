@@ -89,7 +89,7 @@ export const TechNews = ({ theme }) => {
                         variants={containerVariants}
                         initial="hidden"
                         animate="visible"
-                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                        className="flex flex-col space-y-3"
                     >
                         {stories.map((story, idx) => {
                             const storyUrl = story.url || `https://news.ycombinator.com/item?id=${story.id}`;
@@ -97,31 +97,33 @@ export const TechNews = ({ theme }) => {
                             
                             return (
                                 <motion.div key={story.id} variants={cardVariants}>
-                                    <a href={storyUrl} target="_blank" rel="noopener noreferrer" className="block h-full outline-none group">
+                                    <a href={storyUrl} target="_blank" rel="noopener noreferrer" className="block w-full outline-none group">
                                         <GlassCard 
                                             theme={theme} 
-                                            className="h-full flex flex-col p-6 transition-all duration-300 group-hover:scale-[1.02] group-focus:scale-[1.02] group-hover:border-white/30"
+                                            className="w-full flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 transition-all duration-300 group-hover:bg-white/[0.08] group-hover:border-white/30"
                                         >
-                                            <div className="flex items-start justify-between mb-4">
-                                                <div className={`flex items-center space-x-1 text-sm font-bold ${theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}`}>
-                                                    <ArrowUp className="w-4 h-4" />
-                                                    <span>{story.score}</span>
+                                            <div className="flex items-start sm:items-center space-x-4 w-full">
+                                                <div className={`flex-shrink-0 flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-white/5 border border-white/10 ${theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}`}>
+                                                    <ArrowUp className="w-4 h-4 mb-0.5" />
+                                                    <span className="text-xs font-bold">{story.score}</span>
                                                 </div>
-                                                <div className="p-2 rounded-full bg-white/5 text-gray-400 group-hover:text-white transition-colors">
-                                                    <ExternalLink className="w-4 h-4" />
+                                                <div className="flex flex-col flex-grow min-w-0 pr-4">
+                                                    <h2 className="text-base sm:text-lg font-bold text-gray-200 group-hover:text-white transition-colors truncate">
+                                                        {story.title}
+                                                    </h2>
+                                                    <div className="flex items-center text-xs text-gray-500 font-medium mt-1.5 space-x-3">
+                                                        <div className="flex items-center space-x-1 flex-shrink-0">
+                                                            <User className="w-3.5 h-3.5" />
+                                                            <span className="truncate max-w-[100px]">{story.by}</span>
+                                                        </div>
+                                                        <span className="text-gray-600 hidden sm:inline">•</span>
+                                                        <span className="truncate max-w-[150px] sm:max-w-[200px]">{domain}</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                             
-                                            <h2 className="text-lg font-bold text-gray-200 group-hover:text-white transition-colors mb-4 line-clamp-3 leading-snug">
-                                                {story.title}
-                                            </h2>
-                                            
-                                            <div className="mt-auto flex items-center justify-between text-xs text-gray-500 font-medium pt-4 border-t border-white/5">
-                                                <div className="flex items-center space-x-1.5">
-                                                    <User className="w-3.5 h-3.5" />
-                                                    <span className="truncate max-w-[100px]">{story.by}</span>
-                                                </div>
-                                                <span className="truncate max-w-[120px] text-right">{domain}</span>
+                                            <div className="hidden sm:flex flex-shrink-0 ml-4 p-2 rounded-full bg-white/5 text-gray-400 group-hover:text-white group-hover:bg-white/10 transition-colors">
+                                                <ExternalLink className="w-4 h-4" />
                                             </div>
                                         </GlassCard>
                                     </a>
