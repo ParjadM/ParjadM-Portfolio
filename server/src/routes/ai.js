@@ -15,6 +15,25 @@ router.post('/chat', async (req, res) => {
       return res.status(400).json({ error: 'Messages array is required' })
     }
 
+    // Rate Limiting: Max 25 prompts per user per 24 hours
+    if (redisClient) {
+      try {
+        const rawIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown'
+        const ip = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : 'unknown'
+        const rateLimitKey = `rate_limit_chat:${ip}`
+        
+        const count = await redisClient.incr(rateLimitKey)
+        if (count === 1) {
+          await redisClient.expire(rateLimitKey, 86400) // 24 hours
+        }
+        if (count > 25) {
+          return res.status(429).json({ error: "You've reached your limit of 25 questions for today. Please come back tomorrow!" })
+        }
+      } catch (err) {
+        console.error('Redis rate limit error:', err)
+      }
+    }
+
     // Attempt to fetch from cache first
     let cacheKey = null
     if (redisClient) {
@@ -56,7 +75,7 @@ If asked something outside of this scope, you can politely decline or say you do
     let replyText = ''
     
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3.5-flash',
       contents: messages,
       config: { systemInstruction }
     })
@@ -129,7 +148,7 @@ Respond EXCLUSIVELY in valid JSON format using the following schema:
 }`
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3.5-flash',
       contents: [{ role: 'user', parts: [{ text: code }] }],
       config: {
         systemInstruction: systemInstruction,
