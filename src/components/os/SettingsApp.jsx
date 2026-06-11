@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Monitor, Image as ImageIcon, Settings as SettingsIcon, Shield, Cpu, HardDrive } from 'lucide-react';
 
 export const SettingsApp = ({ theme, osState }) => {
     const { wallpaper, setWallpaper } = osState;
+    const [activeTab, setActiveTab] = useState('personalization');
 
     return (
         <div className="flex h-full w-full bg-gray-900 text-gray-200">
@@ -10,16 +11,16 @@ export const SettingsApp = ({ theme, osState }) => {
             <div className="w-1/3 max-w-[200px] border-r border-white/10 bg-gray-800/50 p-4 space-y-2">
                 <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 px-2">Settings</h2>
                 
-                <button className="w-full flex items-center space-x-3 px-3 py-2 bg-white/10 rounded-lg text-sm font-medium transition-colors">
-                    <Monitor className="w-4 h-4 text-blue-400" />
+                <button onClick={() => setActiveTab('personalization')} className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'personalization' ? 'bg-white/10 text-white' : 'hover:bg-white/5 text-gray-400'}`}>
+                    <Monitor className={`w-4 h-4 ${activeTab === 'personalization' ? 'text-blue-400' : 'text-gray-500'}`} />
                     <span>Personalization</span>
                 </button>
-                <button className="w-full flex items-center space-x-3 px-3 py-2 hover:bg-white/5 rounded-lg text-sm font-medium transition-colors text-gray-400">
-                    <SettingsIcon className="w-4 h-4 text-gray-500" />
+                <button onClick={() => setActiveTab('system')} className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'system' ? 'bg-white/10 text-white' : 'hover:bg-white/5 text-gray-400'}`}>
+                    <SettingsIcon className={`w-4 h-4 ${activeTab === 'system' ? 'text-gray-400' : 'text-gray-500'}`} />
                     <span>System</span>
                 </button>
-                <button className="w-full flex items-center space-x-3 px-3 py-2 hover:bg-white/5 rounded-lg text-sm font-medium transition-colors text-gray-400">
-                    <Shield className="w-4 h-4 text-emerald-500" />
+                <button onClick={() => setActiveTab('privacy')} className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'privacy' ? 'bg-white/10 text-white' : 'hover:bg-white/5 text-gray-400'}`}>
+                    <Shield className={`w-4 h-4 ${activeTab === 'privacy' ? 'text-emerald-500' : 'text-gray-500'}`} />
                     <span>Privacy</span>
                 </button>
             </div>
@@ -28,11 +29,13 @@ export const SettingsApp = ({ theme, osState }) => {
             <div className="flex-1 p-8 overflow-y-auto">
                 <div className="max-w-2xl mx-auto space-y-8">
                     
-                    {/* Header */}
-                    <div>
-                        <h1 className="text-3xl font-light text-white mb-1">Personalization</h1>
-                        <p className="text-gray-400 text-sm">Customize how your workspace looks and feels.</p>
-                    </div>
+                    {activeTab === 'personalization' && (
+                        <>
+                            {/* Header */}
+                            <div>
+                                <h1 className="text-3xl font-light text-white mb-1">Personalization</h1>
+                                <p className="text-gray-400 text-sm">Customize how your workspace looks and feels.</p>
+                            </div>
 
                     {/* Wallpaper Section */}
                     <div className="space-y-4">
@@ -63,15 +66,22 @@ export const SettingsApp = ({ theme, osState }) => {
                             </div>
                         </div>
                     </div>
+                    </>
+                    )}
 
-                    <hr className="border-white/10" />
+                    {activeTab === 'system' && (
+                        <>
+                            <div>
+                                <h1 className="text-3xl font-light text-white mb-1">System</h1>
+                                <p className="text-gray-400 text-sm">Hardware specifications and storage.</p>
+                            </div>
 
-                    {/* System Specs Mockup */}
-                    <div className="space-y-4">
-                        <h3 className="text-sm font-medium text-gray-300 flex items-center">
-                            <Cpu className="w-4 h-4 mr-2" />
-                            System Information
-                        </h3>
+                            {/* System Specs Mockup */}
+                            <div className="space-y-4">
+                                <h3 className="text-sm font-medium text-gray-300 flex items-center">
+                                    <Cpu className="w-4 h-4 mr-2" />
+                                    System Information
+                                </h3>
                         
                         <div className="bg-gray-800/50 rounded-lg border border-white/5 p-4 space-y-3 text-sm">
                             <div className="flex justify-between">
@@ -102,6 +112,24 @@ export const SettingsApp = ({ theme, osState }) => {
                             </div>
                         </div>
                     </div>
+                        </>
+                    )}
+
+                    {activeTab === 'privacy' && (
+                        <>
+                            <div>
+                                <h1 className="text-3xl font-light text-white mb-1">Privacy & Security</h1>
+                                <p className="text-gray-400 text-sm">Manage your security settings.</p>
+                            </div>
+                            <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-4 rounded-lg flex items-start space-x-3">
+                                <Shield className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                                <div>
+                                    <h4 className="font-medium text-emerald-300 mb-1">Secure Environment</h4>
+                                    <p className="text-sm opacity-80">This WebOS runs entirely in your browser sandbox. No personal files or data are uploaded to any external servers.</p>
+                                </div>
+                            </div>
+                        </>
+                    )}
 
                 </div>
             </div>

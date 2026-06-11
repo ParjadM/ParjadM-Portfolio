@@ -171,10 +171,7 @@ export const SnakeGameApp = ({ theme }) => {
 
         // Draw food
         ctx.fillStyle = '#ef4444'; // red-500
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = '#ef4444';
         ctx.fillRect(food.x * CELL_SIZE + 2, food.y * CELL_SIZE + 2, CELL_SIZE - 4, CELL_SIZE - 4);
-        ctx.shadowBlur = 0;
 
         // Draw snake
         snake.forEach((segment, index) => {

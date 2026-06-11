@@ -6,6 +6,9 @@ export const MediaPlayerApp = ({ theme }) => {
     const VIDEO_ID = 'jfKfPfyJRdk';
     const [isPlaying, setIsPlaying] = useState(false);
 
+    // Using Lofi Girl's persistent channel live stream URL so it never breaks
+    const I_FRAME_SRC = "https://www.youtube.com/embed/live_stream?channel=UCSJ4gkVC6NrvII8umztf0Ow&autoplay=1&mute=0&controls=1&showinfo=0&rel=0";
+
     // Note: Due to browser autoplay policies and YouTube iframe API limitations, 
     // a pure custom UI overlaying a YouTube iframe requires the YouTube IFrame API.
     // To keep this lightweight and reliable, we will embed the iframe directly 
@@ -32,7 +35,7 @@ export const MediaPlayerApp = ({ theme }) => {
                 <iframe
                     width="100%"
                     height="100%"
-                    src={`https://www.youtube.com/embed/${VIDEO_ID}?autoplay=1&mute=0&controls=1&showinfo=0&rel=0&loop=1`}
+                    src={I_FRAME_SRC}
                     title="Lofi Radio"
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
