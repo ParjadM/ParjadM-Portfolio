@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Link, Routes, Route } from 'react-router-dom';
 import { Mail, Github, Linkedin, Code, BrainCircuit, Palette, Menu, Sun, Moon } from '../ui/Icons.jsx';
+import { Monitor, Newspaper, Film, Terminal, MessageSquare, Activity, ChevronDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { GlassCard } from '../ui/GlassCard.jsx';
 import { RippleButton } from '../ui/RippleButton.jsx';
 import { Toast } from '../ui/Toast.jsx';
@@ -137,19 +139,46 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
         document.body
     );
 
-    const moreEl = isMoreOpen && moreRect && typeof document !== 'undefined' && createPortal(
-        <div
-            id="more-dropdown-portal"
-            className="fixed z-[9999] w-48 rounded-xl bg-gray-900 border border-gray-700 shadow-2xl overflow-hidden"
-            style={{ top: moreRect.top, left: moreRect.left }}
-        >
-            <Link to="/os" onClick={() => setIsMoreOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">Operating System</Link>
-            <Link to="/tech-news" onClick={() => setIsMoreOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">Tech News</Link>
-            <Link to="/intro" onClick={() => setIsMoreOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">Intro Cinematic</Link>
-            <Link to="/cli" onClick={() => setIsMoreOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">CLI Mode</Link>
-            <Link to="/interview" onClick={() => setIsMoreOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">Mock Interview</Link>
-            <Link to="/stats" onClick={() => setIsMoreOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">{t('nav.Stats')}</Link>
-        </div>,
+    const MORE_ITEMS = [
+        { name: 'Operating System', path: '/os', icon: <Monitor className="w-4 h-4" />, description: 'Web-based Desktop Environment' },
+        { name: 'Tech News', path: '/tech-news', icon: <Newspaper className="w-4 h-4" />, description: 'Latest updates & articles' },
+        { name: 'Intro Cinematic', path: '/intro', icon: <Film className="w-4 h-4" />, description: 'Watch the opening sequence' },
+        { name: 'CLI Mode', path: '/cli', icon: <Terminal className="w-4 h-4" />, description: 'Command-line interface' },
+        { name: 'Mock Interview', path: '/interview', icon: <MessageSquare className="w-4 h-4" />, description: 'Practice with an AI' },
+        { name: t('nav.Stats'), path: '/stats', icon: <Activity className="w-4 h-4" />, description: 'Site statistics & metrics' }
+    ];
+
+    const moreEl = typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+            {isMoreOpen && moreRect && (
+                <motion.div
+                    id="more-dropdown-portal"
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    className="fixed z-[9999] w-64 rounded-2xl bg-gray-900/90 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden p-2 flex flex-col gap-1"
+                    style={{ top: moreRect.top, left: moreRect.left }}
+                >
+                    {MORE_ITEMS.map((item, idx) => (
+                        <Link 
+                            key={idx}
+                            to={item.path} 
+                            onClick={() => setIsMoreOpen(false)} 
+                            className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
+                        >
+                            <div className="mt-0.5 p-2 rounded-lg bg-white/5 text-gray-400 group-hover:text-white group-hover:bg-white/20 transition-colors">
+                                {item.icon}
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-sm font-semibold text-gray-200 group-hover:text-white transition-colors">{item.name}</span>
+                                <span className="text-[10px] text-gray-500 group-hover:text-gray-400 transition-colors">{item.description}</span>
+                            </div>
+                        </Link>
+                    ))}
+                </motion.div>
+            )}
+        </AnimatePresence>,
         document.body
     );
 
@@ -188,10 +217,11 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                             <div className="relative" ref={moreDropdownRef}>
                                 <button 
                                     onClick={() => setIsMoreOpen(!isMoreOpen)}
-                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 text-gray-300 hover:text-white hover:bg-white/10 border border-transparent`}
+                                    className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border border-transparent ${isMoreOpen ? 'bg-white/10 text-white shadow-inner' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}
                                     aria-expanded={isMoreOpen}
                                 >
-                                    More ▾
+                                    <span>More</span>
+                                    <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${isMoreOpen ? 'rotate-180 text-white' : 'text-gray-400'}`} />
                                 </button>
                                 {moreEl}
                             </div>
