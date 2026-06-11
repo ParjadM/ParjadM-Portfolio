@@ -52,12 +52,11 @@ const APPS = [
     { id: 'calculator', title: 'Calculator', icon: <Calculator className="w-4 h-4 text-orange-400" />, desktopIcon: <Calculator className="w-10 h-10 text-orange-400" />, type: 'native', component: CalculatorApp },
     { id: 'weather', title: 'Weather', icon: <CloudSun className="w-4 h-4 text-sky-400" />, desktopIcon: <CloudSun className="w-10 h-10 text-sky-400" />, type: 'native', component: WeatherApp },
     { id: 'music', title: 'Media Player', icon: <Music className="w-4 h-4 text-purple-500" />, desktopIcon: <Music className="w-10 h-10 text-purple-500" />, type: 'native', component: MediaPlayerApp },
-    { id: 'snake', title: 'Snake Game', icon: <Gamepad2 className="w-4 h-4 text-green-500" />, desktopIcon: <Gamepad2 className="w-10 h-10 text-green-500" />, type: 'native', component: SnakeGameApp },
+    { id: 'snake', title: 'Snake Game', icon: <Gamepad2 className="w-4 h-4 text-green-500" />, desktopIcon: <Gamepad2 className="w-10 h-10 text-green-500" />, type: 'native', component: SnakeGameApp, defaultSize: { width: 600, height: 650 } },
     { id: 'terminal', title: 'Command Prompt', icon: <Terminal className="w-4 h-4 text-emerald-400" />, desktopIcon: <Terminal className="w-10 h-10 text-emerald-400" />, type: 'iframe', url: '/cli' },
     { id: 'notepad', title: 'Notepad', icon: <FileEdit className="w-4 h-4 text-purple-400" />, desktopIcon: <FileEdit className="w-10 h-10 text-purple-400" />, type: 'native', component: Notepad },
     { id: 'news', title: 'Tech Hub', icon: <Newspaper className="w-4 h-4 text-pink-400" />, desktopIcon: <Newspaper className="w-10 h-10 text-pink-400" />, type: 'iframe', url: '/tech-news' },
     { id: 'stats', title: 'Task Manager', icon: <Activity className="w-4 h-4 text-red-400" />, desktopIcon: <Activity className="w-10 h-10 text-red-400" />, type: 'iframe', url: '/stats' },
-    { id: 'resume', title: 'Resume.pdf', icon: <FileText className="w-4 h-4 text-red-400" />, desktopIcon: <FileText className="w-10 h-10 text-red-400" />, type: 'iframe', url: '/resume.pdf' },
     { id: 'github', title: 'GitHub', icon: <Code className="w-4 h-4 text-white" />, desktopIcon: <Code className="w-10 h-10 text-white" />, type: 'link', url: 'https://github.com/ParjadM' },
 ];
 
@@ -78,6 +77,12 @@ export const DesktopOS = ({ theme }) => {
     }, []);
 
     const openApp = (appId) => {
+        const app = APPS.find(a => a.id === appId);
+        if (app?.type === 'link') {
+            window.open(app.url, '_blank');
+            return;
+        }
+
         const existing = windows.find(w => w.id === appId);
         if (existing) {
             setWindows(windows.map(w => w.id === appId ? { ...w, isMinimized: false, zIndex: topZIndex + 1 } : w));
@@ -241,6 +246,7 @@ export const DesktopOS = ({ theme }) => {
                                     onMinimize={minimizeApp}
                                     onFocus={focusApp}
                                     theme={theme}
+                                    defaultSize={appDef.defaultSize}
                                 >
                                     {appDef.type === 'iframe' ? (
                                         <iframe 
@@ -299,7 +305,7 @@ export const DesktopOS = ({ theme }) => {
                     {/* System Tray */}
                     <div className="flex-shrink-0 flex items-center space-x-2 sm:space-x-4 pl-2 border-l border-white/10 sm:border-0 ml-auto relative">
                         <div 
-                            onClick={() => { setIsTrayExpanded(!isTrayExpanded); setIsClockExpanded(false); }}
+                            onClick={(e) => { e.stopPropagation(); setIsTrayExpanded(!isTrayExpanded); setIsClockExpanded(false); }}
                             className="hidden sm:flex items-center space-x-2 text-gray-400 hover:bg-white/10 px-2 py-1 rounded cursor-pointer transition-colors"
                         >
                             <ChevronUp className={`w-4 h-4 transition-transform duration-200 ${isTrayExpanded ? 'rotate-180' : ''}`} />
@@ -309,7 +315,7 @@ export const DesktopOS = ({ theme }) => {
                         </div>
                         
                         <div 
-                            onClick={() => { setIsClockExpanded(!isClockExpanded); setIsTrayExpanded(false); }}
+                            onClick={(e) => { e.stopPropagation(); setIsClockExpanded(!isClockExpanded); setIsTrayExpanded(false); }}
                             className="flex flex-col items-end text-[10px] sm:text-xs text-gray-300 hover:bg-white/10 px-2 py-1 rounded cursor-pointer transition-colors whitespace-nowrap"
                         >
                             <span>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>

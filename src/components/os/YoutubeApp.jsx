@@ -13,14 +13,17 @@ export const YoutubeApp = ({ theme }) => {
 
     const handleSearch = (e) => {
         e?.preventDefault();
+        if (!input.trim()) return;
+
         const id = extractVideoId(input);
         if (id) {
             setVideoId(id);
+        } else if (input.trim().length === 11 && !input.includes(' ')) {
+            // Treat as raw ID if exactly 11 chars without spaces
+            setVideoId(input.trim());
         } else {
-            // Treat as raw ID if 11 chars
-            if (input.trim().length === 11) {
-                setVideoId(input.trim());
-            }
+            // Not a direct video ID, treat as generic search and open in new tab
+            window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(input.trim())}`, '_blank');
         }
     };
 

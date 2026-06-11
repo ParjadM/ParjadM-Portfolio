@@ -16,7 +16,8 @@ export const FileSystemApp = ({ theme }) => {
         }
     }, []);
 
-    const fileSystem = {
+    const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 });
+    const [fileSystem, setFileSystem] = useState({
         name: 'C:',
         type: 'drive',
         children: [
@@ -39,17 +40,63 @@ export const FileSystemApp = ({ theme }) => {
                             {
                                 name: 'Pictures',
                                 type: 'folder',
-                                children: photos.map(p => ({
-                                    name: `Snapshot-${p.id}.jpg`,
-                                    type: 'image',
-                                    url: p.url
-                                }))
+                                children: []
                             }
                         ]
                     }
                 ]
             }
         ]
+    });
+
+    useEffect(() => {
+        setFileSystem(prev => {
+            const newFs = JSON.parse(JSON.stringify(prev));
+            const users = newFs.children.find(c => c.name === 'Users');
+            const guest = users?.children.find(c => c.name === 'Guest');
+            const pictures = guest?.children.find(c => c.name === 'Pictures');
+            if (pictures) {
+                pictures.children = photos.map(p => ({
+                    name: `Snapshot-${p.id}.jpg`,
+                    type: 'image',
+                    url: p.url
+                }));
+            }
+            return newFs;
+        });
+    }, [photos]);
+
+    const handleContextMenu = (e) => {
+        e.preventDefault();
+        setContextMenu({ visible: true, x: e.clientX, y: e.clientY });
+    };
+
+    const closeContextMenu = () => setContextMenu({ ...contextMenu, visible: false });
+
+    const createItem = (type) => {
+        setFileSystem(prev => {
+            const newFs = JSON.parse(JSON.stringify(prev));
+            let current = newFs;
+            for (let i = 1; i < currentPath.length; i++) {
+                current = current.children?.find(c => c.name === currentPath[i]);
+            }
+            if (current && current.children) {
+                const baseName = type === 'folder' ? 'New Folder' : 'New Text Document.txt';
+                let name = baseName;
+                let counter = 1;
+                while (current.children.find(c => c.name === name)) {
+                    name = type === 'folder' ? `New Folder (${counter})` : `New Text Document (${counter}).txt`;
+                    counter++;
+                }
+                current.children.push({
+                    name,
+                    type,
+                    ...(type === 'file' ? { content: 'Empty file' } : { children: [] })
+                });
+            }
+            return newFs;
+        });
+        closeContextMenu();
     };
 
     // Traverse to current path
@@ -71,6 +118,7 @@ export const FileSystemApp = ({ theme }) => {
     const navigateTo = (name) => {
         setCurrentPath([...currentPath, name]);
         setSelectedFile(null);
+        closeContextMenu();
     };
 
     const navigateUp = () => {
@@ -87,7 +135,7 @@ export const FileSystemApp = ({ theme }) => {
     };
 
     return (
-        <div className="flex flex-col h-full w-full bg-[#1e1e1e] text-gray-200 font-sans select-none">
+        <div className="flex flex-col h-full w-full bg-[#1e1e1e] text-gray-200 font-sans select-none" onClick={closeContextMenu}>
             {/* Top Navigation Bar */}
             <div className="flex items-center space-x-2 p-2 bg-[#252526] border-b border-black/20 shadow-sm">
                 <button 
@@ -150,7 +198,10 @@ export const FileSystemApp = ({ theme }) => {
                 </div>
 
                 {/* File Viewer / Grid */}
-                <div className="flex-1 bg-[#1e1e1e] overflow-y-auto relative">
+                <div 
+                    className="flex-1 bg-[#1e1e1e] overflow-y-auto relative"
+                    onContextMenu={handleContextMenu}
+                >
                     {selectedFile ? (
                         <div className="absolute inset-0 bg-white text-black flex flex-col z-10">
                             <div className="flex items-center justify-between p-2 bg-gray-200 border-b border-gray-300">
@@ -204,6 +255,22 @@ export const FileSystemApp = ({ theme }) => {
                 <span>{currentFolder?.children?.length || 0} items</span>
                 <span>OS File Explorer</span>
             </div>
+            {/* Context Menu */}
+            {contextMenu.visible && (
+                <div 
+                    className="fixed z-[9999] w-48 bg-[#252526] border border-black/40 rounded shadow-2xl py-1 text-sm text-gray-300"
+                    style={{ left: contextMenu.x, top: contextMenu.y }}
+                >
+                    <button onClick={(e) => { e.stopPropagation(); createItem('folder'); }} className="w-full text-left px-4 py-1.5 hover:bg-[#094771] hover:text-white flex items-center space-x-2">
+                        <Folder className="w-4 h-4 text-[#dcb67a]" fill="#dcb67a" />
+                        <span>New Folder</span>
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); createItem('file'); }} className="w-full text-left px-4 py-1.5 hover:bg-[#094771] hover:text-white flex items-center space-x-2 mt-1">
+                        <FileText className="w-4 h-4 text-white" />
+                        <span>New Text Document</span>
+                    </button>
+                </div>
+            )}
         </div>
     );
 };
