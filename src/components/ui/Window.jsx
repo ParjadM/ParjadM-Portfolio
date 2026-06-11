@@ -20,8 +20,32 @@ export const Window = ({
     defaultPosition = { x: 50, y: 50 }
 }) => {
     const [isMaximized, setIsMaximized] = useState(false);
+    const [size, setSize] = useState(defaultSize);
     const windowRef = useRef(null);
     const dragControls = useDragControls();
+
+    const handleResizeStart = (e) => {
+        e.stopPropagation();
+        onFocus(id);
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const startWidth = size.width;
+        const startHeight = size.height;
+
+        const handlePointerMove = (eMove) => {
+            const newWidth = Math.max(300, startWidth + (eMove.clientX - startX));
+            const newHeight = Math.max(200, startHeight + (eMove.clientY - startY));
+            setSize({ width: newWidth, height: newHeight });
+        };
+
+        const handlePointerUp = () => {
+            document.removeEventListener('pointermove', handlePointerMove);
+            document.removeEventListener('pointerup', handlePointerUp);
+        };
+
+        document.addEventListener('pointermove', handlePointerMove);
+        document.addEventListener('pointerup', handlePointerUp);
+    };
 
     // Bring to front on click
     const handlePointerDown = () => {
@@ -50,20 +74,19 @@ export const Window = ({
                         scale: 1,
                         x: isMaximized ? 0 : undefined,
                         y: isMaximized ? 0 : undefined,
-                        width: isMaximized ? '100vw' : undefined,
-                        height: isMaximized ? 'calc(100vh - 48px)' : undefined, // 48px for taskbar
+                        width: isMaximized ? '100vw' : size.width,
+                        height: isMaximized ? 'calc(100vh - 48px)' : size.height, // 48px for taskbar
                         zIndex: zIndex
                     }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ type: "spring", bounce: 0, duration: 0.3 }}
+                    transition={{ 
+                        default: { type: "spring", bounce: 0, duration: 0.3 },
+                        width: { type: "tween", duration: 0 },
+                        height: { type: "tween", duration: 0 }
+                    }}
                     onPointerDown={handlePointerDown}
                     className="absolute shadow-2xl flex flex-col rounded-xl overflow-hidden bg-gray-900/80 backdrop-blur-xl border border-white/10"
-                    style={{ 
-                        position: 'absolute',
-                        width: defaultSize.width,
-                        height: defaultSize.height,
-                        resize: isMaximized ? 'none' : 'both'
-                    }}
+                    style={{ position: 'absolute' }}
                 >
                     {/* Title Bar (Drag Handle) */}
                     <div 
@@ -102,6 +125,18 @@ export const Window = ({
                         {isFocused && <div className="absolute inset-0 pointer-events-none border border-transparent shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]" />}
                         {children}
                     </div>
+
+                    {/* Custom Resize Handle */}
+                    {!isMaximized && (
+                        <div 
+                            onPointerDown={handleResizeStart}
+                            className="absolute bottom-0 right-0 w-6 h-6 cursor-se-resize z-50 flex items-end justify-end p-1.5 opacity-50 hover:opacity-100 transition-opacity"
+                        >
+                            <svg viewBox="0 0 10 10" width="10" height="10" className="text-gray-400">
+                                <path d="M 8 10 L 10 8 M 5 10 L 10 5 M 2 10 L 10 2" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+                            </svg>
+                        </div>
+                    )}
                 </motion.div>
             )}
         </AnimatePresence>
