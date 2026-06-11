@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Window } from '../components/ui/Window.jsx';
 import { BackgroundBlobs } from '../components/ui/BackgroundBlobs.jsx';
 import { Notepad } from '../components/os/Notepad.jsx';
+import { BrowserApp } from '../components/os/BrowserApp.jsx';
 import { 
     Terminal, 
     Globe, 
@@ -14,12 +15,14 @@ import {
     Wifi,
     Battery,
     Volume2,
-    FileEdit
+    FileEdit,
+    Compass
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const APPS = [
-    { id: 'browser', title: 'Portfolio Edge', icon: <Globe className="w-4 h-4 text-blue-400" />, desktopIcon: <Globe className="w-10 h-10 text-blue-400" />, type: 'iframe', url: '/' },
+    { id: 'browser', title: 'Web Browser', icon: <Compass className="w-4 h-4 text-blue-500" />, desktopIcon: <Compass className="w-10 h-10 text-blue-500" />, type: 'native', component: BrowserApp },
+    { id: 'portfolio', title: 'Portfolio Home', icon: <Globe className="w-4 h-4 text-blue-400" />, desktopIcon: <Globe className="w-10 h-10 text-blue-400" />, type: 'iframe', url: '/' },
     { id: 'terminal', title: 'Command Prompt', icon: <Terminal className="w-4 h-4 text-emerald-400" />, desktopIcon: <Terminal className="w-10 h-10 text-emerald-400" />, type: 'iframe', url: '/cli' },
     { id: 'notepad', title: 'Notepad', icon: <FileEdit className="w-4 h-4 text-purple-400" />, desktopIcon: <FileEdit className="w-10 h-10 text-purple-400" />, type: 'native', component: Notepad },
     { id: 'news', title: 'Tech Hub', icon: <Newspaper className="w-4 h-4 text-pink-400" />, desktopIcon: <Newspaper className="w-10 h-10 text-pink-400" />, type: 'iframe', url: '/tech-news' },
