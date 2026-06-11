@@ -38,7 +38,10 @@ import {
     Bluetooth,
     ShieldCheck,
     FileText,
-    Code
+    Code,
+    Search,
+    Power,
+    LayoutGrid
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -70,6 +73,8 @@ export const DesktopOS = ({ theme }) => {
     const [wallpaper, setWallpaper] = useState('blobs');
     const [isClockExpanded, setIsClockExpanded] = useState(false);
     const [isTrayExpanded, setIsTrayExpanded] = useState(false);
+    const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
+    const [startMenuSearch, setStartMenuSearch] = useState('');
     const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 });
     
     // Global OS State
@@ -199,6 +204,7 @@ export const DesktopOS = ({ theme }) => {
 
     const closeContextMenu = () => {
         if (contextMenu.visible) setContextMenu({ ...contextMenu, visible: false });
+        if (isStartMenuOpen) setIsStartMenuOpen(false);
     };
 
     const toggleWallpaper = () => {
@@ -323,22 +329,83 @@ export const DesktopOS = ({ theme }) => {
                     })}
                 </div>
 
+                {/* Start Menu Overlay */}
+                <AnimatePresence>
+                    {isStartMenuOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
+                            className="absolute bottom-14 left-1/2 -translate-x-1/2 w-[90%] max-w-2xl bg-gray-900/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-2xl p-6 z-[60] flex flex-col"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="relative mb-6">
+                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <input 
+                                    type="text" 
+                                    placeholder="Type here to search apps..." 
+                                    value={startMenuSearch}
+                                    onChange={(e) => setStartMenuSearch(e.target.value)}
+                                    className="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-12 pr-4 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500/50 focus:bg-white/10 transition-all"
+                                />
+                            </div>
+                            
+                            <div className="flex justify-between items-center mb-4 px-2">
+                                <span className="font-semibold text-white">Pinned apps</span>
+                            </div>
+
+                            <div className="grid grid-cols-4 sm:grid-cols-6 gap-4 mb-6">
+                                {APPS.filter(a => a.title.toLowerCase().includes(startMenuSearch.toLowerCase())).map(app => (
+                                    <button 
+                                        key={app.id}
+                                        onClick={() => { openApp(app.id); setIsStartMenuOpen(false); }}
+                                        className="flex flex-col items-center justify-center p-3 rounded-xl hover:bg-white/10 transition-colors group"
+                                    >
+                                        <div className="group-hover:scale-110 transition-transform duration-200">
+                                            {app.desktopIcon}
+                                        </div>
+                                        <span className="mt-2 text-xs text-gray-300 text-center truncate w-full">{app.title}</span>
+                                    </button>
+                                ))}
+                            </div>
+
+                            <div className="mt-auto pt-4 border-t border-white/10 flex justify-between items-center px-2">
+                                <div className="flex items-center space-x-3">
+                                    <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold text-sm">
+                                        P
+                                    </div>
+                                    <span className="text-sm text-gray-200 font-medium">Guest User</span>
+                                </div>
+                                <button 
+                                    onClick={handleExit}
+                                    className="p-2 rounded-lg hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors group"
+                                    title="Shut Down"
+                                >
+                                    <Power className="w-5 h-5 transition-transform group-hover:scale-110" />
+                                </button>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
                 {/* Taskbar */}
                 <div className="absolute bottom-0 left-0 right-0 h-12 bg-gray-900/80 backdrop-blur-xl border-t border-white/10 z-50 flex items-center justify-between px-2 sm:px-4">
                     {/* Start Button & Centered Apps */}
                     <div className="flex-1 flex items-center justify-start sm:justify-center space-x-2 overflow-x-auto overflow-y-hidden scrollbar-hide pr-2">
                         <button 
-                            onClick={handleExit}
-                            className="w-10 h-10 flex items-center justify-center rounded hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors group"
-                            title="Turn Off OS"
+                            onClick={(e) => { e.stopPropagation(); setIsStartMenuOpen(!isStartMenuOpen); closeContextMenu(); }}
+                            className={`w-10 h-10 flex items-center justify-center rounded transition-all group ${isStartMenuOpen ? 'bg-white/20 shadow-inner' : 'hover:bg-white/10'}`}
+                            title="Start"
                         >
-                            <Monitor className={`w-5 h-5 transition-transform group-hover:scale-110`} />
+                            <LayoutGrid className={`w-5 h-5 text-blue-400 transition-transform group-hover:scale-110`} />
                         </button>
                         
                         <div className="w-px h-6 bg-white/20 mx-2" />
 
                         {APPS.map((app) => {
                             const win = windows.find(w => w.id === app.id);
+                            if (!win) return null;
                             const isOpen = !!win;
                             const isFocused = isOpen && win.zIndex === Math.max(...windows.map(w => w.zIndex)) && !win.isMinimized;
                             
