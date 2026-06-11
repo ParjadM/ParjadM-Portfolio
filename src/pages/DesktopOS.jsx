@@ -12,6 +12,7 @@ import { SnakeGameApp } from '../components/os/SnakeGameApp.jsx';
 import { CameraApp } from '../components/os/CameraApp.jsx';
 import { AIAssistantApp } from '../components/os/AIAssistantApp.jsx';
 import { FileSystemApp } from '../components/os/FileSystemApp.jsx';
+import { YoutubeApp } from '../components/os/YoutubeApp.jsx';
 import { 
     Terminal, 
     Globe, 
@@ -32,14 +33,16 @@ import {
     Gamepad2,
     Camera,
     Bot,
-    FileText,
-    Github
+    Youtube,
+    Bluetooth,
+    ShieldCheck
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const APPS = [
     { id: 'browser', title: 'Web Browser', icon: <Compass className="w-4 h-4 text-blue-500" />, desktopIcon: <Compass className="w-10 h-10 text-blue-500" />, type: 'native', component: BrowserApp },
     { id: 'filesystem', title: 'File Explorer', icon: <Folder className="w-4 h-4 text-yellow-500" />, desktopIcon: <Folder className="w-10 h-10 text-yellow-500" />, type: 'native', component: FileSystemApp },
+    { id: 'youtube', title: 'YouTube', icon: <Youtube className="w-4 h-4 text-red-500" />, desktopIcon: <Youtube className="w-10 h-10 text-red-500" />, type: 'native', component: YoutubeApp },
     { id: 'assistant', title: 'AI Assistant', icon: <Bot className="w-4 h-4 text-emerald-500" />, desktopIcon: <Bot className="w-10 h-10 text-emerald-500" />, type: 'native', component: AIAssistantApp },
     { id: 'camera', title: 'Camera', icon: <Camera className="w-4 h-4 text-pink-500" />, desktopIcon: <Camera className="w-10 h-10 text-pink-500" />, type: 'native', component: CameraApp },
     { id: 'settings', title: 'Settings', icon: <Settings className="w-4 h-4 text-gray-400" />, desktopIcon: <Settings className="w-10 h-10 text-gray-400" />, type: 'native', component: SettingsApp },
@@ -63,6 +66,8 @@ export const DesktopOS = ({ theme }) => {
     const [time, setTime] = useState(new Date());
     const [isExiting, setIsExiting] = useState(false);
     const [wallpaper, setWallpaper] = useState('blobs');
+    const [isClockExpanded, setIsClockExpanded] = useState(false);
+    const [isTrayExpanded, setIsTrayExpanded] = useState(false);
     const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 });
 
     useEffect(() => {
@@ -290,18 +295,82 @@ export const DesktopOS = ({ theme }) => {
                     </div>
 
                     {/* System Tray */}
-                    <div className="flex-shrink-0 flex items-center space-x-2 sm:space-x-4 pl-2 border-l border-white/10 sm:border-0 ml-auto">
-                        <div className="hidden sm:flex items-center space-x-2 text-gray-400 hover:bg-white/10 px-2 py-1 rounded cursor-default transition-colors">
-                            <ChevronUp className="w-4 h-4" />
+                    <div className="flex-shrink-0 flex items-center space-x-2 sm:space-x-4 pl-2 border-l border-white/10 sm:border-0 ml-auto relative">
+                        <div 
+                            onClick={() => { setIsTrayExpanded(!isTrayExpanded); setIsClockExpanded(false); }}
+                            className="hidden sm:flex items-center space-x-2 text-gray-400 hover:bg-white/10 px-2 py-1 rounded cursor-pointer transition-colors"
+                        >
+                            <ChevronUp className={`w-4 h-4 transition-transform duration-200 ${isTrayExpanded ? 'rotate-180' : ''}`} />
                             <Wifi className="w-4 h-4" />
                             <Volume2 className="w-4 h-4" />
                             <Battery className="w-4 h-4" />
                         </div>
                         
-                        <div className="flex flex-col items-end text-[10px] sm:text-xs text-gray-300 hover:bg-white/10 px-2 py-1 rounded cursor-default transition-colors whitespace-nowrap">
+                        <div 
+                            onClick={() => { setIsClockExpanded(!isClockExpanded); setIsTrayExpanded(false); }}
+                            className="flex flex-col items-end text-[10px] sm:text-xs text-gray-300 hover:bg-white/10 px-2 py-1 rounded cursor-pointer transition-colors whitespace-nowrap"
+                        >
                             <span>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                             <span className="hidden sm:block">{time.toLocaleDateString()}</span>
                         </div>
+
+                        {/* Tray Popover */}
+                        <AnimatePresence>
+                            {isTrayExpanded && (
+                                <motion.div 
+                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                    className="absolute bottom-14 right-24 w-48 bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-xl p-3 shadow-2xl flex flex-col space-y-2 z-50"
+                                >
+                                    <div className="flex items-center space-x-3 p-2 hover:bg-white/10 rounded-lg cursor-pointer transition-colors text-white">
+                                        <Bluetooth className="w-5 h-5 text-blue-400" />
+                                        <span className="text-sm">Bluetooth</span>
+                                    </div>
+                                    <div className="flex items-center space-x-3 p-2 hover:bg-white/10 rounded-lg cursor-pointer transition-colors text-white">
+                                        <ShieldCheck className="w-5 h-5 text-green-400" />
+                                        <span className="text-sm">Security</span>
+                                    </div>
+                                    <div className="flex items-center space-x-3 p-2 hover:bg-white/10 rounded-lg cursor-pointer transition-colors text-white">
+                                        <Volume2 className="w-5 h-5 text-purple-400" />
+                                        <span className="text-sm flex-1">Volume</span>
+                                        <span className="text-xs text-gray-400">80%</span>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        {/* Clock Popover */}
+                        <AnimatePresence>
+                            {isClockExpanded && (
+                                <motion.div 
+                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                    className="absolute bottom-14 right-2 w-64 bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-2xl flex flex-col items-center z-50 text-white"
+                                >
+                                    <div className="text-5xl font-light tracking-tighter mb-2">
+                                        {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </div>
+                                    <div className="text-emerald-400 text-sm font-medium mb-6">
+                                        {time.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}
+                                    </div>
+                                    
+                                    {/* Mini Calendar Grid (Visual Only) */}
+                                    <div className="w-full grid grid-cols-7 gap-1 text-center text-xs text-gray-400 mb-2">
+                                        {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => <div key={d}>{d}</div>)}
+                                    </div>
+                                    <div className="w-full grid grid-cols-7 gap-1 text-center text-sm">
+                                        {/* Just some dummy days for the visual effect */}
+                                        {Array.from({length: 31}).map((_, i) => (
+                                            <div key={i} className={`p-1 rounded-full ${i+1 === time.getDate() ? 'bg-emerald-500 text-white font-bold shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'hover:bg-white/10 cursor-pointer'}`}>
+                                                {i + 1}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
                 </div>
             </div>
