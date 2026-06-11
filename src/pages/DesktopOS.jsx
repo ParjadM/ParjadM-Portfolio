@@ -265,7 +265,7 @@ export const DesktopOS = ({ theme }) => {
                 </div>
 
                 {/* Taskbar */}
-                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gray-900/80 backdrop-blur-xl border-t border-white/10 z-50 flex items-center justify-between px-2 sm:px-4 overflow-hidden">
+                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gray-900/80 backdrop-blur-xl border-t border-white/10 z-50 flex items-center justify-between px-2 sm:px-4">
                     {/* Start Button & Centered Apps */}
                     <div className="flex-1 flex items-center justify-start sm:justify-center space-x-2 overflow-x-auto overflow-y-hidden scrollbar-hide pr-2">
                         <button 
