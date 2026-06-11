@@ -96,6 +96,8 @@ export const SnakeGameApp = ({ theme }) => {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [gameState.gameOver]);
+
     // Game Loop
     useEffect(() => {
         if (gameState.gameOver || isPaused) return;
