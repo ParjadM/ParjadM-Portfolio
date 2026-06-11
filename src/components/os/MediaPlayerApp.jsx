@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Pause, SkipForward, SkipBack, Volume2, Music, Youtube } from 'lucide-react';
+import { Play, Pause, SkipForward, SkipBack, Volume2, Music, Radio } from 'lucide-react';
 
 export const MediaPlayerApp = ({ theme }) => {
     // Lofi Girl 24/7 stream ID
@@ -23,7 +23,7 @@ export const MediaPlayerApp = ({ theme }) => {
                     <p className="text-xs text-gray-400">beats to relax/study to</p>
                 </div>
                 <div className="ml-auto">
-                    <Youtube className="w-5 h-5 text-red-500 opacity-80" />
+                    <Radio className="w-5 h-5 text-red-500 opacity-80" />
                 </div>
             </div>
 
