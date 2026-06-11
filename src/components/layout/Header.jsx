@@ -143,6 +143,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
             className="fixed z-[9999] w-48 rounded-xl bg-gray-900 border border-gray-700 shadow-2xl overflow-hidden"
             style={{ top: moreRect.top, left: moreRect.left }}
         >
+            <Link to="/os" onClick={() => setIsMoreOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">Operating System</Link>
             <Link to="/tech-news" onClick={() => setIsMoreOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">Tech News</Link>
             <Link to="/intro" onClick={() => setIsMoreOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">Intro Cinematic</Link>
             <Link to="/cli" onClick={() => setIsMoreOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">CLI Mode</Link>
@@ -265,6 +266,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                             <div className="w-full h-px bg-white/10 my-4" />
                             
                             <div className="flex flex-wrap justify-center gap-4 w-full">
+                                <Link to="/os" onClick={handleNavClick} className="text-gray-400 hover:text-white font-medium">OS Mode</Link>
                                 <Link to="/tech-news" onClick={handleNavClick} className="text-gray-400 hover:text-white font-medium">Tech News</Link>
                                 <Link to="/intro" onClick={handleNavClick} className="text-gray-400 hover:text-white font-medium">Intro</Link>
                                 <Link to="/cli" onClick={handleNavClick} className="text-gray-400 hover:text-white font-medium">CLI</Link>

@@ -27,6 +27,7 @@ const IntroCinematic = React.lazy(() => import('../../pages/IntroCinematic.jsx')
 const CliMode = React.lazy(() => import('../../pages/CliMode.jsx').then(m => ({default: m.CliMode})));
 const MockInterviewPage = React.lazy(() => import('../../pages/MockInterviewPage.jsx').then(m => ({default: m.MockInterviewPage})));
 const TechNews = React.lazy(() => import('../../pages/TechNews.jsx').then(m => ({default: m.TechNews})));
+const DesktopOS = React.lazy(() => import('../../pages/DesktopOS.jsx').then(m => ({default: m.DesktopOS})));
 
 export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
     const location = useLocation();
@@ -34,7 +35,7 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const themeConfig = getThemeConfig(themeId);
     
-    const isFullscreenRoute = location?.pathname === '/intro' || location?.pathname === '/cli';
+    const isFullscreenRoute = location?.pathname === '/intro' || location?.pathname === '/cli' || location?.pathname === '/os';
 
     useEffect(() => {
         // Ensure stable visitorId
@@ -141,6 +142,7 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
                             <Route path="/blog/:id" element={<BlogPostPage theme={themeConfig.accentPrefix} />} />
                             <Route path="/contact" element={<ContactSection theme={themeConfig.accentPrefix} />} />
                             <Route path="/tech-news" element={<TechNews theme={themeConfig.accentPrefix} />} />
+                            <Route path="/os" element={<DesktopOS theme={themeConfig.accentPrefix} />} />
                             <Route path="/admin/login" element={<AdminLoginPage theme={themeConfig.accentPrefix} />} />
                             <Route path="/admin" element={<RequireAuth><AdminDashboard theme={themeConfig.accentPrefix} /></RequireAuth>} />
                             <Route path="/intro" element={<IntroCinematic theme={themeConfig.accentPrefix} />} />
