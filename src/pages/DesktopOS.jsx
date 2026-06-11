@@ -232,9 +232,9 @@ export const DesktopOS = ({ theme }) => {
                 </div>
 
                 {/* Taskbar */}
-                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gray-900/80 backdrop-blur-xl border-t border-white/10 z-50 flex items-center justify-between px-4">
+                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gray-900/80 backdrop-blur-xl border-t border-white/10 z-50 flex items-center justify-between px-2 sm:px-4 overflow-hidden">
                     {/* Start Button & Centered Apps */}
-                    <div className="flex-1 flex items-center justify-center space-x-2">
+                    <div className="flex-1 flex items-center justify-start sm:justify-center space-x-2 overflow-x-auto overflow-y-hidden scrollbar-hide pr-2">
                         <button 
                             onClick={handleExit}
                             className="w-10 h-10 flex items-center justify-center rounded hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors group"
@@ -270,17 +270,17 @@ export const DesktopOS = ({ theme }) => {
                     </div>
 
                     {/* System Tray */}
-                    <div className="flex-shrink-0 flex items-center space-x-4">
-                        <div className="flex items-center space-x-2 text-gray-400 hover:bg-white/10 px-2 py-1 rounded cursor-default transition-colors">
+                    <div className="flex-shrink-0 flex items-center space-x-2 sm:space-x-4 pl-2 border-l border-white/10 sm:border-0 ml-auto">
+                        <div className="hidden sm:flex items-center space-x-2 text-gray-400 hover:bg-white/10 px-2 py-1 rounded cursor-default transition-colors">
                             <ChevronUp className="w-4 h-4" />
                             <Wifi className="w-4 h-4" />
                             <Volume2 className="w-4 h-4" />
                             <Battery className="w-4 h-4" />
                         </div>
                         
-                        <div className="flex flex-col items-end text-xs text-gray-300 hover:bg-white/10 px-2 py-1 rounded cursor-default transition-colors">
+                        <div className="flex flex-col items-end text-[10px] sm:text-xs text-gray-300 hover:bg-white/10 px-2 py-1 rounded cursor-default transition-colors whitespace-nowrap">
                             <span>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                            <span>{time.toLocaleDateString()}</span>
+                            <span className="hidden sm:block">{time.toLocaleDateString()}</span>
                         </div>
                     </div>
                 </div>

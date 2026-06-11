@@ -19,8 +19,17 @@ export const Window = ({
     defaultSize = { width: 600, height: 400 },
     defaultPosition = { x: 50, y: 50 }
 }) => {
-    const [isMaximized, setIsMaximized] = useState(false);
-    const [size, setSize] = useState(defaultSize);
+    const [isMaximized, setIsMaximized] = useState(() => window.innerWidth < 768);
+    const [size, setSize] = useState(() => {
+        const isMobile = window.innerWidth < 768;
+        if (isMobile) {
+            return { width: window.innerWidth, height: window.innerHeight - 48 };
+        }
+        return {
+            width: Math.min(defaultSize.width, window.innerWidth - 40),
+            height: Math.min(defaultSize.height, window.innerHeight - 100)
+        };
+    });
     const windowRef = useRef(null);
     const dragControls = useDragControls();
 
