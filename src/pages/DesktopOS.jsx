@@ -35,7 +35,9 @@ import {
     Bot,
     Video,
     Bluetooth,
-    ShieldCheck
+    ShieldCheck,
+    FileText,
+    Code
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -56,7 +58,7 @@ const APPS = [
     { id: 'news', title: 'Tech Hub', icon: <Newspaper className="w-4 h-4 text-pink-400" />, desktopIcon: <Newspaper className="w-10 h-10 text-pink-400" />, type: 'iframe', url: '/tech-news' },
     { id: 'stats', title: 'Task Manager', icon: <Activity className="w-4 h-4 text-red-400" />, desktopIcon: <Activity className="w-10 h-10 text-red-400" />, type: 'iframe', url: '/stats' },
     { id: 'resume', title: 'Resume.pdf', icon: <FileText className="w-4 h-4 text-red-400" />, desktopIcon: <FileText className="w-10 h-10 text-red-400" />, type: 'iframe', url: '/resume.pdf' },
-    { id: 'github', title: 'GitHub', icon: <Github className="w-4 h-4 text-white" />, desktopIcon: <Github className="w-10 h-10 text-white" />, type: 'link', url: 'https://github.com/ParjadM' },
+    { id: 'github', title: 'GitHub', icon: <Code className="w-4 h-4 text-white" />, desktopIcon: <Code className="w-10 h-10 text-white" />, type: 'link', url: 'https://github.com/ParjadM' },
 ];
 
 export const DesktopOS = ({ theme }) => {
