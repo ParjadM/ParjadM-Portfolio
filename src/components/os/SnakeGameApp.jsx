@@ -145,45 +145,7 @@ export const SnakeGameApp = ({ theme }) => {
         }
     };
 
-    // Rendering
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        
-        // Clear canvas
-        ctx.fillStyle = '#111827'; // gray-900
-        ctx.fillRect(0, 0, GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE);
-
-        // Draw grid (optional, subtle)
-        ctx.strokeStyle = '#1f2937'; // gray-800
-        ctx.lineWidth = 1;
-        for (let i = 0; i <= GRID_SIZE; i++) {
-            ctx.beginPath();
-            ctx.moveTo(i * CELL_SIZE, 0);
-            ctx.lineTo(i * CELL_SIZE, GRID_SIZE * CELL_SIZE);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(0, i * CELL_SIZE);
-            ctx.lineTo(GRID_SIZE * CELL_SIZE, i * CELL_SIZE);
-            ctx.stroke();
-        }
-
-        // Draw food
-        ctx.fillStyle = '#ef4444'; // red-500
-        ctx.fillRect(food.x * CELL_SIZE + 2, food.y * CELL_SIZE + 2, CELL_SIZE - 4, CELL_SIZE - 4);
-
-        // Draw snake
-        snake.forEach((segment, index) => {
-            if (index === 0) {
-                ctx.fillStyle = theme === 'pink' ? '#ec4899' : '#10b981'; // emerald-500
-            } else {
-                ctx.fillStyle = theme === 'pink' ? '#fbcfe8' : '#6ee7b7'; // emerald-300
-            }
-            ctx.fillRect(segment.x * CELL_SIZE + 1, segment.y * CELL_SIZE + 1, CELL_SIZE - 2, CELL_SIZE - 2);
-        });
-
-    }, [snake, food, theme]);
+    // Canvas rendering has been removed in favor of CSS Grid for maximum reliability.
 
     return (
         <div className="flex flex-col items-center justify-center h-full w-full bg-gray-950 text-white font-mono p-4">
@@ -206,12 +168,39 @@ export const SnakeGameApp = ({ theme }) => {
             </div>
 
             <div className="relative rounded-lg overflow-hidden border-2 border-gray-800 shadow-2xl bg-gray-900">
-                <canvas 
-                    ref={canvasRef}
-                    width={GRID_SIZE * CELL_SIZE}
-                    height={GRID_SIZE * CELL_SIZE}
-                    className="block"
-                />
+                <div 
+                    style={{ 
+                        display: 'grid', 
+                        gridTemplateColumns: `repeat(${GRID_SIZE}, ${CELL_SIZE}px)`,
+                        gridTemplateRows: `repeat(${GRID_SIZE}, ${CELL_SIZE}px)`,
+                        backgroundColor: '#111827'
+                    }}
+                >
+                    {Array.from({ length: GRID_SIZE * GRID_SIZE }).map((_, i) => {
+                        const x = i % GRID_SIZE;
+                        const y = Math.floor(i / GRID_SIZE);
+                        const isFood = food.x === x && food.y === y;
+                        const snakeIndex = snake.findIndex(s => s.x === x && s.y === y);
+                        const isHead = snakeIndex === 0;
+                        const isBody = snakeIndex > 0;
+                        
+                        let bg = 'transparent';
+                        if (isFood) bg = '#ef4444'; // red-500
+                        else if (isHead) bg = theme === 'pink' ? '#ec4899' : '#10b981';
+                        else if (isBody) bg = theme === 'pink' ? '#fbcfe8' : '#6ee7b7';
+
+                        return (
+                            <div 
+                                key={i} 
+                                style={{ 
+                                    backgroundColor: bg,
+                                    border: '1px solid #1f2937', // subtle grid
+                                    boxSizing: 'border-box'
+                                }}
+                            />
+                        );
+                    })}
+                </div>
 
                 {gameOver && (
                     <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center backdrop-blur-sm">

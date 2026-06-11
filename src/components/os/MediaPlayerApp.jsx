@@ -2,12 +2,11 @@ import React, { useState } from 'react';
 import { Play, Pause, SkipForward, SkipBack, Volume2, Music, Radio } from 'lucide-react';
 
 export const MediaPlayerApp = ({ theme }) => {
-    // Lofi Girl 24/7 stream ID
-    const VIDEO_ID = 'jfKfPfyJRdk';
     const [isPlaying, setIsPlaying] = useState(false);
 
-    // Using Lofi Girl's persistent channel live stream URL so it never breaks
-    const I_FRAME_SRC = "https://www.youtube.com/embed/live_stream?channel=UCSJ4gkVC6NrvII8umztf0Ow&autoplay=1&mute=0&controls=1&showinfo=0&rel=0";
+    // Using a regular 1-hour Lofi mix VOD instead of a live stream, because live streams often block external embedding.
+    const VIDEO_ID = 'n61ULEU7CO0'; // Famous Lofi Mix VOD
+    const I_FRAME_SRC = `https://www.youtube.com/embed/${VIDEO_ID}?autoplay=1&mute=0&controls=1&showinfo=0&rel=0&loop=1&playlist=${VIDEO_ID}`;
 
     // Note: Due to browser autoplay policies and YouTube iframe API limitations, 
     // a pure custom UI overlaying a YouTube iframe requires the YouTube IFrame API.
