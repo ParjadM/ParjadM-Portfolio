@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { Minus, Square, X, Maximize2 } from 'lucide-react';
 import { GlassCard } from './GlassCard.jsx';
 
@@ -21,6 +21,7 @@ export const Window = ({
 }) => {
     const [isMaximized, setIsMaximized] = useState(false);
     const windowRef = useRef(null);
+    const dragControls = useDragControls();
 
     // Bring to front on click
     const handlePointerDown = () => {
@@ -39,6 +40,8 @@ export const Window = ({
                 <motion.div
                     ref={windowRef}
                     drag={!isMaximized}
+                    dragListener={false}
+                    dragControls={dragControls}
                     dragMomentum={false}
                     dragConstraints={{ left: 0, top: 0, right: window.innerWidth - 100, bottom: window.innerHeight - 100 }}
                     initial={{ opacity: 0, scale: 0.95, ...defaultPosition }}
@@ -47,18 +50,24 @@ export const Window = ({
                         scale: 1,
                         x: isMaximized ? 0 : undefined,
                         y: isMaximized ? 0 : undefined,
-                        width: isMaximized ? '100vw' : defaultSize.width,
-                        height: isMaximized ? 'calc(100vh - 48px)' : defaultSize.height, // 48px for taskbar
+                        width: isMaximized ? '100vw' : undefined,
+                        height: isMaximized ? 'calc(100vh - 48px)' : undefined, // 48px for taskbar
                         zIndex: zIndex
                     }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ type: "spring", bounce: 0, duration: 0.3 }}
                     onPointerDown={handlePointerDown}
                     className="absolute shadow-2xl flex flex-col rounded-xl overflow-hidden bg-gray-900/80 backdrop-blur-xl border border-white/10"
-                    style={{ position: 'absolute' }}
+                    style={{ 
+                        position: 'absolute',
+                        width: defaultSize.width,
+                        height: defaultSize.height,
+                        resize: isMaximized ? 'none' : 'both'
+                    }}
                 >
                     {/* Title Bar (Drag Handle) */}
                     <div 
+                        onPointerDown={(e) => dragControls.start(e)}
                         className={`h-10 flex items-center justify-between px-3 cursor-grab active:cursor-grabbing border-b border-white/5 bg-gray-800/50 ${isFocused ? (theme === 'pink' ? 'bg-pink-900/20' : 'bg-emerald-900/20') : ''}`}
                     >
                         <div className="flex items-center space-x-2 text-gray-300">

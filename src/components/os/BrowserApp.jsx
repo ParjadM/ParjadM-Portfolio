@@ -6,12 +6,27 @@ export const BrowserApp = ({ theme }) => {
     const [currentUrl, setCurrentUrl] = useState('https://example.com');
     const [iframeError, setIframeError] = useState(false);
 
+    const BLOCKED_DOMAINS = ['google.com', 'youtube.com', 'facebook.com', 'github.com', 'twitter.com', 'instagram.com', 'linkedin.com', 'reddit.com', 'netflix.com', 'amazon.com', 'apple.com', 'microsoft.com'];
+
     const handleNavigate = (e) => {
         e.preventDefault();
         let finalUrl = urlInput.trim();
         if (!finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
             finalUrl = 'https://' + finalUrl;
         }
+        
+        try {
+            const urlObj = new URL(finalUrl);
+            const domain = urlObj.hostname.replace('www.', '');
+            
+            if (BLOCKED_DOMAINS.some(d => domain === d || domain.endsWith('.' + d))) {
+                setUrlInput(finalUrl);
+                setCurrentUrl(finalUrl);
+                setIframeError(true);
+                return;
+            }
+        } catch (err) {}
+
         setUrlInput(finalUrl);
         setCurrentUrl(finalUrl);
         setIframeError(false);
