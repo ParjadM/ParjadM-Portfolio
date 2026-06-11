@@ -1,71 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Folder, FileText, Image as ImageIcon, ChevronRight, ChevronLeft, Search, HardDrive } from 'lucide-react';
 
-export const FileSystemApp = ({ theme }) => {
+export const FileSystemApp = ({ theme, osState }) => {
+    const { fileSystem, setFileSystem } = osState || {};
     const [currentPath, setCurrentPath] = useState(['C:', 'Users', 'Guest']);
-    const [photos, setPhotos] = useState([]);
     const [selectedFile, setSelectedFile] = useState(null);
-
-    // Fetch photos on mount to populate the Pictures folder
-    useEffect(() => {
-        const saved = localStorage.getItem('os_camera_photos');
-        if (saved) {
-            try {
-                setPhotos(JSON.parse(saved));
-            } catch (e) {}
-        }
-    }, []);
 
     const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 });
     const rootRef = useRef(null);
-    const [fileSystem, setFileSystem] = useState({
-        name: 'C:',
-        type: 'drive',
-        children: [
-            {
-                name: 'Users',
-                type: 'folder',
-                children: [
-                    {
-                        name: 'Guest',
-                        type: 'folder',
-                        children: [
-                            {
-                                name: 'Documents',
-                                type: 'folder',
-                                children: [
-                                    { name: 'Welcome.txt', type: 'file', content: 'Welcome to Parjad WebOS! Feel free to explore.' },
-                                    { name: 'Secret.txt', type: 'file', content: 'You found the secret file. 42 is the answer.' }
-                                ]
-                            },
-                            {
-                                name: 'Pictures',
-                                type: 'folder',
-                                children: []
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
-    });
-
-    useEffect(() => {
-        setFileSystem(prev => {
-            const newFs = JSON.parse(JSON.stringify(prev));
-            const users = newFs.children.find(c => c.name === 'Users');
-            const guest = users?.children.find(c => c.name === 'Guest');
-            const pictures = guest?.children.find(c => c.name === 'Pictures');
-            if (pictures) {
-                pictures.children = photos.map(p => ({
-                    name: `Snapshot-${p.id}.jpg`,
-                    type: 'image',
-                    url: p.url
-                }));
-            }
-            return newFs;
-        });
-    }, [photos]);
 
     const handleContextMenu = (e) => {
         e.preventDefault();

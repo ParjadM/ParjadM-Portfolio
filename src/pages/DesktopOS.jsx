@@ -13,6 +13,7 @@ import { CameraApp } from '../components/os/CameraApp.jsx';
 import { AIAssistantApp } from '../components/os/AIAssistantApp.jsx';
 import { FileSystemApp } from '../components/os/FileSystemApp.jsx';
 import { YoutubeApp } from '../components/os/YoutubeApp.jsx';
+import { TerminalApp } from '../components/os/TerminalApp.jsx';
 import { 
     Terminal, 
     Globe, 
@@ -53,7 +54,7 @@ const APPS = [
     { id: 'weather', title: 'Weather', icon: <CloudSun className="w-4 h-4 text-sky-400" />, desktopIcon: <CloudSun className="w-10 h-10 text-sky-400" />, type: 'native', component: WeatherApp },
     { id: 'music', title: 'Media Player', icon: <Music className="w-4 h-4 text-purple-500" />, desktopIcon: <Music className="w-10 h-10 text-purple-500" />, type: 'native', component: MediaPlayerApp },
     { id: 'snake', title: 'Snake Game', icon: <Gamepad2 className="w-4 h-4 text-green-500" />, desktopIcon: <Gamepad2 className="w-10 h-10 text-green-500" />, type: 'native', component: SnakeGameApp, defaultSize: { width: 600, height: 650 } },
-    { id: 'terminal', title: 'Command Prompt', icon: <Terminal className="w-4 h-4 text-emerald-400" />, desktopIcon: <Terminal className="w-10 h-10 text-emerald-400" />, type: 'iframe', url: '/cli' },
+    { id: 'terminal', title: 'Command Prompt', icon: <Terminal className="w-4 h-4 text-emerald-400" />, desktopIcon: <Terminal className="w-10 h-10 text-emerald-400" />, type: 'native', component: TerminalApp },
     { id: 'notepad', title: 'Notepad', icon: <FileEdit className="w-4 h-4 text-purple-400" />, desktopIcon: <FileEdit className="w-10 h-10 text-purple-400" />, type: 'native', component: Notepad },
     { id: 'news', title: 'Tech Hub', icon: <Newspaper className="w-4 h-4 text-pink-400" />, desktopIcon: <Newspaper className="w-10 h-10 text-pink-400" />, type: 'iframe', url: '/tech-news' },
     { id: 'stats', title: 'Task Manager', icon: <Activity className="w-4 h-4 text-red-400" />, desktopIcon: <Activity className="w-10 h-10 text-red-400" />, type: 'iframe', url: '/stats' },
@@ -70,6 +71,64 @@ export const DesktopOS = ({ theme }) => {
     const [isClockExpanded, setIsClockExpanded] = useState(false);
     const [isTrayExpanded, setIsTrayExpanded] = useState(false);
     const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 });
+    
+    // Global OS State
+    const [photos, setPhotos] = useState([]);
+    const [fileSystem, setFileSystem] = useState({
+        name: 'C:',
+        type: 'drive',
+        children: [
+            {
+                name: 'Users',
+                type: 'folder',
+                children: [
+                    {
+                        name: 'Guest',
+                        type: 'folder',
+                        children: [
+                            {
+                                name: 'Documents',
+                                type: 'folder',
+                                children: [
+                                    { name: 'Welcome.txt', type: 'file', content: 'Welcome to Parjad WebOS! Feel free to explore.' },
+                                    { name: 'Secret.txt', type: 'file', content: 'You found the secret file. 42 is the answer.' }
+                                ]
+                            },
+                            {
+                                name: 'Pictures',
+                                type: 'folder',
+                                children: []
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    useEffect(() => {
+        const saved = localStorage.getItem('os_camera_photos');
+        if (saved) {
+            try { setPhotos(JSON.parse(saved)); } catch (e) {}
+        }
+    }, []);
+
+    useEffect(() => {
+        setFileSystem(prev => {
+            const newFs = JSON.parse(JSON.stringify(prev));
+            const users = newFs.children.find(c => c.name === 'Users');
+            const guest = users?.children.find(c => c.name === 'Guest');
+            const pictures = guest?.children.find(c => c.name === 'Pictures');
+            if (pictures) {
+                pictures.children = photos.map(p => ({
+                    name: `Snapshot-${p.id}.jpg`,
+                    type: 'image',
+                    url: p.url
+                }));
+            }
+            return newFs;
+        });
+    }, [photos]);
 
     useEffect(() => {
         const timer = setInterval(() => setTime(new Date()), 1000);
@@ -256,7 +315,7 @@ export const DesktopOS = ({ theme }) => {
                                             sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
                                         />
                                     ) : (
-                                        <appDef.component theme={theme} osState={{ wallpaper, setWallpaper }} />
+                                        <appDef.component theme={theme} osState={{ wallpaper, setWallpaper, fileSystem, setFileSystem }} />
                                     )}
                                 </Window>
                             </div>
