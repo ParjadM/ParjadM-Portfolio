@@ -110,25 +110,22 @@ export const DesktopOS = ({ theme }) => {
     };
 
     const crtVariants = {
-        initial: { scaleY: 1, scaleX: 1, opacity: 1 },
+        initial: { scaleY: 0.8, scaleX: 1, opacity: 0.5 },
         exit: { 
-            scaleY: [1, 0.01, 0.01], 
+            scaleY: [0.8, 0.005, 0.005], 
             scaleX: [1, 1, 0], 
-            opacity: [1, 1, 0],
-            transition: { duration: 0.6, times: [0, 0.4, 1] } 
+            opacity: [0.8, 1, 0],
+            transition: { duration: 0.5, ease: "easeOut", times: [0, 0.4, 1] } 
         }
     };
 
     return (
-        <motion.div 
+        <div 
             className="fixed inset-0 w-full h-full overflow-hidden bg-black text-white font-sans select-none flex items-center justify-center"
-            initial="initial"
-            animate={isExiting ? "exit" : "initial"}
-            variants={crtVariants}
             onClick={closeContextMenu}
             onContextMenu={handleContextMenu}
         >
-            <div className="relative w-full h-full bg-gray-900 overflow-hidden shadow-[0_0_100px_rgba(255,255,255,0.1)]">
+            <div className={`relative w-full h-full bg-gray-900 overflow-hidden shadow-[0_0_100px_rgba(255,255,255,0.1)] transition-opacity duration-75 ${isExiting ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
                 {/* Wallpaper */}
                 <div className="absolute inset-0 z-0 transition-colors duration-1000">
                     {wallpaper === 'blobs' ? (
@@ -282,6 +279,16 @@ export const DesktopOS = ({ theme }) => {
                     </div>
                 </div>
             </div>
-        </motion.div>
+
+            {/* High-Performance CRT Animation Overlay */}
+            {isExiting && (
+                <motion.div
+                    className="absolute z-[99999] bg-white w-full h-full shadow-[0_0_50px_rgba(255,255,255,0.8)]"
+                    initial="initial"
+                    animate="exit"
+                    variants={crtVariants}
+                />
+            )}
+        </div>
     );
 };
