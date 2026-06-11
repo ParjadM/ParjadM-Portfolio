@@ -69,6 +69,7 @@ export const FileSystemApp = ({ theme }) => {
 
     const handleContextMenu = (e) => {
         e.preventDefault();
+        e.stopPropagation();
         if (rootRef.current) {
             const rect = rootRef.current.getBoundingClientRect();
             setContextMenu({ visible: true, x: e.clientX - rect.left, y: e.clientY - rect.top });
