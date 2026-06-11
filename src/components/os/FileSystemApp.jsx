@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Folder, FileText, Image as ImageIcon, ChevronRight, ChevronLeft, Search, HardDrive } from 'lucide-react';
 
 export const FileSystemApp = ({ theme }) => {
@@ -17,6 +17,7 @@ export const FileSystemApp = ({ theme }) => {
     }, []);
 
     const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 });
+    const rootRef = useRef(null);
     const [fileSystem, setFileSystem] = useState({
         name: 'C:',
         type: 'drive',
@@ -68,7 +69,10 @@ export const FileSystemApp = ({ theme }) => {
 
     const handleContextMenu = (e) => {
         e.preventDefault();
-        setContextMenu({ visible: true, x: e.clientX, y: e.clientY });
+        if (rootRef.current) {
+            const rect = rootRef.current.getBoundingClientRect();
+            setContextMenu({ visible: true, x: e.clientX - rect.left, y: e.clientY - rect.top });
+        }
     };
 
     const closeContextMenu = () => setContextMenu({ ...contextMenu, visible: false });
@@ -135,7 +139,7 @@ export const FileSystemApp = ({ theme }) => {
     };
 
     return (
-        <div className="flex flex-col h-full w-full bg-[#1e1e1e] text-gray-200 font-sans select-none" onClick={closeContextMenu}>
+        <div ref={rootRef} className="relative flex flex-col h-full w-full bg-[#1e1e1e] text-gray-200 font-sans select-none" onClick={closeContextMenu}>
             {/* Top Navigation Bar */}
             <div className="flex items-center space-x-2 p-2 bg-[#252526] border-b border-black/20 shadow-sm">
                 <button 
@@ -258,7 +262,7 @@ export const FileSystemApp = ({ theme }) => {
             {/* Context Menu */}
             {contextMenu.visible && (
                 <div 
-                    className="fixed z-[9999] w-48 bg-[#252526] border border-black/40 rounded shadow-2xl py-1 text-sm text-gray-300"
+                    className="absolute z-[9999] w-48 bg-[#252526] border border-black/40 rounded shadow-2xl py-1 text-sm text-gray-300"
                     style={{ left: contextMenu.x, top: contextMenu.y }}
                 >
                     <button onClick={(e) => { e.stopPropagation(); createItem('folder'); }} className="w-full text-left px-4 py-1.5 hover:bg-[#094771] hover:text-white flex items-center space-x-2">
