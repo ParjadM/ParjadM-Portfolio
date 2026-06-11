@@ -6,17 +6,19 @@ const CELL_SIZE = 20;
 const INITIAL_SPEED = 150;
 
 export const SnakeGameApp = ({ theme }) => {
-    const [snake, setSnake] = useState([{ x: 10, y: 10 }]);
-    const [food, setFood] = useState({ x: 15, y: 10 });
-    const [direction, setDirection] = useState({ x: 1, y: 0 });
-    const [gameOver, setGameOver] = useState(false);
-    const [score, setScore] = useState(0);
+    const [gameState, setGameState] = useState({
+        snake: [{ x: 10, y: 10 }],
+        food: { x: 15, y: 10 },
+        direction: { x: 1, y: 0 },
+        score: 0,
+        gameOver: false
+    });
+    
     const [highScore, setHighScore] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
     
-    const canvasRef = useRef(null);
-    const directionRef = useRef(direction);
-    directionRef.current = direction;
+    const directionRef = useRef(gameState.direction);
+    directionRef.current = gameState.direction;
 
     // Initialize high score from localStorage
     useEffect(() => {
@@ -39,11 +41,13 @@ export const SnakeGameApp = ({ theme }) => {
     }, []);
 
     const resetGame = () => {
-        setSnake([{ x: 10, y: 10 }]);
-        setDirection({ x: 1, y: 0 });
-        setFood(generateFood([{ x: 10, y: 10 }]));
-        setScore(0);
-        setGameOver(false);
+        setGameState({
+            snake: [{ x: 10, y: 10 }],
+            direction: { x: 1, y: 0 },
+            food: generateFood([{ x: 10, y: 10 }]),
+            score: 0,
+            gameOver: false
+        });
         setIsPaused(false);
     };
 
@@ -55,50 +59,53 @@ export const SnakeGameApp = ({ theme }) => {
             }
 
             const dir = directionRef.current;
+            let newDir = null;
             switch (e.key) {
                 case 'ArrowUp':
                 case 'w':
                 case 'W':
-                    if (dir.y === 0) setDirection({ x: 0, y: -1 });
+                    if (dir.y === 0) newDir = { x: 0, y: -1 };
                     break;
                 case 'ArrowDown':
                 case 's':
                 case 'S':
-                    if (dir.y === 0) setDirection({ x: 0, y: 1 });
+                    if (dir.y === 0) newDir = { x: 0, y: 1 };
                     break;
                 case 'ArrowLeft':
                 case 'a':
                 case 'A':
-                    if (dir.x === 0) setDirection({ x: -1, y: 0 });
+                    if (dir.x === 0) newDir = { x: -1, y: 0 };
                     break;
                 case 'ArrowRight':
                 case 'd':
                 case 'D':
-                    if (dir.x === 0) setDirection({ x: 1, y: 0 });
+                    if (dir.x === 0) newDir = { x: 1, y: 0 };
                     break;
                 case ' ':
-                    if (gameOver) resetGame();
+                    if (gameState.gameOver) resetGame();
                     else setIsPaused(p => !p);
                     break;
                 default:
                     break;
             }
+            
+            if (newDir) {
+                setGameState(prev => ({ ...prev, direction: newDir }));
+            }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [gameOver]);
-
     // Game Loop
     useEffect(() => {
-        if (gameOver || isPaused) return;
+        if (gameState.gameOver || isPaused) return;
 
         const moveSnake = () => {
-            setSnake(prevSnake => {
-                const head = prevSnake[0];
+            setGameState(prev => {
+                const head = prev.snake[0];
                 const newHead = {
-                    x: head.x + directionRef.current.x,
-                    y: head.y + directionRef.current.y
+                    x: head.x + prev.direction.x,
+                    y: head.y + prev.direction.y
                 };
 
                 // Wall collision
@@ -108,40 +115,46 @@ export const SnakeGameApp = ({ theme }) => {
                     newHead.y < 0 || 
                     newHead.y >= GRID_SIZE
                 ) {
-                    handleGameOver();
-                    return prevSnake;
+                    handleGameOver(prev.score);
+                    return { ...prev, gameOver: true };
                 }
 
                 // Self collision
-                if (prevSnake.some(segment => segment.x === newHead.x && segment.y === newHead.y)) {
-                    handleGameOver();
-                    return prevSnake;
+                if (prev.snake.some(segment => segment.x === newHead.x && segment.y === newHead.y)) {
+                    handleGameOver(prev.score);
+                    return { ...prev, gameOver: true };
                 }
 
-                const newSnake = [newHead, ...prevSnake];
+                const newSnake = [newHead, ...prev.snake];
+                let newFood = prev.food;
+                let newScore = prev.score;
 
                 // Food collision
-                if (newHead.x === food.x && newHead.y === food.y) {
-                    setScore(s => s + 10);
-                    setFood(generateFood(newSnake));
+                if (newHead.x === prev.food.x && newHead.y === prev.food.y) {
+                    newScore += 10;
+                    newFood = generateFood(newSnake);
                 } else {
                     newSnake.pop(); // Remove tail
                 }
 
-                return newSnake;
+                return {
+                    ...prev,
+                    snake: newSnake,
+                    food: newFood,
+                    score: newScore
+                };
             });
         };
 
-        const speed = Math.max(50, INITIAL_SPEED - Math.floor(score / 50) * 10);
+        const speed = Math.max(50, INITIAL_SPEED - Math.floor(gameState.score / 50) * 10);
         const gameInterval = setInterval(moveSnake, speed);
         return () => clearInterval(gameInterval);
-    }, [direction, food, gameOver, isPaused, score, generateFood]);
+    }, [gameState.gameOver, isPaused, generateFood, gameState.score]);
 
-    const handleGameOver = () => {
-        setGameOver(true);
-        if (score > highScore) {
-            setHighScore(score);
-            localStorage.setItem('os_snake_highscore', score.toString());
+    const handleGameOver = (finalScore) => {
+        if (finalScore > highScore) {
+            setHighScore(finalScore);
+            localStorage.setItem('os_snake_highscore', finalScore.toString());
         }
     };
 
@@ -158,7 +171,7 @@ export const SnakeGameApp = ({ theme }) => {
                 <div className="flex space-x-6 text-sm">
                     <div className="flex flex-col items-end">
                         <span className="text-gray-500 text-xs uppercase">Score</span>
-                        <span className="font-bold">{score}</span>
+                        <span className="font-bold">{gameState.score}</span>
                     </div>
                     <div className="flex flex-col items-end">
                         <span className="text-gray-500 text-xs uppercase">Best</span>
@@ -179,8 +192,8 @@ export const SnakeGameApp = ({ theme }) => {
                     {Array.from({ length: GRID_SIZE * GRID_SIZE }).map((_, i) => {
                         const x = i % GRID_SIZE;
                         const y = Math.floor(i / GRID_SIZE);
-                        const isFood = food.x === x && food.y === y;
-                        const snakeIndex = snake.findIndex(s => s.x === x && s.y === y);
+                        const isFood = gameState.food.x === x && gameState.food.y === y;
+                        const snakeIndex = gameState.snake.findIndex(s => s.x === x && s.y === y);
                         const isHead = snakeIndex === 0;
                         const isBody = snakeIndex > 0;
                         
@@ -202,10 +215,10 @@ export const SnakeGameApp = ({ theme }) => {
                     })}
                 </div>
 
-                {gameOver && (
+                {gameState.gameOver && (
                     <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center backdrop-blur-sm">
                         <h2 className="text-3xl font-bold text-red-500 mb-2 tracking-widest">GAME OVER</h2>
-                        <p className="text-gray-300 mb-6">Final Score: {score}</p>
+                        <p className="text-gray-300 mb-6">Final Score: {gameState.score}</p>
                         <button 
                             onClick={resetGame}
                             className="flex items-center space-x-2 bg-white text-black px-6 py-2 rounded-full font-bold hover:bg-gray-200 transition-transform active:scale-95"
@@ -216,7 +229,7 @@ export const SnakeGameApp = ({ theme }) => {
                     </div>
                 )}
 
-                {isPaused && !gameOver && (
+                {isPaused && !gameState.gameOver && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center backdrop-blur-sm">
                         <h2 className="text-2xl font-bold tracking-widest">PAUSED</h2>
                     </div>
