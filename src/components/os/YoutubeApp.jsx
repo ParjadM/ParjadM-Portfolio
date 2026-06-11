@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Youtube, Play } from 'lucide-react';
+import { Search, Play, Video } from 'lucide-react';
 
 export const YoutubeApp = ({ theme }) => {
     const [input, setInput] = useState('');
@@ -29,7 +29,7 @@ export const YoutubeApp = ({ theme }) => {
             {/* Header / Navbar */}
             <div className="flex items-center p-3 space-x-4 border-b border-white/10">
                 <div className="flex items-center space-x-1 text-red-500 font-semibold tracking-tighter text-xl">
-                    <Youtube className="w-8 h-8" />
+                    <Video className="w-8 h-8" />
                     <span>YouTube</span>
                 </div>
 

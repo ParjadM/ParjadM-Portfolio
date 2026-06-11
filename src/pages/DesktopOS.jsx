@@ -33,7 +33,7 @@ import {
     Gamepad2,
     Camera,
     Bot,
-    Youtube,
+    Video,
     Bluetooth,
     ShieldCheck
 } from 'lucide-react';
@@ -42,7 +42,7 @@ import { useNavigate } from 'react-router-dom';
 const APPS = [
     { id: 'browser', title: 'Web Browser', icon: <Compass className="w-4 h-4 text-blue-500" />, desktopIcon: <Compass className="w-10 h-10 text-blue-500" />, type: 'native', component: BrowserApp },
     { id: 'filesystem', title: 'File Explorer', icon: <Folder className="w-4 h-4 text-yellow-500" />, desktopIcon: <Folder className="w-10 h-10 text-yellow-500" />, type: 'native', component: FileSystemApp },
-    { id: 'youtube', title: 'YouTube', icon: <Youtube className="w-4 h-4 text-red-500" />, desktopIcon: <Youtube className="w-10 h-10 text-red-500" />, type: 'native', component: YoutubeApp },
+    { id: 'youtube', title: 'YouTube', icon: <Video className="w-4 h-4 text-red-500" />, desktopIcon: <Video className="w-10 h-10 text-red-500" />, type: 'native', component: YoutubeApp },
     { id: 'assistant', title: 'AI Assistant', icon: <Bot className="w-4 h-4 text-emerald-500" />, desktopIcon: <Bot className="w-10 h-10 text-emerald-500" />, type: 'native', component: AIAssistantApp },
     { id: 'camera', title: 'Camera', icon: <Camera className="w-4 h-4 text-pink-500" />, desktopIcon: <Camera className="w-10 h-10 text-pink-500" />, type: 'native', component: CameraApp },
     { id: 'settings', title: 'Settings', icon: <Settings className="w-4 h-4 text-gray-400" />, desktopIcon: <Settings className="w-10 h-10 text-gray-400" />, type: 'native', component: SettingsApp },
