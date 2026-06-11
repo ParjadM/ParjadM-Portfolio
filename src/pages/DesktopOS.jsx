@@ -6,6 +6,9 @@ import { Notepad } from '../components/os/Notepad.jsx';
 import { BrowserApp } from '../components/os/BrowserApp.jsx';
 import { CalculatorApp } from '../components/os/CalculatorApp.jsx';
 import { WeatherApp } from '../components/os/WeatherApp.jsx';
+import { SettingsApp } from '../components/os/SettingsApp.jsx';
+import { MediaPlayerApp } from '../components/os/MediaPlayerApp.jsx';
+import { SnakeGameApp } from '../components/os/SnakeGameApp.jsx';
 import { 
     Terminal, 
     Globe, 
@@ -20,15 +23,21 @@ import {
     FileEdit,
     Compass,
     Calculator,
-    CloudSun
+    CloudSun,
+    Settings,
+    Music,
+    Gamepad2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const APPS = [
     { id: 'browser', title: 'Web Browser', icon: <Compass className="w-4 h-4 text-blue-500" />, desktopIcon: <Compass className="w-10 h-10 text-blue-500" />, type: 'native', component: BrowserApp },
+    { id: 'settings', title: 'Settings', icon: <Settings className="w-4 h-4 text-gray-400" />, desktopIcon: <Settings className="w-10 h-10 text-gray-400" />, type: 'native', component: SettingsApp },
     { id: 'portfolio', title: 'Portfolio Home', icon: <Globe className="w-4 h-4 text-blue-400" />, desktopIcon: <Globe className="w-10 h-10 text-blue-400" />, type: 'iframe', url: '/' },
     { id: 'calculator', title: 'Calculator', icon: <Calculator className="w-4 h-4 text-orange-400" />, desktopIcon: <Calculator className="w-10 h-10 text-orange-400" />, type: 'native', component: CalculatorApp },
     { id: 'weather', title: 'Weather', icon: <CloudSun className="w-4 h-4 text-sky-400" />, desktopIcon: <CloudSun className="w-10 h-10 text-sky-400" />, type: 'native', component: WeatherApp },
+    { id: 'music', title: 'Media Player', icon: <Music className="w-4 h-4 text-indigo-400" />, desktopIcon: <Music className="w-10 h-10 text-indigo-400" />, type: 'native', component: MediaPlayerApp },
+    { id: 'snake', title: 'Snake Game', icon: <Gamepad2 className="w-4 h-4 text-emerald-500" />, desktopIcon: <Gamepad2 className="w-10 h-10 text-emerald-500" />, type: 'native', component: SnakeGameApp },
     { id: 'terminal', title: 'Command Prompt', icon: <Terminal className="w-4 h-4 text-emerald-400" />, desktopIcon: <Terminal className="w-10 h-10 text-emerald-400" />, type: 'iframe', url: '/cli' },
     { id: 'notepad', title: 'Notepad', icon: <FileEdit className="w-4 h-4 text-purple-400" />, desktopIcon: <FileEdit className="w-10 h-10 text-purple-400" />, type: 'native', component: Notepad },
     { id: 'news', title: 'Tech Hub', icon: <Newspaper className="w-4 h-4 text-pink-400" />, desktopIcon: <Newspaper className="w-10 h-10 text-pink-400" />, type: 'iframe', url: '/tech-news' },
@@ -223,7 +232,7 @@ export const DesktopOS = ({ theme }) => {
                                             sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
                                         />
                                     ) : (
-                                        <appDef.component theme={theme} />
+                                        <appDef.component theme={theme} osState={{ wallpaper, setWallpaper }} />
                                     )}
                                 </Window>
                             </div>
