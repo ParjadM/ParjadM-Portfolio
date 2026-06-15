@@ -1,7 +1,7 @@
 {
-  "timeWithConstant": "O(60N + 3P + 5B + D log D)",
-  "timeWithoutConstant": "O(N + P + B + log D)",
-  "memoryWithConstant": "O(192N + 32U + M + D)",
-  "memoryWithoutConstant": "O(N + U + M + D)",
-  "explanation": "The heaviest operations reside in the local client-side LQFT Benchmark page and server database metrics. Running the browser benchmark inserts and searches N items across several simulated 32-way branching trie representations. Each transaction performs custom hashing and up to 6 levels of node lookups, yielding a linear O(N) CPU runtime with a structural multiplier (~60N). SWR caching in the frontend stores U unique JSON payloads to ensure O(1) page transitions, while AI chat payload truncation constrains history assembly. Server-side database actions on D documents scale logarithmically O(log D) due to compound compound indexes on visitor and path tables."
+  "timeWithConstant": "O(N log N + 5N + C)",
+  "timeWithoutConstant": "O(N log N)",
+  "memoryWithConstant": "O(3N + K)",
+  "memoryWithoutConstant": "O(N)",
+  "explanation": "The overall time complexity is governed by the LQFT Benchmark page and data sorting layers (projects and blog feeds) which perform sorting and comparison operations in O(N log N) time, while standard page views and API operations run in linear O(N) time. Memory complexity is bounded to O(N) because the application holds dataset instances (projects, blog posts, live logs, simulated trees, and chatbot contexts) in both React's local state/Virtual DOM and server-side MongoDB/Redis cache buffers."
 }

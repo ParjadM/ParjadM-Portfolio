@@ -33,7 +33,7 @@ export const Window = ({
     const windowRef = useRef(null);
     const dragControls = useDragControls();
 
-    const handleResizeStart = (e) => {
+    const handleResize = (e, direction) => {
         e.stopPropagation();
         onFocus(id);
         const startX = e.clientX;
@@ -42,8 +42,15 @@ export const Window = ({
         const startHeight = size.height;
 
         const handlePointerMove = (eMove) => {
-            const newWidth = Math.max(300, startWidth + (eMove.clientX - startX));
-            const newHeight = Math.max(200, startHeight + (eMove.clientY - startY));
+            let newWidth = startWidth;
+            let newHeight = startHeight;
+            
+            if (direction === 'right' || direction === 'both') {
+                newWidth = Math.max(300, startWidth + (eMove.clientX - startX));
+            }
+            if (direction === 'bottom' || direction === 'both') {
+                newHeight = Math.max(200, startHeight + (eMove.clientY - startY));
+            }
             setSize({ width: newWidth, height: newHeight });
         };
 
@@ -135,16 +142,29 @@ export const Window = ({
                         {children}
                     </div>
 
-                    {/* Custom Resize Handle */}
+                    {/* Edge Resize Handles */}
                     {!isMaximized && (
-                        <div 
-                            onPointerDown={handleResizeStart}
-                            className="absolute bottom-0 right-0 w-6 h-6 cursor-se-resize z-50 flex items-end justify-end p-1.5 opacity-50 hover:opacity-100 transition-opacity"
-                        >
-                            <svg viewBox="0 0 10 10" width="10" height="10" className="text-gray-400">
-                                <path d="M 8 10 L 10 8 M 5 10 L 10 5 M 2 10 L 10 2" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
-                            </svg>
-                        </div>
+                        <>
+                            {/* Right Edge */}
+                            <div 
+                                onPointerDown={(e) => handleResize(e, 'right')}
+                                className="absolute top-0 right-0 w-2 h-full cursor-e-resize z-50 hover:bg-white/10 transition-colors"
+                            />
+                            {/* Bottom Edge */}
+                            <div 
+                                onPointerDown={(e) => handleResize(e, 'bottom')}
+                                className="absolute bottom-0 left-0 w-full h-2 cursor-s-resize z-50 hover:bg-white/10 transition-colors"
+                            />
+                            {/* Custom Bottom-Right Corner Resize Handle */}
+                            <div 
+                                onPointerDown={(e) => handleResize(e, 'both')}
+                                className="absolute bottom-0 right-0 w-6 h-6 cursor-se-resize z-50 flex items-end justify-end p-1.5 opacity-50 hover:opacity-100 transition-opacity bg-transparent"
+                            >
+                                <svg viewBox="0 0 10 10" width="10" height="10" className="text-gray-400">
+                                    <path d="M 8 10 L 10 8 M 5 10 L 10 5 M 2 10 L 10 2" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+                                </svg>
+                            </div>
+                        </>
                     )}
                 </motion.div>
             )}

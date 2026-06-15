@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Suspense } from 'react';
 import { Window } from '../components/ui/Window.jsx';
 import { BackgroundBlobs } from '../components/ui/BackgroundBlobs.jsx';
+import { BootSequence } from '../components/os/BootSequence.jsx';
 import { Loader2 } from 'lucide-react';
 
 const Notepad = React.lazy(() => import('../components/os/Notepad.jsx').then(module => ({ default: module.Notepad })));
@@ -80,6 +81,14 @@ export const DesktopOS = ({ theme }) => {
     const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
     const [startMenuSearch, setStartMenuSearch] = useState('');
     const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 });
+    const [isBooting, setIsBooting] = useState(() => !sessionStorage.getItem('os_has_booted'));
+    const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
     
     // Global OS State
     const [photos, setPhotos] = useState([]);
@@ -240,6 +249,26 @@ export const DesktopOS = ({ theme }) => {
         closeContextMenu();
     };
 
+    const createFileSystemItem = (type) => {
+        setFileSystem(prev => {
+            const newFs = JSON.parse(JSON.stringify(prev));
+            const users = newFs.children.find(c => c.name === 'Users');
+            const guest = users?.children.find(c => c.name === 'Guest');
+            const docs = guest?.children.find(c => c.name === 'Documents');
+            if (docs) {
+                if (type === 'folder') {
+                    const name = `New Folder ${docs.children.length + 1}`;
+                    docs.children.push({ name, type: 'folder', children: [] });
+                } else if (type === 'file') {
+                    const name = `New Document ${docs.children.length + 1}.txt`;
+                    docs.children.push({ name, type: 'file', content: '' });
+                }
+            }
+            return newFs;
+        });
+        closeContextMenu();
+    };
+
     const crtVariants = {
         initial: { scaleY: 0.8, scaleX: 1, opacity: 0.5 },
         exit: { 
@@ -251,6 +280,13 @@ export const DesktopOS = ({ theme }) => {
     };
 
     return (
+        <>
+        {isBooting && (
+            <BootSequence onComplete={() => {
+                sessionStorage.setItem('os_has_booted', 'true');
+                setIsBooting(false);
+            }} />
+        )}
         <div 
             className="fixed inset-0 w-full h-full overflow-hidden bg-black text-white font-sans select-none flex items-center justify-center"
             onClick={closeContextMenu}
@@ -282,10 +318,30 @@ export const DesktopOS = ({ theme }) => {
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
                             transition={{ duration: 0.1 }}
-                            className="absolute z-[9999] w-48 py-1 bg-gray-800/95 backdrop-blur-xl border border-white/10 rounded-lg shadow-2xl"
+                            className="absolute z-[9999] w-48 py-1 bg-gray-800/95 backdrop-blur-xl border border-white/10 rounded-lg shadow-2xl flex flex-col"
                             style={{ top: contextMenu.y, left: contextMenu.x }}
                             onClick={(e) => e.stopPropagation()}
                         >
+                            <button 
+                                onClick={() => createFileSystemItem('folder')}
+                                className="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-white/10 hover:text-white transition-colors"
+                            >
+                                New Folder
+                            </button>
+                            <button 
+                                onClick={() => createFileSystemItem('file')}
+                                className="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-white/10 hover:text-white transition-colors"
+                            >
+                                New Document
+                            </button>
+                            <div className="h-px bg-white/10 my-1 mx-2" />
+                            <button 
+                                onClick={() => { openApp('terminal'); closeContextMenu(); }}
+                                className="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-white/10 hover:text-white transition-colors"
+                            >
+                                Open Terminal
+                            </button>
+                            <div className="h-px bg-white/10 my-1 mx-2" />
                             <button 
                                 onClick={toggleWallpaper}
                                 className="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-white/10 hover:text-white transition-colors"
@@ -297,45 +353,64 @@ export const DesktopOS = ({ theme }) => {
                                     setWindows([]);
                                     closeContextMenu();
                                 }}
-                                className="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-white/10 hover:text-white transition-colors"
+                                className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/20 transition-colors"
                             >
-                                Refresh Desktop
+                                Close All Windows
                             </button>
                         </motion.div>
                     )}
                 </AnimatePresence>
 
-                {/* Draggable Desktop Icons */}
-                <div className="absolute inset-0 z-10 pointer-events-none">
-                    {desktopIcons.map(iconConfig => {
-                        const appDef = APPS.find(a => a.id === iconConfig.id);
-                        if (!appDef) return null;
-                        return (
-                            <motion.div
-                                key={iconConfig.id}
-                                drag
-                                dragMomentum={false}
-                                onDragEnd={(e, info) => {
-                                    setDesktopIcons(prev => prev.map(icon => 
-                                        icon.id === iconConfig.id 
-                                            ? { ...icon, x: icon.x + info.offset.x, y: icon.y + info.offset.y }
-                                            : icon
-                                    ));
-                                }}
-                                initial={{ x: iconConfig.x, y: iconConfig.y }}
-                                className="absolute pointer-events-auto flex flex-col items-center justify-center p-2 rounded-lg hover:bg-white/10 transition-colors group cursor-pointer w-24"
-                                onDoubleClick={(e) => { e.stopPropagation(); openApp(iconConfig.id); }}
+                {/* Desktop Icons / Mobile Grid */}
+                {isMobile ? (
+                    <div className="absolute inset-0 z-10 p-6 pt-12 grid grid-cols-4 gap-x-4 gap-y-8 content-start">
+                        {APPS.map((app) => (
+                            <div 
+                                key={app.id}
+                                onClick={(e) => { e.stopPropagation(); openApp(app.id); }}
+                                className="flex flex-col items-center justify-start cursor-pointer group active:scale-95 transition-transform"
                             >
-                                <div className="group-hover:scale-110 transition-transform duration-200">
-                                    {appDef.desktopIcon}
+                                <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/20 shadow-lg mb-2">
+                                    {React.cloneElement(app.desktopIcon, { className: 'w-8 h-8 text-white' })}
                                 </div>
-                                <span className="mt-1 text-xs text-white text-center drop-shadow-md font-medium px-1 bg-black/20 rounded break-words w-full">
-                                    {appDef.title}
+                                <span className="text-[10px] font-medium text-white text-center drop-shadow-md leading-tight max-w-full break-words px-1">
+                                    {app.title}
                                 </span>
-                            </motion.div>
-                        );
-                    })}
-                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="absolute inset-0 z-10 pointer-events-none">
+                        {desktopIcons.map(iconConfig => {
+                            const appDef = APPS.find(a => a.id === iconConfig.id);
+                            if (!appDef) return null;
+                            return (
+                                <motion.div
+                                    key={iconConfig.id}
+                                    drag
+                                    dragMomentum={false}
+                                    onDragEnd={(e, info) => {
+                                        setDesktopIcons(prev => prev.map(icon => 
+                                            icon.id === iconConfig.id 
+                                                ? { ...icon, x: icon.x + info.offset.x, y: icon.y + info.offset.y }
+                                                : icon
+                                        ));
+                                    }}
+                                    initial={{ x: iconConfig.x, y: iconConfig.y }}
+                                    className="absolute pointer-events-auto flex flex-col items-center justify-center p-2 rounded-lg hover:bg-white/10 transition-colors group cursor-pointer w-24"
+                                    onDoubleClick={(e) => { e.stopPropagation(); openApp(iconConfig.id); }}
+                                >
+                                    <div className="group-hover:scale-110 transition-transform duration-200">
+                                        {appDef.desktopIcon}
+                                    </div>
+                                    <span className="mt-1 text-xs text-white text-center drop-shadow-md font-medium px-1 bg-black/20 rounded break-words w-full">
+                                        {appDef.title}
+                                    </span>
+                                </motion.div>
+                            );
+                        })}
+                    </div>
+                )}
 
                 {/* Windows Window Manager */}
                 <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden">
@@ -438,8 +513,10 @@ export const DesktopOS = ({ theme }) => {
                     )}
                 </AnimatePresence>
 
-                {/* Taskbar */}
-                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gray-900/80 backdrop-blur-xl border-t border-white/10 z-50 flex items-center justify-between px-2 sm:px-4">
+                {/* Taskbar / Dock */}
+                <div className={`absolute bottom-0 left-0 w-full z-40 transition-all duration-300 ${isMobile ? 'h-0 overflow-hidden' : 'h-12'}`}>
+                    <div className="absolute inset-0 bg-gray-900/80 backdrop-blur-2xl border-t border-white/10" />
+                    <div className="relative h-full flex items-center justify-between px-2 sm:px-4">
                     {/* Start Button & Centered Apps */}
                     <div className="flex-1 flex items-center justify-start sm:justify-center space-x-2 overflow-x-auto overflow-y-hidden scrollbar-hide pr-2">
                         <button 
@@ -554,6 +631,7 @@ export const DesktopOS = ({ theme }) => {
                                 </motion.div>
                             )}
                         </AnimatePresence>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -568,5 +646,6 @@ export const DesktopOS = ({ theme }) => {
                 />
             )}
         </div>
+        </>
     );
 };
