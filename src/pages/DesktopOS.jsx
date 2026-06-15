@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Suspense } from 'react';
 import { Window } from '../components/ui/Window.jsx';
 import { BackgroundBlobs } from '../components/ui/BackgroundBlobs.jsx';
-import { BootSequence } from '../components/os/BootSequence.jsx';
 import { Loader2 } from 'lucide-react';
 
 const Notepad = React.lazy(() => import('../components/os/Notepad.jsx').then(module => ({ default: module.Notepad })));
@@ -81,7 +80,6 @@ export const DesktopOS = ({ theme }) => {
     const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
     const [startMenuSearch, setStartMenuSearch] = useState('');
     const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 });
-    const [isBooting, setIsBooting] = useState(() => !sessionStorage.getItem('os_has_booted'));
     const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
 
     useEffect(() => {
@@ -280,13 +278,6 @@ export const DesktopOS = ({ theme }) => {
     };
 
     return (
-        <>
-        {isBooting && (
-            <BootSequence onComplete={() => {
-                sessionStorage.setItem('os_has_booted', 'true');
-                setIsBooting(false);
-            }} />
-        )}
         <div 
             className="fixed inset-0 w-full h-full overflow-hidden bg-black text-white font-sans select-none flex items-center justify-center"
             onClick={closeContextMenu}
@@ -646,6 +637,5 @@ export const DesktopOS = ({ theme }) => {
                 />
             )}
         </div>
-        </>
     );
 };
