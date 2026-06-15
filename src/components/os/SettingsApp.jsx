@@ -45,26 +45,30 @@ export const SettingsApp = ({ theme, osState }) => {
                             Desktop Background
                         </h3>
                         
-                        <div className="grid grid-cols-2 gap-4">
-                            <div 
-                                onClick={() => setWallpaper('blobs')}
-                                className={`cursor-pointer group relative rounded-xl overflow-hidden aspect-video border-2 transition-all ${wallpaper === 'blobs' ? 'border-blue-500 ring-4 ring-blue-500/20' : 'border-white/10 hover:border-white/30'}`}
-                            >
-                                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 opacity-80 group-hover:scale-105 transition-transform duration-500" />
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                                    <span className="font-medium text-white drop-shadow-md">Fluid Blobs</span>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            {[
+                                { id: 'blobs', name: 'Fluid Blobs', preview: 'bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500' },
+                                { id: 'solid', name: 'Solid Dark', preview: 'bg-gray-950' },
+                                { id: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2064&auto=format&fit=crop', name: 'Abstract Liquid', type: 'image' },
+                                { id: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop', name: 'Earth Space', type: 'image' },
+                                { id: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop', name: 'Cyber Neon', type: 'image' },
+                                { id: 'https://images.unsplash.com/photo-1506744626753-140285396207?q=80&w=2070&auto=format&fit=crop', name: 'Mountain Lake', type: 'image' }
+                            ].map(wp => (
+                                <div 
+                                    key={wp.id}
+                                    onClick={() => setWallpaper(wp.id)}
+                                    className={`cursor-pointer group relative rounded-xl overflow-hidden aspect-video border-2 transition-all ${wallpaper === wp.id ? 'border-blue-500 ring-4 ring-blue-500/20' : 'border-white/10 hover:border-white/30'}`}
+                                >
+                                    {wp.type === 'image' ? (
+                                        <img src={wp.id} alt={wp.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                    ) : (
+                                        <div className={`absolute inset-0 ${wp.preview} opacity-80 group-hover:scale-105 transition-transform duration-500`} />
+                                    )}
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                                        <span className="font-medium text-white drop-shadow-md text-xs sm:text-sm text-center px-1">{wp.name}</span>
+                                    </div>
                                 </div>
-                            </div>
-                            
-                            <div 
-                                onClick={() => setWallpaper('solid')}
-                                className={`cursor-pointer group relative rounded-xl overflow-hidden aspect-video border-2 transition-all ${wallpaper === 'solid' ? 'border-blue-500 ring-4 ring-blue-500/20' : 'border-white/10 hover:border-white/30'}`}
-                            >
-                                <div className="absolute inset-0 bg-gray-950" />
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <span className="font-medium text-white drop-shadow-md">Solid Dark</span>
-                                </div>
-                            </div>
+                            ))}
                         </div>
 
                         <div className="mt-4 flex space-x-2">
