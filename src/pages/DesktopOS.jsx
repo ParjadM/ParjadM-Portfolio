@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Suspense } from 'react';
 import { Window } from '../components/ui/Window.jsx';
 import { BackgroundBlobs } from '../components/ui/BackgroundBlobs.jsx';
-import { Notepad } from '../components/os/Notepad.jsx';
-import { BrowserApp } from '../components/os/BrowserApp.jsx';
-import { CalculatorApp } from '../components/os/CalculatorApp.jsx';
-import { WeatherApp } from '../components/os/WeatherApp.jsx';
-import { SettingsApp } from '../components/os/SettingsApp.jsx';
-import { MediaPlayerApp } from '../components/os/MediaPlayerApp.jsx';
-import { SnakeGameApp } from '../components/os/SnakeGameApp.jsx';
-import { CameraApp } from '../components/os/CameraApp.jsx';
-import { AIAssistantApp } from '../components/os/AIAssistantApp.jsx';
-import { FileSystemApp } from '../components/os/FileSystemApp.jsx';
-import { YoutubeApp } from '../components/os/YoutubeApp.jsx';
-import { TerminalApp } from '../components/os/TerminalApp.jsx';
+import { Loader2 } from 'lucide-react';
+
+const Notepad = React.lazy(() => import('../components/os/Notepad.jsx').then(module => ({ default: module.Notepad })));
+const BrowserApp = React.lazy(() => import('../components/os/BrowserApp.jsx').then(module => ({ default: module.BrowserApp })));
+const CalculatorApp = React.lazy(() => import('../components/os/CalculatorApp.jsx').then(module => ({ default: module.CalculatorApp })));
+const WeatherApp = React.lazy(() => import('../components/os/WeatherApp.jsx').then(module => ({ default: module.WeatherApp })));
+const SettingsApp = React.lazy(() => import('../components/os/SettingsApp.jsx').then(module => ({ default: module.SettingsApp })));
+const MediaPlayerApp = React.lazy(() => import('../components/os/MediaPlayerApp.jsx').then(module => ({ default: module.MediaPlayerApp })));
+const SnakeGameApp = React.lazy(() => import('../components/os/SnakeGameApp.jsx').then(module => ({ default: module.SnakeGameApp })));
+const CameraApp = React.lazy(() => import('../components/os/CameraApp.jsx').then(module => ({ default: module.CameraApp })));
+const AIAssistantApp = React.lazy(() => import('../components/os/AIAssistantApp.jsx').then(module => ({ default: module.AIAssistantApp })));
+const FileSystemApp = React.lazy(() => import('../components/os/FileSystemApp.jsx').then(module => ({ default: module.FileSystemApp })));
+const YoutubeApp = React.lazy(() => import('../components/os/YoutubeApp.jsx').then(module => ({ default: module.YoutubeApp })));
+const TerminalApp = React.lazy(() => import('../components/os/TerminalApp.jsx').then(module => ({ default: module.TerminalApp })));
 import { 
     Terminal, 
     Globe, 
@@ -70,7 +73,8 @@ export const DesktopOS = ({ theme }) => {
     const [topZIndex, setTopZIndex] = useState(10);
     const [time, setTime] = useState(new Date());
     const [isExiting, setIsExiting] = useState(false);
-    const [wallpaper, setWallpaper] = useState('blobs');
+    const [wallpaper, setWallpaper] = useState(() => localStorage.getItem('os_wallpaper') || 'blobs');
+    const [osTheme, setOsTheme] = useState(() => localStorage.getItem('os_theme') || 'emerald');
     const [isClockExpanded, setIsClockExpanded] = useState(false);
     const [isTrayExpanded, setIsTrayExpanded] = useState(false);
     const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
@@ -79,37 +83,61 @@ export const DesktopOS = ({ theme }) => {
     
     // Global OS State
     const [photos, setPhotos] = useState([]);
-    const [fileSystem, setFileSystem] = useState({
-        name: 'C:',
-        type: 'drive',
-        children: [
-            {
-                name: 'Users',
-                type: 'folder',
-                children: [
-                    {
-                        name: 'Guest',
-                        type: 'folder',
-                        children: [
-                            {
-                                name: 'Documents',
-                                type: 'folder',
-                                children: [
-                                    { name: 'Welcome.txt', type: 'file', content: 'Welcome to Parjad WebOS! Feel free to explore.' },
-                                    { name: 'Secret.txt', type: 'file', content: 'You found the secret file. 42 is the answer.' }
-                                ]
-                            },
-                            {
-                                name: 'Pictures',
-                                type: 'folder',
-                                children: []
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
+    const [fileSystem, setFileSystem] = useState(() => {
+        const saved = localStorage.getItem('os_file_system');
+        if (saved) {
+            try { return JSON.parse(saved); } catch (e) {}
+        }
+        return {
+            name: 'C:',
+            type: 'drive',
+            children: [
+                {
+                    name: 'Users',
+                    type: 'folder',
+                    children: [
+                        {
+                            name: 'Guest',
+                            type: 'folder',
+                            children: [
+                                {
+                                    name: 'Documents',
+                                    type: 'folder',
+                                    children: [
+                                        { name: 'Welcome.txt', type: 'file', content: 'Welcome to Parjad WebOS! Feel free to explore.' },
+                                        { name: 'Secret.txt', type: 'file', content: 'You found the secret file. 42 is the answer.' }
+                                    ]
+                                },
+                                {
+                                    name: 'Pictures',
+                                    type: 'folder',
+                                    children: []
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
     });
+
+    const [desktopIcons, setDesktopIcons] = useState(() => {
+        const saved = localStorage.getItem('os_desktop_icons');
+        if (saved) {
+            try { return JSON.parse(saved); } catch (e) {}
+        }
+        return [
+            { id: 'browser', x: 20, y: 20 },
+            { id: 'filesystem', x: 20, y: 120 },
+            { id: 'terminal', x: 20, y: 220 },
+            { id: 'settings', x: 20, y: 320 }
+        ];
+    });
+
+    useEffect(() => { localStorage.setItem('os_wallpaper', wallpaper); }, [wallpaper]);
+    useEffect(() => { localStorage.setItem('os_theme', osTheme); }, [osTheme]);
+    useEffect(() => { localStorage.setItem('os_file_system', JSON.stringify(fileSystem)); }, [fileSystem]);
+    useEffect(() => { localStorage.setItem('os_desktop_icons', JSON.stringify(desktopIcons)); }, [desktopIcons]);
 
     useEffect(() => {
         const saved = localStorage.getItem('os_camera_photos');
@@ -233,30 +261,17 @@ export const DesktopOS = ({ theme }) => {
                 <div className="absolute inset-0 z-0 transition-colors duration-1000">
                     {wallpaper === 'blobs' ? (
                         <>
-                            <BackgroundBlobs theme={theme} darkMode={true} />
+                            <BackgroundBlobs theme={osTheme} darkMode={true} />
                             <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
                         </>
-                    ) : (
+                    ) : wallpaper === 'solid' ? (
                         <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900" />
-                    )}
-                </div>
-
-                {/* Desktop Icons */}
-                <div className="absolute inset-0 z-10 p-6 flex flex-col items-start gap-6 content-start flex-wrap">
-                    {APPS.map((app) => (
-                        <div 
-                            key={app.id}
-                            onDoubleClick={(e) => { e.stopPropagation(); openApp(app.id); }}
-                            className="flex flex-col items-center justify-center w-24 p-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer group"
-                        >
-                            <div className="drop-shadow-lg group-hover:scale-110 transition-transform duration-200">
-                                {app.desktopIcon}
-                            </div>
-                            <span className="mt-2 text-xs font-medium text-center drop-shadow-md bg-black/20 px-2 py-0.5 rounded backdrop-blur-sm">
-                                {app.title}
-                            </span>
+                    ) : (
+                        <div className="absolute inset-0">
+                            <img src={wallpaper} alt="Wallpaper" className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/20" />
                         </div>
-                    ))}
+                    )}
                 </div>
 
                 {/* Custom Context Menu */}
@@ -290,8 +305,40 @@ export const DesktopOS = ({ theme }) => {
                     )}
                 </AnimatePresence>
 
+                {/* Draggable Desktop Icons */}
+                <div className="absolute inset-0 z-10 pointer-events-none">
+                    {desktopIcons.map(iconConfig => {
+                        const appDef = APPS.find(a => a.id === iconConfig.id);
+                        if (!appDef) return null;
+                        return (
+                            <motion.div
+                                key={iconConfig.id}
+                                drag
+                                dragMomentum={false}
+                                onDragEnd={(e, info) => {
+                                    setDesktopIcons(prev => prev.map(icon => 
+                                        icon.id === iconConfig.id 
+                                            ? { ...icon, x: icon.x + info.offset.x, y: icon.y + info.offset.y }
+                                            : icon
+                                    ));
+                                }}
+                                initial={{ x: iconConfig.x, y: iconConfig.y }}
+                                className="absolute pointer-events-auto flex flex-col items-center justify-center p-2 rounded-lg hover:bg-white/10 transition-colors group cursor-pointer w-24"
+                                onDoubleClick={(e) => { e.stopPropagation(); openApp(iconConfig.id); }}
+                            >
+                                <div className="group-hover:scale-110 transition-transform duration-200">
+                                    {appDef.desktopIcon}
+                                </div>
+                                <span className="mt-1 text-xs text-white text-center drop-shadow-md font-medium px-1 bg-black/20 rounded break-words w-full">
+                                    {appDef.title}
+                                </span>
+                            </motion.div>
+                        );
+                    })}
+                </div>
+
                 {/* Windows Window Manager */}
-                <div className="absolute inset-0 z-20 pointer-events-none">
+                <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden">
                     {windows.map(win => {
                         const appDef = APPS.find(a => a.id === win.id);
                         if (!appDef) return null;
@@ -321,7 +368,9 @@ export const DesktopOS = ({ theme }) => {
                                             sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
                                         />
                                     ) : (
-                                        <appDef.component theme={theme} osState={{ wallpaper, setWallpaper, fileSystem, setFileSystem }} />
+                                        <Suspense fallback={<div className="h-full w-full flex flex-col items-center justify-center text-white space-y-4"><Loader2 className="w-8 h-8 animate-spin text-emerald-500" /><span>Loading App...</span></div>}>
+                                            <appDef.component theme={osTheme} osState={{ wallpaper, setWallpaper, fileSystem, setFileSystem, osTheme, setOsTheme }} />
+                                        </Suspense>
                                     )}
                                 </Window>
                             </div>

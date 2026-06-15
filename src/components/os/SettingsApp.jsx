@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Monitor, Image as ImageIcon, Settings as SettingsIcon, Shield, Cpu, HardDrive } from 'lucide-react';
 
 export const SettingsApp = ({ theme, osState }) => {
-    const { wallpaper, setWallpaper } = osState;
+    const { wallpaper, setWallpaper, osTheme, setOsTheme } = osState;
     const [activeTab, setActiveTab] = useState('personalization');
+    const [customUrl, setCustomUrl] = useState(wallpaper && wallpaper.startsWith('http') ? wallpaper : '');
 
     return (
         <div className="flex h-full w-full bg-gray-900 text-gray-200">
@@ -64,6 +65,45 @@ export const SettingsApp = ({ theme, osState }) => {
                                     <span className="font-medium text-white drop-shadow-md">Solid Dark</span>
                                 </div>
                             </div>
+                        </div>
+
+                        <div className="mt-4 flex space-x-2">
+                            <input 
+                                type="text"
+                                placeholder="Custom Image URL..."
+                                value={customUrl}
+                                onChange={(e) => setCustomUrl(e.target.value)}
+                                className="flex-1 bg-gray-800/50 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50"
+                            />
+                            <button 
+                                onClick={() => { if (customUrl) setWallpaper(customUrl); }}
+                                className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                            >
+                                Apply
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Theme Accent Color */}
+                    <div className="space-y-4 pt-6 border-t border-white/10">
+                        <h3 className="text-sm font-medium text-gray-300 flex items-center">
+                            <Monitor className="w-4 h-4 mr-2" />
+                            System Accent Color
+                        </h3>
+                        <div className="flex space-x-4">
+                            {[
+                                { id: 'emerald', color: 'bg-emerald-500' },
+                                { id: 'blue', color: 'bg-blue-500' },
+                                { id: 'purple', color: 'bg-purple-500' },
+                                { id: 'pink', color: 'bg-pink-500' },
+                            ].map(t => (
+                                <button
+                                    key={t.id}
+                                    onClick={() => setOsTheme(t.id)}
+                                    className={`w-10 h-10 rounded-full transition-all ${t.color} ${osTheme === t.id ? 'ring-4 ring-white/50 scale-110' : 'hover:scale-105 opacity-80 hover:opacity-100'}`}
+                                    title={t.id}
+                                />
+                            ))}
                         </div>
                     </div>
                     </>
