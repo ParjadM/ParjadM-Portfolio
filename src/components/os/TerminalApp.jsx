@@ -113,10 +113,23 @@ export const TerminalApp = ({ theme, osState }) => {
 
         switch(cmd) {
             case 'help':
-                pushToHistory('system', 'Available commands:\n  ls         - List directory contents\n  cd         - Change directory\n  pwd        - Print working directory\n  cat        - Read a text file\n  mkdir      - Create a new directory\n  touch      - Create a new empty file\n  rm         - Remove a file or directory\n  clear      - Clear terminal');
+                pushToHistory('system', 'Available commands:\n  ls         - List directory contents\n  cd         - Change directory\n  pwd        - Print working directory\n  cat        - Read a text file\n  mkdir      - Create a new directory\n  touch      - Create a new empty file\n  rm         - Remove a file or directory\n  ping       - Send ICMP ECHO_REQUEST to network hosts\n  clear      - Clear terminal');
                 break;
             case 'clear':
                 setHistory([{ type: 'system', text: 'Terminal cleared.', animated: false }]);
+                break;
+            case 'ping':
+                if (!args[0]) {
+                    pushToHistory('error', 'ping: missing host operand');
+                } else if (args[0].includes('parjadm.ca')) {
+                    pushToHistory('system', `Pinging ${args[0]} [216.198.79.1] with 32 bytes of data:\n`);
+                    setTimeout(() => pushToHistory('system', `Reply from 216.198.79.1: bytes=32 time=4ms TTL=248`), 500);
+                    setTimeout(() => pushToHistory('system', `Reply from 216.198.79.1: bytes=32 time=5ms TTL=248`), 1000);
+                    setTimeout(() => pushToHistory('system', `\n...Wait, anomalous connection detected...`), 1800);
+                    setTimeout(() => pushToHistory('system', `\nACCESS GRANTED.\n\n   \\ \`    /  ___  ___   ____  ____  ___   _____    _   _\n   /   \\  /  | __]| _ \\ [__  | __]| _ \\ | __|  \\  // | |\n   \\_// \\/   | _] | _ < ___] | _] |  _/ |  _|\\  \\//  | |\n     \\__/    |___]|___/ |___]|___]|_\\   |_|   \\__/   |_|\n\nWelcome to the hidden network, guest.`), 3000);
+                } else {
+                    pushToHistory('system', `Pinging ${args[0]} [192.168.1.1] with 32 bytes of data:\nReply from 192.168.1.1: bytes=32 time=12ms TTL=64\nReply from 192.168.1.1: bytes=32 time=14ms TTL=64\nReply from 192.168.1.1: bytes=32 time=11ms TTL=64\n\nPing statistics for 192.168.1.1:\n    Packets: Sent = 3, Received = 3, Lost = 0 (0% loss)`);
+                }
                 break;
             case 'pwd':
                 pushToHistory('system', formatPathStr(currentPath));
