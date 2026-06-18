@@ -1,5 +1,5 @@
-import React from 'react';
-import { Route } from 'react-router-dom';
+import React, { Suspense } from 'react';
+import { Route, useRoutes } from 'react-router-dom';
 import { RequireAuth } from '../../utils/auth.jsx';
 
 const HomeSection = React.lazy(() => import('../../pages/HomeSection.jsx').then(m => ({ default: m.HomeSection })));
@@ -44,20 +44,46 @@ function routePath(prefix, path) {
   return path;
 }
 
-export function AppRoutes({ theme }) {
-  const themed = (Component) => <Component theme={theme} />;
-
+function lazyThemed(Component, theme) {
   return (
-    <>
-      {PUBLIC_ROUTES.flatMap(({ path, Component }) => [
-        <Route key={`en-${path}`} path={routePath('', path)} element={themed(Component)} />,
-        <Route key={`fr-${path}`} path={routePath('/fr', path)} element={themed(Component)} />,
-      ])}
-      <Route path="/admin/login" element={themed(AdminLoginPage)} />
-      <Route path="/admin" element={<RequireAuth>{themed(AdminDashboard)}</RequireAuth>} />
-      <Route path="/fr/admin/login" element={themed(AdminLoginPage)} />
-      <Route path="/fr/admin" element={<RequireAuth>{themed(AdminDashboard)}</RequireAuth>} />
-      <Route path="*" element={themed(NotFoundPage)} />
-    </>
+    <Suspense fallback={
+      <div className="min-h-[50vh] flex items-center justify-center py-20 px-4 text-gray-300">
+        Loading...
+      </div>
+    }>
+      <Component theme={theme} />
+    </Suspense>
   );
+}
+
+export function buildAppRouteElements(theme) {
+  const themed = (Component) => lazyThemed(Component, theme);
+
+  return PUBLIC_ROUTES.flatMap(({ path, Component }) => [
+    <Route key={`en-${path}`} path={routePath('', path)} element={themed(Component)} />,
+    <Route key={`fr-${path}`} path={routePath('/fr', path)} element={themed(Component)} />,
+  ]).concat([
+    <Route key="admin-login" path="/admin/login" element={themed(AdminLoginPage)} />,
+    <Route key="admin" path="/admin" element={<RequireAuth>{themed(AdminDashboard)}</RequireAuth>} />,
+    <Route key="fr-admin-login" path="/fr/admin/login" element={themed(AdminLoginPage)} />,
+    <Route key="fr-admin" path="/fr/admin" element={<RequireAuth>{themed(AdminDashboard)}</RequireAuth>} />,
+    <Route key="not-found" path="*" element={themed(NotFoundPage)} />,
+  ]);
+}
+
+/** Hook-based routing for use outside a <Routes> wrapper. */
+export function AppRoutes({ theme }) {
+  const themed = (Component) => lazyThemed(Component, theme);
+
+  return useRoutes([
+    ...PUBLIC_ROUTES.flatMap(({ path, Component }) => [
+      { path: routePath('', path), element: themed(Component) },
+      { path: routePath('/fr', path), element: themed(Component) },
+    ]),
+    { path: '/admin/login', element: themed(AdminLoginPage) },
+    { path: '/admin', element: <RequireAuth>{themed(AdminDashboard)}</RequireAuth> },
+    { path: '/fr/admin/login', element: themed(AdminLoginPage) },
+    { path: '/fr/admin', element: <RequireAuth>{themed(AdminDashboard)}</RequireAuth> },
+    { path: '*', element: themed(NotFoundPage) },
+  ]);
 }

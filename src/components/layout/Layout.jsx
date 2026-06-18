@@ -1,5 +1,5 @@
-import React, { useState, useEffect, Suspense } from 'react';
-import { useLocation, Routes } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { BackgroundBlobs } from '../ui/BackgroundBlobs.jsx';
 import { CustomCursor } from '../CustomCursor.jsx';
 import { Header } from './Header.jsx';
@@ -135,18 +135,10 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
                 />
             )}
             
-            <main id="main-content" role="main" tabIndex={-1} className={`transition-all duration-500 ${!isFullscreenRoute ? 'pt-[4.75rem] sm:pt-20 md:pt-24 pb-28 lg:pb-0' : ''}`}>
-                <Suspense fallback={
-                    <div className="min-h-screen flex items-center justify-center py-20 px-4 text-gray-300">
-                        Loading...
-                    </div>
-                }>
-                    <AnimatePresence mode="wait">
-                        <Routes location={location} key={location.pathname}>
-                            <AppRoutes theme={themeConfig.accentPrefix} />
-                        </Routes>
-                    </AnimatePresence>
-                </Suspense>
+            <main id="main-content" role="main" tabIndex={-1} className={`relative z-10 transition-all duration-500 ${!isFullscreenRoute ? 'pt-[4.75rem] sm:pt-20 md:pt-24 pb-28 lg:pb-0' : ''}`}>
+                <AnimatePresence mode="wait">
+                    <AppRoutes theme={themeConfig.accentPrefix} key={location.pathname} />
+                </AnimatePresence>
             </main>
 
             {/* Footer */}
