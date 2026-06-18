@@ -46,26 +46,13 @@ export const HomeSection = ({ theme }) => {
           <a href="https://github.com/ParjadM" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:-translate-y-0.5 hover:scale-105"><Github size={32} /></a>
           <a href="https://www.linkedin.com/in/parjadminooei" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:-translate-y-0.5 hover:scale-105"><Linkedin size={32} /></a>
         </div>
-
-        <p className="mt-10 text-sm font-semibold uppercase tracking-wider text-gray-400">{t('home.mainPath')}</p>
-        <div className="mt-3 flex flex-wrap gap-3">
-          <RippleButton onClick={() => navigate('/about')} className="px-6 py-2.5 rounded-full text-sm font-semibold shadow-lg" theme={theme}>
-            {t('nav.About')}
-          </RippleButton>
-          <RippleButton onClick={() => navigate('/projects')} className="px-6 py-2.5 rounded-full text-sm font-semibold shadow-lg" theme={theme}>
-            {t('nav.Projects')}
-          </RippleButton>
-          <RippleButton onClick={() => navigate('/contact')} className="px-6 py-2.5 rounded-full text-sm font-semibold shadow-lg" theme={theme}>
-            {t('nav.Contact')}
-          </RippleButton>
-        </div>
-
-        <p className="mt-8 text-sm font-semibold uppercase tracking-wider text-gray-400">{t('home.exploreLabel')}</p>
-        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm">
-          <Link to="/stats" className={`${theme === 'pink' ? 'text-pink-300 hover:text-pink-200' : 'text-emerald-300 hover:text-emerald-200'} hover:underline`}>{t('nav.Stats')}</Link>
-          <Link to="/blog" className={`${theme === 'pink' ? 'text-pink-300 hover:text-pink-200' : 'text-emerald-300 hover:text-emerald-200'} hover:underline`}>{t('nav.Blog')}</Link>
-          <Link to="/explore" className={`${theme === 'pink' ? 'text-pink-300 hover:text-pink-200' : 'text-emerald-300 hover:text-emerald-200'} hover:underline`}>{t('home.exploreAll')}</Link>
-        </div>
+        <RippleButton 
+          onClick={() => navigate('/contact')} 
+          className="mt-10 px-8 py-3 rounded-full text-lg font-semibold shadow-lg"
+          theme={theme}
+        >
+          {t('home.cta')}
+        </RippleButton>
         </Reveal>
         
       </div>
