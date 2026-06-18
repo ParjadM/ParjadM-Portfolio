@@ -86,7 +86,7 @@ export const Window = ({
                     dragConstraints={{ left: 0, top: 0, right: window.innerWidth - 100, bottom: window.innerHeight - 100 }}
                     initial={{ opacity: 0, scale: 0.95, ...defaultPosition }}
                     animate={{ 
-                        opacity: 1, 
+                        opacity: isFocused ? 1 : 0.88, 
                         scale: 1,
                         x: isMaximized ? 0 : undefined,
                         y: isMaximized ? 0 : undefined,

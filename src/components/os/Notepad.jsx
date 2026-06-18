@@ -3,14 +3,19 @@ import { Download, FileText, LayoutTemplate } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
-export const Notepad = ({ theme }) => {
-    const [text, setText] = useState('# Web OS Notes\n\nWelcome to the Markdown editor!\n\n- Write **Markdown** on the left.\n- See the *preview* on the right.\n- Support for [links](https://github.com) and `code`.');
+export const Notepad = ({ theme, osState }) => {
+    const { notepadFile } = osState || {};
+    const [text, setText] = useState('# Web OS Notes\n\nWelcome to the Markdown editor!');
     const [showPreview, setShowPreview] = useState(true);
 
     useEffect(() => {
         const saved = localStorage.getItem('os_notepad_content');
-        if (saved) setText(saved);
-    }, []);
+        if (saved && !notepadFile) setText(saved);
+    }, [notepadFile]);
+
+    useEffect(() => {
+        if (notepadFile?.content != null) setText(notepadFile.content);
+    }, [notepadFile]);
 
     const handleChange = (e) => {
         setText(e.target.value);

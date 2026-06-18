@@ -1,10 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Suspense } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Window } from '../components/ui/Window.jsx';
 import { BackgroundBlobs } from '../components/ui/BackgroundBlobs.jsx';
 import { Loader2 } from 'lucide-react';
 import { SEO } from '../components/SEO.jsx';
+import { OsBootScreen } from '../components/os/OsBootScreen.jsx';
+import { OsNotifications } from '../components/os/OsNotifications.jsx';
+import { loadFileSystem, saveFileSystem } from '../os/filesystem.js';
+import { onLaunchApp, onOpenFile, consumePendingLaunch, notify } from '../os/events.js';
+import { unlockAchievement } from '../os/achievements.js';
+import { pushRecentApp, getRecentApps } from '../os/session.js';
 
 const Notepad = React.lazy(() => import('../components/os/Notepad.jsx').then(module => ({ default: module.Notepad })));
 const BrowserApp = React.lazy(() => import('../components/os/BrowserApp.jsx').then(module => ({ default: module.BrowserApp })));
@@ -18,6 +25,12 @@ const AIAssistantApp = React.lazy(() => import('../components/os/AIAssistantApp.
 const FileSystemApp = React.lazy(() => import('../components/os/FileSystemApp.jsx').then(module => ({ default: module.FileSystemApp })));
 const YoutubeApp = React.lazy(() => import('../components/os/YoutubeApp.jsx').then(module => ({ default: module.YoutubeApp })));
 const TerminalApp = React.lazy(() => import('../components/os/TerminalApp.jsx').then(module => ({ default: module.TerminalApp })));
+const TaskManagerApp = React.lazy(() => import('../components/os/TaskManagerApp.jsx').then(module => ({ default: module.TaskManagerApp })));
+const NativePortfolio = React.lazy(() => import('../components/os/NativeSiteApps.jsx').then(m => ({ default: m.PortfolioApp })));
+const NativeProjects = React.lazy(() => import('../components/os/NativeSiteApps.jsx').then(m => ({ default: m.ProjectsApp })));
+const NativeBlog = React.lazy(() => import('../components/os/NativeSiteApps.jsx').then(m => ({ default: m.BlogApp })));
+const NativeStats = React.lazy(() => import('../components/os/NativeSiteApps.jsx').then(m => ({ default: m.StatsApp })));
+const NativeTechNews = React.lazy(() => import('../components/os/NativeSiteApps.jsx').then(m => ({ default: m.TechNewsApp })));
 import { 
     Terminal, 
     Globe, 
@@ -47,7 +60,6 @@ import {
     Power,
     LayoutGrid
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 const APPS = [
     { id: 'browser', title: 'Web Browser', icon: <Compass className="w-4 h-4 text-blue-500" />, desktopIcon: <Compass className="w-10 h-10 text-blue-500" />, type: 'native', component: BrowserApp },
@@ -56,15 +68,18 @@ const APPS = [
     { id: 'assistant', title: 'AI Assistant', icon: <Bot className="w-4 h-4 text-emerald-500" />, desktopIcon: <Bot className="w-10 h-10 text-emerald-500" />, type: 'native', component: AIAssistantApp },
     { id: 'camera', title: 'Camera', icon: <Camera className="w-4 h-4 text-pink-500" />, desktopIcon: <Camera className="w-10 h-10 text-pink-500" />, type: 'native', component: CameraApp },
     { id: 'settings', title: 'Settings', icon: <Settings className="w-4 h-4 text-gray-400" />, desktopIcon: <Settings className="w-10 h-10 text-gray-400" />, type: 'native', component: SettingsApp },
-    { id: 'portfolio', title: 'Portfolio Home', icon: <Globe className="w-4 h-4 text-blue-400" />, desktopIcon: <Globe className="w-10 h-10 text-blue-400" />, type: 'iframe', url: '/' },
+    { id: 'portfolio', title: 'Portfolio Home', icon: <Globe className="w-4 h-4 text-blue-400" />, desktopIcon: <Globe className="w-10 h-10 text-blue-400" />, type: 'native', component: NativePortfolio },
+    { id: 'projects', title: 'Projects', icon: <Folder className="w-4 h-4 text-amber-400" />, desktopIcon: <Folder className="w-10 h-10 text-amber-400" />, type: 'native', component: NativeProjects },
+    { id: 'blog', title: 'Blog', icon: <FileText className="w-4 h-4 text-emerald-400" />, desktopIcon: <FileText className="w-10 h-10 text-emerald-400" />, type: 'native', component: NativeBlog },
     { id: 'calculator', title: 'Calculator', icon: <Calculator className="w-4 h-4 text-orange-400" />, desktopIcon: <Calculator className="w-10 h-10 text-orange-400" />, type: 'native', component: CalculatorApp },
     { id: 'weather', title: 'Weather', icon: <CloudSun className="w-4 h-4 text-sky-400" />, desktopIcon: <CloudSun className="w-10 h-10 text-sky-400" />, type: 'native', component: WeatherApp },
     { id: 'music', title: 'Media Player', icon: <Music className="w-4 h-4 text-purple-500" />, desktopIcon: <Music className="w-10 h-10 text-purple-500" />, type: 'native', component: MediaPlayerApp },
     { id: 'snake', title: 'Snake Game', icon: <Gamepad2 className="w-4 h-4 text-green-500" />, desktopIcon: <Gamepad2 className="w-10 h-10 text-green-500" />, type: 'native', component: SnakeGameApp, defaultSize: { width: 600, height: 650 } },
     { id: 'terminal', title: 'Command Prompt', icon: <Terminal className="w-4 h-4 text-emerald-400" />, desktopIcon: <Terminal className="w-10 h-10 text-emerald-400" />, type: 'native', component: TerminalApp },
     { id: 'notepad', title: 'Notepad', icon: <FileEdit className="w-4 h-4 text-purple-400" />, desktopIcon: <FileEdit className="w-10 h-10 text-purple-400" />, type: 'native', component: Notepad },
-    { id: 'news', title: 'Tech Hub', icon: <Newspaper className="w-4 h-4 text-pink-400" />, desktopIcon: <Newspaper className="w-10 h-10 text-pink-400" />, type: 'iframe', url: '/tech-news' },
-    { id: 'stats', title: 'Task Manager', icon: <Activity className="w-4 h-4 text-red-400" />, desktopIcon: <Activity className="w-10 h-10 text-red-400" />, type: 'iframe', url: '/stats' },
+    { id: 'news', title: 'Tech Hub', icon: <Newspaper className="w-4 h-4 text-pink-400" />, desktopIcon: <Newspaper className="w-10 h-10 text-pink-400" />, type: 'native', component: NativeTechNews },
+    { id: 'stats', title: 'Stats & ClickUp', icon: <Activity className="w-4 h-4 text-red-400" />, desktopIcon: <Activity className="w-10 h-10 text-red-400" />, type: 'native', component: NativeStats },
+    { id: 'taskmanager', title: 'Task Manager', icon: <Monitor className="w-4 h-4 text-cyan-400" />, desktopIcon: <Monitor className="w-10 h-10 text-cyan-400" />, type: 'native', component: TaskManagerApp },
     { id: 'github', title: 'GitHub', icon: <Code className="w-4 h-4 text-white" />, desktopIcon: <Code className="w-10 h-10 text-white" />, type: 'link', url: 'https://github.com/ParjadM' },
 ];
 
@@ -82,6 +97,10 @@ export const DesktopOS = ({ theme }) => {
     const [startMenuSearch, setStartMenuSearch] = useState('');
     const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 });
     const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+    const [isOsBooted, setIsOsBooted] = useState(() => sessionStorage.getItem('os_booted') === '1');
+    const [altTabOpen, setAltTabOpen] = useState(false);
+    const [notepadFile, setNotepadFile] = useState(null);
+    const [recentApps, setRecentApps] = useState(getRecentApps);
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -91,43 +110,7 @@ export const DesktopOS = ({ theme }) => {
     
     // Global OS State
     const [photos, setPhotos] = useState([]);
-    const [fileSystem, setFileSystem] = useState(() => {
-        const saved = localStorage.getItem('os_file_system');
-        if (saved) {
-            try { return JSON.parse(saved); } catch (e) {}
-        }
-        return {
-            name: 'C:',
-            type: 'drive',
-            children: [
-                {
-                    name: 'Users',
-                    type: 'folder',
-                    children: [
-                        {
-                            name: 'Guest',
-                            type: 'folder',
-                            children: [
-                                {
-                                    name: 'Documents',
-                                    type: 'folder',
-                                    children: [
-                                        { name: 'Welcome.txt', type: 'file', content: 'Welcome to Parjad WebOS! Feel free to explore.' },
-                                        { name: 'Secret.txt', type: 'file', content: 'You found the secret file. 42 is the answer.' }
-                                    ]
-                                },
-                                {
-                                    name: 'Pictures',
-                                    type: 'folder',
-                                    children: []
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        };
-    });
+    const [fileSystem, setFileSystem] = useState(loadFileSystem);
 
     const [desktopIcons, setDesktopIcons] = useState(() => {
         const saved = localStorage.getItem('os_desktop_icons');
@@ -144,7 +127,7 @@ export const DesktopOS = ({ theme }) => {
 
     useEffect(() => { localStorage.setItem('os_wallpaper', wallpaper); }, [wallpaper]);
     useEffect(() => { localStorage.setItem('os_theme', osTheme); }, [osTheme]);
-    useEffect(() => { localStorage.setItem('os_file_system', JSON.stringify(fileSystem)); }, [fileSystem]);
+    useEffect(() => { saveFileSystem(fileSystem); }, [fileSystem]);
     useEffect(() => { localStorage.setItem('os_desktop_icons', JSON.stringify(desktopIcons)); }, [desktopIcons]);
 
     useEffect(() => {
@@ -176,7 +159,7 @@ export const DesktopOS = ({ theme }) => {
         return () => clearInterval(timer);
     }, []);
 
-    const openApp = (appId) => {
+    const openApp = useCallback((appId) => {
         const app = APPS.find(a => a.id === appId);
         if (app?.type === 'link') {
             window.open(app.url, '_blank');
@@ -185,13 +168,33 @@ export const DesktopOS = ({ theme }) => {
 
         const existing = windows.find(w => w.id === appId);
         if (existing) {
-            setWindows(windows.map(w => w.id === appId ? { ...w, isMinimized: false, zIndex: topZIndex + 1 } : w));
-            setTopZIndex(topZIndex + 1);
+            setWindows(prev => prev.map(w => w.id === appId ? { ...w, isMinimized: false, zIndex: topZIndex + 1 } : w));
+            setTopZIndex(z => z + 1);
         } else {
-            setWindows([...windows, { id: appId, isOpen: true, isMinimized: false, zIndex: topZIndex + 1 }]);
-            setTopZIndex(topZIndex + 1);
+            setWindows(prev => [...prev, { id: appId, isOpen: true, isMinimized: false, zIndex: topZIndex + 1 }]);
+            setTopZIndex(z => z + 1);
         }
-    };
+        pushRecentApp(appId);
+        setRecentApps(getRecentApps());
+        unlockAchievement('used_gui');
+    }, [windows, topZIndex]);
+
+    useEffect(() => {
+        if (!isOsBooted) return;
+        unlockAchievement('first_boot');
+        sessionStorage.setItem('os_booted', '1');
+        const pending = consumePendingLaunch();
+        if (pending?.appId) setTimeout(() => openApp(pending.appId), 300);
+    }, [isOsBooted, openApp]);
+
+    useEffect(() => onLaunchApp(({ appId }) => openApp(appId)), [openApp]);
+
+    useEffect(() => onOpenFile(({ file, appId }) => {
+        if (appId === 'notepad' || file?.type === 'file') {
+            setNotepadFile(file);
+            openApp('notepad');
+        }
+    }), [openApp]);
 
     const closeApp = (appId) => {
         setWindows(windows.filter(w => w.id !== appId));
@@ -226,8 +229,17 @@ export const DesktopOS = ({ theme }) => {
         setIsExiting(true);
         setTimeout(() => {
             navigate('/');
-        }, 600); // Matches CRT animation duration
+        }, 600);
     };
+
+    useEffect(() => {
+        const onKey = (e) => {
+            if (e.altKey && e.key === 'Tab') { e.preventDefault(); setAltTabOpen(v => !v); }
+            if (e.key === 'Escape') { setAltTabOpen(false); setIsStartMenuOpen(false); }
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, []);
 
     const handleContextMenu = (e) => {
         e.preventDefault();
@@ -285,7 +297,9 @@ export const DesktopOS = ({ theme }) => {
             onContextMenu={handleContextMenu}
         >
             <SEO title="Desktop OS — Parjad Minooei" description="A playful desktop environment on parjadm.ca." />
-            <div className={`relative w-full h-full bg-gray-900 overflow-hidden shadow-[0_0_100px_rgba(255,255,255,0.1)] transition-opacity duration-75 ${isExiting ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+            {!isOsBooted && <OsBootScreen onComplete={() => setIsOsBooted(true)} />}
+            <OsNotifications />
+            <div className={`relative w-full h-full bg-gray-900 overflow-hidden shadow-[0_0_100px_rgba(255,255,255,0.1)] transition-opacity duration-75 ${isExiting ? 'opacity-0 pointer-events-none' : 'opacity-100'} ${!isOsBooted ? 'opacity-0' : ''}`}>
                 {/* Wallpaper */}
                 <div className="absolute inset-0 z-0 transition-colors duration-1000">
                     {wallpaper === 'blobs' ? (
@@ -333,6 +347,12 @@ export const DesktopOS = ({ theme }) => {
                                 className="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-white/10 hover:text-white transition-colors"
                             >
                                 Open Terminal
+                            </button>
+                            <button 
+                                onClick={() => { navigate('/cli'); closeContextMenu(); }}
+                                className="w-full text-left px-4 py-2 text-sm text-emerald-300 hover:bg-white/10 transition-colors"
+                            >
+                                Open CLI Mode
                             </button>
                             <div className="h-px bg-white/10 my-1 mx-2" />
                             <button 
@@ -437,7 +457,7 @@ export const DesktopOS = ({ theme }) => {
                                         />
                                     ) : (
                                         <Suspense fallback={<div className="h-full w-full flex flex-col items-center justify-center text-white space-y-4"><Loader2 className="w-8 h-8 animate-spin text-emerald-500" /><span>Loading App...</span></div>}>
-                                            <appDef.component theme={osTheme} osState={{ wallpaper, setWallpaper, fileSystem, setFileSystem, osTheme, setOsTheme }} />
+                                            <appDef.component theme={osTheme} osState={{ wallpaper, setWallpaper, fileSystem, setFileSystem, osTheme, setOsTheme, openApp, windows, APPS, notepadFile, setNotepadFile, navigate }} />
                                         </Suspense>
                                     )}
                                 </Window>
@@ -471,6 +491,23 @@ export const DesktopOS = ({ theme }) => {
                             <div className="flex justify-between items-center mb-4 px-2">
                                 <span className="font-semibold text-white">Pinned apps</span>
                             </div>
+
+                            {recentApps.length > 0 && (
+                                <>
+                                    <div className="text-xs text-gray-400 uppercase tracking-wider mb-2 px-2">Recent</div>
+                                    <div className="flex gap-2 mb-4 px-2 flex-wrap">
+                                        {recentApps.map(id => {
+                                            const app = APPS.find(a => a.id === id);
+                                            if (!app) return null;
+                                            return (
+                                                <button key={id} onClick={() => { openApp(id); setIsStartMenuOpen(false); }} className="px-3 py-1.5 rounded-lg bg-white/10 text-xs text-gray-200 hover:bg-white/20">
+                                                    {app.title}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </>
+                            )}
 
                             <div className="grid grid-cols-4 sm:grid-cols-6 gap-4 mb-6">
                                 {APPS.filter(a => a.title.toLowerCase().includes(startMenuSearch.toLowerCase())).map(app => (
@@ -506,9 +543,39 @@ export const DesktopOS = ({ theme }) => {
                     )}
                 </AnimatePresence>
 
+                {/* Alt+Tab switcher */}
+                <AnimatePresence>
+                    {altTabOpen && windows.length > 0 && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 z-[80] bg-black/60 backdrop-blur-sm flex items-center justify-center"
+                            onClick={() => setAltTabOpen(false)}
+                        >
+                            <div className="flex gap-4 flex-wrap justify-center max-w-3xl p-6">
+                                {windows.filter(w => !w.isMinimized).map(w => {
+                                    const app = APPS.find(a => a.id === w.id);
+                                    return (
+                                        <button
+                                            key={w.id}
+                                            type="button"
+                                            onClick={(e) => { e.stopPropagation(); focusApp(w.id); setWindows(prev => prev.map(win => win.id === w.id ? { ...win, isMinimized: false } : win)); setAltTabOpen(false); }}
+                                            className="flex flex-col items-center p-4 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 min-w-[100px]"
+                                        >
+                                            {app?.desktopIcon}
+                                            <span className="text-xs text-white mt-2">{app?.title}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
                 {/* Taskbar / Dock */}
-                <div className={`absolute bottom-0 left-0 w-full z-40 transition-all duration-300 ${isMobile ? 'h-0 overflow-hidden' : 'h-12'}`}>
-                    <div className="absolute inset-0 bg-gray-900/80 backdrop-blur-2xl border-t border-white/10" />
+                <div className={`absolute bottom-0 left-0 w-full z-40 transition-all duration-300 ${isMobile ? 'h-14' : 'h-12'}`}>
+                    <div className="absolute inset-0 bg-gray-900/70 backdrop-blur-2xl border-t border-emerald-500/20 shadow-[0_-4px_30px_rgba(16,185,129,0.08)]" />
                     <div className="relative h-full flex items-center justify-between px-2 sm:px-4">
                     {/* Start Button & Centered Apps */}
                     <div className="flex-1 flex items-center justify-start sm:justify-center space-x-2 overflow-x-auto overflow-y-hidden scrollbar-hide pr-2">
@@ -577,8 +644,8 @@ export const DesktopOS = ({ theme }) => {
                                     className="absolute bottom-14 right-24 w-48 bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-xl p-3 shadow-2xl flex flex-col space-y-2 z-50"
                                 >
                                     <div className="flex items-center space-x-3 p-2 hover:bg-white/10 rounded-lg cursor-pointer transition-colors text-white">
-                                        <Bluetooth className="w-5 h-5 text-blue-400" />
-                                        <span className="text-sm">Bluetooth</span>
+                                        <Wifi className="w-5 h-5 text-emerald-400" />
+                                        <span className="text-sm">parjadm.ca</span>
                                     </div>
                                     <div className="flex items-center space-x-3 p-2 hover:bg-white/10 rounded-lg cursor-pointer transition-colors text-white">
                                         <ShieldCheck className="w-5 h-5 text-green-400" />

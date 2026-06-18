@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Monitor, Image as ImageIcon, Settings as SettingsIcon, Shield, Cpu, HardDrive } from 'lucide-react';
+import { Monitor, Image as ImageIcon, Settings as SettingsIcon, Shield, Cpu, HardDrive, Terminal } from 'lucide-react';
+import { getAchievements } from '../../os/achievements.js';
 
 export const SettingsApp = ({ theme, osState }) => {
-    const { wallpaper, setWallpaper, osTheme, setOsTheme } = osState;
+    const { wallpaper, setWallpaper, osTheme, setOsTheme, navigate } = osState || {};
     const [activeTab, setActiveTab] = useState('personalization');
     const [customUrl, setCustomUrl] = useState(wallpaper && wallpaper.startsWith('http') ? wallpaper : '');
 
@@ -155,7 +156,22 @@ export const SettingsApp = ({ theme, osState }) => {
                                 </button>
                             </div>
                         </div>
-                    </div>
+                        <button
+                            type="button"
+                            onClick={() => navigate?.('/cli')}
+                            className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 transition-colors text-sm font-medium"
+                        >
+                            <Terminal className="w-4 h-4" /> Open Fullscreen CLI
+                        </button>
+                        <div className="mt-6 space-y-2">
+                            <h3 className="text-sm font-medium text-gray-300">Achievements</h3>
+                            {getAchievements().map(a => (
+                                <div key={a.id} className={`text-xs px-3 py-2 rounded-lg border ${a.unlocked ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : 'border-white/5 bg-white/5 text-gray-500'}`}>
+                                    {a.unlocked ? '✓' : '○'} {a.label} — {a.desc}
+                                </div>
+                            ))}
+                        </div>
+                            </div>
                         </>
                     )}
 

@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Folder, FileText, Image as ImageIcon, ChevronRight, ChevronLeft, Search, HardDrive } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Folder, FileText, Image as ImageIcon, ChevronRight, ChevronLeft, Search, HardDrive, Terminal } from 'lucide-react';
+import { openFileInApp } from '../../os/events.js';
 
 export const FileSystemApp = ({ theme, osState }) => {
-    const { fileSystem, setFileSystem } = osState || {};
+    const { fileSystem, setFileSystem, openApp } = osState || {};
     const [currentPath, setCurrentPath] = useState(['C:', 'Users', 'Guest']);
     const [selectedFile, setSelectedFile] = useState(null);
 
@@ -76,9 +77,16 @@ export const FileSystemApp = ({ theme, osState }) => {
     };
 
     const openFile = (file) => {
-        if (file.type === 'file' || file.type === 'image') {
+        if (file.type === 'file') {
+            openFileInApp(file, 'notepad');
+        } else if (file.type === 'image') {
             setSelectedFile(file);
         }
+    };
+
+    const openInTerminal = () => {
+        openApp?.('terminal');
+        closeContextMenu();
     };
 
     return (
@@ -215,6 +223,10 @@ export const FileSystemApp = ({ theme, osState }) => {
                     <button onClick={(e) => { e.stopPropagation(); createItem('file'); }} className="w-full text-left px-4 py-1.5 hover:bg-[#094771] hover:text-white flex items-center space-x-2 mt-1">
                         <FileText className="w-4 h-4 text-white" />
                         <span>New Text Document</span>
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); openInTerminal(); }} className="w-full text-left px-4 py-1.5 hover:bg-[#094771] hover:text-white flex items-center space-x-2 mt-1">
+                        <Terminal className="w-4 h-4 text-emerald-400" />
+                        <span>Open Terminal</span>
                     </button>
                 </div>
             )}
