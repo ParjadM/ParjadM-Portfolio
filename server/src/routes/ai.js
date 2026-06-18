@@ -1,208 +1,22 @@
 import { Router } from 'express'
-import { GoogleGenAI } from '@google/genai'
-import { AiKnowledge } from '../db/mongo.js'
-import { currentEngine } from '../db/index.js'
-import crypto from 'crypto'
-import { redisClient } from '../db/redis.js'
+import { askGemini, streamGeminiChat } from '../ai/askGemini.js'
+import { aiConfig } from '../config/ai.js'
+import { extractLastUserMessage, formatInterviewTranscript, countUserTurns } from '../ai/normalize.js'
+import { matchFaq } from '../ai/faq.js'
+import { getStaticPageSummary, matchStaticAnswer } from '../ai/staticAnswers.js'
+import { getClientIp } from '../ai/limits.js'
+import { explainBlogPost } from '../ai/blogExplain.js'
+import { getUsageSnapshot } from '../ai/limits.js'
 
 const router = Router()
 
-router.post('/chat', async (req, res) => {
-  try {
-    const { messages, context } = req.body
-    
-    if (!messages || !Array.isArray(messages)) {
-      return res.status(400).json({ error: 'Messages array is required' })
-    }
+const CHAT_PROMPT = `You are a helpful AI assistant for Parjad's portfolio website.
+You answer questions about Parjad based on the following information:`
 
-    // Rate Limiting: Max 25 prompts per user per 24 hours
-    if (redisClient) {
-      try {
-        const rawIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown'
-        const ip = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : 'unknown'
-        const rateLimitKey = `rate_limit_chat:${ip}`
-        
-        const count = await redisClient.incr(rateLimitKey)
-        if (count === 1) {
-          await redisClient.expire(rateLimitKey, 86400) // 24 hours
-        }
-        if (count > 25) {
-          return res.status(429).json({ error: "You've reached your limit of 25 questions for today. Please come back tomorrow!" })
-        }
-      } catch (err) {
-        console.error('Redis rate limit error:', err)
-      }
-    }
+const INTERVIEW_PROMPT = `You are Parjad Minooei, a talented Software Engineer. You are currently in a technical job interview with a recruiter or hiring manager.
+Answer their questions confidently, accurately, and professionally, but let your personality shine through. Use the following facts about your background:`
 
-    // Attempt to fetch from cache first
-    let cacheKey = null
-    if (redisClient) {
-      try {
-        const hash = crypto.createHash('sha256').update(JSON.stringify(messages)).digest('hex')
-        cacheKey = `ai_chat:${hash}`
-        const cachedResponse = await redisClient.get(cacheKey)
-        if (cachedResponse) {
-          return res.json({ reply: cachedResponse })
-        }
-      } catch (err) {
-        console.error('Redis cache retrieval error:', err)
-        // Fallback to Gemini if Redis fails
-      }
-    }
-
-    const apiKey = process.env.GEMINI_API_KEY
-    if (!apiKey) {
-      return res.status(500).json({ error: 'GEMINI_API_KEY is not configured' })
-    }
-
-    const ai = new GoogleGenAI({ apiKey })
-
-    // Fetch knowledge base
-    let knowledgeContent = ''
-    if (currentEngine === 'mongo') {
-      const doc = await AiKnowledge.findOne({ key: 'global' }).lean()
-      if (doc && doc.content) {
-        knowledgeContent = doc.content
-      }
-    }
-
-    const systemInstruction = `You are a helpful AI assistant for Parjad's portfolio website. 
-You answer questions about Parjad based on the following information:
-${knowledgeContent ? knowledgeContent : "No specific knowledge provided yet. Please direct them to the contact page."}
-${context ? `\n\nAdditional Context: ${context}` : ''}
-If asked something outside of this scope, you can politely decline or say you don't know.`
-
-    let replyText = ''
-    
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
-      contents: messages,
-      config: { systemInstruction }
-    })
-    
-    replyText = response.text
-
-    if (redisClient && cacheKey && replyText) {
-      try {
-        // Cache for 24 hours (86400 seconds)
-        await redisClient.set(cacheKey, replyText, { ex: 86400 })
-      } catch (err) {
-        console.error('Redis cache save error:', err)
-      }
-    }
-
-    res.json({ reply: replyText })
-  } catch (err) {
-    console.error('AI Chat Error:', err)
-    
-    // Cleanly parse rate limit errors so the chatbot speaks a friendly message
-    let errorMessage = err.message || 'Failed to generate AI response'
-    if (errorMessage.includes('429') || errorMessage.includes('quota') || errorMessage.includes('RESOURCE_EXHAUSTED')) {
-      errorMessage = "I've been answering a lot of questions lately and need a quick breather! Please wait about a minute and ask me again."
-    }
-    
-    res.status(500).json({ error: errorMessage })
-  }
-})
-
-router.post('/interview', async (req, res) => {
-  try {
-    const { messages, isRecruiter } = req.body
-    
-    if (!messages || !Array.isArray(messages)) {
-      return res.status(400).json({ error: 'Messages array is required' })
-    }
-
-    const limit = isRecruiter ? 25 : 15;
-
-    // Rate Limiting
-    if (redisClient) {
-      try {
-        const rawIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown'
-        const ip = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : 'unknown'
-        const rateLimitKey = `rate_limit_interview:${ip}`
-        
-        const count = await redisClient.incr(rateLimitKey)
-        if (count === 1) {
-          await redisClient.expire(rateLimitKey, 86400) // 24 hours
-        }
-        if (count > limit) {
-          return res.status(429).json({ error: `You've reached your limit of ${limit} questions. If you'd like to ask more, please contact Parjad directly!` })
-        }
-      } catch (err) {
-        console.error('Redis rate limit error:', err)
-      }
-    }
-
-    const apiKey = process.env.GEMINI_API_KEY
-    if (!apiKey) {
-      return res.status(500).json({ error: 'GEMINI_API_KEY is not configured' })
-    }
-
-    const ai = new GoogleGenAI({ apiKey })
-
-    // Fetch interview knowledge base
-    let knowledgeContent = ''
-    if (currentEngine === 'mongo') {
-      const doc = await AiKnowledge.findOne({ key: 'interview' }).lean()
-      if (doc && doc.content) {
-        knowledgeContent = doc.content
-      }
-    }
-
-    const systemInstruction = `You are Parjad Minooei, a talented Software Engineer. You are currently in a technical job interview with a recruiter or hiring manager.
-Answer their questions confidently, accurately, and professionally, but let your personality shine through. Use the following facts about your background:
-${knowledgeContent ? knowledgeContent : "You are a Software Engineer with experience in React, Node.js, Python, and MongoDB."}
-Do not break character. Do not admit you are an AI assistant. You ARE Parjad. If the interview concludes, thank them for their time.`
-
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
-      contents: messages,
-      config: { systemInstruction }
-    })
-    
-    res.json({ reply: response.text })
-  } catch (err) {
-    console.error('AI Interview Error:', err)
-    let errorMessage = err.message || 'Failed to generate AI response'
-    if (errorMessage.includes('429') || errorMessage.includes('quota') || errorMessage.includes('RESOURCE_EXHAUSTED')) {
-      errorMessage = "I need a quick second to think. Please wait about a minute and ask me again."
-    }
-    res.status(500).json({ error: errorMessage })
-  }
-})
-
-router.post('/complexity', async (req, res) => {
-  try {
-    const { code } = req.body
-    
-    if (!code || typeof code !== 'string') {
-      return res.status(400).json({ error: 'Code string is required' })
-    }
-
-    let cacheKey = null
-    if (redisClient) {
-      try {
-        const hash = crypto.createHash('sha256').update(code).digest('hex')
-        cacheKey = `ai_complexity_v2:${hash}`
-        const cachedResponse = await redisClient.get(cacheKey)
-        if (cachedResponse) {
-          // Parse JSON if it was stored as string, Upstash auto-parses, but let's handle both
-          return res.json(typeof cachedResponse === 'string' ? JSON.parse(cachedResponse) : cachedResponse)
-        }
-      } catch (err) {
-        console.error('Redis cache retrieval error:', err)
-      }
-    }
-
-    const apiKey = process.env.GEMINI_API_KEY
-    if (!apiKey) {
-      return res.status(500).json({ error: 'GEMINI_API_KEY is not configured' })
-    }
-
-    const ai = new GoogleGenAI({ apiKey })
-
-    const systemInstruction = `You are an expert static analyzer for code complexity.
+const COMPLEXITY_PROMPT = `You are an expert static analyzer for code complexity.
 Analyze the following source code and determine its Time Complexity and Space (Memory) Complexity.
 Provide the complexity BOTH with constants (exact operations/space count, e.g., O(3N + 2)) and without constants (Big-O notation, e.g., O(N)).
 Respond EXCLUSIVELY in valid JSON format using the following schema:
@@ -214,41 +28,350 @@ Respond EXCLUSIVELY in valid JSON format using the following schema:
   "explanation": "A concise explanation."
 }`
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
-      contents: [{ role: 'user', parts: [{ text: code }] }],
-      config: {
-        systemInstruction: systemInstruction,
-        responseMimeType: "application/json"
-      }
+const JOB_FIT_PROMPT = `You are a hiring analyst comparing a job description to Parjad Minooei's background.
+Use the candidate knowledge below. Be honest, constructive, and recruiter-friendly.
+Respond EXCLUSIVELY in valid JSON:
+{
+  "matchScore": 0-100,
+  "matchingSkills": ["..."],
+  "gaps": ["..."],
+  "relevantProjects": ["..."],
+  "talkingPoints": ["..."],
+  "summary": "2-3 sentence overview"
+}`
+
+const DEBRIEF_PROMPT = `You are an interview coach reviewing a mock interview transcript where AI played Parjad.
+Provide constructive feedback for the interviewer/candidate. Be specific and balanced.
+Respond EXCLUSIVELY in valid JSON:
+{
+  "strengths": ["..."],
+  "areasToImprove": ["..."],
+  "standoutAnswers": ["..."],
+  "weakAnswers": ["..."],
+  "followUpQuestions": ["..."],
+  "overallSummary": "2-4 sentences"
+}`
+
+const CODE_REVIEW_PROMPT = `You are a senior code reviewer. Analyze the submitted code for bugs, readability, and complexity.
+Respond EXCLUSIVELY in valid JSON:
+{
+  "bugs": ["..."],
+  "readabilityScore": 1-10,
+  "timeComplexity": "O(...)",
+  "spaceComplexity": "O(...)",
+  "suggestions": ["..."],
+  "summary": "2-3 sentence overview"
+}`
+
+router.post('/chat', async (req, res) => {
+  try {
+    const { messages, context, pageContext } = req.body
+
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: 'Messages array is required' })
+    }
+
+    const userMessage = extractLastUserMessage(messages)
+    const result = await askGemini({
+      feature: 'chat',
+      userMessage,
+      messages,
+      context,
+      pageContext,
+      systemPromptBase: CHAT_PROMPT,
+      knowledgeKey: 'global',
+      knowledgeFallback: 'No specific knowledge provided yet. Please direct them to the contact page.',
+      req,
+      cacheTtl: aiConfig.cacheTtlChat,
     })
 
-    let replyData;
-    try {
-      replyData = JSON.parse(response.text)
-    } catch (e) {
-      replyData = {
-        timeWithoutConstant: "O(?)",
-        memoryWithoutConstant: "O(?)",
-        explanation: "Could not parse AI response."
-      }
+    if (!result.ok) {
+      return res.status(result.status || 500).json({ error: result.error })
     }
 
-    if (redisClient && cacheKey) {
-      try {
-        // Cache for 7 days
-        await redisClient.set(cacheKey, JSON.stringify(replyData), { ex: 604800 })
-      } catch (err) {
-        console.error('Redis cache save error:', err)
-      }
+    res.json({ reply: result.reply, source: result.source })
+  } catch (err) {
+    console.error('AI Chat Error:', err)
+    res.status(500).json({ error: err.message || 'Failed to generate AI response' })
+  }
+})
+
+router.post('/chat/stream', async (req, res) => {
+  try {
+    const { messages, context, pageContext } = req.body
+
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: 'Messages array is required' })
     }
 
-    res.json(replyData)
+    if (!aiConfig.streamingEnabled) {
+      const userMessage = extractLastUserMessage(messages)
+      const result = await askGemini({
+        feature: 'chat',
+        userMessage,
+        messages,
+        context,
+        pageContext,
+        systemPromptBase: CHAT_PROMPT,
+        knowledgeKey: 'global',
+        knowledgeFallback: 'No specific knowledge provided yet. Please direct them to the contact page.',
+        req,
+        cacheTtl: aiConfig.cacheTtlChat,
+      })
+      if (!result.ok) {
+        return res.status(result.status || 500).json({ error: result.error })
+      }
+      return res.json({ reply: result.reply, source: result.source })
+    }
+
+    res.setHeader('Content-Type', 'text/event-stream')
+    res.setHeader('Cache-Control', 'no-cache, no-transform')
+    res.setHeader('Connection', 'keep-alive')
+    res.flushHeaders?.()
+
+    const userMessage = extractLastUserMessage(messages)
+    await streamGeminiChat({
+      feature: 'chat',
+      userMessage,
+      messages,
+      context,
+      pageContext,
+      systemPromptBase: CHAT_PROMPT,
+      knowledgeKey: 'global',
+      knowledgeFallback: 'No specific knowledge provided yet. Please direct them to the contact page.',
+      req,
+      cacheTtl: aiConfig.cacheTtlChat,
+    }, res)
+  } catch (err) {
+    console.error('AI Chat Stream Error:', err)
+    if (!res.headersSent) {
+      res.status(500).json({ error: err.message || 'Failed to stream AI response' })
+    } else {
+      res.write(`event: error\ndata: ${JSON.stringify({ error: err.message })}\n\n`)
+      res.end()
+    }
+  }
+})
+
+router.post('/interview', async (req, res) => {
+  try {
+    const { messages, isRecruiter } = req.body
+
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: 'Messages array is required' })
+    }
+
+    const userMessage = extractLastUserMessage(messages)
+    const result = await askGemini({
+      feature: 'interview',
+      userMessage,
+      messages,
+      systemPromptBase: `${INTERVIEW_PROMPT}
+Do not break character. Do not admit you are an AI assistant. You ARE Parjad. If the interview concludes, thank them for their time.`,
+      knowledgeKey: 'interview',
+      knowledgeFallback: 'You are a Software Engineer with experience in React, Node.js, Python, and MongoDB.',
+      req,
+      skipFaq: true,
+      skipStatic: true,
+      cacheTtl: aiConfig.cacheTtlInterview,
+      customDailyLimit: isRecruiter
+        ? aiConfig.interviewRecruiterDailyPerIp
+        : aiConfig.interviewDailyPerIp,
+    })
+
+    if (!result.ok) {
+      return res.status(result.status || 500).json({ error: result.error })
+    }
+
+    res.json({ reply: result.reply, source: result.source })
+  } catch (err) {
+    console.error('AI Interview Error:', err)
+    res.status(500).json({ error: err.message || 'Failed to generate AI response' })
+  }
+})
+
+router.post('/interview/debrief', async (req, res) => {
+  try {
+    const { messages } = req.body
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: 'Messages array is required' })
+    }
+
+    const userTurns = countUserTurns(messages)
+    if (userTurns < aiConfig.debriefMinTurns) {
+      return res.status(400).json({
+        error: `Ask at least ${aiConfig.debriefMinTurns} interview questions before requesting a debrief.`,
+      })
+    }
+
+    const transcript = formatInterviewTranscript(messages)
+    const result = await askGemini({
+      feature: 'debrief',
+      userMessage: transcript,
+      messages: [{ role: 'user', parts: [{ text: transcript }] }],
+      systemPromptBase: DEBRIEF_PROMPT,
+      knowledgeKey: 'interview',
+      knowledgeFallback: 'Parjad is a full-stack engineer with React, Node.js, Python, and MongoDB experience.',
+      responseFormat: 'json',
+      req,
+      skipFaq: true,
+      skipStatic: true,
+      cacheTtl: aiConfig.cacheTtlDebrief,
+      maxOutputTokensOverride: aiConfig.maxOutputTokensDetailed,
+    })
+
+    if (!result.ok) {
+      return res.status(result.status || 500).json({ error: result.error })
+    }
+
+    res.json({ ...result.reply, source: result.source })
+  } catch (err) {
+    console.error('AI Debrief Error:', err)
+    res.status(500).json({ error: err.message || 'Failed to generate debrief' })
+  }
+})
+
+router.post('/job-fit', async (req, res) => {
+  try {
+    const { jobDescription } = req.body
+    if (!jobDescription || typeof jobDescription !== 'string') {
+      return res.status(400).json({ error: 'jobDescription string is required' })
+    }
+
+    const trimmed = jobDescription.trim()
+    if (trimmed.length < 40) {
+      return res.status(400).json({ error: 'Please paste a fuller job description (at least 40 characters).' })
+    }
+
+    const capped = trimmed.slice(0, aiConfig.jobDescriptionMaxChars)
+    const result = await askGemini({
+      feature: 'job-fit',
+      userMessage: capped,
+      messages: [{ role: 'user', parts: [{ text: capped }] }],
+      systemPromptBase: JOB_FIT_PROMPT,
+      knowledgeKey: 'global',
+      knowledgeFallback: 'Parjad is a Software Engineer skilled in React, Node.js, Express, MongoDB, and Python.',
+      responseFormat: 'json',
+      req,
+      skipFaq: true,
+      skipStatic: true,
+      cacheTtl: aiConfig.cacheTtlJobFit,
+      maxOutputTokensOverride: aiConfig.maxOutputTokensDetailed,
+    })
+
+    if (!result.ok) {
+      return res.status(result.status || 500).json({ error: result.error })
+    }
+
+    res.json({ ...result.reply, source: result.source })
+  } catch (err) {
+    console.error('AI Job Fit Error:', err)
+    res.status(500).json({ error: err.message || 'Failed to analyze job fit' })
+  }
+})
+
+router.post('/review', async (req, res) => {
+  try {
+    const { code, language } = req.body
+    if (!code || typeof code !== 'string') {
+      return res.status(400).json({ error: 'Code string is required' })
+    }
+
+    const trimmed = code.trim()
+    if (trimmed.length < 10) {
+      return res.status(400).json({ error: 'Please provide more code to review.' })
+    }
+
+    const capped = trimmed.slice(0, aiConfig.codeReviewMaxChars)
+    const label = language ? `Language: ${language}\n\n` : ''
+    const payload = `${label}${capped}`
+
+    const result = await askGemini({
+      feature: 'code-review',
+      userMessage: capped,
+      messages: [{ role: 'user', parts: [{ text: payload }] }],
+      systemPromptBase: CODE_REVIEW_PROMPT,
+      responseFormat: 'json',
+      req,
+      skipFaq: true,
+      skipStatic: true,
+      skipKnowledge: true,
+      cacheTtl: aiConfig.cacheTtlCodeReview,
+      maxOutputTokensOverride: aiConfig.maxOutputTokensDetailed,
+    })
+
+    if (!result.ok) {
+      return res.status(result.status || 500).json({ error: result.error })
+    }
+
+    res.json({ ...result.reply, source: result.source })
+  } catch (err) {
+    console.error('AI Review Error:', err)
+    res.status(500).json({ error: err.message || 'Failed to review code' })
+  }
+})
+
+router.post('/blog/explain', async (req, res) => {
+  try {
+    const { postId, mode } = req.body
+    const result = await explainBlogPost({ postId, mode, req })
+
+    if (!result.ok) {
+      return res.status(result.status || 500).json({ error: result.error })
+    }
+
+    res.json({ reply: result.reply, mode: result.mode, source: result.source })
+  } catch (err) {
+    console.error('AI Blog Explain Error:', err)
+    res.status(500).json({ error: err.message || 'Failed to explain blog post' })
+  }
+})
+
+router.post('/complexity', async (req, res) => {
+  try {
+    const { code } = req.body
+
+    if (!code || typeof code !== 'string') {
+      return res.status(400).json({ error: 'Code string is required' })
+    }
+
+    const result = await askGemini({
+      feature: 'complexity',
+      userMessage: code.trim(),
+      systemPromptBase: COMPLEXITY_PROMPT,
+      responseFormat: 'json',
+      req,
+      skipFaq: true,
+      skipStatic: true,
+      skipKnowledge: true,
+      cacheTtl: aiConfig.cacheTtlComplexity,
+    })
+
+    if (!result.ok) {
+      return res.status(result.status || 500).json({ error: result.error })
+    }
+
+    res.json(result.reply)
   } catch (err) {
     console.error('AI Complexity Error:', err)
-    // Send back actual error message to debug Vercel issues
     res.status(500).json({ error: err.message || 'Failed to analyze code complexity' })
   }
+})
+
+router.get('/static', (req, res) => {
+  const { q, path } = req.query
+  const query = typeof q === 'string' ? q : ''
+  const pathname = typeof path === 'string' ? path : ''
+
+  const pageContext = pathname ? { pathname, type: 'page' } : null
+  const answer = matchStaticAnswer(query, pageContext) || matchFaq(query) || getStaticPageSummary(pathname)
+
+  res.json({ answer: answer || null })
+})
+
+router.get('/usage', async (req, res) => {
+  const snapshot = await getUsageSnapshot(getClientIp(req))
+  res.json(snapshot)
 })
 
 export default router

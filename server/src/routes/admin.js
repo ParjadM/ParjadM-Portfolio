@@ -1,6 +1,8 @@
 import { Router } from 'express'
 import mongoose from 'mongoose'
 import { BlogPost, Project, Analytics, Visitor, AnalyticsDaily, AiKnowledge, DeviceStats, HourlyStats, AccessLog } from '../db/mongo.js'
+import { getAdminAiStats } from '../ai/analytics.js'
+import { clearKnowledgeMemoryCache } from '../ai/knowledge.js'
 import crypto from 'crypto'
 import { currentEngine } from '../db/index.js'
 import { redisClient } from '../db/redis.js'
@@ -400,6 +402,16 @@ router.post('/projects/:id/feature', async (req, res) => {
 })
 
 // --- AI Knowledge Management (Admin) ---
+router.get('/ai/stats', async (req, res) => {
+  try {
+    const range = Number(req.query.range || 7)
+    const stats = await getAdminAiStats(range)
+    res.json(stats)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
 router.get('/ai-knowledge', async (req, res) => {
   if (currentEngine !== 'mongo') return res.json({ content: '' })
   try {
@@ -428,6 +440,7 @@ router.put('/ai-knowledge', async (req, res) => {
         console.error('Failed to flush Redis cache:', err)
       }
     }
+    clearKnowledgeMemoryCache()
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })

@@ -93,7 +93,10 @@ export function useTerminalEngine({
       const res = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: payload, context: 'ParjadOS terminal' }),
+        body: JSON.stringify({
+          messages: payload,
+          pageContext: { type: 'page', pathname: mode === 'cli' ? '/cli' : '/os' },
+        }),
       });
       const data = await res.json();
       if (res.ok && data.reply) {

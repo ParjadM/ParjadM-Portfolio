@@ -22,6 +22,9 @@ const BlogPostSchema = new mongoose.Schema(
     tags: { type: [String], default: [] },
     status: { type: String, enum: ['draft', 'published'], default: 'draft' },
     publishAt: { type: Date, default: () => new Date() },
+    aiTldr: { type: String, default: '' },
+    aiJuniorExplain: { type: String, default: '' },
+    aiExplainVersion: { type: String, default: '' },
   },
   { timestamps: true }
 )
@@ -167,6 +170,53 @@ const AiKnowledgeSchema = new mongoose.Schema(
 )
 
 export const AiKnowledge = mongoose.models.AiKnowledge || mongoose.model('AiKnowledge', AiKnowledgeSchema, 'ai_knowledge')
+
+const AiCacheSchema = new mongoose.Schema(
+  {
+    key: { type: String, unique: true, required: true },
+    value: { type: String, required: true },
+    expiresAt: { type: Date, required: true, index: true },
+  },
+  { timestamps: true }
+)
+export const AiCache = mongoose.models.AiCache || mongoose.model('AiCache', AiCacheSchema, 'ai_cache')
+
+const AiUsageSchema = new mongoose.Schema(
+  {
+    key: { type: String, required: true },
+    windowKey: { type: String, required: true },
+    count: { type: Number, default: 0 },
+  },
+  { timestamps: true }
+)
+AiUsageSchema.index({ key: 1, windowKey: 1 }, { unique: true })
+export const AiUsage = mongoose.models.AiUsage || mongoose.model('AiUsage', AiUsageSchema, 'ai_usage')
+
+const AiAnalyticsDailySchema = new mongoose.Schema(
+  {
+    date: { type: String, required: true },
+    feature: { type: String, required: true },
+    source: { type: String, required: true },
+    count: { type: Number, default: 0 },
+  },
+  { timestamps: true }
+)
+AiAnalyticsDailySchema.index({ date: 1, feature: 1, source: 1 }, { unique: true })
+export const AiAnalyticsDaily = mongoose.models.AiAnalyticsDaily
+  || mongoose.model('AiAnalyticsDaily', AiAnalyticsDailySchema, 'ai_analytics_daily')
+
+const AiTopicDailySchema = new mongoose.Schema(
+  {
+    date: { type: String, required: true },
+    feature: { type: String, required: true },
+    topicSlug: { type: String, required: true },
+    count: { type: Number, default: 0 },
+  },
+  { timestamps: true }
+)
+AiTopicDailySchema.index({ date: 1, feature: 1, topicSlug: 1 }, { unique: true })
+export const AiTopicDaily = mongoose.models.AiTopicDaily
+  || mongoose.model('AiTopicDaily', AiTopicDailySchema, 'ai_topic_daily')
 
 // Premium Analytics Schemas
 const DeviceStatsSchema = new mongoose.Schema(

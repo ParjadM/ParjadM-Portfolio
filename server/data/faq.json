@@ -1,0 +1,82 @@
+[
+  {
+    "patterns": ["who is parjad", "who are you", "about parjad", "tell me about yourself", "about you"],
+    "answer": "Parjad Minooei is a Software Engineer who builds full-stack web applications. This portfolio showcases projects, blog posts, a mock interview experience, and an interactive CLI/OS mode. Browse the Projects and About pages to learn more."
+  },
+  {
+    "patterns": ["contact", "email", "reach out", "get in touch", "how can i contact"],
+    "answer": "You can reach Parjad through the Contact page on this site or via LinkedIn at linkedin.com/in/parjadminooei."
+  },
+  {
+    "patterns": ["skills", "tech stack", "technologies", "what do you know", "programming languages"],
+    "answer": "Parjad works with React, Node.js, Express, MongoDB, Python, and modern frontend tooling including Vite, Tailwind CSS, and Framer Motion. Check the Skills section and individual project pages for more detail."
+  },
+  {
+    "patterns": ["projects", "portfolio projects", "what have you built", "show me your work"],
+    "answer": "The Projects page lists featured work with descriptions, tech stacks, and links. Each project card opens a detail view with more context."
+  },
+  {
+    "patterns": ["experience", "work history", "where do you work", "job history"],
+    "answer": "Parjad's professional experience and background are summarized on the About page and in the AI knowledge base used by this assistant. For hiring conversations, try the Mock Interview page."
+  },
+  {
+    "patterns": ["education", "school", "university", "degree", "studied"],
+    "answer": "Education details are available on the About page. Ask a more specific question if you need a particular program or credential."
+  },
+  {
+    "patterns": ["resume", "cv", "download resume"],
+    "answer": "If a resume link is available on the site, you'll find it on the About or Contact page. You can also connect on LinkedIn for a direct conversation."
+  },
+  {
+    "patterns": ["github", "source code", "code repository"],
+    "answer": "GitHub activity and stats are integrated into this portfolio. Visit the GitHub section or Parjad's GitHub profile for repositories and contributions."
+  },
+  {
+    "patterns": ["leetcode", "coding problems", "algorithm practice"],
+    "answer": "LeetCode stats are displayed live on the site. Open the LeetCode section from the navigation to see solved problems and rankings."
+  },
+  {
+    "patterns": ["hire", "hiring", "available for work", "open to work", "freelance", "contract"],
+    "answer": "For hiring or collaboration, use the Contact page or LinkedIn. The Mock Interview page lets recruiters practice technical questions in character."
+  },
+  {
+    "patterns": ["location", "where are you based", "where do you live", "timezone"],
+    "answer": "Location and timezone details are on the About and Contact pages if listed. Reach out directly for the most current availability."
+  },
+  {
+    "patterns": ["blog", "articles", "writing", "posts"],
+    "answer": "The Blog page lists technical articles and write-ups. Each post includes full content and shareable links."
+  },
+  {
+    "patterns": ["cli mode", "terminal", "command line", "parjados", "desktop os"],
+    "answer": "This site includes an interactive CLI at /cli and a desktop OS experience at /os with apps, a file system, and terminal commands. Try `help` in the terminal for commands."
+  },
+  {
+    "patterns": ["what can you do", "help me", "how does this work", "what is this site"],
+    "answer": "I'm the portfolio AI assistant. I can answer questions about Parjad's background, projects, skills, and site features. Browse Projects, Blog, About, or Contact—or ask me something specific."
+  },
+  {
+    "patterns": ["mock interview", "interview page", "practice interview"],
+    "answer": "The Mock Interview at /interview lets recruiters ask technical questions to an AI playing Parjad. Toggle recruiter mode for a higher daily question limit."
+  },
+  {
+    "patterns": ["complexity analyzer", "big o", "time complexity", "analyze complexity"],
+    "answer": "The Stats page includes an AI complexity analyzer. Paste code to get time and space complexity with explanations. Results are cached to save API usage."
+  },
+  {
+    "patterns": ["stats page", "github stats", "coding stats"],
+    "answer": "The Stats page shows live GitHub and LeetCode metrics plus tools like the complexity analyzer. Visit /stats from the navigation."
+  },
+  {
+    "patterns": ["lqft", "fenwick", "persistent tree", "benchmark page"],
+    "answer": "LQFT Benchmark is an interactive demo comparing persistent tree structures — CRUD, memory density, and complexity views. Open /projects/lqftBenchmark to explore it."
+  },
+  {
+    "patterns": ["parjados", "desktop os", "gui mode", "startx"],
+    "answer": "ParjadOS is the desktop GUI at /os with apps, a taskbar, file explorer, and terminal. Type `gui` or `startx` from CLI to boot it."
+  },
+  {
+    "patterns": ["rate limit", "daily limit", "how many questions"],
+    "answer": "AI features have daily limits per visitor to keep the site sustainable. FAQ and cached answers are free — only new Gemini responses count toward limits."
+  }
+]

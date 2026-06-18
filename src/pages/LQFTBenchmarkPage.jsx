@@ -10,6 +10,7 @@ import { Reveal } from '../components/Reveal.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
 import { PageTransition } from '../components/ui/PageTransition.jsx';
 import { SEO } from '../components/SEO.jsx';
+import { setActivePageContext, clearActivePageContext } from '../utils/chatbotEvents.js';
 
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 import ParjadImage from '../Images/Parjad.jpg';
@@ -22,6 +23,18 @@ import BinaryGeneratorImage from '../Images/Binary 1010 Generator.jpg';
 import SpaceShooterImage from '../Images/SpaceShooter.jpg';
 
 export const LQFTBenchmarkPage = ({ theme }) => {
+    useEffect(() => {
+        setActivePageContext({
+            type: 'project',
+            pathname: '/projects/lqftBenchmark',
+            title: 'LQFT Benchmark',
+            description: 'Interactive browser benchmark and LQFT demo for persistent tree structures, CRUD, comparison, memory density, and complexity views.',
+            tags: ['Python', 'Benchmark', 'Data Structures', 'Browser Demo'],
+            liveUrl: '/projects/lqftBenchmark',
+        });
+        return () => clearActivePageContext();
+    }, []);
+
     const [mode, setMode] = useState('adaptive_light');
     const [compareN, setCompareN] = useState(3000);
     const [memoryN, setMemoryN] = useState(3000);

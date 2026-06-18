@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { PageTransition } from '../components/ui/PageTransition.jsx';
 import { SEO } from '../components/SEO.jsx';
 import { useFetchWithCache } from '../utils/useFetchWithCache.js';
+import { ProjectAskAi } from '../components/ProjectAskAi.jsx';
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 import ParjadImage from '../Images/Parjad.jpg';
 import GitHubStats from '../components/GitHubStats.tsx';
@@ -72,11 +73,14 @@ export const ProjectsSection = ({ theme }) => {
                             {(project.tags || []).map(tag => <span key={tag} className={`${tagClasses} text-xs font-semibold px-2.5 py-1 rounded-full`}>{tag}</span>)}
                         </div>
                         <p className="text-gray-300 mb-6 flex-grow">{project.description}</p>
-                        <div className="flex justify-end space-x-4 mt-auto">
+                        <div className="flex items-center justify-between mt-auto gap-3">
+                          <ProjectAskAi project={project} theme={theme} />
+                          <div className="flex space-x-4">
                            {project.githubUrl && <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110"><Github size={24} /></a>}
                            {project.liveUrl && <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                            </a>}
+                          </div>
                             </div>
                         </div>
                     </GlassCard>

@@ -1,0 +1,30 @@
+{
+  "topics": {
+    "lqft": "LQFT (Lazy Query Fenwick Tree) is a persistent data structure for range queries and point updates. The LQFT Benchmark page on this portfolio compares performance, memory density, and complexity against other approaches with interactive browser demos.",
+    "fenwick tree": "A Fenwick Tree (Binary Indexed Tree) supports point updates and prefix/range queries in O(log n) time with O(n) space. Parjad's LQFT Benchmark explores variants and practical trade-offs.",
+    "persistent data structure": "Persistent structures keep prior versions after updates. The LQFT Benchmark project demonstrates persistent-tree ideas with visual complexity and memory comparisons.",
+    "react": "Parjad builds interactive UIs with React 18, Vite, Tailwind CSS, and Framer Motion. Several portfolio projects use React on the frontend with Node/Express APIs.",
+    "node": "The portfolio backend uses Node.js and Express with MongoDB, Redis caching, and JWT admin auth.",
+    "mongodb": "MongoDB stores projects, blog posts, analytics, and the editable AI knowledge base used by this assistant.",
+    "mock interview": "The Mock Interview page at /interview lets recruiters ask technical questions to an AI playing Parjad in character. Rate limits apply to keep usage sustainable."
+  },
+  "pages": {
+    "/": "Home — overview of Parjad Minooei, featured sections, and links to projects, blog, stats, and contact.",
+    "/about": "About — background, experience, education, and personal story.",
+    "/projects": "Projects — portfolio work with descriptions, tech tags, GitHub links, and live demos.",
+    "/projects/lqftBenchmark": "LQFT Benchmark — interactive benchmark for persistent tree structures, CRUD demos, and complexity views.",
+    "/stats": "Stats — live GitHub and LeetCode metrics plus an AI-powered code complexity analyzer.",
+    "/blog": "Blog — technical articles and write-ups by Parjad.",
+    "/contact": "Contact — form and links to reach Parjad for hiring or collaboration.",
+    "/interview": "Mock Interview — practice technical interviews with an AI version of Parjad.",
+    "/cli": "CLI Mode — fullscreen retro terminal with filesystem, commands, and AI mode.",
+    "/os": "Desktop OS — ParjadOS GUI with apps, taskbar, notifications, and integrated site apps.",
+    "/tech-news": "Tech News — curated developer headlines from Hacker News."
+  },
+  "projects": {
+    "codequest": "CodeQuest is a coding education/game project showcasing interactive learning mechanics and polished UI.",
+    "binary 1010 generator": "Binary 1010 Generator is a utility project for generating and working with binary patterns.",
+    "spaceshooter": "SpaceShooter is a browser game project demonstrating game loops, input handling, and canvas or DOM rendering.",
+    "lqft benchmark": "LQFT Benchmark is an interactive browser benchmark inspired by Python app.py workflows — CRUD, comparison, memory density, and complexity views for persistent tree structures."
+  }
+}

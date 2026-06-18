@@ -10,6 +10,8 @@ import { Reveal } from '../components/Reveal.jsx';
 import { MarkdownContent } from '../components/ui/MarkdownContent.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
 import { useTranslation } from 'react-i18next';
+import { setActivePageContext, clearActivePageContext, buildBlogPageContext } from '../utils/chatbotEvents.js';
+import { BlogAiExplain } from '../components/BlogAiExplain.jsx';
 
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 import ParjadImage from '../Images/Parjad.jpg';
@@ -71,6 +73,12 @@ export const BlogPostPage = ({ theme }) => {
         }
     }, [post]);
 
+    useEffect(() => {
+        if (!post) return undefined;
+        setActivePageContext(buildBlogPageContext(post, `/blog/${id}`));
+        return () => clearActivePageContext();
+    }, [post, id]);
+
     if (loading) {
         return (
             <section className="min-h-screen flex items-center justify-center py-20 px-4">
@@ -111,6 +119,7 @@ export const BlogPostPage = ({ theme }) => {
                       </div>
                     )}
                     <h1 className="text-3xl font-bold text-white mb-6">{post.title}</h1>
+                    <BlogAiExplain postId={post.id || id} theme={theme} />
                     <MarkdownContent content={post.content} />
                 </GlassCard>
             </div>

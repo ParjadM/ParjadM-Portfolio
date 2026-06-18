@@ -6,6 +6,7 @@ import { resolveAppId, listAppsHelp, APP_META } from './apps.js';
 import { launchApp, notify, setPendingLaunch } from './events.js';
 import { unlockAchievement } from './achievements.js';
 import { pushCommandHistory, pushRecentApp } from './session.js';
+import { CLI_AI_HELP, getCliPageSummary, getCliStaticAnswer } from './aiStatic.js';
 
 export const COMMAND_LIST = [
   'help', 'manual', 'ls', 'cd', 'pwd', 'cat', 'mkdir', 'touch', 'rm',
@@ -21,6 +22,8 @@ export const HELP_TEXT = `Available commands:
   apps                                - List GUI applications
   open <app>                          - Launch app (calculator, notepad, blog…)
   email, ai, news                       - Interactive tools
+  ai help | ai explain <topic>          - Static AI answers (no API)
+  ai summarize <path>                   - Page summary (e.g. /projects)
   gui, startx                           - Boot graphical interface (/os)
   cli                                   - Fullscreen terminal (/cli)
   ping <host>                           - Network diagnostics
@@ -279,10 +282,63 @@ export async function executeCommand(rawCmd, ctx) {
       setEmailState?.({ step: 1, name: '', email: '', message: '' });
       pushToHistory('system', 'Email wizard — enter your name:');
       break;
-    case 'ai':
+    case 'ai': {
+      const sub = (args[0] || '').toLowerCase();
+      if (sub === 'help') {
+        pushToHistory('system', CLI_AI_HELP);
+        break;
+      }
+      if (sub === 'explain') {
+        const topic = args.slice(1).join(' ').replace(/^["']|["']$/g, '');
+        if (!topic) {
+          pushToHistory('error', 'ai explain: missing topic. Example: ai explain lqft');
+          break;
+        }
+        const answer = getCliStaticAnswer(topic);
+        pushToHistory('system', answer || 'No static answer for that topic. Use plain `ai` for live chat.');
+        break;
+      }
+      if (sub === 'summarize') {
+        const path = args[1] || '/';
+        const summary = getCliPageSummary(path.startsWith('/') ? path : `/${path}`);
+        pushToHistory('system', summary || `No static summary for ${path}. Try /projects or /stats.`);
+        break;
+      }
+      if (sub === 'code-review' || sub === 'review') {
+        const code = args.slice(1).join(' ').trim();
+        if (!code || code.length < 10) {
+          pushToHistory('error', 'ai code-review: paste code after the command.');
+          break;
+        }
+        pushToHistory('system', '> Reviewing code...');
+        try {
+          const res = await fetch('/api/ai/review', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code, language: 'javascript' }),
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            pushToHistory('error', data.error || 'Review failed.');
+            break;
+          }
+          const lines = [
+            `Readability: ${data.readabilityScore}/10`,
+            `Time: ${data.timeComplexity || '?'}`,
+            `Space: ${data.spaceComplexity || '?'}`,
+            data.summary || '',
+            ...(data.suggestions?.length ? ['Suggestions:', ...data.suggestions.map((s) => `  - ${s}`)] : []),
+          ].filter(Boolean);
+          pushToHistory('system', lines.join('\n'), true);
+        } catch {
+          pushToHistory('error', 'Network error during code review.');
+        }
+        break;
+      }
       setAiState?.({ active: true, messages: [] });
-      pushToHistory('system', 'AI mode — type "exit" to leave.');
+      pushToHistory('system', 'AI mode — type "exit" to leave. Try `ai help` for zero-cost commands.');
       break;
+    }
     case 'news':
       await fetchNews(pushToHistory);
       break;

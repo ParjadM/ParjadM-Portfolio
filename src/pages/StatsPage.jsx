@@ -9,6 +9,7 @@ import GitHubStats from '../components/GitHubStats.tsx';
 import LeetCodeStats from '../components/LeetCodeStats.tsx';
 import { ClickUpSection } from '../components/ClickUpSection.jsx';
 import { ComplexityAnalyzer } from '../components/ComplexityAnalyzer.jsx';
+import { CodeReviewAnalyzer } from '../components/CodeReviewAnalyzer.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
 import { useTranslation } from 'react-i18next';
 import { PageTransition } from '../components/ui/PageTransition.jsx';
@@ -50,6 +51,12 @@ export const StatsPage = ({ theme }) => {
         <Reveal>
         <div className="mt-8">
           <ComplexityAnalyzer theme={theme} />
+        </div>
+        </Reveal>
+
+        <Reveal>
+        <div className="mt-8">
+          <CodeReviewAnalyzer theme={theme} />
         </div>
         </Reveal>
 

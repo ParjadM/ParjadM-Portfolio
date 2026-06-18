@@ -11,6 +11,7 @@ import { getAuthToken } from '../utils/auth.jsx';
 import { useTranslation } from 'react-i18next';
 import { PageTransition } from '../components/ui/PageTransition.jsx';
 import { SEO } from '../components/SEO.jsx';
+import { JobFitChecker } from '../components/JobFitChecker.jsx';
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 import ParjadImage from '../Images/Parjad.jpg';
 import GitHubStats from '../components/GitHubStats.tsx';
@@ -210,6 +211,12 @@ export const AboutSection = ({ theme }) => {
                         </Reveal>
                     </div>
                 </div>
+
+                <Reveal>
+                <div className="mt-10">
+                    <JobFitChecker theme={theme} />
+                </div>
+                </Reveal>
             </div>
         </PageTransition>
     );

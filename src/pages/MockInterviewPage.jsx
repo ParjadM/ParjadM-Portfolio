@@ -25,6 +25,9 @@ export const MockInterviewPage = ({ theme }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [debrief, setDebrief] = useState(null);
+  const [debriefLoading, setDebriefLoading] = useState(false);
+  const [debriefError, setDebriefError] = useState('');
   const messagesContainerRef = useRef(null);
 
   const gradientClass = theme !== 'pink' 
@@ -86,6 +89,28 @@ export const MockInterviewPage = ({ theme }) => {
     }
   };
 
+  const userTurns = messages.filter((m) => m.role === 'user').length;
+
+  const handleDebrief = async () => {
+    if (debriefLoading || userTurns < 3) return;
+    setDebriefLoading(true);
+    setDebriefError('');
+    try {
+      const res = await fetch('/api/ai/interview/debrief', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Debrief failed');
+      setDebrief(data);
+    } catch (err) {
+      setDebriefError(err.message || 'Could not generate debrief');
+    } finally {
+      setDebriefLoading(false);
+    }
+  };
+
   if (!roleSelected) {
     return (
       <div className="min-h-screen flex items-center justify-center py-20 px-4">
@@ -139,6 +164,15 @@ export const MockInterviewPage = ({ theme }) => {
               </span>
             </div>
           </div>
+          <button
+            type="button"
+            onClick={handleDebrief}
+            disabled={debriefLoading || userTurns < 3}
+            className="text-xs font-semibold px-3 py-1.5 rounded-full border border-white/20 text-gray-200 hover:bg-white/10 disabled:opacity-40 transition-colors"
+            title={userTurns < 3 ? 'Ask at least 3 questions first' : 'Generate interview debrief'}
+          >
+            {debriefLoading ? 'Generating...' : 'End & Debrief'}
+          </button>
         </div>
 
         {/* Messages Container */}
@@ -171,6 +205,35 @@ export const MockInterviewPage = ({ theme }) => {
             </div>
           )}
         </div>
+
+        {debriefError && (
+          <div className="px-6 pb-2 text-red-300 text-sm">{debriefError}</div>
+        )}
+
+        {debrief && (
+          <div className="mx-6 mb-4 p-4 rounded-2xl bg-black/40 border border-white/10 text-sm text-gray-300 space-y-3 max-h-48 overflow-y-auto">
+            <p className="text-white font-semibold">Interview Debrief</p>
+            {debrief.overallSummary && <p>{debrief.overallSummary}</p>}
+            {debrief.strengths?.length > 0 && (
+              <div>
+                <span className="text-emerald-300 font-medium">Strengths: </span>
+                {debrief.strengths.join(' · ')}
+              </div>
+            )}
+            {debrief.areasToImprove?.length > 0 && (
+              <div>
+                <span className="text-amber-300 font-medium">Improve: </span>
+                {debrief.areasToImprove.join(' · ')}
+              </div>
+            )}
+            {debrief.followUpQuestions?.length > 0 && (
+              <div>
+                <span className="text-white font-medium">Follow-ups: </span>
+                {debrief.followUpQuestions.join(' · ')}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Input Form */}
         <div className="p-4 md:p-6 border-t border-white/10 bg-black/30">

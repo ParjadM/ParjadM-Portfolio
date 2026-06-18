@@ -1,5 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
+import {
+  CHATBOT_OPEN_EVENT,
+  PAGE_CONTEXT_EVENT,
+  buildChatPayloadContext,
+  getChatGreeting,
+} from '../utils/chatbotEvents.js';
+import { sendChatStream, consumeAiChatStream } from '../utils/aiStream.js';
 
 
 // ... (icons remain the same) ...
@@ -53,27 +60,48 @@ const Chatbot = ({ theme = 'green' }) => {
   const [loading, setLoading] = useState(false);
   
   const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [sessionPageContext, setSessionPageContext] = useState(null);
   const messagesContainerRef = useRef(null);
   const location = useLocation();
+  const pendingSendRef = useRef(null);
+  const handleSendRef = useRef(null);
 
-  // Initialize greeting based on page
+  const refreshGreeting = useCallback((pathname, pageContext) => {
+    const greeting = getChatGreeting(pathname, pageContext);
+    setMessages([{ role: 'model', parts: [{ text: greeting }] }]);
+  }, []);
+
   useEffect(() => {
-    let greeting = "Hi! I'm Parjad's AI assistant. How can I help you today?";
-    const path = location.pathname;
-    
-    if (path.includes('lqftBenchmark')) {
-      greeting = "Hi! I see you're checking out the LQFT Benchmark. Need any help understanding persistent tree structures or algorithm complexity?";
-    } else if (path.includes('admin')) {
-      greeting = "Welcome to the Admin Dashboard! Let me know if you need help analyzing the traffic metrics or managing content.";
-    } else if (path.includes('projects')) {
-      greeting = "Hi! Exploring the projects? Feel free to ask me specific questions about the tech stack.";
-    }
-    
-    // Reset conversation if it's the first time or if they change major contexts
-    if (messages.length <= 1) {
-      setMessages([{ role: 'model', parts: [{ text: greeting }] }]);
-    }
-  }, [location.pathname]);
+    const onPageContext = (event) => {
+      setSessionPageContext(event.detail || null);
+    };
+    window.addEventListener(PAGE_CONTEXT_EVENT, onPageContext);
+    return () => window.removeEventListener(PAGE_CONTEXT_EVENT, onPageContext);
+  }, []);
+
+  useEffect(() => {
+    const onOpen = (event) => {
+      const { message, pageContext, autoSend } = event.detail || {};
+      if (pageContext) setSessionPageContext(pageContext);
+      setIsOpen(true);
+      if (message) {
+        setInput(message);
+        if (autoSend) pendingSendRef.current = message;
+      } else {
+        refreshGreeting(location.pathname, pageContext);
+      }
+    };
+    window.addEventListener(CHATBOT_OPEN_EVENT, onOpen);
+    return () => window.removeEventListener(CHATBOT_OPEN_EVENT, onOpen);
+  }, [location.pathname, refreshGreeting]);
+
+  useEffect(() => {
+    const pageContext = buildChatPayloadContext(location, sessionPageContext);
+    setMessages((prev) => {
+      if (prev.length > 1) return prev;
+      return [{ role: 'model', parts: [{ text: getChatGreeting(location.pathname, pageContext) }] }];
+    });
+  }, [location.pathname, sessionPageContext]);
 
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
@@ -182,51 +210,71 @@ const Chatbot = ({ theme = 'green' }) => {
     });
   };
 
-  const handleSend = async (e) => {
+  const handleSend = async (e, overrideText) => {
     e?.preventDefault();
-    if (!input.trim() || loading) return;
+    const text = (overrideText ?? input).trim();
+    if (!text || loading) return;
 
     if (listening) {
       recognitionRef.current?.stop();
       setListening(false);
     }
 
-    const userMessage = { role: 'user', parts: [{ text: input }] };
+    const userMessage = { role: 'user', parts: [{ text }] };
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setLoading(true);
 
     try {
-      // Truncate history to save tokens (keep last 6 messages)
       const payloadMessages = [...messages, userMessage].slice(-6);
+      const pageContext = buildChatPayloadContext(location, sessionPageContext);
 
-      // Pass the current page context to the backend
-      const response = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          messages: payloadMessages,
-          context: `The user is currently browsing the page: ${location.pathname}.`
-        })
+      const response = await sendChatStream({
+        messages: payloadMessages,
+        pageContext,
       });
-      const data = await response.json();
-      
-      if (response.ok && data.reply) {
-        setMessages((prev) => [...prev, { role: 'model', parts: [{ text: data.reply }] }]);
-        speakText(data.reply);
-      } else {
-        const errorMsg = `Connection Error: ${data.error || "Please try again later."}`;
-        setMessages((prev) => [...prev, { role: 'model', parts: [{ text: errorMsg }] }]);
-        speakText(errorMsg);
-      }
+
+      const placeholder = { role: 'model', parts: [{ text: '' }] };
+      setMessages((prev) => [...prev, placeholder]);
+
+      let gotToken = false;
+      const { fullText } = await consumeAiChatStream(response, {
+        onToken: (token) => {
+          if (!gotToken) {
+            gotToken = true;
+            setLoading(false);
+          }
+          setMessages((prev) => {
+            const next = [...prev];
+            const last = next[next.length - 1];
+            if (last?.role === 'model') {
+              next[next.length - 1] = {
+                ...last,
+                parts: [{ text: (last.parts[0]?.text || '') + token }],
+              };
+            }
+            return next;
+          });
+        },
+      });
+
+      if (!gotToken) setLoading(false);
+      if (fullText) speakText(fullText);
     } catch (error) {
-      const errorMsg = "Sorry, something went wrong with the network.";
-      setMessages((prev) => [...prev, { role: 'model', parts: [{ text: errorMsg }] }]);
+      const errorMsg = error.message?.includes('limit')
+        ? error.message
+        : 'Sorry, something went wrong with the network.';
+      setMessages((prev) => {
+        const withoutEmpty = prev.filter((m, i) => !(i === prev.length - 1 && m.role === 'model' && !m.parts[0]?.text));
+        return [...withoutEmpty, { role: 'model', parts: [{ text: errorMsg }] }];
+      });
       speakText(errorMsg);
     } finally {
       setLoading(false);
     }
   };
+
+  handleSendRef.current = handleSend;
 
   const gradientClass = theme !== 'pink' 
     ? 'bg-gradient-to-r from-emerald-500 to-teal-500' 

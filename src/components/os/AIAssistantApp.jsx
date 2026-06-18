@@ -41,7 +41,8 @@ export const AIAssistantApp = ({ theme }) => {
                     messages: newMessages.map(m => ({
                         role: m.role,
                         parts: m.parts
-                    })) 
+                    })),
+                    pageContext: { type: 'page', pathname: '/os' },
                 })
             });
 
