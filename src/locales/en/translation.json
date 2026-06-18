@@ -6,7 +6,30 @@
     "Stats": "Stats",
     "Blog": "Blog",
     "Contact": "Contact",
+    "Explore": "Explore",
+    "Menu": "Menu",
+    "More": "More",
     "Visitors": "{{count}} Visitors"
+  },
+  "language": {
+    "label": "Language",
+    "english": "English",
+    "french": "Français",
+    "toastEn": "Language set to English",
+    "toastFr": "Langue définie sur le français"
+  },
+  "more": {
+    "os": "Operating System",
+    "osDesc": "Web-based desktop environment",
+    "techNews": "Tech News",
+    "techNewsDesc": "Latest updates and articles",
+    "intro": "Intro Cinematic",
+    "introDesc": "Watch the opening sequence",
+    "cli": "CLI Mode",
+    "cliDesc": "Command-line interface",
+    "interview": "Mock Interview",
+    "interviewDesc": "Practice with an AI",
+    "statsDesc": "Site statistics and metrics"
   },
   "home": {
     "title": "Parjad Minooei",
@@ -32,7 +55,7 @@
     "storyText1": "I bridge the gap between human behavior and complex computing. With a background that uniquely blends a degree in Psychology with an Advanced Diploma in Computer Programming, I look at software through a dual lens: deep logical problem-solving and intuitive, user-centric design.",
     "storyText2": "Currently expanding my technical foundations in Software Engineering at McMaster University, my focus has evolved from building responsive web applications to engineering scalable, high-performance software and robust systems architecture. From optimizing custom backend engines to developing open-source data structure libraries, I thrive on writing clean, mathematically sound, and highly efficient code.",
     "storyText3_title": "Beyond the Code",
-    "storyText3": "When I’m not designing systems, you’ll usually find me pushing limits at the gym, diving into complex math puzzles, or sharpening my algorithmic skills on LeetCode. I am driven by relentless optimization—both in the IDE and in personal growth."
+    "storyText3": "When I'm not designing systems, you'll usually find me pushing limits at the gym, diving into complex math puzzles, or sharpening my algorithmic skills on LeetCode. I am driven by relentless optimization—both in the IDE and in personal growth."
   },
   "projects": {
     "title": "My Projects",
@@ -71,6 +94,7 @@
   "blog": {
     "title": "Blog & Articles",
     "subtitle": "Thoughts, tutorials, and insights about technology, development, and my journey in tech",
+    "englishOnly": "Blog articles are currently available in English only.",
     "categories": {
       "all": "All Posts",
       "technology": "Technology",
@@ -90,7 +114,12 @@
     "title": "Developer Stats",
     "subtitle": "A quick snapshot of my open‑source presence and coding practice, updated automatically with caching for fast loads.",
     "autoRefreshed": "Auto‑refreshed",
-    "footer": "Data via GitHub API & LeetCode GraphQL • Cached to improve performance"
+    "footer": "Data via GitHub API & LeetCode GraphQL • Cached to improve performance",
+    "sections": {
+      "complexity": "Complexity Analyzer",
+      "codeReview": "AI Code Review",
+      "clickUp": "ClickUp Challenge"
+    }
   },
   "skills": {
     "title": "Technical Skills",
@@ -118,6 +147,84 @@
   "explore": {
     "badge": "Easter eggs",
     "title": "Explore",
-    "subtitle": "Interactive experiences and hidden corners of this site."
+    "subtitle": "Interactive experiences and hidden corners of this site.",
+    "open": "Open →",
+    "seoTitle": "Explore — Parjad Minooei",
+    "seoDesc": "Hidden gems and interactive experiences across parjadm.ca.",
+    "links": {
+      "cli": { "label": "CLI Mode", "desc": "Terminal-style navigation" },
+      "os": { "label": "Desktop OS", "desc": "A playful desktop environment" },
+      "intro": { "label": "Intro Cinematic", "desc": "Animated welcome sequence" },
+      "interview": { "label": "Mock Interview", "desc": "Chat with AI Parjad" },
+      "techNews": { "label": "Tech Hub", "desc": "Top dev articles today" },
+      "stats": { "label": "Stats & ClickUp", "desc": "GitHub, LeetCode, and the counter" },
+      "blog": { "label": "Blog", "desc": "Articles and tutorials" },
+      "lqft": { "label": "LQFT Benchmark", "desc": "Performance playground" }
+    }
+  },
+  "chatbot": {
+    "title": "AI Assistant",
+    "placeholder": "Ask me anything...",
+    "voiceUnavailable": "Voice input unavailable on this browser — type your message below.",
+    "voiceUnsupported": "Voice input is not supported in this browser. On iOS Safari, try Chrome or type your message.",
+    "micBlocked": "Microphone blocked",
+    "openLabel": "Open AI assistant",
+    "greetingDefault": "Hi! I'm Parjad's AI assistant. How can I help you today?",
+    "greetingProject": "Hi! Ask me anything about {{title}} — tech stack, design choices, or how it was built.",
+    "greetingBlog": "Hi! I can help explain \"{{title}}\" or answer questions about this article.",
+    "greetingLqft": "Hi! You're on the LQFT Benchmark page. Ask about persistent trees, complexity, or how the demo works.",
+    "greetingBlogPost": "Hi! Reading a blog post? I can summarize or explain it in plain language.",
+    "greetingStats": "Hi! On the Stats page — ask about GitHub/LeetCode metrics or how the complexity analyzer works.",
+    "greetingInterview": "Hi! Ready to practice? I can explain how Mock Interview works or answer questions about Parjad.",
+    "greetingProjects": "Hi! Exploring projects? Ask about any build, tech stack, or use the Ask AI button on a card.",
+    "greetingAbout": "Hi! On the About page — ask about experience, education, or background.",
+    "greetingContact": "Hi! Need to reach Parjad? I can point you to the best way to get in touch.",
+    "greetingOsCli": "Hi! In terminal/OS mode — I know the commands, apps, and portfolio content. What do you need?",
+    "greetingAdmin": "Welcome to the Admin Dashboard. I can help with site content and AI knowledge management questions."
+  },
+  "tools": {
+    "complexity": {
+      "title": "Project Complexity Analysis",
+      "subtitle": "Architectural time and space complexity of the entire website",
+      "loading": "Loading analysis...",
+      "error": "Failed to load project complexity analysis.",
+      "time": "Time Complexity",
+      "space": "Space Complexity",
+      "copy": "Copy metrics",
+      "copied": "Copied!"
+    },
+    "codeReview": {
+      "title": "AI Code Review",
+      "subtitle": "Paste a snippet for bugs, readability, and complexity hints",
+      "pasteToggle": "Paste code to review",
+      "pasteHide": "Hide code editor",
+      "reviewing": "Reviewing...",
+      "autoHint": "Auto-reviews after 1.5s pause · cached by snippet",
+      "readability": "Readability",
+      "time": "Time",
+      "space": "Space",
+      "issues": "Potential issues",
+      "suggestions": "Suggestions"
+    }
+  },
+  "interview": {
+    "title": "Mock Interview",
+    "subtitle": "Practice interviewing Parjad — technical or behavioral questions welcome.",
+    "rolePrompt": "Choose your role",
+    "recruiter": "I'm a Recruiter",
+    "candidate": "I'm Parjad (candidate mode)",
+    "greeting": "Hi! I'm Parjad. Thanks for taking the time to interview me today. I'm ready when you are—what would you like to ask me first?",
+    "placeholder": "Ask a technical or behavioral question...",
+    "debrief": "Get debrief",
+    "debriefLoading": "Generating debrief...",
+    "debriefNeedMore": "Ask at least 3 questions before requesting a debrief.",
+    "strengths": "Strengths",
+    "improve": "Improve",
+    "followUps": "Follow-ups",
+    "networkError": "Sorry, something went wrong with the network."
+  },
+  "seo": {
+    "defaultTitle": "Parjad Minooei — Software Engineer Portfolio",
+    "defaultDesc": "Software Engineer building beautiful, fast, user-centric web apps."
   }
 }

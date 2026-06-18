@@ -51,7 +51,7 @@ export const StatsPage = ({ theme }) => {
         {/* Complexity Analyzer */}
         <Reveal>
         <div className="mt-8">
-          <MobileCollapsible title="Complexity Analyzer" defaultOpen={false} theme={theme}>
+          <MobileCollapsible title={t('stats.sections.complexity')} defaultOpen={false} theme={theme}>
             <ComplexityAnalyzer theme={theme} />
           </MobileCollapsible>
         </div>
@@ -59,7 +59,7 @@ export const StatsPage = ({ theme }) => {
 
         <Reveal>
         <div className="mt-8">
-          <MobileCollapsible title="AI Code Review" defaultOpen={false} theme={theme}>
+          <MobileCollapsible title={t('stats.sections.codeReview')} defaultOpen={false} theme={theme}>
             <CodeReviewAnalyzer theme={theme} />
           </MobileCollapsible>
         </div>
@@ -68,7 +68,7 @@ export const StatsPage = ({ theme }) => {
         {/* ClickUp - fun interactive game */}
         <Reveal>
         <div className="mt-8">
-          <MobileCollapsible title="ClickUp Challenge" defaultOpen={false} theme={theme}>
+          <MobileCollapsible title={t('stats.sections.clickUp')} defaultOpen={false} theme={theme}>
             <ClickUpSection theme={theme} />
           </MobileCollapsible>
         </div>

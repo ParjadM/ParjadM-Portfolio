@@ -6,6 +6,7 @@ import { RippleButton } from '../ui/RippleButton.jsx';
 import { Toast } from '../ui/Toast.jsx';
 import { getAuthToken } from '../../utils/auth.jsx';
 import { useTranslation } from 'react-i18next';
+import { LocalizedLink } from '../ui/LocalizedLink.jsx';
 
 export const Footer = ({ theme }) => {
     const { t } = useTranslation();
@@ -52,13 +53,13 @@ export const Footer = ({ theme }) => {
                         <ul className="flex flex-wrap justify-center gap-x-8 gap-y-4">
                             {navLinks.map(link => (
                                 <li key={link.name}>
-                                    <Link
+                                    <LocalizedLink
                                         to={link.path}
                                         className="text-gray-300 hover:text-emerald-400 transition-colors duration-300 text-sm font-medium relative group"
                                     >
                                         {link.name}
                                         <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
-                                    </Link>
+                                    </LocalizedLink>
                                 </li>
                             ))}
                         </ul>

@@ -1,27 +1,30 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { openMobileMenu } from '../../utils/mobileMenuEvents.js';
+import { LocalizedLink } from '../ui/LocalizedLink.jsx';
+import { stripLocalePrefix } from '../../utils/i18nRouting.js';
 
 export const BottomNav = ({ theme }) => {
     const { t } = useTranslation();
     const location = useLocation();
+    const path = stripLocalePrefix(location.pathname);
 
-    const isActive = (path) => {
-        if (path === '/explore') {
+    const isActive = (itemPath) => {
+        if (itemPath === '/explore') {
             return ['/explore', '/cli', '/os', '/intro', '/interview', '/tech-news'].some(
-                (p) => location.pathname === p || location.pathname.startsWith(p + '/')
+                (p) => path === p || path.startsWith(p + '/')
             );
         }
-        return location.pathname === path;
+        return path === itemPath;
     };
 
     const navItems = [
         { name: t('nav.Home'), path: '/', icon: HomeIcon },
         { name: t('nav.Projects'), path: '/projects', icon: ProjectsIcon },
-        { name: 'Explore', path: '/explore', icon: ExploreIcon },
+        { name: t('nav.Explore'), path: '/explore', icon: ExploreIcon },
         { name: t('nav.Stats'), path: '/stats', icon: StatsIcon },
-        { name: 'Menu', action: 'menu', icon: MenuIcon },
+        { name: t('nav.Menu'), action: 'menu', icon: MenuIcon },
     ];
 
     const activeColor = theme === 'pink' ? 'text-pink-400' : 'text-emerald-400';
@@ -39,7 +42,7 @@ export const BottomNav = ({ theme }) => {
                                 type="button"
                                 onClick={openMobileMenu}
                                 className="flex flex-col items-center justify-center flex-1 h-full min-h-[44px] text-gray-400 hover:text-white transition-colors"
-                                aria-label="Open menu"
+                                aria-label={t('nav.Menu')}
                             >
                                 <item.icon className="w-6 h-6 mb-0.5" />
                                 <span className="text-[10px] font-semibold tracking-wide">{item.name}</span>
@@ -48,14 +51,14 @@ export const BottomNav = ({ theme }) => {
                     }
 
                     return (
-                        <Link
+                        <LocalizedLink
                             key={item.path}
                             to={item.path}
                             className={`flex flex-col items-center justify-center flex-1 h-full min-h-[44px] transition-colors ${active ? activeColor : 'text-gray-400 hover:text-white'}`}
                         >
                             <item.icon className={`w-6 h-6 mb-0.5 ${active ? 'fill-current' : ''}`} />
                             <span className="text-[10px] font-semibold tracking-wide truncate max-w-full px-0.5">{item.name}</span>
-                        </Link>
+                        </LocalizedLink>
                     );
                 })}
             </div>

@@ -13,9 +13,11 @@ import { THEMES } from '../../utils/themeConfig.js';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../ui/LanguageSwitcher.jsx';
+import { LocalizedLink } from '../ui/LocalizedLink.jsx';
 import { MOBILE_MENU_OPEN } from '../../utils/mobileMenuEvents.js';
+import { stripLocalePrefix } from '../../utils/i18nRouting.js';
 
-export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isMobileMenuOpen, setIsMobileMenuOpen }) => {
+export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isMobileMenuOpen, setIsMobileMenuOpen, onLanguageChange }) => {
     const { t } = useTranslation();
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
     const [paletteRect, setPaletteRect] = useState(null);
@@ -48,7 +50,16 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
         if(setIsMobileMenuOpen) setIsMobileMenuOpen(false);
     };
 
-    const isActive = (path) => location.pathname === path;
+    const isActive = (path) => stripLocalePrefix(location.pathname) === path;
+
+    const MORE_ITEMS = [
+        { name: t('more.os'), path: '/os', icon: <Monitor className="w-4 h-4" />, description: t('more.osDesc') },
+        { name: t('more.techNews'), path: '/tech-news', icon: <Newspaper className="w-4 h-4" />, description: t('more.techNewsDesc') },
+        { name: t('more.intro'), path: '/intro', icon: <Film className="w-4 h-4" />, description: t('more.introDesc') },
+        { name: t('more.cli'), path: '/cli', icon: <Terminal className="w-4 h-4" />, description: t('more.cliDesc') },
+        { name: t('more.interview'), path: '/interview', icon: <MessageSquare className="w-4 h-4" />, description: t('more.interviewDesc') },
+        { name: t('nav.Stats'), path: '/stats', icon: <Activity className="w-4 h-4" />, description: t('more.statsDesc') }
+    ];
 
     useEffect(() => {
         const controller = new AbortController();
@@ -159,15 +170,6 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
         document.body
     );
 
-    const MORE_ITEMS = [
-        { name: 'Operating System', path: '/os', icon: <Monitor className="w-4 h-4" />, description: 'Web-based Desktop Environment' },
-        { name: 'Tech News', path: '/tech-news', icon: <Newspaper className="w-4 h-4" />, description: 'Latest updates & articles' },
-        { name: 'Intro Cinematic', path: '/intro', icon: <Film className="w-4 h-4" />, description: 'Watch the opening sequence' },
-        { name: 'CLI Mode', path: '/cli', icon: <Terminal className="w-4 h-4" />, description: 'Command-line interface' },
-        { name: 'Mock Interview', path: '/interview', icon: <MessageSquare className="w-4 h-4" />, description: 'Practice with an AI' },
-        { name: t('nav.Stats'), path: '/stats', icon: <Activity className="w-4 h-4" />, description: 'Site statistics & metrics' }
-    ];
-
     const moreEl = typeof document !== 'undefined' && createPortal(
         <AnimatePresence>
             {isMoreOpen && moreRect && (
@@ -181,7 +183,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                     style={{ top: moreRect.top, left: moreRect.left }}
                 >
                     {MORE_ITEMS.map((item, idx) => (
-                        <Link 
+                        <LocalizedLink 
                             key={idx}
                             to={item.path} 
                             onClick={() => setIsMoreOpen(false)} 
@@ -194,7 +196,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                                 <span className="text-sm font-semibold text-gray-200 group-hover:text-white transition-colors">{item.name}</span>
                                 <span className="text-[10px] text-gray-500 group-hover:text-gray-400 transition-colors">{item.description}</span>
                             </div>
-                        </Link>
+                        </LocalizedLink>
                     ))}
                 </motion.div>
             )}
@@ -209,9 +211,9 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
             
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex container mx-auto px-6 py-4 justify-between items-center" role="navigation" aria-label="Primary">
-                <Link to="/" className="text-2xl font-bold text-white tracking-wider inline-flex items-center transition-transform hover:scale-105">
+                <LocalizedLink to="/" className="text-2xl font-bold text-white tracking-wider inline-flex items-center transition-transform hover:scale-105">
                     <img src={Logo} alt="Logo" className="h-[4.5rem] w-auto drop-shadow-lg" />
-                </Link>
+                </LocalizedLink>
                 
                 <GlassCard className="!rounded-full border border-white/10 shadow-lg backdrop-blur-md" theme={theme}>
                     <div className="flex items-center px-2 py-1.5">
@@ -220,7 +222,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                             {navItems.map(item => {
                                 const isItemActive = isActive(item.path);
                                 return (
-                                    <Link
+                                    <LocalizedLink
                                         key={item.name}
                                         to={item.path}
                                         className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
@@ -231,7 +233,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                                         aria-current={isItemActive ? 'page' : undefined}
                                     >
                                         {item.name}
-                                    </Link>
+                                    </LocalizedLink>
                                 );
                             })}
                             <div className="relative" ref={moreDropdownRef}>
@@ -240,7 +242,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                                     className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border border-transparent ${isMoreOpen ? 'bg-white/10 text-white shadow-inner' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}
                                     aria-expanded={isMoreOpen}
                                 >
-                                    <span>More</span>
+                                    <span>{t('nav.More')}</span>
                                     <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${isMoreOpen ? 'rotate-180 text-white' : 'text-gray-400'}`} />
                                 </button>
                                 {moreEl}
@@ -258,7 +260,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                                 </div>
                             )}
                             
-                            <LanguageSwitcher />
+                            <LanguageSwitcher onLanguageChange={onLanguageChange} />
                             
                             <div className="relative">
                                 <button
@@ -280,12 +282,12 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
             <nav className="lg:hidden px-4 pt-safe-or-4 pb-3" role="navigation" aria-label="Mobile Primary">
                 <GlassCard className="!rounded-2xl border border-white/10 shadow-lg backdrop-blur-md px-4 py-2" theme={theme}>
                     <div className="flex justify-between items-center gap-2">
-                        <Link to="/" className="inline-flex items-center shrink-0">
+                        <LocalizedLink to="/" className="inline-flex items-center shrink-0">
                             <img src={Logo} alt="Logo" className="h-8 w-auto drop-shadow-md" />
-                        </Link>
+                        </LocalizedLink>
                         
                         <div className="flex items-center gap-1.5 sm:gap-2">
-                            <LanguageSwitcher />
+                            <LanguageSwitcher onLanguageChange={onLanguageChange} />
                             <button
                                 ref={mobilePaletteTriggerRef}
                                 type="button"
@@ -322,33 +324,32 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                         
                         <div className="flex flex-col items-center space-y-6 w-full max-w-sm mt-10">
                             {navItems.map(item => (
-                                <Link
+                                <LocalizedLink
                                     key={item.name}
                                     to={item.path}
                                     onClick={handleNavClick}
                                     className={`text-3xl sm:text-4xl font-extrabold tracking-tight transition-all duration-300 ${isActive(item.path) ? (theme === 'pink' ? 'text-pink-400' : 'text-emerald-400') : 'text-gray-300 hover:text-white'}`}
                                 >
                                     {item.name}
-                                </Link>
+                                </LocalizedLink>
                             ))}
 
-                            <Link
+                            <LocalizedLink
                                 to="/explore"
                                 onClick={handleNavClick}
                                 className={`text-2xl font-bold tracking-tight ${isActive('/explore') ? (theme === 'pink' ? 'text-pink-400' : 'text-emerald-400') : 'text-gray-300 hover:text-white'}`}
                             >
-                                Explore
-                            </Link>
+                                {t('nav.Explore')}
+                            </LocalizedLink>
 
                             <div className="w-full h-px bg-white/10 my-4" />
                             
                             <div className="flex flex-wrap justify-center gap-4 w-full">
-                                <Link to="/os" onClick={handleNavClick} className="text-gray-400 hover:text-white font-medium">OS Mode</Link>
-                                <Link to="/tech-news" onClick={handleNavClick} className="text-gray-400 hover:text-white font-medium">Tech News</Link>
-                                <Link to="/intro" onClick={handleNavClick} className="text-gray-400 hover:text-white font-medium">Intro</Link>
-                                <Link to="/cli" onClick={handleNavClick} className="text-gray-400 hover:text-white font-medium">CLI</Link>
-                                <Link to="/interview" onClick={handleNavClick} className="text-gray-400 hover:text-white font-medium">Interview</Link>
-                                <Link to="/stats" onClick={handleNavClick} className="text-gray-400 hover:text-white font-medium">Stats</Link>
+                                {MORE_ITEMS.map((item) => (
+                                    <LocalizedLink key={item.path} to={item.path} onClick={handleNavClick} className="text-gray-400 hover:text-white font-medium">
+                                        {item.name}
+                                    </LocalizedLink>
+                                ))}
                             </div>
                             
                             {visitors !== null && (

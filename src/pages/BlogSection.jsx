@@ -20,7 +20,7 @@ import BinaryGeneratorImage from '../Images/Binary 1010 Generator.jpg';
 import SpaceShooterImage from '../Images/SpaceShooter.jpg';
 
 export const BlogSection = ({ theme }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -69,6 +69,14 @@ export const BlogSection = ({ theme }) => {
                     </p>
                 </div>
                 </Reveal>
+
+                {i18n.language?.startsWith('fr') && (
+                <Reveal>
+                <div className="mb-8 max-w-2xl mx-auto text-center px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-100 text-sm">
+                    {t('blog.englishOnly')}
+                </div>
+                </Reveal>
+                )}
 
                 {/* Category Filter */}
                 <Reveal>

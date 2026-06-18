@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { SEO } from '../components/SEO.jsx';
+import { getCurrentLocale } from '../utils/chatbotEvents.js';
 
 const BotIcon = (props) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -20,6 +22,7 @@ const UserIcon = (props) => (
 );
 
 export const MockInterviewPage = ({ theme }) => {
+  const { t } = useTranslation();
   const [roleSelected, setRoleSelected] = useState(false);
   const [isRecruiter, setIsRecruiter] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -51,9 +54,9 @@ export const MockInterviewPage = ({ theme }) => {
 
   useEffect(() => {
     if (roleSelected && messages.length === 0) {
-      setMessages([{ role: 'model', parts: [{ text: "Hi! I'm Parjad. Thanks for taking the time to interview me today. I'm ready when you are—what would you like to ask me first?" }] }]);
+      setMessages([{ role: 'model', parts: [{ text: t('interview.greeting') }] }]);
     }
-  }, [roleSelected, messages.length]);
+  }, [roleSelected, messages.length, t]);
 
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
@@ -85,7 +88,8 @@ export const MockInterviewPage = ({ theme }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           messages: payloadMessages,
-          isRecruiter
+          isRecruiter,
+          locale: getCurrentLocale(),
         })
       });
       const data = await response.json();
@@ -97,7 +101,7 @@ export const MockInterviewPage = ({ theme }) => {
         setMessages((prev) => [...prev, { role: 'model', parts: [{ text: errorMsg }] }]);
       }
     } catch (error) {
-      const errorMsg = "Sorry, something went wrong with the network.";
+      const errorMsg = t('interview.networkError');
       setMessages((prev) => [...prev, { role: 'model', parts: [{ text: errorMsg }] }]);
     } finally {
       setLoading(false);
@@ -114,7 +118,7 @@ export const MockInterviewPage = ({ theme }) => {
       const res = await fetch('/api/ai/interview/debrief', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages }),
+        body: JSON.stringify({ messages, locale: getCurrentLocale() }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Debrief failed');
@@ -259,7 +263,7 @@ export const MockInterviewPage = ({ theme }) => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onFocus={scrollInputIntoView}
-              placeholder="Ask a technical or behavioral question..."
+              placeholder={t('interview.placeholder')}
               autoComplete="off"
               enterKeyHint="send"
               className="w-full bg-white/5 border border-white/10 rounded-full pl-6 pr-14 py-4 text-base text-white placeholder-gray-500 focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all shadow-inner"

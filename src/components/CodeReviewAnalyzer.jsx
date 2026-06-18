@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { GlassCard } from './ui/GlassCard.jsx';
 import { Code } from './ui/Icons.jsx';
 import { ChevronDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { getCurrentLocale } from '../utils/chatbotEvents.js';
 
 function useDebounce(value, delay) {
   const [debounced, setDebounced] = useState(value);
@@ -26,6 +28,7 @@ function useIsMobile() {
 }
 
 export function CodeReviewAnalyzer({ theme = 'emerald' }) {
+  const { t } = useTranslation();
   const [code, setCode] = useState('');
   const [language, setLanguage] = useState('javascript');
   const [result, setResult] = useState(null);
@@ -55,7 +58,7 @@ export function CodeReviewAnalyzer({ theme = 'emerald' }) {
         const res = await fetch('/api/ai/review', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code: debouncedCode, language }),
+          body: JSON.stringify({ code: debouncedCode, language, locale: getCurrentLocale() }),
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Review failed');
@@ -88,7 +91,7 @@ export function CodeReviewAnalyzer({ theme = 'emerald' }) {
           <option value="java">Java</option>
           <option value="cpp">C++</option>
         </select>
-        <span className="text-xs text-gray-500 self-center">Auto-reviews after 1.5s pause · cached by snippet</span>
+        <span className="text-xs text-gray-500 self-center">{t('tools.codeReview.autoHint')}</span>
       </div>
 
       <textarea
@@ -109,8 +112,8 @@ export function CodeReviewAnalyzer({ theme = 'emerald' }) {
           <Code size={24} />
         </div>
         <div>
-          <h3 className="text-xl md:text-2xl font-bold text-white">AI Code Review</h3>
-          <p className="text-sm text-gray-400">Paste a snippet for bugs, readability, and complexity hints</p>
+          <h3 className="text-xl md:text-2xl font-bold text-white">{t('tools.codeReview.title')}</h3>
+          <p className="text-sm text-gray-400">{t('tools.codeReview.subtitle')}</p>
         </div>
       </div>
 
@@ -122,7 +125,7 @@ export function CodeReviewAnalyzer({ theme = 'emerald' }) {
             className="w-full flex items-center justify-between gap-3 px-4 py-3.5 min-h-[44px] rounded-xl bg-white/5 border border-white/10 text-white font-medium hover:bg-white/10 transition-colors"
             aria-expanded={pasteOpen}
           >
-            <span>{pasteOpen ? 'Hide code editor' : 'Paste code to review'}</span>
+            <span>{pasteOpen ? t('tools.codeReview.pasteHide') : t('tools.codeReview.pasteToggle')}</span>
             <ChevronDown className={`w-5 h-5 transition-transform ${pasteOpen ? 'rotate-180' : ''}`} />
           </button>
           {pasteOpen && <div className="mt-3">{pasteSection}</div>}
@@ -131,7 +134,7 @@ export function CodeReviewAnalyzer({ theme = 'emerald' }) {
         pasteSection
       )}
 
-      {loading && <p className="mt-3 text-sm text-gray-400">Reviewing...</p>}
+      {loading && <p className="mt-3 text-sm text-gray-400">{t('tools.codeReview.reviewing')}</p>}
       {error && (
         <div className="mt-3 text-red-300 text-sm bg-red-900/20 border border-red-500/30 rounded-lg px-4 py-3">
           {error}
@@ -142,15 +145,15 @@ export function CodeReviewAnalyzer({ theme = 'emerald' }) {
         <div className="mt-6 space-y-4 border-t border-white/10 pt-6">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="p-4 bg-black/30 rounded-xl border border-white/5">
-              <div className="text-xs text-gray-400 uppercase mb-1">Readability</div>
+              <div className="text-xs text-gray-400 uppercase mb-1">{t('tools.codeReview.readability')}</div>
               <div className={`text-2xl font-bold ${accent}`}>{result.readabilityScore}/10</div>
             </div>
             <div className="p-4 bg-black/30 rounded-xl border border-white/5">
-              <div className="text-xs text-gray-400 uppercase mb-1">Time</div>
+              <div className="text-xs text-gray-400 uppercase mb-1">{t('tools.codeReview.time')}</div>
               <div className={`text-lg font-bold ${accent}`}>{result.timeComplexity || '—'}</div>
             </div>
             <div className="p-4 bg-black/30 rounded-xl border border-white/5">
-              <div className="text-xs text-gray-400 uppercase mb-1">Space</div>
+              <div className="text-xs text-gray-400 uppercase mb-1">{t('tools.codeReview.space')}</div>
               <div className={`text-lg font-bold ${accent}`}>{result.spaceComplexity || '—'}</div>
             </div>
           </div>
@@ -159,7 +162,7 @@ export function CodeReviewAnalyzer({ theme = 'emerald' }) {
 
           {result.bugs?.length > 0 && (
             <div>
-              <h4 className="text-white font-semibold mb-2 text-sm">Potential issues</h4>
+              <h4 className="text-white font-semibold mb-2 text-sm">{t('tools.codeReview.issues')}</h4>
               <ul className="list-disc list-inside text-amber-200/90 text-sm space-y-1">
                 {result.bugs.map((bug) => <li key={bug}>{bug}</li>)}
               </ul>
@@ -168,7 +171,7 @@ export function CodeReviewAnalyzer({ theme = 'emerald' }) {
 
           {result.suggestions?.length > 0 && (
             <div>
-              <h4 className="text-white font-semibold mb-2 text-sm">Suggestions</h4>
+              <h4 className="text-white font-semibold mb-2 text-sm">{t('tools.codeReview.suggestions')}</h4>
               <ul className="list-disc list-inside text-gray-300 text-sm space-y-1">
                 {result.suggestions.map((item) => <li key={item}>{item}</li>)}
               </ul>

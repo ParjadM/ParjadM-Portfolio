@@ -38,7 +38,7 @@ export const ComplexityAnalyzer = ({ theme = 'emerald' }) => {
                 setAnalysis(data);
             } catch (err) {
                 console.error("Failed to load project complexity:", err);
-                setError('Failed to load project complexity analysis.');
+                setError(t('tools.complexity.error'));
             } finally {
                 setLoading(false);
             }
@@ -72,8 +72,8 @@ export const ComplexityAnalyzer = ({ theme = 'emerald' }) => {
                     <BrainCircuit size={24} />
                 </div>
                 <div>
-                    <h3 className="text-2xl font-bold text-white">Project Complexity Analysis</h3>
-                    <p className="text-sm text-gray-400">Architectural Time and Space Complexity of the entire Website</p>
+                    <h3 className="text-2xl font-bold text-white">{t('tools.complexity.title')}</h3>
+                    <p className="text-sm text-gray-400">{t('tools.complexity.subtitle')}</p>
                 </div>
             </div>
 

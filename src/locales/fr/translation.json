@@ -6,7 +6,30 @@
     "Stats": "Statistiques",
     "Blog": "Blog",
     "Contact": "Contact",
+    "Explore": "Explorer",
+    "Menu": "Menu",
+    "More": "Plus",
     "Visitors": "{{count}} Visiteurs"
+  },
+  "language": {
+    "label": "Langue",
+    "english": "English",
+    "french": "Français",
+    "toastEn": "Language set to English",
+    "toastFr": "Langue définie sur le français"
+  },
+  "more": {
+    "os": "Système d'exploitation",
+    "osDesc": "Environnement de bureau sur le Web",
+    "techNews": "Nouvelles tech",
+    "techNewsDesc": "Dernières mises à jour et articles",
+    "intro": "Intro cinématique",
+    "introDesc": "Voir la séquence d'ouverture",
+    "cli": "Mode CLI",
+    "cliDesc": "Interface en ligne de commande",
+    "interview": "Entrevue simulée",
+    "interviewDesc": "S'entraîner avec une IA",
+    "statsDesc": "Statistiques et métriques du site"
   },
   "home": {
     "title": "Parjad Minooei",
@@ -47,7 +70,7 @@
       "title": "Envoyez-moi un message",
       "nameLabel": "Nom *",
       "namePlaceholder": "Votre nom",
-      "emailLabel": "E-mail *",
+      "emailLabel": "Courriel *",
       "emailPlaceholder": "votre.email@exemple.com",
       "subjectLabel": "Sujet *",
       "subjectPlaceholder": "De quoi s'agit-il ?",
@@ -71,6 +94,7 @@
   "blog": {
     "title": "Blog & Articles",
     "subtitle": "Pensées, tutoriels et réflexions sur la technologie, le développement et mon parcours dans la tech",
+    "englishOnly": "Les articles du blogue sont actuellement disponibles en anglais seulement.",
     "categories": {
       "all": "Tous les articles",
       "technology": "Technologie",
@@ -90,7 +114,12 @@
     "title": "Statistiques de développeur",
     "subtitle": "Un aperçu rapide de ma présence open-source et de ma pratique du code, mis à jour automatiquement avec mise en cache pour des chargements rapides.",
     "autoRefreshed": "Actualisé automatiquement",
-    "footer": "Données via l'API GitHub et LeetCode GraphQL • Mis en cache pour améliorer les performances"
+    "footer": "Données via l'API GitHub et LeetCode GraphQL • Mis en cache pour améliorer les performances",
+    "sections": {
+      "complexity": "Analyseur de complexité",
+      "codeReview": "Revue de code IA",
+      "clickUp": "Défi ClickUp"
+    }
   },
   "skills": {
     "title": "Compétences Techniques",
@@ -118,6 +147,84 @@
   "explore": {
     "badge": "Easter eggs",
     "title": "Explorer",
-    "subtitle": "Expériences interactives et coins cachés de ce site."
+    "subtitle": "Expériences interactives et coins cachés de ce site.",
+    "open": "Ouvrir →",
+    "seoTitle": "Explorer — Parjad Minooei",
+    "seoDesc": "Pépites cachées et expériences interactives sur parjadm.ca.",
+    "links": {
+      "cli": { "label": "Mode CLI", "desc": "Navigation style terminal" },
+      "os": { "label": "Bureau OS", "desc": "Un environnement de bureau ludique" },
+      "intro": { "label": "Intro cinématique", "desc": "Séquence d'accueil animée" },
+      "interview": { "label": "Entrevue simulée", "desc": "Clavarder avec Parjad IA" },
+      "techNews": { "label": "Hub tech", "desc": "Meilleurs articles dev du jour" },
+      "stats": { "label": "Stats et ClickUp", "desc": "GitHub, LeetCode et le compteur" },
+      "blog": { "label": "Blog", "desc": "Articles et tutoriels" },
+      "lqft": { "label": "Benchmark LQFT", "desc": "Terrain de jeu performance" }
+    }
+  },
+  "chatbot": {
+    "title": "Assistant IA",
+    "placeholder": "Posez-moi une question...",
+    "voiceUnavailable": "Entrée vocale indisponible — écrivez votre message ci-dessous.",
+    "voiceUnsupported": "L'entrée vocale n'est pas prise en charge. Sur iOS Safari, essayez Chrome ou tapez votre message.",
+    "micBlocked": "Microphone bloqué",
+    "openLabel": "Ouvrir l'assistant IA",
+    "greetingDefault": "Bonjour! Je suis l'assistant IA de Parjad. Comment puis-je vous aider?",
+    "greetingProject": "Bonjour! Posez-moi des questions sur {{title}} — pile technique, choix de design ou construction.",
+    "greetingBlog": "Bonjour! Je peux expliquer « {{title}} » ou répondre à vos questions sur cet article.",
+    "greetingLqft": "Bonjour! Vous êtes sur la page Benchmark LQFT. Demandez-moi les arbres persistants, la complexité ou la démo.",
+    "greetingBlogPost": "Bonjour! Vous lisez un article? Je peux le résumer ou l'expliquer simplement.",
+    "greetingStats": "Bonjour! Sur la page Stats — posez des questions sur GitHub/LeetCode ou l'analyseur de complexité.",
+    "greetingInterview": "Bonjour! Prêt à pratiquer? Je peux expliquer l'entrevue simulée ou répondre sur Parjad.",
+    "greetingProjects": "Bonjour! Vous explorez les projets? Demandez-moi la pile, le build ou utilisez le bouton Demander à l'IA.",
+    "greetingAbout": "Bonjour! Sur la page À propos — expérience, éducation ou parcours.",
+    "greetingContact": "Bonjour! Besoin de joindre Parjad? Je peux vous indiquer la meilleure façon.",
+    "greetingOsCli": "Bonjour! En mode terminal/OS — je connais les commandes, apps et le contenu du portfolio.",
+    "greetingAdmin": "Bienvenue dans l'admin. Je peux aider avec le contenu et la gestion des connaissances IA."
+  },
+  "tools": {
+    "complexity": {
+      "title": "Analyse de complexité du projet",
+      "subtitle": "Complexité temporelle et spatiale de l'ensemble du site",
+      "loading": "Chargement de l'analyse...",
+      "error": "Échec du chargement de l'analyse de complexité.",
+      "time": "Complexité temporelle",
+      "space": "Complexité spatiale",
+      "copy": "Copier les métriques",
+      "copied": "Copié!"
+    },
+    "codeReview": {
+      "title": "Revue de code IA",
+      "subtitle": "Collez un extrait pour détecter bogues, lisibilité et complexité",
+      "pasteToggle": "Coller du code à analyser",
+      "pasteHide": "Masquer l'éditeur",
+      "reviewing": "Analyse en cours...",
+      "autoHint": "Revue auto après 1,5 s de pause · mise en cache par extrait",
+      "readability": "Lisibilité",
+      "time": "Temps",
+      "space": "Espace",
+      "issues": "Problèmes potentiels",
+      "suggestions": "Suggestions"
+    }
+  },
+  "interview": {
+    "title": "Entrevue simulée",
+    "subtitle": "Pratiquez une entrevue avec Parjad — questions techniques ou comportementales.",
+    "rolePrompt": "Choisissez votre rôle",
+    "recruiter": "Je suis recruteur",
+    "candidate": "Je suis Parjad (mode candidat)",
+    "greeting": "Bonjour! Je suis Parjad. Merci de prendre le temps de m'entrevue aujourd'hui. Je suis prêt — par où commençons-nous?",
+    "placeholder": "Posez une question technique ou comportementale...",
+    "debrief": "Obtenir le débriefing",
+    "debriefLoading": "Génération du débriefing...",
+    "debriefNeedMore": "Posez au moins 3 questions avant de demander un débriefing.",
+    "strengths": "Forces",
+    "improve": "À améliorer",
+    "followUps": "Suivis",
+    "networkError": "Désolé, un problème réseau est survenu."
+  },
+  "seo": {
+    "defaultTitle": "Parjad Minooei — Portfolio d'ingénieur logiciel",
+    "defaultDesc": "Ingénieur logiciel créant des applications web rapides et centrées sur l'utilisateur."
   }
 }

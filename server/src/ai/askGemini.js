@@ -21,20 +21,25 @@ function parseGeminiError(err) {
   return message
 }
 
-function buildSystemInstruction({ systemPromptBase, knowledgeText, context, fallbackText, skipKnowledge }) {
+function buildSystemInstruction({ systemPromptBase, knowledgeText, context, fallbackText, skipKnowledge, locale }) {
+  const languageSuffix = locale?.startsWith('fr')
+    ? '\n\nIMPORTANT: Write all user-facing text in French (Canadian French preferred). Keep code snippets, URLs, and proper nouns unchanged.'
+    : '';
+
   if (skipKnowledge) {
-    return context ? `${systemPromptBase}\n\nAdditional Context: ${context}` : systemPromptBase
+    const base = context ? `${systemPromptBase}\n\nAdditional Context: ${context}` : systemPromptBase;
+    return `${base}${languageSuffix}`;
   }
 
   const knowledgeSection = knowledgeText
     ? knowledgeText
-    : fallbackText || 'No specific knowledge provided yet. Please direct them to the contact page.'
+    : fallbackText || 'No specific knowledge provided yet. Please direct them to the contact page.';
 
-  let instruction = `${systemPromptBase}\n${knowledgeSection}`
+  let instruction = `${systemPromptBase}\n${knowledgeSection}`;
   if (context) {
-    instruction += `\n\nAdditional Context: ${context}`
+    instruction += `\n\nAdditional Context: ${context}`;
   }
-  return instruction
+  return `${instruction}${languageSuffix}`;
 }
 
 function buildContents(messages, userMessage) {
@@ -74,6 +79,7 @@ export async function resolveAiPipeline({
   skipKnowledge = false,
   cacheTtl,
   customDailyLimit,
+  locale,
 }) {
   const resolvedMessage = userMessage || extractLastUserMessage(messages)
   if (!resolvedMessage?.trim()) {
@@ -136,6 +142,7 @@ export async function resolveAiPipeline({
         context: resolvedContext,
         fallbackText: knowledgeFallback,
         skipKnowledge,
+        locale,
       }),
       contents: buildContents(messages, resolvedMessage),
       cacheKey,

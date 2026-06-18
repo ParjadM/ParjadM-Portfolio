@@ -5,8 +5,10 @@ import {
   PAGE_CONTEXT_EVENT,
   buildChatPayloadContext,
   getChatGreeting,
+  getCurrentLocale,
 } from '../utils/chatbotEvents.js';
 import { sendChatStream, consumeAiChatStream } from '../utils/aiStream.js';
+import { useTranslation } from 'react-i18next';
 
 
 // ... (icons remain the same) ...
@@ -54,6 +56,7 @@ const SpeakerOffIcon = (props) => (
 );
 
 const Chatbot = ({ theme = 'green' }) => {
+  const { t, i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -101,7 +104,7 @@ const Chatbot = ({ theme = 'green' }) => {
       if (prev.length > 1) return prev;
       return [{ role: 'model', parts: [{ text: getChatGreeting(location.pathname, pageContext) }] }];
     });
-  }, [location.pathname, sessionPageContext]);
+  }, [location.pathname, sessionPageContext, i18n.language]);
 
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
@@ -136,7 +139,7 @@ const Chatbot = ({ theme = 'green' }) => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     
     if (!SpeechRecognition) {
-      setVoiceError('Voice input is not supported in this browser. On iOS Safari, try Chrome or type your message.');
+      setVoiceError(t('chatbot.voiceUnsupported'));
       return;
     }
 
@@ -241,6 +244,7 @@ const Chatbot = ({ theme = 'green' }) => {
       const response = await sendChatStream({
         messages: payloadMessages,
         pageContext,
+        locale: getCurrentLocale(),
       });
 
       const placeholder = { role: 'model', parts: [{ text: '' }] };
@@ -298,7 +302,7 @@ const Chatbot = ({ theme = 'green' }) => {
           <div className={`p-4 pt-safe-or-4 flex items-center justify-between ${gradientClass}`}>
             <div className="flex items-center gap-2 text-white">
               <BotIcon className="w-5 h-5" />
-              <span className="font-semibold">AI Assistant</span>
+              <span className="font-semibold">{t('chatbot.title')}</span>
             </div>
             <div className="flex items-center gap-2">
               <button 
@@ -350,7 +354,7 @@ const Chatbot = ({ theme = 'green' }) => {
           {/* Input Area */}
           <div className="p-3 pb-safe-or-3 border-t border-white/10 bg-black/20">
             {!speechSupported && (
-              <p className="text-[11px] text-gray-500 mb-2 px-1">Voice input unavailable on this browser — type your message below.</p>
+              <p className="text-[11px] text-gray-500 mb-2 px-1">{t('chatbot.voiceUnavailable')}</p>
             )}
             {voiceError && (
               <p className="text-[11px] text-amber-300/90 mb-2 px-1">{voiceError}</p>
@@ -371,7 +375,7 @@ const Chatbot = ({ theme = 'green' }) => {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask me anything..."
+                placeholder={t('chatbot.placeholder')}
                 className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2.5 text-base sm:text-sm text-white placeholder-gray-400 focus:outline-none focus:border-white/30 transition-all"
               />
               <button
@@ -394,7 +398,7 @@ const Chatbot = ({ theme = 'green' }) => {
         <button
           onClick={() => setIsOpen(true)}
           className={`absolute bottom-safe-fab right-4 sm:bottom-0 sm:right-0 p-4 min-w-[56px] min-h-[56px] flex items-center justify-center rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 shadow-emerald-500/20 pointer-events-auto ${gradientClass}`}
-          aria-label="Open AI assistant"
+          aria-label={t('chatbot.openLabel')}
         >
           <BotIcon className="w-6 h-6 text-white" />
         </button>

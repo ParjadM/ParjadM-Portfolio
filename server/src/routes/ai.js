@@ -7,6 +7,7 @@ import { getStaticPageSummary, matchStaticAnswer } from '../ai/staticAnswers.js'
 import { getClientIp } from '../ai/limits.js'
 import { explainBlogPost } from '../ai/blogExplain.js'
 import { getUsageSnapshot } from '../ai/limits.js'
+import { normalizeLocale } from '../ai/locale.js'
 
 const router = Router()
 
@@ -65,7 +66,8 @@ Respond EXCLUSIVELY in valid JSON:
 
 router.post('/chat', async (req, res) => {
   try {
-    const { messages, context, pageContext } = req.body
+    const { messages, context, pageContext, locale: reqLocale } = req.body
+    const locale = normalizeLocale(reqLocale)
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ error: 'Messages array is required' })
@@ -82,6 +84,7 @@ router.post('/chat', async (req, res) => {
       knowledgeKey: 'global',
       knowledgeFallback: 'No specific knowledge provided yet. Please direct them to the contact page.',
       req,
+      locale,
       cacheTtl: aiConfig.cacheTtlChat,
     })
 
@@ -98,7 +101,8 @@ router.post('/chat', async (req, res) => {
 
 router.post('/chat/stream', async (req, res) => {
   try {
-    const { messages, context, pageContext } = req.body
+    const { messages, context, pageContext, locale: reqLocale } = req.body
+    const locale = normalizeLocale(reqLocale)
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ error: 'Messages array is required' })
@@ -116,6 +120,7 @@ router.post('/chat/stream', async (req, res) => {
         knowledgeKey: 'global',
         knowledgeFallback: 'No specific knowledge provided yet. Please direct them to the contact page.',
         req,
+        locale,
         cacheTtl: aiConfig.cacheTtlChat,
       })
       if (!result.ok) {
@@ -140,6 +145,7 @@ router.post('/chat/stream', async (req, res) => {
       knowledgeKey: 'global',
       knowledgeFallback: 'No specific knowledge provided yet. Please direct them to the contact page.',
       req,
+      locale,
       cacheTtl: aiConfig.cacheTtlChat,
     }, res)
   } catch (err) {
@@ -155,7 +161,8 @@ router.post('/chat/stream', async (req, res) => {
 
 router.post('/interview', async (req, res) => {
   try {
-    const { messages, isRecruiter } = req.body
+    const { messages, isRecruiter, locale: reqLocale } = req.body
+    const locale = normalizeLocale(reqLocale)
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ error: 'Messages array is required' })
@@ -171,6 +178,7 @@ Do not break character. Do not admit you are an AI assistant. You ARE Parjad. If
       knowledgeKey: 'interview',
       knowledgeFallback: 'You are a Software Engineer with experience in React, Node.js, Python, and MongoDB.',
       req,
+      locale,
       skipFaq: true,
       skipStatic: true,
       cacheTtl: aiConfig.cacheTtlInterview,
@@ -192,7 +200,8 @@ Do not break character. Do not admit you are an AI assistant. You ARE Parjad. If
 
 router.post('/interview/debrief', async (req, res) => {
   try {
-    const { messages } = req.body
+    const { messages, locale: reqLocale } = req.body
+    const locale = normalizeLocale(reqLocale)
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ error: 'Messages array is required' })
     }
@@ -214,6 +223,7 @@ router.post('/interview/debrief', async (req, res) => {
       knowledgeFallback: 'Parjad is a full-stack engineer with React, Node.js, Python, and MongoDB experience.',
       responseFormat: 'json',
       req,
+      locale,
       skipFaq: true,
       skipStatic: true,
       cacheTtl: aiConfig.cacheTtlDebrief,
@@ -233,7 +243,8 @@ router.post('/interview/debrief', async (req, res) => {
 
 router.post('/job-fit', async (req, res) => {
   try {
-    const { jobDescription } = req.body
+    const { jobDescription, locale: reqLocale } = req.body
+    const locale = normalizeLocale(reqLocale)
     if (!jobDescription || typeof jobDescription !== 'string') {
       return res.status(400).json({ error: 'jobDescription string is required' })
     }
@@ -253,6 +264,7 @@ router.post('/job-fit', async (req, res) => {
       knowledgeFallback: 'Parjad is a Software Engineer skilled in React, Node.js, Express, MongoDB, and Python.',
       responseFormat: 'json',
       req,
+      locale,
       skipFaq: true,
       skipStatic: true,
       cacheTtl: aiConfig.cacheTtlJobFit,
@@ -272,7 +284,8 @@ router.post('/job-fit', async (req, res) => {
 
 router.post('/review', async (req, res) => {
   try {
-    const { code, language } = req.body
+    const { code, language, locale: reqLocale } = req.body
+    const locale = normalizeLocale(reqLocale)
     if (!code || typeof code !== 'string') {
       return res.status(400).json({ error: 'Code string is required' })
     }
@@ -293,6 +306,7 @@ router.post('/review', async (req, res) => {
       systemPromptBase: CODE_REVIEW_PROMPT,
       responseFormat: 'json',
       req,
+      locale,
       skipFaq: true,
       skipStatic: true,
       skipKnowledge: true,

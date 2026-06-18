@@ -9,6 +9,7 @@
     "dev:server": "npm --prefix server run dev",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "test:i18n": "node scripts/check-i18n-keys.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

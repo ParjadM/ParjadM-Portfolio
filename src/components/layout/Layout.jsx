@@ -1,35 +1,19 @@
-import React, { useState, useEffect, useRef, Suspense } from 'react';
-import { useNavigate, useLocation, Link, Routes, Route } from 'react-router-dom';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useLocation, Routes } from 'react-router-dom';
 import { BackgroundBlobs } from '../ui/BackgroundBlobs.jsx';
 import { CustomCursor } from '../CustomCursor.jsx';
 import { Header } from './Header.jsx';
 import { Footer } from './Footer.jsx';
 import { BottomNav } from './BottomNav.jsx';
+import { AppRoutes } from './AppRoutes.jsx';
+import { LocaleSync } from '../LocaleSync.jsx';
 import Chatbot from '../Chatbot.jsx';
 import { Toast } from '../ui/Toast.jsx';
-import { getAuthToken, RequireAuth } from '../../utils/auth.jsx';
 import { AnimatePresence } from 'framer-motion';
 
 import { getThemeConfig } from '../../utils/themeConfig.js';
 import { useReducedMotion } from '../../utils/useReducedMotion.js';
-
-const HomeSection = React.lazy(() => import('../../pages/HomeSection.jsx').then(m => ({default: m.HomeSection})));
-const AboutSection = React.lazy(() => import('../../pages/AboutSection.jsx').then(m => ({default: m.AboutSection})));
-const ProjectsSection = React.lazy(() => import('../../pages/ProjectsSection.jsx').then(m => ({default: m.ProjectsSection})));
-const LQFTBenchmarkPage = React.lazy(() => import('../../pages/LQFTBenchmarkPage.jsx').then(m => ({default: m.LQFTBenchmarkPage})));
-const StatsPage = React.lazy(() => import('../../pages/StatsPage.jsx').then(m => ({default: m.StatsPage})));
-const BlogSection = React.lazy(() => import('../../pages/BlogSection.jsx').then(m => ({default: m.BlogSection})));
-const BlogPostPage = React.lazy(() => import('../../pages/BlogPostPage.jsx').then(m => ({default: m.BlogPostPage})));
-const ContactSection = React.lazy(() => import('../../pages/ContactSection.jsx').then(m => ({default: m.ContactSection})));
-const AdminLoginPage = React.lazy(() => import('../../pages/admin/AdminLoginPage.jsx').then(m => ({default: m.AdminLoginPage})));
-const AdminDashboard = React.lazy(() => import('../../pages/admin/AdminDashboard.jsx').then(m => ({default: m.AdminDashboard})));
-const NotFoundPage = React.lazy(() => import('../../pages/NotFoundPage.jsx').then(m => ({default: m.NotFoundPage})));
-const IntroCinematic = React.lazy(() => import('../../pages/IntroCinematic.jsx').then(m => ({default: m.IntroCinematic})));
-const CliMode = React.lazy(() => import('../../pages/CliMode.jsx').then(m => ({default: m.CliMode})));
-const MockInterviewPage = React.lazy(() => import('../../pages/MockInterviewPage.jsx').then(m => ({default: m.MockInterviewPage})));
-const TechNews = React.lazy(() => import('../../pages/TechNews.jsx').then(m => ({default: m.TechNews})));
-const DesktopOS = React.lazy(() => import('../../pages/DesktopOS.jsx').then(m => ({default: m.DesktopOS})));
-const ExplorePage = React.lazy(() => import('../../pages/ExplorePage.jsx').then(m => ({default: m.ExplorePage})));
+import { isFullscreenPath, stripLocalePrefix } from '../../utils/i18nRouting.js';
 
 export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
     const location = useLocation();
@@ -40,8 +24,12 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
     const [staticBlobs, setStaticBlobs] = useState(() =>
         typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches
     );
-    
-    const isFullscreenRoute = location?.pathname === '/intro' || location?.pathname === '/cli' || location?.pathname === '/os';
+
+    const isFullscreenRoute = isFullscreenPath(location?.pathname);
+
+    const showLanguageToast = (message) => {
+        setToast({ isVisible: true, message, type: 'success' });
+    };
 
     useEffect(() => {
         const mq = window.matchMedia('(max-width: 1023px)');
@@ -66,9 +54,8 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
     }, [])
 
     useEffect(() => {
-        // Track each route view
         try {
-            const path = location?.pathname || '/'
+            const path = stripLocalePrefix(location?.pathname || '/')
             fetch('/api/metrics/visit', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -80,9 +67,10 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
     // Manual SEO moved to SEO.jsx component on individual pages
 
     return (
-        <div className={`font-sans transition-colors duration-500 ${
+        <div className={`relative min-h-screen overflow-x-hidden font-sans transition-colors duration-500 ${
             themeConfig.backgroundClass
         } ${!themeConfig.isDark ? 'light-mode text-gray-900' : 'text-white'} ${themeConfig.isTerminal ? 'terminal-mode' : ''}`}>
+            <LocaleSync />
             <style>{`
                 body { font-family: 'Outfit', sans-serif; }
                 .lqft-select option { color: #0f172a; background: #f8fafc; }
@@ -143,6 +131,7 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
                     darkMode={themeConfig.isDark} 
                     isMobileMenuOpen={isMobileMenuOpen}
                     setIsMobileMenuOpen={setIsMobileMenuOpen}
+                    onLanguageChange={showLanguageToast}
                 />
             )}
             
@@ -154,23 +143,7 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
                 }>
                     <AnimatePresence mode="wait">
                         <Routes location={location} key={location.pathname}>
-                            <Route path="/" element={<HomeSection theme={themeConfig.accentPrefix} />} />
-                            <Route path="/about" element={<AboutSection theme={themeConfig.accentPrefix} />} />
-                            <Route path="/projects" element={<ProjectsSection theme={themeConfig.accentPrefix} />} />
-                            <Route path="/projects/lqftBenchmark" element={<LQFTBenchmarkPage theme={themeConfig.accentPrefix} />} />
-                            <Route path="/stats" element={<StatsPage theme={themeConfig.accentPrefix} />} />
-                            <Route path="/blog" element={<BlogSection theme={themeConfig.accentPrefix} />} />
-                            <Route path="/blog/:id" element={<BlogPostPage theme={themeConfig.accentPrefix} />} />
-                            <Route path="/contact" element={<ContactSection theme={themeConfig.accentPrefix} />} />
-                            <Route path="/explore" element={<ExplorePage theme={themeConfig.accentPrefix} />} />
-                            <Route path="/tech-news" element={<TechNews theme={themeConfig.accentPrefix} />} />
-                            <Route path="/os" element={<DesktopOS theme={themeConfig.accentPrefix} />} />
-                            <Route path="/admin/login" element={<AdminLoginPage theme={themeConfig.accentPrefix} />} />
-                            <Route path="/admin" element={<RequireAuth><AdminDashboard theme={themeConfig.accentPrefix} /></RequireAuth>} />
-                            <Route path="/intro" element={<IntroCinematic theme={themeConfig.accentPrefix} />} />
-                            <Route path="/cli" element={<CliMode theme={themeConfig.accentPrefix} />} />
-                            <Route path="/interview" element={<MockInterviewPage theme={themeConfig.accentPrefix} />} />
-                            <Route path="*" element={<NotFoundPage theme={themeConfig.accentPrefix} />} />
+                            <AppRoutes theme={themeConfig.accentPrefix} />
                         </Routes>
                     </AnimatePresence>
                 </Suspense>
