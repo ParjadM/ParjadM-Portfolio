@@ -102,6 +102,11 @@ export const DesktopOS = ({ theme }) => {
     const [notepadFile, setNotepadFile] = useState(null);
     const [recentApps, setRecentApps] = useState(getRecentApps);
 
+    const handleBootComplete = useCallback(() => {
+        setIsOsBooted(true);
+        try { sessionStorage.setItem('os_booted', '1'); } catch {}
+    }, []);
+
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 768);
         window.addEventListener('resize', handleResize);
@@ -297,7 +302,7 @@ export const DesktopOS = ({ theme }) => {
             onContextMenu={handleContextMenu}
         >
             <SEO title="Desktop OS — Parjad Minooei" description="A playful desktop environment on parjadm.ca." />
-            {!isOsBooted && <OsBootScreen onComplete={() => setIsOsBooted(true)} />}
+            {!isOsBooted && <OsBootScreen onComplete={handleBootComplete} />}
             <OsNotifications />
             <div className={`relative w-full h-full bg-gray-900 overflow-hidden shadow-[0_0_100px_rgba(255,255,255,0.1)] transition-opacity duration-75 ${isExiting ? 'opacity-0 pointer-events-none' : 'opacity-100'} ${!isOsBooted ? 'opacity-0' : ''}`}>
                 {/* Wallpaper */}
