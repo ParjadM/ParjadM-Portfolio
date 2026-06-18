@@ -67,4 +67,26 @@ body {
   .pt-safe { padding-top: env(safe-area-inset-top); }
   .pb-safe-or-3 { padding-bottom: calc(0.75rem + env(safe-area-inset-bottom)); }
   .pt-safe-or-4 { padding-top: calc(1rem + env(safe-area-inset-top)); }
+  .top-safe-or-4 { top: calc(1rem + env(safe-area-inset-top)); }
+  .bottom-safe-fab { bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
+}
+
+/* Prevent iOS zoom on form focus */
+.mobile-input,
+.mobile-input textarea {
+  font-size: 16px;
+}
+
+@media (min-width: 768px) {
+  .mobile-input,
+  .mobile-input textarea {
+    font-size: inherit;
+  }
+}
+
+/* Markdown code blocks scroll horizontally on narrow screens */
+.markdown-pre {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
 }

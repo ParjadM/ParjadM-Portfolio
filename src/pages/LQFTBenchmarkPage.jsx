@@ -460,7 +460,7 @@ export const LQFTBenchmarkPage = ({ theme }) => {
     const treeMemoryRows = memoryRows.filter(r => TREE_STRUCTURES.has(r.structure));
     const graphRows = complexityRows.slice().sort((a, b) => (graphMetric === 'complexityRank' ? a.complexityRank - b.complexityRank : Number(a.totalScore) - Number(b.totalScore)));
 
-    const tabButtonClass = (tab) => `px-3 py-2 rounded text-sm font-semibold ${activeTab === tab ? (theme === 'pink' ? 'bg-pink-500/30 text-white' : 'bg-emerald-500/30 text-white') : 'bg-white/10 text-gray-300 hover:bg-white/20'}`;
+    const tabButtonClass = (tab) => `px-3 py-2.5 min-h-[44px] shrink-0 rounded text-sm font-semibold whitespace-nowrap ${activeTab === tab ? (theme === 'pink' ? 'bg-pink-500/30 text-white' : 'bg-emerald-500/30 text-white') : 'bg-white/10 text-gray-300 hover:bg-white/20'}`;
 
     return (
         <PageTransition className="min-h-screen flex items-center justify-center py-20 px-4">
@@ -529,16 +529,16 @@ export const LQFTBenchmarkPage = ({ theme }) => {
                           <input value={keyInput} onChange={(e) => setKeyInput(e.target.value)} placeholder="Key" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded text-white" />
                           <input value={valueInput} onChange={(e) => setValueInput(e.target.value)} placeholder="Value" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded text-white" />
                           <div className="flex flex-wrap gap-2">
-                            <button onClick={onInsert} className="px-3 py-2 rounded bg-white/10 hover:bg-white/20">Insert</button>
-                            <button onClick={onSearch} className="px-3 py-2 rounded bg-white/10 hover:bg-white/20">Search</button>
-                            <button onClick={onDelete} className="px-3 py-2 rounded bg-white/10 hover:bg-white/20">Delete</button>
-                            <button onClick={onPurge} className="px-3 py-2 rounded bg-white/10 hover:bg-white/20">Purge / Clear</button>
+                            <button onClick={onInsert} className="px-3 py-2.5 min-h-[44px] rounded bg-white/10 hover:bg-white/20">Insert</button>
+                            <button onClick={onSearch} className="px-3 py-2.5 min-h-[44px] rounded bg-white/10 hover:bg-white/20">Search</button>
+                            <button onClick={onDelete} className="px-3 py-2.5 min-h-[44px] rounded bg-white/10 hover:bg-white/20">Delete</button>
+                            <button onClick={onPurge} className="px-3 py-2.5 min-h-[44px] rounded bg-white/10 hover:bg-white/20">Purge / Clear</button>
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-2 mb-4">
+                    <div className="flex gap-2 mb-4 overflow-x-auto pb-2 -mx-1 px-1 scroll-smooth">
                       <button className={tabButtonClass('snapshot')} onClick={() => setActiveTab('snapshot')}>Snapshot</button>
                       <button className={tabButtonClass('log')} onClick={() => setActiveTab('log')}>Log</button>
                       <button className={tabButtonClass('ranking')} onClick={() => setActiveTab('ranking')}>Ranking</button>
@@ -582,7 +582,24 @@ export const LQFTBenchmarkPage = ({ theme }) => {
                         {compareRows.length === 0 ? (
                           <div className="text-gray-400 text-sm">Run comparison to populate rows.</div>
                         ) : (
-                          <table className="w-full text-sm">
+                          <>
+                          <div className="md:hidden space-y-3">
+                            {compareRows.map(r => (
+                              <div key={r.structure} className={`p-4 rounded-lg border border-white/10 ${accentRowClass(r.structure)}`}>
+                                <div className="flex justify-between items-center mb-2">
+                                  <span className={`font-semibold ${accentTextClass(r.structure)}`}>#{r.rank} {r.structure}</span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2 text-sm">
+                                  <div><span className="text-gray-500">Insert</span><div className="text-white">{Math.round(r.insertOps).toLocaleString()}</div></div>
+                                  <div><span className="text-gray-500">Hit</span><div className="text-white">{Math.round(r.hitOps).toLocaleString()}</div></div>
+                                  <div><span className="text-gray-500">Miss</span><div className="text-white">{Math.round(r.missOps).toLocaleString()}</div></div>
+                                  <div><span className="text-gray-500">Delete</span><div className="text-white">{r.delOps == null ? 'N/A' : Math.round(r.delOps).toLocaleString()}</div></div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="hidden md:block overflow-x-auto">
+                          <table className="w-full text-sm min-w-[32rem]">
                             <thead>
                               <tr className="text-left text-gray-300 border-b border-white/10">
                                 <th className="py-2 pr-4">Rank</th>
@@ -606,6 +623,8 @@ export const LQFTBenchmarkPage = ({ theme }) => {
                               ))}
                             </tbody>
                           </table>
+                          </div>
+                          </>
                         )}
                       </div>
                     )}
@@ -614,7 +633,7 @@ export const LQFTBenchmarkPage = ({ theme }) => {
                       <div className="p-4 rounded border border-white/10 bg-white/5 overflow-auto">
                         <h4 className="text-white font-semibold mb-3">Complexity Table (app.py-style)</h4>
                         <p className="text-xs text-gray-400 mb-3">For rank and total score columns: lower is better.</p>
-                        <table className="w-full text-sm">
+                        <table className="w-full text-sm min-w-[36rem]">
                           <thead>
                             <tr className="text-left text-gray-300 border-b border-white/10">
                               <th className="py-2 pr-4">Overall</th>
@@ -656,7 +675,7 @@ export const LQFTBenchmarkPage = ({ theme }) => {
                         <h4 className="text-white font-semibold mb-3">Tree Comparison</h4>
                         <p className="text-xs text-gray-400 mb-3">For Insert/Hit/Miss/Delete ops: higher is better.</p>
                         {treeCompareRows.length === 0 ? <div className="text-gray-400 text-sm">Run comparison to populate tree rows.</div> : (
-                          <table className="w-full text-sm">
+                          <table className="w-full text-sm min-w-[36rem]">
                             <thead>
                               <tr className="text-left text-gray-300 border-b border-white/10">
                                 <th className="py-2 pr-4">Rank</th><th className="py-2 pr-4">Structure</th><th className="py-2 pr-4">Insert</th><th className="py-2 pr-4">Hit</th><th className="py-2 pr-4">Miss</th><th className="py-2 pr-4">Delete</th>
@@ -774,7 +793,7 @@ export const LQFTBenchmarkPage = ({ theme }) => {
                         {memoryRows.length === 0 ? (
                           <div className="text-gray-400 text-sm">Run memory density to populate rows.</div>
                         ) : (
-                          <table className="w-full text-sm">
+                          <table className="w-full text-sm min-w-[36rem]">
                             <thead>
                               <tr className="text-left text-gray-300 border-b border-white/10">
                                 <th className="py-2 pr-4">Rank</th>
@@ -804,7 +823,7 @@ export const LQFTBenchmarkPage = ({ theme }) => {
                         <h4 className="text-white font-semibold mb-3">Tree Memory Density</h4>
                         <p className="text-xs text-gray-400 mb-3">For Delta MB and Bytes/Item: lower is better.</p>
                         {treeMemoryRows.length === 0 ? <div className="text-gray-400 text-sm">Run memory density to populate tree rows.</div> : (
-                          <table className="w-full text-sm">
+                          <table className="w-full text-sm min-w-[36rem]">
                             <thead>
                               <tr className="text-left text-gray-300 border-b border-white/10">
                                 <th className="py-2 pr-4">Rank</th>

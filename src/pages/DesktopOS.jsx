@@ -302,7 +302,7 @@ export const DesktopOS = ({ theme }) => {
             onContextMenu={handleContextMenu}
         >
             <SEO title="Desktop OS — Parjad Minooei" description="A playful desktop environment on parjadm.ca." />
-            {!isOsBooted && <OsBootScreen onComplete={handleBootComplete} />}
+            {!isOsBooted && <OsBootScreen onComplete={handleBootComplete} fastBoot={isMobile} />}
             <OsNotifications />
             <div className={`relative w-full h-full bg-gray-900 overflow-hidden shadow-[0_0_100px_rgba(255,255,255,0.1)] transition-opacity duration-75 ${isExiting ? 'opacity-0 pointer-events-none' : 'opacity-100'} ${!isOsBooted ? 'opacity-0' : ''}`}>
                 {/* Wallpaper */}

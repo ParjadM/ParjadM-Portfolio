@@ -37,8 +37,18 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const themeConfig = getThemeConfig(themeId);
     const reducedMotion = useReducedMotion();
+    const [staticBlobs, setStaticBlobs] = useState(() =>
+        typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches
+    );
     
     const isFullscreenRoute = location?.pathname === '/intro' || location?.pathname === '/cli' || location?.pathname === '/os';
+
+    useEffect(() => {
+        const mq = window.matchMedia('(max-width: 1023px)');
+        const onChange = (e) => setStaticBlobs(e.matches);
+        mq.addEventListener('change', onChange);
+        return () => mq.removeEventListener('change', onChange);
+    }, []);
 
     useEffect(() => {
         // Ensure stable visitorId
@@ -122,7 +132,7 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
                 .terminal-mode header img[alt="Logo"] { filter: sepia(100%) hue-rotate(80deg) saturate(400%) brightness(1.2); }
             `}</style>
 
-            <BackgroundBlobs theme={themeConfig.accentPrefix} darkMode={themeConfig.isDark} customBlobClasses={themeConfig.blobClasses} reducedMotion={reducedMotion} />
+            <BackgroundBlobs theme={themeConfig.accentPrefix} darkMode={themeConfig.isDark} customBlobClasses={themeConfig.blobClasses} reducedMotion={reducedMotion} staticOnMobile={staticBlobs} />
             <CustomCursor theme={themeConfig.accentPrefix} darkMode={themeConfig.isDark} reducedMotion={reducedMotion} />
             
             {!isFullscreenRoute && (
@@ -136,7 +146,7 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
                 />
             )}
             
-            <main id="main-content" role="main" tabIndex={-1} className={`transition-all duration-500 ${!isFullscreenRoute ? 'pt-20 md:pt-24 pb-24 lg:pb-0' : ''}`}>
+            <main id="main-content" role="main" tabIndex={-1} className={`transition-all duration-500 ${!isFullscreenRoute ? 'pt-[4.75rem] sm:pt-20 md:pt-24 pb-28 lg:pb-0' : ''}`}>
                 <Suspense fallback={
                     <div className="min-h-screen flex items-center justify-center py-20 px-4 text-gray-300">
                         Loading...

@@ -36,7 +36,7 @@ export const HomeSection = ({ theme }) => {
       {/* Left: Text content */}
       <div className="p-6 md:p-0 text-left">
         <Reveal>
-        <h1 className={`text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-tight bg-gradient-to-r ${theme !== 'pink' ? 'from-emerald-400 via-teal-400 to-cyan-400' : 'from-pink-400 via-red-400 to-purple-400'} bg-clip-text text-transparent`}>
+        <h1 className={`text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-tight bg-gradient-to-r ${theme !== 'pink' ? 'from-emerald-400 via-teal-400 to-cyan-400' : 'from-pink-400 via-red-400 to-purple-400'} bg-clip-text text-transparent`}>
           {t('home.title')}
         </h1>
         <p className="mt-4 text-xl md:text-2xl text-gray-300 max-w-2xl">

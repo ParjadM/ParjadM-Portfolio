@@ -14,6 +14,7 @@ import { getAuthToken } from '../utils/auth.jsx';
 import { useTranslation } from 'react-i18next';
 import { PageTransition } from '../components/ui/PageTransition.jsx';
 import { SEO } from '../components/SEO.jsx';
+import { MobileCollapsible } from '../components/ui/MobileCollapsible.jsx';
 
 export const StatsPage = ({ theme }) => {
   const { t } = useTranslation();
@@ -50,20 +51,26 @@ export const StatsPage = ({ theme }) => {
         {/* Complexity Analyzer */}
         <Reveal>
         <div className="mt-8">
-          <ComplexityAnalyzer theme={theme} />
+          <MobileCollapsible title="Complexity Analyzer" defaultOpen={false} theme={theme}>
+            <ComplexityAnalyzer theme={theme} />
+          </MobileCollapsible>
         </div>
         </Reveal>
 
         <Reveal>
         <div className="mt-8">
-          <CodeReviewAnalyzer theme={theme} />
+          <MobileCollapsible title="AI Code Review" defaultOpen={false} theme={theme}>
+            <CodeReviewAnalyzer theme={theme} />
+          </MobileCollapsible>
         </div>
         </Reveal>
 
         {/* ClickUp - fun interactive game */}
         <Reveal>
         <div className="mt-8">
-          <ClickUpSection theme={theme} />
+          <MobileCollapsible title="ClickUp Challenge" defaultOpen={false} theme={theme}>
+            <ClickUpSection theme={theme} />
+          </MobileCollapsible>
         </div>
         </Reveal>
 

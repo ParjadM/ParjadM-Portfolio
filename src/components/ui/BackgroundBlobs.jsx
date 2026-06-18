@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const BackgroundBlobs = ({ theme, darkMode = true, customBlobClasses, reducedMotion = false }) => {
+export const BackgroundBlobs = ({ theme, darkMode = true, customBlobClasses, reducedMotion = false, staticOnMobile = false }) => {
     const pinkThemeClasses = darkMode
         ? { blob1: "bg-pink-500/30", blob2: "bg-red-500/30", blob3: "bg-purple-500/20" }
         : { blob1: "bg-pink-400/20", blob2: "bg-red-400/20", blob3: "bg-purple-400/15" };
@@ -8,7 +8,7 @@ export const BackgroundBlobs = ({ theme, darkMode = true, customBlobClasses, red
         ? { blob1: "bg-emerald-500/30", blob2: "bg-teal-500/30", blob3: "bg-cyan-500/20" }
         : { blob1: "bg-emerald-400/25", blob2: "bg-teal-400/25", blob3: "bg-cyan-400/20" };
     const themeClasses = customBlobClasses || (theme === 'green' || theme === 'emerald' ? greenThemeClasses : pinkThemeClasses);
-    const animClass = reducedMotion ? '' : 'animate-blob';
+    const animClass = reducedMotion || staticOnMobile ? '' : 'animate-blob';
 
     return (
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">

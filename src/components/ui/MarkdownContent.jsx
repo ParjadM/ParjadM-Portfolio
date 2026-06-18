@@ -14,10 +14,13 @@ export const MarkdownContent = ({ content, className = '' }) => (
         ul: ({ ...props }) => <ul className="mb-4 list-disc pl-6 space-y-2" {...props} />,
         ol: ({ ...props }) => <ol className="mb-4 list-decimal pl-6 space-y-2" {...props} />,
         a: ({ ...props }) => <a className="text-emerald-400 hover:text-emerald-300 underline" {...props} />,
-        code: ({ inline, ...props }) => 
-          inline ? 
-          <code className="bg-white/10 px-1.5 py-0.5 rounded text-sm font-mono text-emerald-300" {...props} /> :
-          <code className="block bg-black/50 p-4 rounded-lg overflow-x-auto text-sm font-mono text-gray-300 mb-4 border border-white/10" {...props} />,
+        pre: ({ children, ...props }) => (
+          <pre className="markdown-pre mb-4 rounded-lg border border-white/10 bg-black/50" {...props}>{children}</pre>
+        ),
+        code: ({ inline, children, ...props }) =>
+          inline ?
+          <code className="bg-white/10 px-1.5 py-0.5 rounded text-sm font-mono text-emerald-300" {...props}>{children}</code> :
+          <code className="block p-4 text-sm font-mono text-gray-300 whitespace-pre" {...props}>{children}</code>,
         blockquote: ({ ...props }) => <blockquote className="border-l-4 border-emerald-500 pl-4 italic text-gray-400 mb-4" {...props} />
       }}
     >

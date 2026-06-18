@@ -29,6 +29,21 @@ export const MockInterviewPage = ({ theme }) => {
   const [debriefLoading, setDebriefLoading] = useState(false);
   const [debriefError, setDebriefError] = useState('');
   const messagesContainerRef = useRef(null);
+  const inputRef = useRef(null);
+
+  const scrollInputIntoView = () => {
+    requestAnimationFrame(() => {
+      inputRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    });
+  };
+
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const onResize = () => scrollInputIntoView();
+    vv.addEventListener('resize', onResize);
+    return () => vv.removeEventListener('resize', onResize);
+  }, []);
 
   const gradientClass = theme !== 'pink' 
     ? 'bg-gradient-to-r from-emerald-500 to-teal-500' 
@@ -236,14 +251,18 @@ export const MockInterviewPage = ({ theme }) => {
         )}
 
         {/* Input Form */}
-        <div className="p-4 md:p-6 border-t border-white/10 bg-black/30">
-          <form onSubmit={handleSend} className="relative flex items-center">
+        <div className="p-4 md:p-6 pb-safe-or-3 border-t border-white/10 bg-black/30">
+          <form onSubmit={handleSend} className="relative flex items-center mobile-input">
             <input
+              ref={inputRef}
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              onFocus={scrollInputIntoView}
               placeholder="Ask a technical or behavioral question..."
-              className="w-full bg-white/5 border border-white/10 rounded-full pl-6 pr-14 py-4 text-[15px] text-white placeholder-gray-500 focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all shadow-inner"
+              autoComplete="off"
+              enterKeyHint="send"
+              className="w-full bg-white/5 border border-white/10 rounded-full pl-6 pr-14 py-4 text-base text-white placeholder-gray-500 focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all shadow-inner"
             />
             <button
               type="submit"

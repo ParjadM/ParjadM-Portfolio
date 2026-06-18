@@ -108,7 +108,7 @@ export const ContactSection = ({ theme }) => {
                     <Reveal>
                     <GlassCard className="p-8">
                         <h3 className="text-2xl font-bold text-white mb-6">{t('contact.form.title')}</h3>
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-6 mobile-input">
                             {/* Honeypot field */}
                             <div className="hidden" aria-hidden="true">
                                 <label>
@@ -128,6 +128,8 @@ export const ContactSection = ({ theme }) => {
                                         value={formData.name}
                                         onChange={handleInputChange}
                                         required
+                                        autoComplete="name"
+                                        inputMode="text"
                                         className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-all duration-300"
                                         placeholder={t('contact.form.namePlaceholder')}
                                     />
@@ -143,6 +145,8 @@ export const ContactSection = ({ theme }) => {
                                         value={formData.email}
                                         onChange={handleInputChange}
                                         required
+                                        autoComplete="email"
+                                        inputMode="email"
                                         className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-all duration-300"
                                         placeholder={t('contact.form.emailPlaceholder')}
                                     />
@@ -160,6 +164,7 @@ export const ContactSection = ({ theme }) => {
                                     value={formData.subject}
                                     onChange={handleInputChange}
                                     required
+                                    autoComplete="off"
                                     className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-all duration-300"
                                     placeholder={t('contact.form.subjectPlaceholder')}
                                 />

@@ -50,7 +50,7 @@ function useDecoderText(text, delay = 0, instant = false) {
     return { displayText, done };
 }
 
-const ParticleNetwork = ({ isPink, reducedMotion }) => {
+const ParticleNetwork = ({ isPink, reducedMotion, lightMode = false }) => {
     const canvasRef = useRef(null);
 
     useEffect(() => {
@@ -67,7 +67,7 @@ const ParticleNetwork = ({ isPink, reducedMotion }) => {
         resize();
 
         const particles = [];
-        const numParticles = 45;
+        const numParticles = lightMode ? 18 : 45;
         const connectionDistance = 180;
         let mouse = { x: null, y: null, radius: 200 };
 
@@ -142,7 +142,7 @@ const ParticleNetwork = ({ isPink, reducedMotion }) => {
             window.removeEventListener('resize', resize);
             cancelAnimationFrame(animationFrameId);
         };
-    }, [isPink, reducedMotion]);
+    }, [isPink, reducedMotion, lightMode]);
 
     if (reducedMotion) return null;
     return <canvas ref={canvasRef} className="absolute inset-0 z-0 opacity-35 pointer-events-none" aria-hidden="true" />;
@@ -166,14 +166,14 @@ const BootSequence = ({ lines, visible, accentClass }) => {
     );
 };
 
-const CinematicCard = ({ theme, reducedMotion, onEnter, onReplay, isExiting }) => {
+const CinematicCard = ({ theme, reducedMotion, lightMode = false, onEnter, onReplay, isExiting }) => {
     const cardRef = useRef(null);
     const [transform, setTransform] = useState({ x: 0, y: 0 });
     const [bootDone, setBootDone] = useState(reducedMotion);
     const [showActions, setShowActions] = useState(reducedMotion);
     const canTilt = !reducedMotion && typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches;
 
-    const instant = reducedMotion;
+    const instant = reducedMotion || lightMode;
     const { displayText: decodedTitle1, done: title1Done } = useDecoderText('Architecting', instant ? 0 : 1400, instant);
     const { displayText: decodedTitle2, done: title2Done } = useDecoderText('Innovation', instant ? 0 : 1900, instant);
     const { displayText: decodedSubtitle, done: subtitleDone } = useDecoderText(SUBTITLE, instant ? 0 : 2600, instant);
@@ -296,6 +296,13 @@ const CinematicCard = ({ theme, reducedMotion, onEnter, onReplay, isExiting }) =
 export const IntroCinematic = ({ theme }) => {
     const navigate = useNavigate();
     const reducedMotion = useReducedMotion();
+    const [lightMode] = useState(() => {
+        if (typeof window === 'undefined') return false;
+        try {
+            if (navigator.connection?.saveData) return true;
+        } catch {}
+        return window.matchMedia('(max-width: 767px)').matches;
+    });
     const [sequenceKey, setSequenceKey] = useState(0);
     const [isExiting, setIsExiting] = useState(false);
     const [flash, setFlash] = useState(false);
@@ -387,8 +394,8 @@ export const IntroCinematic = ({ theme }) => {
                 }
             `}</style>
 
-            <BackgroundBlobs theme={theme} darkMode reducedMotion={reducedMotion} />
-            <ParticleNetwork isPink={isPink} reducedMotion={reducedMotion} />
+            <BackgroundBlobs theme={theme} darkMode reducedMotion={reducedMotion || lightMode} staticOnMobile={lightMode} />
+            <ParticleNetwork isPink={isPink} reducedMotion={reducedMotion} lightMode={lightMode} />
 
             {/* Letterbox + vignette */}
             <div className="pointer-events-none absolute inset-0 z-[5]" aria-hidden="true">
@@ -401,15 +408,24 @@ export const IntroCinematic = ({ theme }) => {
             <button
                 type="button"
                 onClick={handleSkip}
-                className="absolute top-5 right-5 z-20 px-4 py-2 rounded-full text-xs font-mono uppercase tracking-widest text-gray-400 bg-white/5 border border-white/10 hover:text-white hover:bg-white/10 transition-colors"
+                className="absolute top-safe-or-4 right-4 sm:right-5 z-20 px-5 py-3 min-h-[44px] rounded-full text-sm font-mono uppercase tracking-widest text-white bg-white/10 border border-white/20 hover:bg-white/20 transition-colors shadow-lg backdrop-blur-sm"
             >
                 Skip →
+            </button>
+
+            <button
+                type="button"
+                onClick={handleSkip}
+                className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-20 px-8 py-3 min-h-[44px] rounded-full text-sm font-semibold text-gray-200 bg-black/60 border border-white/20 backdrop-blur-md hover:bg-black/80 transition-colors"
+            >
+                Skip intro
             </button>
 
             <CinematicCard
                 key={sequenceKey}
                 theme={theme}
                 reducedMotion={reducedMotion}
+                lightMode={lightMode}
                 onEnter={handleEnter}
                 onReplay={handleReplay}
                 isExiting={isExiting}

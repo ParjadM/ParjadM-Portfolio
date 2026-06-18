@@ -116,6 +116,15 @@ const Chatbot = ({ theme = 'green' }) => {
     scrollToBottom();
   }, [messages, isOpen]);
 
+  useEffect(() => {
+    if (!isOpen || window.matchMedia('(min-width: 640px)').matches) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, [isOpen]);
+
+  const speechSupported = typeof window !== 'undefined' && !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+
   // Robust Native Voice State
   const [listening, setListening] = useState(false);
   const [voiceError, setVoiceError] = useState('');
@@ -127,7 +136,7 @@ const Chatbot = ({ theme = 'green' }) => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     
     if (!SpeechRecognition) {
-      alert("Voice input is not supported in this browser. Try Chrome or Edge.");
+      setVoiceError('Voice input is not supported in this browser. On iOS Safari, try Chrome or type your message.');
       return;
     }
 
@@ -340,18 +349,35 @@ const Chatbot = ({ theme = 'green' }) => {
 
           {/* Input Area */}
           <div className="p-3 pb-safe-or-3 border-t border-white/10 bg-black/20">
-            <form onSubmit={handleSend} className="flex items-center gap-2">
+            {!speechSupported && (
+              <p className="text-[11px] text-gray-500 mb-2 px-1">Voice input unavailable on this browser — type your message below.</p>
+            )}
+            {voiceError && (
+              <p className="text-[11px] text-amber-300/90 mb-2 px-1">{voiceError}</p>
+            )}
+            <form onSubmit={handleSend} className="flex items-center gap-2 mobile-input">
+              {speechSupported && (
+                <button
+                  type="button"
+                  onClick={toggleListening}
+                  className={`p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full transition-all ${listening ? 'bg-red-500/30 text-red-300' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'}`}
+                  aria-label={listening ? 'Stop listening' : 'Start voice input'}
+                  title={listening ? 'Stop listening' : 'Voice input'}
+                >
+                  <MicIcon className="w-4 h-4" />
+                </button>
+              )}
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask me anything..."
-                className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-white/30 transition-all"
+                className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2.5 text-base sm:text-sm text-white placeholder-gray-400 focus:outline-none focus:border-white/30 transition-all"
               />
               <button
                 type="submit"
                 disabled={!input.trim() || loading}
-                className={`p-2 rounded-full ${gradientClass} text-white disabled:opacity-50 transition-all`}
+                className={`p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full ${gradientClass} text-white disabled:opacity-50 transition-all`}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -367,7 +393,8 @@ const Chatbot = ({ theme = 'green' }) => {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className={`absolute bottom-24 right-4 sm:bottom-0 sm:right-0 p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 shadow-emerald-500/20 pointer-events-auto ${gradientClass}`}
+          className={`absolute bottom-safe-fab right-4 sm:bottom-0 sm:right-0 p-4 min-w-[56px] min-h-[56px] flex items-center justify-center rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 shadow-emerald-500/20 pointer-events-auto ${gradientClass}`}
+          aria-label="Open AI assistant"
         >
           <BotIcon className="w-6 h-6 text-white" />
         </button>

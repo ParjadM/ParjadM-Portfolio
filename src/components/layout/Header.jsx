@@ -13,6 +13,7 @@ import { THEMES } from '../../utils/themeConfig.js';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../ui/LanguageSwitcher.jsx';
+import { MOBILE_MENU_OPEN } from '../../utils/mobileMenuEvents.js';
 
 export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isMobileMenuOpen, setIsMobileMenuOpen }) => {
     const { t } = useTranslation();
@@ -83,14 +84,29 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
     }, []);
 
     useEffect(() => {
-        if (isPaletteOpen && paletteTriggerRef.current && typeof window !== 'undefined') {
-            const rect = paletteTriggerRef.current.getBoundingClientRect();
-            const w = 192; // w-48
-            setPaletteRect({ top: rect.bottom + 8, left: rect.right - w });
+        if (isPaletteOpen && typeof window !== 'undefined') {
+            const trigger = mobilePaletteTriggerRef.current || paletteTriggerRef.current;
+            if (!trigger) return;
+            const rect = trigger.getBoundingClientRect();
+            const w = 192;
+            setPaletteRect({ top: rect.bottom + 8, left: Math.max(8, rect.right - w) });
         } else {
             setPaletteRect(null);
         }
     }, [isPaletteOpen]);
+
+    useEffect(() => {
+        const onOpenMenu = () => setIsMobileMenuOpen?.(true);
+        window.addEventListener(MOBILE_MENU_OPEN, onOpenMenu);
+        return () => window.removeEventListener(MOBILE_MENU_OPEN, onOpenMenu);
+    }, [setIsMobileMenuOpen]);
+
+    useEffect(() => {
+        if (!isMobileMenuOpen) return;
+        const prev = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => { document.body.style.overflow = prev; };
+    }, [isMobileMenuOpen]);
 
     useEffect(() => {
         if (isMoreOpen && moreDropdownRef.current && typeof window !== 'undefined') {
@@ -104,7 +120,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
     useEffect(() => {
         const handleClickOutside = (e) => {
             // Check palette dropdown
-            const isPaletteClick = paletteDropdownRef.current?.contains(e.target) || paletteTriggerRef.current?.contains(e.target);
+            const isPaletteClick = paletteDropdownRef.current?.contains(e.target) || paletteTriggerRef.current?.contains(e.target) || mobilePaletteTriggerRef.current?.contains(e.target);
             if (!isPaletteClick) {
                 setIsPaletteOpen(false);
             }
@@ -261,18 +277,37 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
             </nav>
 
             {/* Mobile & Tablet Navigation */}
-            <nav className="lg:hidden px-4 py-3" role="navigation" aria-label="Mobile Primary">
+            <nav className="lg:hidden px-4 pt-safe-or-4 pb-3" role="navigation" aria-label="Mobile Primary">
                 <GlassCard className="!rounded-2xl border border-white/10 shadow-lg backdrop-blur-md px-4 py-2" theme={theme}>
-                    <div className="flex justify-between items-center">
-                        <Link to="/" className="inline-flex items-center">
+                    <div className="flex justify-between items-center gap-2">
+                        <Link to="/" className="inline-flex items-center shrink-0">
                             <img src={Logo} alt="Logo" className="h-8 w-auto drop-shadow-md" />
                         </Link>
                         
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center gap-1.5 sm:gap-2">
                             <LanguageSwitcher />
+                            <button
+                                ref={mobilePaletteTriggerRef}
+                                type="button"
+                                onClick={() => setIsPaletteOpen(!isPaletteOpen)}
+                                className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/20 transition-all"
+                                aria-label="Theme palette"
+                            >
+                                <Palette className="w-4 h-4" />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setIsMobileMenuOpen?.(true)}
+                                className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/20 transition-all"
+                                aria-label="Open menu"
+                                aria-expanded={isMobileMenuOpen}
+                            >
+                                <Menu className="w-5 h-5" />
+                            </button>
                         </div>
                     </div>
                 </GlassCard>
+                {paletteEl}
 
                 {/* Full-Screen Mobile Menu Overlay */}
                 {isMobileMenuOpen && typeof document !== 'undefined' && createPortal(
@@ -296,6 +331,14 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                                     {item.name}
                                 </Link>
                             ))}
+
+                            <Link
+                                to="/explore"
+                                onClick={handleNavClick}
+                                className={`text-2xl font-bold tracking-tight ${isActive('/explore') ? (theme === 'pink' ? 'text-pink-400' : 'text-emerald-400') : 'text-gray-300 hover:text-white'}`}
+                            >
+                                Explore
+                            </Link>
 
                             <div className="w-full h-px bg-white/10 my-4" />
                             
