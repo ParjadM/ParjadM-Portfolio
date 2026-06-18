@@ -22,6 +22,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
     const [paletteRect, setPaletteRect] = useState(null);
     const paletteTriggerRef = useRef(null);
+    const mobilePaletteTriggerRef = useRef(null);
     const paletteDropdownRef = useRef(null);
     const [isMoreOpen, setIsMoreOpen] = useState(false);
     const [moreRect, setMoreRect] = useState(null);

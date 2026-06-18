@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Routes } from 'react-router-dom';
 import { BackgroundBlobs } from '../ui/BackgroundBlobs.jsx';
 import { CustomCursor } from '../CustomCursor.jsx';
 import { Header } from './Header.jsx';
 import { Footer } from './Footer.jsx';
 import { BottomNav } from './BottomNav.jsx';
-import { AppRoutes } from './AppRoutes.jsx';
+import { buildAppRouteElements } from './AppRoutes.jsx';
 import { LocaleSync } from '../LocaleSync.jsx';
 import Chatbot from '../Chatbot.jsx';
 import { Toast } from '../ui/Toast.jsx';
-import { AnimatePresence } from 'framer-motion';
 
 import { getThemeConfig } from '../../utils/themeConfig.js';
 import { useReducedMotion } from '../../utils/useReducedMotion.js';
@@ -136,9 +135,9 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
             )}
             
             <main id="main-content" role="main" tabIndex={-1} className={`relative z-10 transition-all duration-500 ${!isFullscreenRoute ? 'pt-[4.75rem] sm:pt-20 md:pt-24 pb-28 lg:pb-0' : ''}`}>
-                <AnimatePresence mode="wait">
-                    <AppRoutes theme={themeConfig.accentPrefix} key={location.pathname} />
-                </AnimatePresence>
+                <Routes location={location} key={location.pathname}>
+                    {buildAppRouteElements(themeConfig.accentPrefix)}
+                </Routes>
             </main>
 
             {/* Footer */}
