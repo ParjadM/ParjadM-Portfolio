@@ -13,7 +13,10 @@
     "subtitle1": "Un ",
     "subtitle2": "Ingénieur Logiciel",
     "subtitle3": " créatif passionné par la création d'applications web magnifiques, fonctionnelles et centrées sur l'utilisateur.",
-    "cta": "Contactez-moi"
+    "cta": "Contactez-moi",
+    "mainPath": "Par ici",
+    "exploreLabel": "Ou explorer",
+    "exploreAll": "Tout explorer →"
   },
   "about": {
     "title": "À propos de moi",
@@ -111,5 +114,10 @@
     "desc": "Le lien que vous avez suivi n'existe pas sur parjadm.ca. Il a peut-être été déplacé ou supprimé.",
     "home": "Accueil",
     "back": "Retour"
+  },
+  "explore": {
+    "badge": "Easter eggs",
+    "title": "Explorer",
+    "subtitle": "Expériences interactives et coins cachés de ce site."
   }
 }

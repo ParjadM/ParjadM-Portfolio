@@ -13,7 +13,10 @@
     "subtitle1": "A creative ",
     "subtitle2": "Software Engineer",
     "subtitle3": " with a passion for building beautiful, functional, and user-centric applications.",
-    "cta": "Get in Touch"
+    "cta": "Get in Touch",
+    "mainPath": "Start here",
+    "exploreLabel": "Or explore",
+    "exploreAll": "Explore all →"
   },
   "about": {
     "title": "About Me",
@@ -111,5 +114,10 @@
     "desc": "The link you followed doesn't exist on parjadm.ca. It may have been moved or removed.",
     "home": "Go home",
     "back": "Go back"
+  },
+  "explore": {
+    "badge": "Easter eggs",
+    "title": "Explore",
+    "subtitle": "Interactive experiences and hidden corners of this site."
   }
 }

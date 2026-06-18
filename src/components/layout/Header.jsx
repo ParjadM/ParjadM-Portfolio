@@ -71,7 +71,11 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
           .then(res => res.ok ? res.json() : null)
           .then(d => {
             const posts = Array.isArray(d?.posts) ? d.posts : [];
-            setBlogPosts(posts.filter(p => p.id && p.title).map(p => ({ id: p.id, title: p.title })));
+            setBlogPosts(posts.filter(p => p.id && p.title).map(p => ({
+              id: p.id,
+              title: p.title,
+              publishAt: p.publishAt || p.updatedAt || p.date,
+            })));
           })
           .catch(() => {});
 

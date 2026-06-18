@@ -13,6 +13,7 @@ import clickupRouter from './routes/clickup.js'
 import githubRouter from './routes/github.js'
 import leetcodeRouter from './routes/leetcode.js'
 import aiRouter from './routes/ai.js'
+import { buildRssFeed } from './routes/blog.js'
 
 export async function createApp() {
   const app = express()
@@ -27,6 +28,17 @@ export async function createApp() {
   // Health check
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', service: 'parjad-portfolio-server', dbEngine: currentEngine, timestamp: new Date().toISOString() })
+  })
+
+  // RSS feed (also at /api/blog/rss)
+  app.get('/feed.xml', async (_req, res) => {
+    try {
+      res.setHeader('Content-Type', 'application/rss+xml; charset=utf-8')
+      res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=600')
+      res.send(await buildRssFeed())
+    } catch (err) {
+      res.status(500).json({ error: err.message })
+    }
   })
 
   // API routes

@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://parjad-m-portfolio.vercel.app/</loc></url>
-  <url><loc>https://parjad-m-portfolio.vercel.app/about</loc></url>
-  <url><loc>https://parjad-m-portfolio.vercel.app/projects</loc></url>
-  <url><loc>https://parjad-m-portfolio.vercel.app/blog</loc></url>
-  <url><loc>https://parjad-m-portfolio.vercel.app/contact</loc></url>
-  <url><loc>https://parjad-m-portfolio.vercel.app/admin/login</loc></url>
+  <url><loc>https://parjadm.ca/</loc></url>
+  <url><loc>https://parjadm.ca/about</loc></url>
+  <url><loc>https://parjadm.ca/projects</loc></url>
+  <url><loc>https://parjadm.ca/stats</loc></url>
+  <url><loc>https://parjadm.ca/blog</loc></url>
+  <url><loc>https://parjadm.ca/contact</loc></url>
+  <url><loc>https://parjadm.ca/explore</loc></url>
+  <url><loc>https://parjadm.ca/tech-news</loc></url>
+  <url><loc>https://parjadm.ca/cli</loc></url>
+  <url><loc>https://parjadm.ca/os</loc></url>
+  <url><loc>https://parjadm.ca/intro</loc></url>
+  <url><loc>https://parjadm.ca/interview</loc></url>
 </urlset>
-
-

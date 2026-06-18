@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { Window } from '../components/ui/Window.jsx';
 import { BackgroundBlobs } from '../components/ui/BackgroundBlobs.jsx';
 import { Loader2 } from 'lucide-react';
+import { SEO } from '../components/SEO.jsx';
 
 const Notepad = React.lazy(() => import('../components/os/Notepad.jsx').then(module => ({ default: module.Notepad })));
 const BrowserApp = React.lazy(() => import('../components/os/BrowserApp.jsx').then(module => ({ default: module.BrowserApp })));
@@ -283,6 +284,7 @@ export const DesktopOS = ({ theme }) => {
             onClick={closeContextMenu}
             onContextMenu={handleContextMenu}
         >
+            <SEO title="Desktop OS — Parjad Minooei" description="A playful desktop environment on parjadm.ca." />
             <div className={`relative w-full h-full bg-gray-900 overflow-hidden shadow-[0_0_100px_rgba(255,255,255,0.1)] transition-opacity duration-75 ${isExiting ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
                 {/* Wallpaper */}
                 <div className="absolute inset-0 z-0 transition-colors duration-1000">

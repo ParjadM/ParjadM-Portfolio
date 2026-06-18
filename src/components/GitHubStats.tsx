@@ -37,7 +37,7 @@ export default function GitHubStats({ theme = 'green' as 'green' | 'pink' }) {
   const tagColor = theme === 'pink' ? 'bg-pink-500/20 text-pink-300' : 'bg-emerald-500/20 text-emerald-300'
 
   if (loading) return <div className="text-gray-300">Loading...</div>
-  if (error || !data) return <div className="text-red-300">{error || 'Failed to load'}</div>
+  if (error || !data) return <div className="text-amber-300/90 text-sm">GitHub stats temporarily unavailable. {error ? `(${error})` : ''}</div>
 
   return (
     <div className="w-full">

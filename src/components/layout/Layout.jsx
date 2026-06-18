@@ -11,6 +11,7 @@ import { getAuthToken, RequireAuth } from '../../utils/auth.jsx';
 import { AnimatePresence } from 'framer-motion';
 
 import { getThemeConfig } from '../../utils/themeConfig.js';
+import { useReducedMotion } from '../../utils/useReducedMotion.js';
 
 const HomeSection = React.lazy(() => import('../../pages/HomeSection.jsx').then(m => ({default: m.HomeSection})));
 const AboutSection = React.lazy(() => import('../../pages/AboutSection.jsx').then(m => ({default: m.AboutSection})));
@@ -28,12 +29,14 @@ const CliMode = React.lazy(() => import('../../pages/CliMode.jsx').then(m => ({d
 const MockInterviewPage = React.lazy(() => import('../../pages/MockInterviewPage.jsx').then(m => ({default: m.MockInterviewPage})));
 const TechNews = React.lazy(() => import('../../pages/TechNews.jsx').then(m => ({default: m.TechNews})));
 const DesktopOS = React.lazy(() => import('../../pages/DesktopOS.jsx').then(m => ({default: m.DesktopOS})));
+const ExplorePage = React.lazy(() => import('../../pages/ExplorePage.jsx').then(m => ({default: m.ExplorePage})));
 
 export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
     const location = useLocation();
     const [visitorId, setVisitorId] = useState(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const themeConfig = getThemeConfig(themeId);
+    const reducedMotion = useReducedMotion();
     
     const isFullscreenRoute = location?.pathname === '/intro' || location?.pathname === '/cli' || location?.pathname === '/os';
 
@@ -82,6 +85,14 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
                     66% { transform: translate(-20px, 20px) scale(0.9); }
                     100% { transform: translate(0px, 0px) scale(1); }
                 }
+                @media (prefers-reduced-motion: reduce) {
+                    .animate-blob { animation: none !important; }
+                    *, *::before, *::after {
+                        animation-duration: 0.01ms !important;
+                        animation-iteration-count: 1 !important;
+                        transition-duration: 0.01ms !important;
+                    }
+                }
                 .light-mode .text-white { color: rgb(17 24 39) !important; }
                 .light-mode .text-gray-300 { color: rgb(75 85 99) !important; }
                 .light-mode .text-gray-400 { color: rgb(107 114 128) !important; }
@@ -111,8 +122,8 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
                 .terminal-mode header img[alt="Logo"] { filter: sepia(100%) hue-rotate(80deg) saturate(400%) brightness(1.2); }
             `}</style>
 
-            <BackgroundBlobs theme={themeConfig.accentPrefix} darkMode={themeConfig.isDark} customBlobClasses={themeConfig.blobClasses} />
-            <CustomCursor theme={themeConfig.accentPrefix} darkMode={themeConfig.isDark} />
+            <BackgroundBlobs theme={themeConfig.accentPrefix} darkMode={themeConfig.isDark} customBlobClasses={themeConfig.blobClasses} reducedMotion={reducedMotion} />
+            <CustomCursor theme={themeConfig.accentPrefix} darkMode={themeConfig.isDark} reducedMotion={reducedMotion} />
             
             {!isFullscreenRoute && (
                 <Header 
@@ -141,6 +152,7 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
                             <Route path="/blog" element={<BlogSection theme={themeConfig.accentPrefix} />} />
                             <Route path="/blog/:id" element={<BlogPostPage theme={themeConfig.accentPrefix} />} />
                             <Route path="/contact" element={<ContactSection theme={themeConfig.accentPrefix} />} />
+                            <Route path="/explore" element={<ExplorePage theme={themeConfig.accentPrefix} />} />
                             <Route path="/tech-news" element={<TechNews theme={themeConfig.accentPrefix} />} />
                             <Route path="/os" element={<DesktopOS theme={themeConfig.accentPrefix} />} />
                             <Route path="/admin/login" element={<AdminLoginPage theme={themeConfig.accentPrefix} />} />
@@ -158,7 +170,7 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
             {!isFullscreenRoute && <Footer theme={themeConfig.accentPrefix} />}
             
             {/* Mobile Bottom Navigation */}
-            {!isFullscreenRoute && <BottomNav theme={themeConfig.accentPrefix} setIsMobileMenuOpen={setIsMobileMenuOpen} />}
+            {!isFullscreenRoute && <BottomNav theme={themeConfig.accentPrefix} />}
             
             {/* AI Chatbot */}
             {!isFullscreenRoute && <Chatbot theme={themeConfig.accentPrefix} />}

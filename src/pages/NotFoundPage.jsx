@@ -7,20 +7,18 @@ import { Toast } from '../components/ui/Toast.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
 import { useTranslation } from 'react-i18next';
 import { Reveal } from '../components/Reveal.jsx';
+import { SEO } from '../components/SEO.jsx';
 
 export const NotFoundPage = ({ theme }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    useEffect(() => {
-        document.title = 'Page not found — Parjad Minooei';
-        return () => { document.title = 'Parjad Minooei'; };
-    }, []);
     const gradientClass = theme === 'pink'
         ? 'bg-gradient-to-r from-pink-500 to-red-500'
         : 'bg-gradient-to-r from-emerald-500 to-teal-500';
 
     return (
         <section className="min-h-screen flex items-center justify-center py-20 px-4">
+            <SEO title="Page not found — Parjad Minooei" description="The page you requested does not exist on parjadm.ca." />
             <div className="container mx-auto max-w-2xl text-center">
                 <Reveal>
                 <GlassCard className="p-12 md:p-16" theme={theme}>

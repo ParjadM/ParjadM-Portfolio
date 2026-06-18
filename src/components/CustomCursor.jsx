@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 
-export const CustomCursor = ({ theme, darkMode = true }) => {
+export const CustomCursor = ({ theme, darkMode = true, reducedMotion = false }) => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    if (reducedMotion) return;
     const onMouseMove = (e) => {
       setPosition({ x: e.clientX, y: e.clientY });
       setIsVisible(true);
@@ -33,7 +34,9 @@ export const CustomCursor = ({ theme, darkMode = true }) => {
       document.removeEventListener('mouseleave', onMouseLeave);
       document.removeEventListener('mouseenter', onMouseEnter);
     };
-  }, []);
+  }, [reducedMotion]);
+
+  if (reducedMotion) return null;
 
   // Only show on non-touch devices
   if (typeof navigator !== 'undefined' &&  /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {

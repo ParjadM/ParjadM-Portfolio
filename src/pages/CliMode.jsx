@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { BackgroundBlobs } from '../components/ui/BackgroundBlobs.jsx';
+import { SEO } from '../components/SEO.jsx';
 import { apiCache } from '../utils/useFetchWithCache.js';
 
 // Typewriter component for animations
@@ -518,6 +519,7 @@ export const CliMode = ({ theme }) => {
 
     return (
         <section className={`min-h-screen flex items-center justify-center py-24 px-4 bg-black relative ${isExiting ? 'animate-crt-off' : 'animate-fade-in'}`}>
+            <SEO title="CLI Mode — Parjad Minooei" description="Navigate parjadm.ca from the terminal." />
             <style>{`
                 .animate-fade-in { animation: fadeIn 1s ease-out forwards; }
                 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

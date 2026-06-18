@@ -41,7 +41,7 @@ export default function LeetCodeStats({ theme = 'green' as 'green' | 'pink' }) {
   }, [])
 
   if (loading) return <div className="text-gray-300">Loading...</div>
-  if (error || !data) return <div className="text-red-300">{error || 'Failed to load'}</div>
+  if (error || !data) return <div className="text-amber-300/90 text-sm">LeetCode stats temporarily unavailable. {error ? `(${error})` : ''}</div>
 
   const ring = theme === 'pink' ? 'ring-pink-400/40' : 'ring-emerald-400/40'
   const accent = theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'

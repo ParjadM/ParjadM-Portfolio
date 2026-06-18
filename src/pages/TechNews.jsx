@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { PageTransition } from '../components/ui/PageTransition.jsx';
 import { ExternalLink, Heart, Clock, User } from 'lucide-react';
+import { SEO } from '../components/SEO.jsx';
 
 export const TechNews = ({ theme }) => {
     const [stories, setStories] = useState([]);
@@ -45,6 +46,10 @@ export const TechNews = ({ theme }) => {
 
     return (
         <PageTransition>
+            <SEO
+                title="Tech Hub — Parjad Minooei"
+                description="Top software engineering articles of the day from the global developer community."
+            />
             <div className="container mx-auto px-4 lg:px-8 max-w-6xl pb-24">
                 <div className="mb-12 text-center md:text-left pt-8">
                     <motion.h1 

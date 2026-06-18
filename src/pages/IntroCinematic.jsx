@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { BackgroundBlobs } from '../components/ui/BackgroundBlobs.jsx';
 import { Code, BrainCircuit, Palette } from '../components/ui/Icons.jsx';
 import { RippleButton } from '../components/ui/RippleButton.jsx';
+import { SEO } from '../components/SEO.jsx';
 
 // Custom Hook for Hacker Decoder Text
 const useDecoderText = (text, delay = 0) => {
@@ -194,6 +195,7 @@ export const IntroCinematic = ({ theme }) => {
 
     return (
         <section key={key} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black perspective-1000">
+            <SEO title="Intro — Parjad Minooei" description="An animated welcome to parjadm.ca." />
             <style>{`
                 .perspective-1000 { perspective: 1200px; }
                 

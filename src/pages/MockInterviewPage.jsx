@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { SEO } from '../components/SEO.jsx';
 
 const BotIcon = (props) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -88,6 +89,7 @@ export const MockInterviewPage = ({ theme }) => {
   if (!roleSelected) {
     return (
       <div className="min-h-screen flex items-center justify-center py-20 px-4">
+        <SEO title="Mock Interview — Parjad Minooei" description="Chat with an AI trained on Parjad's resume and experience." />
         <div className="bg-gray-900/80 backdrop-blur-xl border border-white/10 p-8 rounded-3xl max-w-lg w-full text-center shadow-2xl">
           <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-white/10 flex items-center justify-center">
             <BotIcon className={`w-8 h-8 ${theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}`} />
@@ -121,6 +123,7 @@ export const MockInterviewPage = ({ theme }) => {
 
   return (
     <div className="h-[100dvh] flex flex-col pt-20 lg:pt-24 px-4 pb-4 md:px-8 max-w-5xl mx-auto w-full">
+      <SEO title="Mock Interview — Parjad Minooei" description="Chat with an AI trained on Parjad's resume and experience." />
       <div className="flex-1 bg-gray-900/60 backdrop-blur-md border border-white/10 rounded-3xl shadow-2xl flex flex-col min-h-0 overflow-hidden">
         {/* Header */}
         <div className={`p-5 flex items-center justify-between border-b border-white/10 bg-black/20`}>

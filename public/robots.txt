@@ -1,6 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://parjad-m-portfolio.vercel.app/sitemap.xml
-
-
+Sitemap: https://parjadm.ca/sitemap.xml
