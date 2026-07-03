@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import mongoose from 'mongoose'
-import { BlogPost, Project, Analytics, Visitor, AnalyticsDaily, AiKnowledge, DeviceStats, HourlyStats, AccessLog } from '../db/mongo.js'
+import { BlogPost, Project, Analytics, Visitor, AnalyticsDaily, AiKnowledge, DeviceStats, HourlyStats, AccessLog, CommunityApp } from '../db/mongo.js'
 import { getAdminAiStats } from '../ai/analytics.js'
 import { clearKnowledgeMemoryCache } from '../ai/knowledge.js'
 import crypto from 'crypto'
@@ -472,6 +472,56 @@ router.get('/metrics/hourly', async (req, res) => {
     res.json({ heatmap: docs })
   } catch (err) {
     res.status(500).json({ error: err.message })
+  }
+})
+
+// --- App Store Moderation (Admin) ---
+// GET /api/admin/apps?status=pending|approved|rejected (default: all)
+router.get('/apps', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.json({ apps: [] })
+  try {
+    const { status } = req.query
+    const filter = status ? { status } : {}
+    const docs = await CommunityApp.find(filter).sort({ createdAt: -1 }).lean()
+    res.json({ apps: docs.map(d => ({ id: d._id.toString(), ...d })) })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+router.post('/apps/:id/approve', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
+  try {
+    await CommunityApp.updateOne(
+      { _id: req.params.id },
+      { $set: { status: 'approved', approvedAt: new Date(), rejectionReason: '' } }
+    )
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(400).json({ error: err.message })
+  }
+})
+
+router.post('/apps/:id/reject', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
+  try {
+    await CommunityApp.updateOne(
+      { _id: req.params.id },
+      { $set: { status: 'rejected', rejectionReason: (req.body?.reason || '').slice(0, 300) } }
+    )
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(400).json({ error: err.message })
+  }
+})
+
+router.delete('/apps/:id', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
+  try {
+    await CommunityApp.deleteOne({ _id: req.params.id })
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(400).json({ error: err.message })
   }
 })
 

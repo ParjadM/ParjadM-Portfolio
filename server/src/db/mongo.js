@@ -242,6 +242,25 @@ const HourlyStatsSchema = new mongoose.Schema(
 HourlyStatsSchema.index({ date: 1, hour: 1 }, { unique: true })
 export const HourlyStats = mongoose.models.HourlyStats || mongoose.model('HourlyStats', HourlyStatsSchema, 'hourly_stats')
 
+// Community App Store: user-submitted web apps, gated behind admin approval.
+const CommunityAppSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true, maxlength: 60 },
+    description: { type: String, required: true, trim: true, maxlength: 300 },
+    url: { type: String, required: true, trim: true, maxlength: 500 },
+    iconUrl: { type: String, default: '', trim: true, maxlength: 500 },
+    author: { type: String, required: true, trim: true, maxlength: 60 },
+    authorEmail: { type: String, default: '', trim: true, maxlength: 120 },
+    status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending', index: true },
+    rejectionReason: { type: String, default: '' },
+    submittedIp: { type: String, default: '' },
+    approvedAt: { type: Date },
+  },
+  { timestamps: true }
+)
+export const CommunityApp = mongoose.models.CommunityApp
+  || mongoose.model('CommunityApp', CommunityAppSchema, 'community_apps')
+
 const AccessLogSchema = new mongoose.Schema(
   {
     timestamp: { type: Date, default: () => new Date(), index: true },

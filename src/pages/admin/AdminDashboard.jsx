@@ -10,6 +10,7 @@ import { AdminProjectsManager } from './AdminProjectsManager.jsx';
 import { AdminAIManager } from './AdminAIManager.jsx';
 import { AdminAICostDashboard } from './AdminAICostDashboard.jsx';
 import { AdminInterviewManager } from './AdminInterviewManager.jsx';
+import { AdminAppStoreManager } from './AdminAppStoreManager.jsx';
 import { PremiumAnalytics } from './PremiumAnalytics.jsx';
 import { getAuthToken } from '../../utils/auth.jsx';
 
@@ -48,10 +49,10 @@ export const AdminDashboard = ({ theme }) => {
 
           {/* Tabs */}
           <div className="mb-6 flex gap-2 flex-wrap">
-            {['blog','projects','analytics','ai','ai_cost','interview_ai'].map(tab => (
+            {['blog','projects','analytics','ai','ai_cost','interview_ai','app_store'].map(tab => (
               <button key={tab} onClick={() => setActiveTab(tab)}
                 className={`px-3 py-2 rounded ${activeTab===tab ? 'bg-white/20 text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`}>
-                {tab === 'blog' ? 'Blog' : tab === 'projects' ? 'Projects' : tab === 'analytics' ? 'Analytics' : tab === 'ai' ? 'AI Context' : tab === 'ai_cost' ? 'AI Cost' : 'Interview AI'}
+                {tab === 'blog' ? 'Blog' : tab === 'projects' ? 'Projects' : tab === 'analytics' ? 'Analytics' : tab === 'ai' ? 'AI Context' : tab === 'ai_cost' ? 'AI Cost' : tab === 'interview_ai' ? 'Interview AI' : 'App Store'}
               </button>
             ))}
           </div>
@@ -65,6 +66,7 @@ export const AdminDashboard = ({ theme }) => {
           {activeTab === 'ai' && <AdminAIManager theme={theme} />}
           {activeTab === 'ai_cost' && <AdminAICostDashboard theme={theme} />}
           {activeTab === 'interview_ai' && <AdminInterviewManager theme={theme} />}
+          {activeTab === 'app_store' && <AdminAppStoreManager theme={theme} />}
         </GlassCard>
       </div>
     </section>

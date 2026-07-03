@@ -31,6 +31,7 @@ const NativeProjects = React.lazy(() => import('../components/os/NativeSiteApps.
 const NativeBlog = React.lazy(() => import('../components/os/NativeSiteApps.jsx').then(m => ({ default: m.BlogApp })));
 const NativeStats = React.lazy(() => import('../components/os/NativeSiteApps.jsx').then(m => ({ default: m.StatsApp })));
 const NativeTechNews = React.lazy(() => import('../components/os/NativeSiteApps.jsx').then(m => ({ default: m.TechNewsApp })));
+const AppStoreApp = React.lazy(() => import('../components/os/AppStoreApp.jsx').then(m => ({ default: m.AppStoreApp })));
 import { 
     Terminal, 
     Globe, 
@@ -58,7 +59,8 @@ import {
     Code,
     Search,
     Power,
-    LayoutGrid
+    LayoutGrid,
+    Store
 } from 'lucide-react';
 
 const APPS = [
@@ -80,6 +82,7 @@ const APPS = [
     { id: 'news', title: 'Tech Hub', icon: <Newspaper className="w-4 h-4 text-pink-400" />, desktopIcon: <Newspaper className="w-10 h-10 text-pink-400" />, type: 'native', component: NativeTechNews },
     { id: 'stats', title: 'Stats & ClickUp', icon: <Activity className="w-4 h-4 text-red-400" />, desktopIcon: <Activity className="w-10 h-10 text-red-400" />, type: 'native', component: NativeStats },
     { id: 'taskmanager', title: 'Task Manager', icon: <Monitor className="w-4 h-4 text-cyan-400" />, desktopIcon: <Monitor className="w-10 h-10 text-cyan-400" />, type: 'native', component: TaskManagerApp },
+    { id: 'appstore', title: 'App Store', icon: <Store className="w-4 h-4 text-sky-400" />, desktopIcon: <Store className="w-10 h-10 text-sky-400" />, type: 'native', component: AppStoreApp, defaultSize: { width: 720, height: 560 } },
     { id: 'github', title: 'GitHub', icon: <Code className="w-4 h-4 text-white" />, desktopIcon: <Code className="w-10 h-10 text-white" />, type: 'link', url: 'https://github.com/ParjadM' },
 ];
 
