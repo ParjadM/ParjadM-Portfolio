@@ -11,6 +11,7 @@ export const PremiumAnalytics = ({ theme, dbStatus }) => {
   const [deviceData, setDeviceData] = useState({ browsers: [], os: [] });
   const [heatmapData, setHeatmapData] = useState([]);
   const [logs, setLogs] = useState([]);
+  const [clientErrors, setClientErrors] = useState([]);
 
   useEffect(() => {
     const token = getAuthToken();
@@ -35,6 +36,11 @@ export const PremiumAnalytics = ({ theme, dbStatus }) => {
     fetch('/api/admin/metrics/logs', { headers: { Authorization: `Bearer ${token}` } })
       .then(res => res.ok ? res.json() : { logs: [] })
       .then(d => setLogs(d.logs)).catch(() => {});
+
+    // Client-side error reports
+    fetch('/api/admin/client-errors', { headers: { Authorization: `Bearer ${token}` } })
+      .then(res => res.ok ? res.json() : { errors: [] })
+      .then(d => setClientErrors(Array.isArray(d.errors) ? d.errors : [])).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -221,6 +227,37 @@ export const PremiumAnalytics = ({ theme, dbStatus }) => {
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+
+      {/* Client-side JS errors reported from real visitors' browsers */}
+      <div className="p-4 bg-white/5 border border-white/10 rounded-xl overflow-hidden flex flex-col max-h-96">
+        <h4 className="text-white font-semibold mb-3">
+          Client Errors
+          {clientErrors.length > 0 && (
+            <span className="ml-2 px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 text-xs align-middle">
+              {clientErrors.length}
+            </span>
+          )}
+        </h4>
+        <div className="overflow-y-auto flex-1 space-y-2">
+          {clientErrors.length === 0 && (
+            <div className="py-4 text-center text-gray-500 text-sm">No errors reported. 🎉</div>
+          )}
+          {clientErrors.map((e) => (
+            <details key={e.id} className="rounded-lg bg-white/5 border border-white/10 px-3 py-2">
+              <summary className="cursor-pointer text-sm text-red-300 truncate">
+                <span className="text-xs text-gray-500 mr-2">{new Date(e.createdAt).toLocaleString()}</span>
+                {e.message}
+              </summary>
+              <div className="mt-2 text-xs text-gray-400 space-y-1">
+                <div className="truncate" title={e.url}>Page: {e.url}</div>
+                <div className="truncate" title={e.source}>Source: {e.source || 'n/a'}</div>
+                <div className="truncate" title={e.userAgent}>UA: {e.userAgent}</div>
+                {e.stack && <pre className="mt-1 p-2 rounded bg-black/40 overflow-x-auto whitespace-pre-wrap max-h-40 overflow-y-auto">{e.stack}</pre>}
+              </div>
+            </details>
+          ))}
         </div>
       </div>
     </div>

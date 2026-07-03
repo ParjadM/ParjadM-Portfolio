@@ -242,6 +242,24 @@ const HourlyStatsSchema = new mongoose.Schema(
 HourlyStatsSchema.index({ date: 1, hour: 1 }, { unique: true })
 export const HourlyStats = mongoose.models.HourlyStats || mongoose.model('HourlyStats', HourlyStatsSchema, 'hourly_stats')
 
+// Client-side JS errors reported from the browser (capped to stay small).
+const ClientErrorSchema = new mongoose.Schema(
+  {
+    message: { type: String, required: true },
+    stack: { type: String, default: '' },
+    source: { type: String, default: '' },
+    url: { type: String, default: '' },
+    userAgent: { type: String, default: '' },
+    count: { type: Number, default: 1 },
+  },
+  {
+    timestamps: true,
+    capped: { size: 5242880, max: 500 },
+  }
+)
+export const ClientError = mongoose.models.ClientError
+  || mongoose.model('ClientError', ClientErrorSchema, 'client_errors')
+
 // Community App Store: user-submitted web apps, gated behind admin approval.
 const CommunityAppSchema = new mongoose.Schema(
   {

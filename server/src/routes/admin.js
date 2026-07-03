@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import mongoose from 'mongoose'
-import { BlogPost, Project, Analytics, Visitor, AnalyticsDaily, AiKnowledge, DeviceStats, HourlyStats, AccessLog, CommunityApp } from '../db/mongo.js'
+import { BlogPost, Project, Analytics, Visitor, AnalyticsDaily, AiKnowledge, DeviceStats, HourlyStats, AccessLog, CommunityApp, ClientError } from '../db/mongo.js'
 import { getAdminAiStats } from '../ai/analytics.js'
 import { clearKnowledgeMemoryCache } from '../ai/knowledge.js'
 import crypto from 'crypto'
@@ -469,6 +469,17 @@ router.get('/metrics/hourly', async (req, res) => {
     })
     const docs = await HourlyStats.find({ date: { $in: dates } }).sort({ date: 1, hour: 1 }).lean()
     res.json({ heatmap: docs })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// GET /api/admin/client-errors - recent browser error reports
+router.get('/client-errors', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.json({ errors: [] })
+  try {
+    const docs = await ClientError.find({}).sort({ createdAt: -1 }).limit(100).lean()
+    res.json({ errors: docs.map(d => ({ id: d._id.toString(), ...d })) })
   } catch (err) {
     res.status(500).json({ error: err.message })
   }

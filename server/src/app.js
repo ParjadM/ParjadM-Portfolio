@@ -14,6 +14,7 @@ import githubRouter from './routes/github.js'
 import leetcodeRouter from './routes/leetcode.js'
 import aiRouter from './routes/ai.js'
 import appsRouter from './routes/apps.js'
+import clientErrorsRouter from './routes/clientErrors.js'
 import { buildRssFeed } from './routes/blog.js'
 
 export async function createApp() {
@@ -55,6 +56,7 @@ export async function createApp() {
   app.use('/api/leetcode-stats', leetcodeRouter)
   app.use('/api/ai', aiRouter)
   app.use('/api/apps', appsRouter)
+  app.use('/api/client-errors', clientErrorsRouter)
 
   return app
 }
