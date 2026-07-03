@@ -479,10 +479,10 @@ export const DesktopOS = ({ theme }) => {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 20, scale: 0.95 }}
                             transition={{ duration: 0.2, ease: "easeOut" }}
-                            className="absolute bottom-14 left-1/2 -translate-x-1/2 w-[90%] max-w-2xl bg-gray-900/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-2xl p-6 z-[60] flex flex-col"
+                            className="absolute bottom-14 left-1/2 -translate-x-1/2 w-[90%] max-w-2xl max-h-[calc(100%-4.5rem)] bg-gray-900/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-2xl p-4 sm:p-6 z-[60] flex flex-col overflow-hidden"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <div className="relative mb-6">
+                            <div className="relative mb-4 sm:mb-6 shrink-0">
                                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                                 <input 
                                     type="text" 
@@ -493,43 +493,45 @@ export const DesktopOS = ({ theme }) => {
                                 />
                             </div>
                             
-                            <div className="flex justify-between items-center mb-4 px-2">
-                                <span className="font-semibold text-white">Pinned apps</span>
-                            </div>
+                            <div className="min-h-0 flex-1 overflow-y-auto">
+                                <div className="flex justify-between items-center mb-4 px-2">
+                                    <span className="font-semibold text-white">Pinned apps</span>
+                                </div>
 
-                            {recentApps.length > 0 && (
-                                <>
-                                    <div className="text-xs text-gray-400 uppercase tracking-wider mb-2 px-2">Recent</div>
-                                    <div className="flex gap-2 mb-4 px-2 flex-wrap">
-                                        {recentApps.map(id => {
-                                            const app = APPS.find(a => a.id === id);
-                                            if (!app) return null;
-                                            return (
-                                                <button key={id} onClick={() => { openApp(id); setIsStartMenuOpen(false); }} className="px-3 py-1.5 rounded-lg bg-white/10 text-xs text-gray-200 hover:bg-white/20">
-                                                    {app.title}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </>
-                            )}
-
-                            <div className="grid grid-cols-4 sm:grid-cols-6 gap-4 mb-6">
-                                {APPS.filter(a => a.title.toLowerCase().includes(startMenuSearch.toLowerCase())).map(app => (
-                                    <button 
-                                        key={app.id}
-                                        onClick={() => { openApp(app.id); setIsStartMenuOpen(false); }}
-                                        className="flex flex-col items-center justify-center p-3 rounded-xl hover:bg-white/10 transition-colors group"
-                                    >
-                                        <div className="group-hover:scale-110 transition-transform duration-200">
-                                            {app.desktopIcon}
+                                {recentApps.length > 0 && (
+                                    <>
+                                        <div className="text-xs text-gray-400 uppercase tracking-wider mb-2 px-2">Recent</div>
+                                        <div className="flex gap-2 mb-4 px-2 flex-wrap">
+                                            {recentApps.map(id => {
+                                                const app = APPS.find(a => a.id === id);
+                                                if (!app) return null;
+                                                return (
+                                                    <button key={id} onClick={() => { openApp(id); setIsStartMenuOpen(false); }} className="px-3 py-1.5 rounded-lg bg-white/10 text-xs text-gray-200 hover:bg-white/20">
+                                                        {app.title}
+                                                    </button>
+                                                );
+                                            })}
                                         </div>
-                                        <span className="mt-2 text-xs text-gray-300 text-center truncate w-full">{app.title}</span>
-                                    </button>
-                                ))}
+                                    </>
+                                )}
+
+                                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-4 mb-2">
+                                    {APPS.filter(a => a.title.toLowerCase().includes(startMenuSearch.toLowerCase())).map(app => (
+                                        <button 
+                                            key={app.id}
+                                            onClick={() => { openApp(app.id); setIsStartMenuOpen(false); }}
+                                            className="flex flex-col items-center justify-center p-3 rounded-xl hover:bg-white/10 transition-colors group"
+                                        >
+                                            <div className="group-hover:scale-110 transition-transform duration-200">
+                                                {app.desktopIcon}
+                                            </div>
+                                            <span className="mt-2 text-xs text-gray-300 text-center truncate w-full">{app.title}</span>
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
 
-                            <div className="mt-auto pt-4 border-t border-white/10 flex justify-between items-center px-2">
+                            <div className="shrink-0 mt-4 pt-4 border-t border-white/10 flex justify-between items-center px-2">
                                 <div className="flex items-center space-x-3">
                                     <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold text-sm">
                                         P
