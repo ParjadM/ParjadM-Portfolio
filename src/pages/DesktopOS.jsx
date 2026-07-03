@@ -86,10 +86,23 @@ const APPS = [
     { id: 'github', title: 'GitHub', icon: <Code className="w-4 h-4 text-white" />, desktopIcon: <Code className="w-10 h-10 text-white" />, type: 'link', url: 'https://github.com/ParjadM' },
 ];
 
+// Restore the window session from the previous visit (open apps + minimized state)
+const loadSavedWindows = () => {
+    try {
+        const saved = JSON.parse(localStorage.getItem('os_windows') || 'null');
+        if (Array.isArray(saved)) {
+            return saved
+                .filter(w => APPS.some(a => a.id === w.id && a.type !== 'link'))
+                .map((w, i) => ({ id: w.id, isOpen: true, isMinimized: !!w.isMinimized, zIndex: 11 + i }));
+        }
+    } catch {}
+    return [];
+};
+
 export const DesktopOS = ({ theme }) => {
     const navigate = useNavigate();
-    const [windows, setWindows] = useState([]);
-    const [topZIndex, setTopZIndex] = useState(10);
+    const [windows, setWindows] = useState(loadSavedWindows);
+    const [topZIndex, setTopZIndex] = useState(() => 11 + loadSavedWindows().length);
     const [time, setTime] = useState(new Date());
     const [isExiting, setIsExiting] = useState(false);
     const [wallpaper, setWallpaper] = useState(() => localStorage.getItem('os_wallpaper') || 'blobs');
@@ -102,6 +115,7 @@ export const DesktopOS = ({ theme }) => {
     const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
     const [isOsBooted, setIsOsBooted] = useState(() => sessionStorage.getItem('os_booted') === '1');
     const [altTabOpen, setAltTabOpen] = useState(false);
+    const [altTabIndex, setAltTabIndex] = useState(0);
     const [notepadFile, setNotepadFile] = useState(null);
     const [recentApps, setRecentApps] = useState(getRecentApps);
 
@@ -154,6 +168,11 @@ export const DesktopOS = ({ theme }) => {
     useEffect(() => { localStorage.setItem('os_theme', osTheme); }, [osTheme]);
     useEffect(() => { saveFileSystem(fileSystem); }, [fileSystem]);
     useEffect(() => { localStorage.setItem('os_desktop_icons', JSON.stringify(desktopIcons)); }, [desktopIcons]);
+    useEffect(() => {
+        try {
+            localStorage.setItem('os_windows', JSON.stringify(windows.map(({ id, isMinimized }) => ({ id, isMinimized }))));
+        } catch {}
+    }, [windows]);
 
     useEffect(() => {
         const saved = localStorage.getItem('os_camera_photos');
@@ -266,14 +285,41 @@ export const DesktopOS = ({ theme }) => {
         }, 600);
     };
 
+    // Most recently used first, matching real Alt+Tab behavior
+    const getAltTabTargets = () => windows.filter(w => !w.isMinimized).sort((a, b) => b.zIndex - a.zIndex);
+
     useEffect(() => {
-        const onKey = (e) => {
-            if (e.altKey && e.key === 'Tab') { e.preventDefault(); setAltTabOpen(v => !v); }
+        const onKeyDown = (e) => {
+            // Alt+` works everywhere; Alt+Tab reaches the page on macOS but is
+            // usually captured by the host OS on Windows.
+            if (e.altKey && (e.key === 'Tab' || e.key === '`')) {
+                e.preventDefault();
+                const targets = getAltTabTargets();
+                if (targets.length === 0) return;
+                if (!altTabOpen) {
+                    setAltTabOpen(true);
+                    setAltTabIndex(targets.length > 1 ? 1 : 0);
+                } else {
+                    setAltTabIndex(i => (i + 1) % targets.length);
+                }
+            }
             if (e.key === 'Escape') { setAltTabOpen(false); setIsStartMenuOpen(false); }
         };
-        window.addEventListener('keydown', onKey);
-        return () => window.removeEventListener('keydown', onKey);
-    }, []);
+        const onKeyUp = (e) => {
+            if (e.key === 'Alt' && altTabOpen) {
+                const targets = getAltTabTargets();
+                const target = targets[altTabIndex % Math.max(1, targets.length)];
+                if (target) focusApp(target.id);
+                setAltTabOpen(false);
+            }
+        };
+        window.addEventListener('keydown', onKeyDown);
+        window.addEventListener('keyup', onKeyUp);
+        return () => {
+            window.removeEventListener('keydown', onKeyDown);
+            window.removeEventListener('keyup', onKeyUp);
+        };
+    });
 
     const handleContextMenu = (e) => {
         e.preventDefault();
@@ -590,20 +636,25 @@ export const DesktopOS = ({ theme }) => {
                             onClick={() => setAltTabOpen(false)}
                         >
                             <div className="flex gap-4 flex-wrap justify-center max-w-3xl p-6">
-                                {windows.filter(w => !w.isMinimized).map(w => {
-                                    const app = APPS.find(a => a.id === w.id);
-                                    return (
-                                        <button
-                                            key={w.id}
-                                            type="button"
-                                            onClick={(e) => { e.stopPropagation(); focusApp(w.id); setWindows(prev => prev.map(win => win.id === w.id ? { ...win, isMinimized: false } : win)); setAltTabOpen(false); }}
-                                            className="flex flex-col items-center p-4 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 min-w-[100px]"
-                                        >
-                                            {app?.desktopIcon}
-                                            <span className="text-xs text-white mt-2">{app?.title}</span>
-                                        </button>
-                                    );
-                                })}
+                                {(() => {
+                                    const targets = getAltTabTargets();
+                                    const selectedIdx = targets.length > 0 ? altTabIndex % targets.length : 0;
+                                    return targets.map((w, i) => {
+                                        const app = APPS.find(a => a.id === w.id);
+                                        const selected = i === selectedIdx;
+                                        return (
+                                            <button
+                                                key={w.id}
+                                                type="button"
+                                                onClick={(e) => { e.stopPropagation(); focusApp(w.id); setWindows(prev => prev.map(win => win.id === w.id ? { ...win, isMinimized: false } : win)); setAltTabOpen(false); }}
+                                                className={`flex flex-col items-center p-4 rounded-xl border min-w-[100px] transition-colors ${selected ? 'bg-white/25 border-emerald-400/60 ring-2 ring-emerald-400/40' : 'bg-white/10 border-white/20 hover:bg-white/20'}`}
+                                            >
+                                                {app?.desktopIcon}
+                                                <span className="text-xs text-white mt-2">{app?.title}</span>
+                                            </button>
+                                        );
+                                    });
+                                })()}
                             </div>
                         </motion.div>
                     )}

@@ -15,6 +15,7 @@ import leetcodeRouter from './routes/leetcode.js'
 import aiRouter from './routes/ai.js'
 import appsRouter from './routes/apps.js'
 import clientErrorsRouter from './routes/clientErrors.js'
+import ogRouter from './routes/og.js'
 import { buildRssFeed } from './routes/blog.js'
 
 export async function createApp() {
@@ -57,6 +58,7 @@ export async function createApp() {
   app.use('/api/ai', aiRouter)
   app.use('/api/apps', appsRouter)
   app.use('/api/client-errors', clientErrorsRouter)
+  app.use('/api/og', ogRouter)
 
   return app
 }

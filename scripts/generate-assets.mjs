@@ -7,7 +7,7 @@
  * Run: node scripts/generate-assets.mjs
  */
 import sharp from 'sharp';
-import { mkdir } from 'node:fs/promises';
+import { mkdir, copyFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -15,6 +15,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const imagesDir = path.join(root, 'src', 'Images');
 const publicDir = path.join(root, 'public');
 const iconsDir = path.join(publicDir, 'icons');
+const serverAssetsDir = path.join(root, 'server', 'assets');
 
 const WEBP_SOURCES = [
   { file: 'Parjad.jpg', maxWidth: 800 },
@@ -105,7 +106,16 @@ async function generateOgImage() {
   console.log('og    og-image.jpg (1200x630)');
 }
 
+async function copyOgFont() {
+  await mkdir(serverAssetsDir, { recursive: true });
+  const src = path.join(root, 'node_modules', '@fontsource', 'outfit', 'files', 'outfit-latin-600-normal.woff');
+  const dest = path.join(serverAssetsDir, 'outfit-latin-600.woff');
+  await copyFile(src, dest);
+  console.log('font  outfit-latin-600.woff -> server/assets/');
+}
+
 await generateWebp();
 await generateIcons();
 await generateOgImage();
+await copyOgFont();
 console.log('Done.');

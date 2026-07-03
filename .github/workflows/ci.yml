@@ -26,6 +26,9 @@ jobs:
       - name: Check i18n keys
         run: npm run test:i18n
 
+      - name: Unit tests
+        run: npm run test:unit
+
       - name: Build
         run: npm run build
 

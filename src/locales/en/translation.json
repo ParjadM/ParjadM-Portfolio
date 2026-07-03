@@ -107,6 +107,8 @@
     "error": "Failed to load posts",
     "blogLabel": "Blog",
     "articlesLabel": "Articles",
+    "minRead": "{{count}} min read",
+    "related": "Related posts",
     "notFound": "Post not found",
     "backToBlog": "← Back to Blog"
   },

@@ -13,6 +13,7 @@ import { LocalizedLink } from '../ui/LocalizedLink.jsx';
 import { MOBILE_MENU_OPEN } from '../../utils/mobileMenuEvents.js';
 import { stripLocalePrefix } from '../../utils/i18nRouting.js';
 import { useSwipeDown } from '../../utils/useSwipeDown.js';
+import { useFocusTrap } from '../../utils/useFocusTrap.js';
 
 export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isMobileMenuOpen, setIsMobileMenuOpen, onLanguageChange }) => {
     const { t } = useTranslation();
@@ -77,6 +78,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
     };
 
     const menuSwipeHandlers = useSwipeDown(() => setIsMobileMenuOpen?.(false));
+    const menuTrapRef = useFocusTrap(isMobileMenuOpen, () => setIsMobileMenuOpen?.(false));
 
     const isActive = (path) => stripLocalePrefix(location.pathname) === path;
 
@@ -325,6 +327,10 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                 {/* Full-Screen Mobile Menu Overlay */}
                 {isMobileMenuOpen && typeof document !== 'undefined' && createPortal(
                     <div
+                        ref={menuTrapRef}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Site menu"
                         className="fixed inset-0 z-[99999] bg-gray-900/90 backdrop-blur-3xl flex flex-col items-center justify-center p-6 transition-all duration-300 overflow-y-auto"
                         {...menuSwipeHandlers}
                     >

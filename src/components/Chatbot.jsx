@@ -10,6 +10,7 @@ import {
 import { sendChatStream, consumeAiChatStream } from '../utils/aiStream.js';
 import { useTranslation } from 'react-i18next';
 import { useSwipeDown } from '../utils/useSwipeDown.js';
+import { useFocusTrap } from '../utils/useFocusTrap.js';
 
 
 // ... (icons remain the same) ...
@@ -291,6 +292,7 @@ const Chatbot = ({ theme = 'green' }) => {
   handleSendRef.current = handleSend;
 
   const chatSwipeHandlers = useSwipeDown(() => setIsOpen(false));
+  const chatTrapRef = useFocusTrap(isOpen, () => setIsOpen(false));
 
   const gradientClass = theme !== 'pink' 
     ? 'bg-gradient-to-r from-emerald-500 to-teal-500' 
@@ -300,7 +302,12 @@ const Chatbot = ({ theme = 'green' }) => {
     <div className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 z-[9999] pointer-events-none">
       {/* Chat Window */}
       {isOpen && (
-        <div className="absolute inset-0 sm:inset-auto sm:bottom-0 sm:right-0 sm:mb-0 w-full h-full sm:w-96 sm:h-[32rem] bg-gray-900/95 backdrop-blur-xl sm:border border-white/10 sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 transform origin-bottom-right pointer-events-auto">
+        <div
+          ref={chatTrapRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={t('chatbot.title')}
+          className="absolute inset-0 sm:inset-auto sm:bottom-0 sm:right-0 sm:mb-0 w-full h-full sm:w-96 sm:h-[32rem] bg-gray-900/95 backdrop-blur-xl sm:border border-white/10 sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 transform origin-bottom-right pointer-events-auto">
           {/* Header (swipe down to close on touch) */}
           <div className={`p-4 pt-safe-or-4 flex items-center justify-between ${gradientClass}`} {...chatSwipeHandlers}>
             <div className="flex items-center gap-2 text-white">

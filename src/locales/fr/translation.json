@@ -107,6 +107,8 @@
     "error": "Échec du chargement des articles",
     "blogLabel": "Blog",
     "articlesLabel": "Articles",
+    "minRead": "{{count}} min de lecture",
+    "related": "Articles similaires",
     "notFound": "Article introuvable",
     "backToBlog": "← Retour au Blog"
   },

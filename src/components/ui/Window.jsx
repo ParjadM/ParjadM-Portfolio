@@ -32,6 +32,29 @@ export const Window = ({
     });
     const windowRef = useRef(null);
     const dragControls = useDragControls();
+    // Position set by edge snapping (drag to left/right edge = half screen, top = maximize)
+    const [snapPos, setSnapPos] = useState(null);
+
+    const handleDragStart = () => setSnapPos(null);
+
+    const handleDragEnd = (e, info) => {
+        const px = info.point.x;
+        const py = info.point.y;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        if (py <= 8) {
+            setIsMaximized(true);
+            return;
+        }
+        const half = { width: Math.floor(vw / 2), height: vh - 48 };
+        if (px <= 12) {
+            setSize(half);
+            setSnapPos({ x: 0, y: 0 });
+        } else if (px >= vw - 12) {
+            setSize(half);
+            setSnapPos({ x: vw - half.width, y: 0 });
+        }
+    };
 
     const handleResize = (e, direction) => {
         e.stopPropagation();
@@ -71,7 +94,10 @@ export const Window = ({
     if (!isOpen) return null;
 
     const toggleMaximize = () => {
-        setIsMaximized(!isMaximized);
+        setIsMaximized((prev) => {
+            if (prev) setSnapPos(null);
+            return !prev;
+        });
     };
 
     return (
@@ -84,12 +110,14 @@ export const Window = ({
                     dragControls={dragControls}
                     dragMomentum={false}
                     dragConstraints={{ left: 0, top: 0, right: window.innerWidth - 100, bottom: window.innerHeight - 100 }}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
                     initial={{ opacity: 0, scale: 0.95, ...defaultPosition }}
                     animate={{ 
                         opacity: isFocused ? 1 : 0.88, 
                         scale: 1,
-                        x: isMaximized ? 0 : undefined,
-                        y: isMaximized ? 0 : undefined,
+                        x: isMaximized ? 0 : (snapPos ? snapPos.x : undefined),
+                        y: isMaximized ? 0 : (snapPos ? snapPos.y : undefined),
                         width: isMaximized ? '100vw' : size.width,
                         height: isMaximized ? 'calc(100vh - 48px)' : size.height, // 48px for taskbar
                         zIndex: zIndex
