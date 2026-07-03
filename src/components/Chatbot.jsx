@@ -9,6 +9,7 @@ import {
 } from '../utils/chatbotEvents.js';
 import { sendChatStream, consumeAiChatStream } from '../utils/aiStream.js';
 import { useTranslation } from 'react-i18next';
+import { useSwipeDown } from '../utils/useSwipeDown.js';
 
 
 // ... (icons remain the same) ...
@@ -289,6 +290,8 @@ const Chatbot = ({ theme = 'green' }) => {
 
   handleSendRef.current = handleSend;
 
+  const chatSwipeHandlers = useSwipeDown(() => setIsOpen(false));
+
   const gradientClass = theme !== 'pink' 
     ? 'bg-gradient-to-r from-emerald-500 to-teal-500' 
     : 'bg-gradient-to-r from-pink-500 to-red-500';
@@ -298,8 +301,8 @@ const Chatbot = ({ theme = 'green' }) => {
       {/* Chat Window */}
       {isOpen && (
         <div className="absolute inset-0 sm:inset-auto sm:bottom-0 sm:right-0 sm:mb-0 w-full h-full sm:w-96 sm:h-[32rem] bg-gray-900/95 backdrop-blur-xl sm:border border-white/10 sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 transform origin-bottom-right pointer-events-auto">
-          {/* Header */}
-          <div className={`p-4 pt-safe-or-4 flex items-center justify-between ${gradientClass}`}>
+          {/* Header (swipe down to close on touch) */}
+          <div className={`p-4 pt-safe-or-4 flex items-center justify-between ${gradientClass}`} {...chatSwipeHandlers}>
             <div className="flex items-center gap-2 text-white">
               <BotIcon className="w-5 h-5" />
               <span className="font-semibold">{t('chatbot.title')}</span>

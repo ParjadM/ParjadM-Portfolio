@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { openMobileMenu } from '../../utils/mobileMenuEvents.js';
 import { LocalizedLink } from '../ui/LocalizedLink.jsx';
 import { stripLocalePrefix } from '../../utils/i18nRouting.js';
+import { haptic } from '../../utils/haptics.js';
 
 export const BottomNav = ({ theme }) => {
     const { t } = useTranslation();
@@ -40,7 +41,7 @@ export const BottomNav = ({ theme }) => {
                             <button
                                 key="menu"
                                 type="button"
-                                onClick={openMobileMenu}
+                                onClick={() => { haptic(); openMobileMenu(); }}
                                 className="flex flex-col items-center justify-center flex-1 h-full min-h-[44px] text-gray-400 hover:text-white transition-colors"
                                 aria-label={t('nav.Menu')}
                             >
@@ -54,6 +55,7 @@ export const BottomNav = ({ theme }) => {
                         <LocalizedLink
                             key={item.path}
                             to={item.path}
+                            onClick={() => haptic()}
                             className={`flex flex-col items-center justify-center flex-1 h-full min-h-[44px] transition-colors ${active ? activeColor : 'text-gray-400 hover:text-white'}`}
                         >
                             <item.icon className={`w-6 h-6 mb-0.5 ${active ? 'fill-current' : ''}`} />

@@ -12,6 +12,9 @@ import { ProjectCardSkeleton } from '../components/ui/Skeleton.jsx';
 import CodeQuestImage from '../Images/CodeQuest.webp';
 import BinaryGeneratorImage from '../Images/Binary 1010 Generator.webp';
 import SpaceShooterImage from '../Images/SpaceShooter.webp';
+import CodeQuestImageSm from '../Images/CodeQuest-sm.webp';
+import BinaryGeneratorImageSm from '../Images/Binary 1010 Generator-sm.webp';
+import SpaceShooterImageSm from '../Images/SpaceShooter-sm.webp';
 
 export const ProjectsSection = ({ theme }) => {
     const { t } = useTranslation();
@@ -24,6 +27,12 @@ export const ProjectsSection = ({ theme }) => {
         'CodeQuest': CodeQuestImage,
         'Binary 1010 Generator': BinaryGeneratorImage,
         'SpaceShooter': SpaceShooterImage,
+    };
+    // Phone-sized variants served via srcset so mobile doesn't download 1280px images
+    const imageMapSm = {
+        'CodeQuest': CodeQuestImageSm,
+        'Binary 1010 Generator': BinaryGeneratorImageSm,
+        'SpaceShooter': SpaceShooterImageSm,
     };
 
     const tagClasses = theme === 'pink'
@@ -50,6 +59,12 @@ export const ProjectsSection = ({ theme }) => {
                         <div className="w-full h-48 bg-gradient-to-br from-white/5 to-white/10 flex items-center justify-center overflow-hidden">
                             <img 
                                 src={project.image || imageMap[project.title] || `https://placehold.co/600x400/${theme === 'pink' ? 'E94560' : '10B981'}/FFFFFF?text=${encodeURIComponent(project.title)}`}
+                                srcSet={!project.image && imageMapSm[project.title]
+                                    ? `${imageMapSm[project.title]} 640w, ${imageMap[project.title]} 1280w`
+                                    : undefined}
+                                sizes={!project.image && imageMapSm[project.title]
+                                    ? '(max-width: 768px) 100vw, 33vw'
+                                    : undefined}
                                 alt={project.title}
                                 loading="lazy"
                                 decoding="async"

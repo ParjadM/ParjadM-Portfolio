@@ -12,6 +12,7 @@ import { LanguageSwitcher } from '../ui/LanguageSwitcher.jsx';
 import { LocalizedLink } from '../ui/LocalizedLink.jsx';
 import { MOBILE_MENU_OPEN } from '../../utils/mobileMenuEvents.js';
 import { stripLocalePrefix } from '../../utils/i18nRouting.js';
+import { useSwipeDown } from '../../utils/useSwipeDown.js';
 
 export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isMobileMenuOpen, setIsMobileMenuOpen, onLanguageChange }) => {
     const { t } = useTranslation();
@@ -74,6 +75,8 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
     const handleNavClick = () => {
         if(setIsMobileMenuOpen) setIsMobileMenuOpen(false);
     };
+
+    const menuSwipeHandlers = useSwipeDown(() => setIsMobileMenuOpen?.(false));
 
     const isActive = (path) => stripLocalePrefix(location.pathname) === path;
 
@@ -321,7 +324,10 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
 
                 {/* Full-Screen Mobile Menu Overlay */}
                 {isMobileMenuOpen && typeof document !== 'undefined' && createPortal(
-                    <div className="fixed inset-0 z-[99999] bg-gray-900/90 backdrop-blur-3xl flex flex-col items-center justify-center p-6 transition-all duration-300">
+                    <div
+                        className="fixed inset-0 z-[99999] bg-gray-900/90 backdrop-blur-3xl flex flex-col items-center justify-center p-6 transition-all duration-300 overflow-y-auto"
+                        {...menuSwipeHandlers}
+                    >
                         <button 
                             onClick={() => setIsMobileMenuOpen(false)}
                             className="absolute top-6 right-6 p-4 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all"

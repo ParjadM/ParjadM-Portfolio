@@ -18,9 +18,10 @@ export const Window = ({
     defaultSize = { width: 600, height: 400 },
     defaultPosition = { x: 50, y: 50 }
 }) => {
-    const [isMaximized, setIsMaximized] = useState(() => window.innerWidth < 768);
+    // Small screens (including landscape phones with limited height) get full-screen windows
+    const [isMaximized, setIsMaximized] = useState(() => window.innerWidth < 768 || window.innerHeight < 500);
     const [size, setSize] = useState(() => {
-        const isMobile = window.innerWidth < 768;
+        const isMobile = window.innerWidth < 768 || window.innerHeight < 500;
         if (isMobile) {
             return { width: window.innerWidth, height: window.innerHeight - 48 };
         }
@@ -116,19 +117,22 @@ export const Window = ({
                         <div className="flex items-center space-x-1.5" onPointerDown={(e) => e.stopPropagation()}>
                             <button 
                                 onClick={(e) => { e.stopPropagation(); onMinimize(id); }}
-                                className="w-7 h-7 flex items-center justify-center rounded hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                                className="w-9 h-9 md:w-7 md:h-7 flex items-center justify-center rounded hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                                aria-label="Minimize"
                             >
-                                <Minus className="w-3.5 h-3.5" />
+                                <Minus className="w-4 h-4 md:w-3.5 md:h-3.5" />
                             </button>
                             <button 
                                 onClick={(e) => { e.stopPropagation(); toggleMaximize(); }}
-                                className="w-7 h-7 flex items-center justify-center rounded hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                                className="w-9 h-9 md:w-7 md:h-7 flex items-center justify-center rounded hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                                aria-label={isMaximized ? 'Restore' : 'Maximize'}
                             >
-                                {isMaximized ? <Maximize2 className="w-3.5 h-3.5" /> : <Square className="w-3.5 h-3.5" />}
+                                {isMaximized ? <Maximize2 className="w-4 h-4 md:w-3.5 md:h-3.5" /> : <Square className="w-4 h-4 md:w-3.5 md:h-3.5" />}
                             </button>
                             <button 
                                 onClick={(e) => { e.stopPropagation(); onClose(id); }}
-                                className="w-7 h-7 flex items-center justify-center rounded hover:bg-red-500 text-gray-400 hover:text-white transition-colors"
+                                className="w-9 h-9 md:w-7 md:h-7 flex items-center justify-center rounded hover:bg-red-500 text-gray-400 hover:text-white transition-colors"
+                                aria-label="Close"
                             >
                                 <X className="w-4 h-4" />
                             </button>

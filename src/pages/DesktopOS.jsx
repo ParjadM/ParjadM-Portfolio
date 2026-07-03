@@ -12,6 +12,7 @@ import { loadFileSystem, saveFileSystem } from '../os/filesystem.js';
 import { onLaunchApp, onOpenFile, consumePendingLaunch } from '../os/events.js';
 import { unlockAchievement } from '../os/achievements.js';
 import { pushRecentApp, getRecentApps } from '../os/session.js';
+import { haptic } from '../utils/haptics.js';
 
 const Notepad = React.lazy(() => import('../components/os/Notepad.jsx').then(module => ({ default: module.Notepad })));
 const BrowserApp = React.lazy(() => import('../components/os/BrowserApp.jsx').then(module => ({ default: module.BrowserApp })));
@@ -114,6 +115,13 @@ export const DesktopOS = ({ theme }) => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    // Prevent accidental pull-to-refresh from killing the OS session on mobile
+    useEffect(() => {
+        const prev = document.documentElement.style.overscrollBehaviorY;
+        document.documentElement.style.overscrollBehaviorY = 'contain';
+        return () => { document.documentElement.style.overscrollBehaviorY = prev; };
+    }, []);
     
     // Global OS State
     const [photos, setPhotos] = useState([]);
@@ -178,23 +186,32 @@ export const DesktopOS = ({ theme }) => {
 
     const openApp = useCallback((appId) => {
         const app = APPS.find(a => a.id === appId);
+        haptic();
         if (app?.type === 'link') {
             window.open(app.url, '_blank');
             return;
         }
 
+        // On phones, act like a mobile OS: one app in the foreground at a time.
+        const minimizeOthers = (w) => (isMobile && w.id !== appId ? { ...w, isMinimized: true } : w);
+
         const existing = windows.find(w => w.id === appId);
         if (existing) {
-            setWindows(prev => prev.map(w => w.id === appId ? { ...w, isMinimized: false, zIndex: topZIndex + 1 } : w));
+            setWindows(prev => prev.map(w => w.id === appId
+                ? { ...w, isMinimized: false, zIndex: topZIndex + 1 }
+                : minimizeOthers(w)));
             setTopZIndex(z => z + 1);
         } else {
-            setWindows(prev => [...prev, { id: appId, isOpen: true, isMinimized: false, zIndex: topZIndex + 1 }]);
+            setWindows(prev => [
+                ...prev.map(minimizeOthers),
+                { id: appId, isOpen: true, isMinimized: false, zIndex: topZIndex + 1 },
+            ]);
             setTopZIndex(z => z + 1);
         }
         pushRecentApp(appId);
         setRecentApps(getRecentApps());
         unlockAchievement('used_gui');
-    }, [windows, topZIndex]);
+    }, [windows, topZIndex, isMobile]);
 
     useEffect(() => {
         if (!isOsBooted) return;
@@ -599,8 +616,8 @@ export const DesktopOS = ({ theme }) => {
                     {/* Start Button & Centered Apps */}
                     <div className="flex-1 flex items-center justify-start sm:justify-center space-x-2 overflow-x-auto overflow-y-hidden scrollbar-hide pr-2">
                         <button 
-                            onClick={(e) => { e.stopPropagation(); setIsStartMenuOpen(!isStartMenuOpen); closeContextMenu(); }}
-                            className={`w-10 h-10 flex items-center justify-center rounded transition-all group ${isStartMenuOpen ? 'bg-white/20 shadow-inner' : 'hover:bg-white/10'}`}
+                            onClick={(e) => { e.stopPropagation(); haptic(); setIsStartMenuOpen(!isStartMenuOpen); closeContextMenu(); }}
+                            className={`w-12 h-12 md:w-10 md:h-10 flex items-center justify-center rounded transition-all group ${isStartMenuOpen ? 'bg-white/20 shadow-inner' : 'hover:bg-white/10'}`}
                             title="Start"
                         >
                             <LayoutGrid className={`w-5 h-5 text-blue-400 transition-transform group-hover:scale-110`} />
@@ -617,10 +634,11 @@ export const DesktopOS = ({ theme }) => {
                             return (
                                 <button
                                     key={app.id}
-                                    onClick={(e) => { e.stopPropagation(); toggleAppFromTaskbar(app.id); }}
-                                    className={`relative w-10 h-10 flex items-center justify-center rounded transition-all duration-200 
+                                    onClick={(e) => { e.stopPropagation(); haptic(); toggleAppFromTaskbar(app.id); }}
+                                    className={`relative w-12 h-12 md:w-10 md:h-10 flex items-center justify-center rounded transition-all duration-200 
                                         ${isFocused ? 'bg-white/15 shadow-inner' : 'hover:bg-white/10'}
                                     `}
+                                    title={app.title}
                                 >
                                     {app.icon}
                                     {isOpen && (

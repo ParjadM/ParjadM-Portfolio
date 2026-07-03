@@ -8,7 +8,8 @@
 import { spawn } from 'node:child_process';
 import { chromium } from 'playwright';
 
-const PORT = 4173;
+// Random port so an orphaned server from a previous run can't interfere
+const PORT = 4200 + Math.floor(Math.random() * 500);
 const BASE = `http://localhost:${PORT}`;
 const ROUTES = ['/', '/fr', '/projects', '/fr/projects'];
 
@@ -64,8 +65,13 @@ try {
 } finally {
   preview.kill();
   if (process.platform === 'win32' && preview.pid) {
-    // `shell: true` on Windows wraps the command; kill the whole tree.
-    spawn('taskkill', ['/pid', String(preview.pid), '/T', '/F'], { stdio: 'ignore' });
+    // `shell: true` on Windows wraps the command; kill the whole tree and
+    // wait for taskkill to finish so no orphan server stays on the port.
+    await new Promise((resolve) => {
+      const killer = spawn('taskkill', ['/pid', String(preview.pid), '/T', '/F'], { stdio: 'ignore' });
+      killer.on('exit', resolve);
+      killer.on('error', resolve);
+    });
   }
 }
 

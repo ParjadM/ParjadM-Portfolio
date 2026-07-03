@@ -25,6 +25,9 @@ const WEBP_SOURCES = [
   { file: 'SpaceShooter.jpg', maxWidth: 1280 },
 ];
 
+// Project card images also get a 640px variant for phone-sized srcsets.
+const SM_VARIANTS = ['CodeQuest.jpg', 'Binary 1010 Generator.jpg', 'SpaceShooter.jpg'];
+
 async function generateWebp() {
   for (const { file, maxWidth } of WEBP_SOURCES) {
     const src = path.join(imagesDir, file);
@@ -34,6 +37,15 @@ async function generateWebp() {
       .webp({ quality: 82 })
       .toFile(out);
     console.log(`webp  ${file} -> ${path.basename(out)} (${Math.round(info.size / 1024)} kB)`);
+
+    if (SM_VARIANTS.includes(file)) {
+      const outSm = src.replace(/\.(jpe?g|png)$/i, '-sm.webp');
+      const infoSm = await sharp(src)
+        .resize({ width: 640, withoutEnlargement: true })
+        .webp({ quality: 80 })
+        .toFile(outSm);
+      console.log(`webp  ${file} -> ${path.basename(outSm)} (${Math.round(infoSm.size / 1024)} kB)`);
+    }
   }
 }
 

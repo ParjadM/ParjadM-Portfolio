@@ -9,6 +9,8 @@ import { buildAppRouteElements } from './AppRoutes.jsx';
 import { LocaleSync } from '../LocaleSync.jsx';
 import Chatbot from '../Chatbot.jsx';
 import { Toast } from '../ui/Toast.jsx';
+import { OfflineBanner } from '../OfflineBanner.jsx';
+import { PwaInstallPrompt } from '../PwaInstallPrompt.jsx';
 
 import { getThemeConfig } from '../../utils/themeConfig.js';
 import { useReducedMotion } from '../../utils/useReducedMotion.js';
@@ -149,6 +151,9 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
             {/* AI Chatbot */}
             {!isFullscreenRoute && <Chatbot theme={themeConfig.accentPrefix} />}
             
+            <OfflineBanner />
+            <PwaInstallPrompt theme={themeConfig.accentPrefix} />
+
             {/* Toast Notifications */}
             <Toast 
                 isVisible={toast.isVisible} 
