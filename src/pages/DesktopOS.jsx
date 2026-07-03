@@ -121,16 +121,26 @@ export const DesktopOS = ({ theme }) => {
     const [fileSystem, setFileSystem] = useState(loadFileSystem);
 
     const [desktopIcons, setDesktopIcons] = useState(() => {
-        const saved = localStorage.getItem('os_desktop_icons');
-        if (saved) {
-            try { return JSON.parse(saved); } catch (e) {}
-        }
-        return [
+        const defaults = [
             { id: 'browser', x: 20, y: 20 },
             { id: 'filesystem', x: 20, y: 120 },
             { id: 'terminal', x: 20, y: 220 },
-            { id: 'settings', x: 20, y: 320 }
+            { id: 'settings', x: 20, y: 320 },
+            { id: 'appstore', x: 20, y: 420 }
         ];
+        const saved = localStorage.getItem('os_desktop_icons');
+        if (saved) {
+            try {
+                const icons = JSON.parse(saved);
+                // Surface newly added default icons for visitors with a saved layout.
+                if (Array.isArray(icons) && !icons.some(i => i.id === 'appstore')) {
+                    const maxY = icons.reduce((m, i) => Math.max(m, i.y || 0), 0);
+                    icons.push({ id: 'appstore', x: 20, y: Math.min(maxY + 100, window.innerHeight - 160) });
+                }
+                return icons;
+            } catch (e) {}
+        }
+        return defaults;
     });
 
     useEffect(() => { localStorage.setItem('os_wallpaper', wallpaper); }, [wallpaper]);
