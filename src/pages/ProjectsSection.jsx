@@ -13,6 +13,7 @@ import { PageTransition } from '../components/ui/PageTransition.jsx';
 import { SEO } from '../components/SEO.jsx';
 import { useFetchWithCache } from '../utils/useFetchWithCache.js';
 import { ProjectAskAi } from '../components/ProjectAskAi.jsx';
+import { ProjectCardSkeleton } from '../components/ui/Skeleton.jsx';
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 import ParjadImage from '../Images/Parjad.webp';
 import GitHubStats from '../components/GitHubStats.tsx';
@@ -50,9 +51,9 @@ export const ProjectsSection = ({ theme }) => {
             <h2 className="text-4xl font-bold text-white mb-12 text-center">{t('projects.title')}</h2>
             </Reveal>
             {error && <div className="text-red-300 mb-4">{error}</div>}
-            {loading && <div className="text-gray-300">{t('projects.loading')}</div>}
             <div className="container mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {loading && Array.from({ length: 6 }, (_, i) => <ProjectCardSkeleton key={`skeleton-${i}`} />)}
                 {projects.map((project) => (
                     <Reveal key={project.id || project.title}>
                     <GlassCard className="p-0 flex flex-col overflow-hidden">

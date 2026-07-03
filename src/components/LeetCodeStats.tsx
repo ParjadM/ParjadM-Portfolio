@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { StatsPanelSkeleton } from './ui/Skeleton.jsx'
 
 type LcStats = {
   username: string
@@ -40,7 +41,7 @@ export default function LeetCodeStats({ theme = 'green' as 'green' | 'pink' }) {
     load()
   }, [])
 
-  if (loading) return <div className="text-gray-300">Loading...</div>
+  if (loading) return <StatsPanelSkeleton />
   if (error || !data) return <div className="text-amber-300/90 text-sm">LeetCode stats temporarily unavailable. {error ? `(${error})` : ''}</div>
 
   const ring = theme === 'pink' ? 'ring-pink-400/40' : 'ring-emerald-400/40'

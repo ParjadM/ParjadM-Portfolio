@@ -9,6 +9,7 @@ import remarkGfm from 'remark-gfm';
 import { Reveal } from '../components/Reveal.jsx';
 import { MarkdownContent } from '../components/ui/MarkdownContent.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
+import { ArticleSkeleton } from '../components/ui/Skeleton.jsx';
 import { useTranslation } from 'react-i18next';
 import { setActivePageContext, clearActivePageContext, buildBlogPageContext } from '../utils/chatbotEvents.js';
 import { BlogAiExplain } from '../components/BlogAiExplain.jsx';
@@ -81,8 +82,8 @@ export const BlogPostPage = ({ theme }) => {
 
     if (loading) {
         return (
-            <section className="min-h-screen flex items-center justify-center py-20 px-4">
-                <div className="text-gray-300">{t('blog.loading')}</div>
+            <section className="min-h-screen py-32 px-4">
+                <ArticleSkeleton />
             </section>
         );
     }

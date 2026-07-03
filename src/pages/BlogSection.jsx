@@ -9,6 +9,7 @@ import remarkGfm from 'remark-gfm';
 import { Reveal } from '../components/Reveal.jsx';
 import { getAuthToken } from '../utils/auth.jsx';
 import { useTranslation } from 'react-i18next';
+import { BlogCardSkeleton } from '../components/ui/Skeleton.jsx';
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 import ParjadImage from '../Images/Parjad.webp';
 import GitHubStats from '../components/GitHubStats.tsx';
@@ -141,9 +142,9 @@ export const BlogSection = ({ theme }) => {
                         {selectedCategory === 'all' ? t('blog.blogLabel') : `${categories[selectedCategory]} ${t('blog.articlesLabel')}`}
                     </h3>
                     </Reveal>
-                    {loading && <div className="text-center text-gray-300">{t('blog.loading')}</div>}
                     {error && <div className="text-center text-red-300">{error}</div>}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {loading && Array.from({ length: 6 }, (_, i) => <BlogCardSkeleton key={`skeleton-${i}`} />)}
                         {filteredPosts.map(post => (
                             <Reveal key={post.id}>
                             <Link to={`/blog/${post.id}`} className="block">
