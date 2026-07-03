@@ -166,7 +166,7 @@ router.post('/cloudinary-sign', async (req, res) => {
     if ((!apiKey || !apiSecret || !cloudName) && process.env.CLOUDINARY_URL) {
       try {
         const url = process.env.CLOUDINARY_URL.trim()
-        const match = url.match(/^cloudinary:\/\/([^:]+):([^@]+)@([^\/?#]+)$/i)
+        const match = url.match(/^cloudinary:\/\/([^:]+):([^@]+)@([^/?#]+)$/i)
         if (match) {
           apiKey = apiKey || match[1]
           apiSecret = apiSecret || match[2]
@@ -379,7 +379,6 @@ router.post('/projects/reorder', async (req, res) => {
     const ids = Array.isArray(req.body?.ids) ? req.body.ids : []
     let order = 1
     for (const id of ids) {
-      // eslint-disable-next-line no-await-in-loop
       await Project.updateOne({ _id: id }, { order })
       order += 1
     }

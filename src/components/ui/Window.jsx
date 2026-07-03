@@ -1,7 +1,6 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { Minus, Square, X, Maximize2 } from 'lucide-react';
-import { GlassCard } from './GlassCard.jsx';
 
 export const Window = ({ 
     id, 

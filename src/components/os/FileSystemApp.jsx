@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Folder, FileText, Image as ImageIcon, ChevronRight, ChevronLeft, Search, HardDrive, Terminal } from 'lucide-react';
+import { Folder, FileText, ChevronRight, ChevronLeft, Search, HardDrive, Terminal } from 'lucide-react';
 import { openFileInApp } from '../../os/events.js';
 
 export const FileSystemApp = ({ theme, osState }) => {

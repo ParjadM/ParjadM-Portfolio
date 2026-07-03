@@ -47,7 +47,6 @@ export async function initDatabase() {
     return { engine: currentEngine }
   } catch (err) {
     // Fallback to in-memory if connection fails
-    // eslint-disable-next-line no-console
     console.error('Mongo connection failed, using in-memory store:', err.message)
     db = new InMemoryStore()
     currentEngine = 'memory'

@@ -9,7 +9,7 @@ import { SEO } from '../components/SEO.jsx';
 import { OsBootScreen } from '../components/os/OsBootScreen.jsx';
 import { OsNotifications } from '../components/os/OsNotifications.jsx';
 import { loadFileSystem, saveFileSystem } from '../os/filesystem.js';
-import { onLaunchApp, onOpenFile, consumePendingLaunch, notify } from '../os/events.js';
+import { onLaunchApp, onOpenFile, consumePendingLaunch } from '../os/events.js';
 import { unlockAchievement } from '../os/achievements.js';
 import { pushRecentApp, getRecentApps } from '../os/session.js';
 
@@ -53,7 +53,6 @@ import {
     Camera,
     Bot,
     Video,
-    Bluetooth,
     ShieldCheck,
     FileText,
     Code,

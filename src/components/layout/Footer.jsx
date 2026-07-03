@@ -1,10 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation, Link, Routes, Route } from 'react-router-dom';
-import { Mail, Github, Linkedin, Code, BrainCircuit, Palette, Menu, Sun, Moon } from '../ui/Icons.jsx';
-import { GlassCard } from '../ui/GlassCard.jsx';
-import { RippleButton } from '../ui/RippleButton.jsx';
-import { Toast } from '../ui/Toast.jsx';
-import { getAuthToken } from '../../utils/auth.jsx';
+import React from 'react';
+import { Github, Linkedin } from '../ui/Icons.jsx';
 import { useTranslation } from 'react-i18next';
 import { LocalizedLink } from '../ui/LocalizedLink.jsx';
 

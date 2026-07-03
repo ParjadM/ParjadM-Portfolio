@@ -1,14 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation, Link, Routes, Route } from 'react-router-dom';
-import { Mail, Github, Linkedin, Code, BrainCircuit, Palette, Menu, Sun, Moon } from '../ui/Icons.jsx';
+import { useLocation } from 'react-router-dom';
+import { Palette, Menu } from '../ui/Icons.jsx';
 import { Monitor, Newspaper, Film, Terminal, MessageSquare, Activity, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GlassCard } from '../ui/GlassCard.jsx';
-import { RippleButton } from '../ui/RippleButton.jsx';
-import { Toast } from '../ui/Toast.jsx';
-import { getAuthToken } from '../../utils/auth.jsx';
 import Logo from '../../Images/Logo.webp';
-import { NewsFeed } from '../ui/NewsFeed.jsx';
 import { THEMES } from '../../utils/themeConfig.js';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
@@ -56,7 +52,6 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
     const [isMoreOpen, setIsMoreOpen] = useState(false);
     const [moreRect, setMoreRect] = useState(null);
     const moreDropdownRef = useRef(null);
-    const [blogPosts, setBlogPosts] = useState([]);
     const [visitors, setVisitors] = useState(() => {
         try {
             const cached = localStorage.getItem('cachedVisitors');
@@ -103,23 +98,6 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
           .catch(() => {
             // Keep cached value on network/server errors to avoid flashing/reset.
           });
-
-        return () => controller.abort();
-    }, []);
-
-    useEffect(() => {
-        const controller = new AbortController();
-        fetch('/api/blog', { signal: controller.signal })
-          .then(res => res.ok ? res.json() : null)
-          .then(d => {
-            const posts = Array.isArray(d?.posts) ? d.posts : [];
-            setBlogPosts(posts.filter(p => p.id && p.title).map(p => ({
-              id: p.id,
-              title: p.title,
-              publishAt: p.publishAt || p.updatedAt || p.date,
-            })));
-          })
-          .catch(() => {});
 
         return () => controller.abort();
     }, []);

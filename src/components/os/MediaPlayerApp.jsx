@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
-import { Play, Pause, SkipForward, SkipBack, Volume2, Music, Radio } from 'lucide-react';
+import React from 'react';
+import { Music, Radio } from 'lucide-react';
 
 export const MediaPlayerApp = ({ theme }) => {
-    const [isPlaying, setIsPlaying] = useState(false);
-
     // Using a regular 1-hour Lofi mix VOD instead of a live stream, because live streams often block external embedding.
     const VIDEO_ID = 'n61ULEU7CO0'; // Famous Lofi Mix VOD
     const I_FRAME_SRC = `https://www.youtube.com/embed/${VIDEO_ID}?autoplay=1&mute=0&controls=1&showinfo=0&rel=0&loop=1&playlist=${VIDEO_ID}`;

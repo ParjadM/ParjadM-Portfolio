@@ -14,7 +14,7 @@ export const SEO = ({
     url,
 }) => {
     const location = useLocation();
-    const { i18n, t } = useTranslation();
+    const { t } = useTranslation();
     const locale = getLocaleFromPath(location.pathname);
     const strippedPath = stripLocalePrefix(location.pathname);
     const pathname = strippedPath || '/';

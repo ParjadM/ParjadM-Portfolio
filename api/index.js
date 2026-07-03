@@ -13,7 +13,6 @@ export default async function handler(req, res) {
     return app(req, res)
   } catch (err) {
     // Surface the error as JSON instead of a generic crash page
-    // eslint-disable-next-line no-console
     console.error('API handler error:', err)
     res.statusCode = 500
     res.setHeader('Content-Type', 'application/json')

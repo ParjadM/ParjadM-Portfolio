@@ -1,28 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation, Link, Routes, Route, useParams } from 'react-router-dom';
-import { Mail, Github, Linkedin, Code, BrainCircuit, Palette, Menu, Sun, Moon } from '../components/ui/Icons.jsx';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { GlassCard } from '../components/ui/GlassCard.jsx';
-import { RippleButton } from '../components/ui/RippleButton.jsx';
-import { Toast } from '../components/ui/Toast.jsx';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import { Reveal } from '../components/Reveal.jsx';
 import { MarkdownContent } from '../components/ui/MarkdownContent.jsx';
-import { getAuthToken } from '../utils/auth.jsx';
 import { ArticleSkeleton } from '../components/ui/Skeleton.jsx';
 import { useTranslation } from 'react-i18next';
 import { setActivePageContext, clearActivePageContext, buildBlogPageContext } from '../utils/chatbotEvents.js';
 import { BlogAiExplain } from '../components/BlogAiExplain.jsx';
 
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
-import ParjadImage from '../Images/Parjad.webp';
-import GitHubStats from '../components/GitHubStats.tsx';
-import LeetCodeStats from '../components/LeetCodeStats.tsx';
-import ParjadM from '../Images/ParjadM.webp';
-import Logo from '../Images/Logo.webp';
-import CodeQuestImage from '../Images/CodeQuest.webp';
-import BinaryGeneratorImage from '../Images/Binary 1010 Generator.webp';
-import SpaceShooterImage from '../Images/SpaceShooter.webp';
 
 export const BlogPostPage = ({ theme }) => {
     const { t } = useTranslation();

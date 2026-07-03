@@ -140,7 +140,7 @@ export const MockInterviewPage = ({ theme }) => {
           </div>
           <h1 className="text-3xl font-bold text-white mb-4">AI Mock Interview</h1>
           <p className="text-gray-300 mb-8 leading-relaxed">
-            Welcome! I am an AI trained specifically on Parjad's resume and experiences. 
+            Welcome! I am an AI trained specifically on Parjad&apos;s resume and experiences. 
             Before we begin the interview, are you a recruiter or hiring manager?
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

@@ -17,10 +17,22 @@
   "plugins": [
     "react"
   ],
+  "ignorePatterns": ["dist", "dev-dist", "node_modules", "coverage", "App_old.jsx"],
   "rules": {
     "react/prop-types": "off",
-    "react/react-in-jsx-scope": "off"
+    "react/react-in-jsx-scope": "off",
+    "no-empty": ["error", { "allowEmptyCatch": true }],
+    "no-constant-condition": ["error", { "checkLoops": false }],
+    "no-unused-vars": ["error", { "args": "none", "caughtErrors": "none", "ignoreRestSiblings": true }]
   },
+  "overrides": [
+    {
+      "files": ["server/**/*.js", "api/**/*.js", "scripts/**/*.js", "scripts/**/*.mjs", "agent.js", "*.config.js", "vite.config.js"],
+      "env": {
+        "node": true
+      }
+    }
+  ],
   "settings": {
     "react": {
       "version": "detect"

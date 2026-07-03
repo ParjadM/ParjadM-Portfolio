@@ -1,21 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { GlassCard } from './ui/GlassCard.jsx';
-import { BrainCircuit, Code } from './ui/Icons.jsx';
+import { BrainCircuit } from './ui/Icons.jsx';
 import { useTranslation } from 'react-i18next';
-
-// Simple debounce hook
-function useDebounce(value, delay) {
-    const [debouncedValue, setDebouncedValue] = useState(value);
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedValue(value);
-        }, delay);
-        return () => {
-            clearTimeout(handler);
-        };
-    }, [value, delay]);
-    return debouncedValue;
-}
 
 export const ComplexityAnalyzer = ({ theme = 'emerald' }) => {
     const { t } = useTranslation();

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 
 export const GlassCard = ({ children, className = '', theme = 'green', onMouseEnter, onMouseLeave, onClick }) => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -20,8 +19,8 @@ export const GlassCard = ({ children, className = '', theme = 'green', onMouseEn
     <div 
       className={`relative bg-white/[0.04] backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] transition-all duration-500 hover:border-white/20 hover:bg-white/[0.08] hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] group overflow-hidden ${className}`}
       onMouseMove={handleMouseMove}
-      onMouseEnter={(e) => { setIsHovered(true); onMouseEnter && onMouseEnter(e); }}
-      onMouseLeave={(e) => { setIsHovered(false); onMouseLeave && onMouseLeave(e); }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       onClick={onClick}
     >
       {/* Interactive Radial Gradient */}

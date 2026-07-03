@@ -1,14 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation, Link, Routes, Route } from 'react-router-dom';
-import { Mail, Github, Linkedin, Code, BrainCircuit, Palette, Menu, Sun, Moon } from './Icons.jsx';
+import React, { useState } from 'react';
+import { Github, Linkedin } from './Icons.jsx';
 import { GlassCard } from './GlassCard.jsx';
-import { RippleButton } from './RippleButton.jsx';
-import { Toast } from './Toast.jsx';
-import { getAuthToken } from '../../utils/auth.jsx';
+import { Reveal } from '../Reveal.jsx';
 
 export const Chart = ({ theme, data }) => {
   const width = 640, height = 220, padding = 32
-  const xs = data.map((_, i) => i)
   const maxY = Math.max(1, ...data.map(d => Math.max(d.pageviews || 0, d.uniqueVisitors || 0)))
   const x = (i) => padding + (i * (width - 2*padding)) / Math.max(1, (data.length - 1))
   const y = (v) => height - padding - (v * (height - 2*padding)) / maxY
@@ -113,9 +109,9 @@ export const ContactSection = ({ theme }) => {
                 {/* Header */}
                 <Reveal>
                 <div className="text-center mb-16">
-                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Let's Connect</h2>
+                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Let&apos;s Connect</h2>
                     <p className="text-gray-300 max-w-2xl mx-auto text-lg">
-                        I'm currently seeking new opportunities and am open to collaboration. 
+                        I&apos;m currently seeking new opportunities and am open to collaboration. 
                         Whether you have a question or just want to say hi, feel free to reach out.
                     </p>
                 </div>
@@ -216,7 +212,7 @@ export const ContactSection = ({ theme }) => {
                             
                             {submitStatus === 'success' && (
                                 <div className="p-4 bg-green-500/20 border border-green-500/30 rounded-lg text-green-300 text-center">
-                                    ✅ Message sent successfully! I'll get back to you soon.
+                                    ✅ Message sent successfully! I&apos;ll get back to you soon.
                                 </div>
                             )}
                             {submitStatus === 'error' && (

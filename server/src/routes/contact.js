@@ -87,7 +87,6 @@ router.post('/', async (req, res) => {
     await transporter.sendMail(mailOptions)
     return res.json({ ok: true })
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.error('Contact mail error:', err)
     return res.status(500).json({ error: 'Failed to send message' })
   }

@@ -158,7 +158,6 @@ export async function askGemini(options) {
   const {
     feature,
     pageContext,
-    responseFormat = 'text',
     maxOutputTokensOverride,
     skipCache,
     cacheTtl,

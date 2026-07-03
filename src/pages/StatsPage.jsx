@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation, Link, Routes, Route, useParams } from 'react-router-dom';
-import { Mail, Github, Linkedin, Code, BrainCircuit, Palette, Menu, Sun, Moon } from '../components/ui/Icons.jsx';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useParams } from 'react-router-dom';
+import { Github, Code, BrainCircuit } from '../components/ui/Icons.jsx';
 import { GlassCard } from '../components/ui/GlassCard.jsx';
-import { RippleButton } from '../components/ui/RippleButton.jsx';
 import { Reveal } from '../components/Reveal.jsx';
 import { MarkdownContent } from '../components/ui/MarkdownContent.jsx';
 import GitHubStats from '../components/GitHubStats.tsx';
@@ -10,7 +9,6 @@ import LeetCodeStats from '../components/LeetCodeStats.tsx';
 import { ClickUpSection } from '../components/ClickUpSection.jsx';
 import { ComplexityAnalyzer } from '../components/ComplexityAnalyzer.jsx';
 import { CodeReviewAnalyzer } from '../components/CodeReviewAnalyzer.jsx';
-import { getAuthToken } from '../utils/auth.jsx';
 import { useTranslation } from 'react-i18next';
 import { PageTransition } from '../components/ui/PageTransition.jsx';
 import { SEO } from '../components/SEO.jsx';
@@ -86,7 +84,7 @@ export const StatsPage = ({ theme }) => {
 export const SkillsSection = ({ theme }) => {
     const { t } = useTranslation();
     const [selectedCategory, setSelectedCategory] = useState('all');
-    const [hoveredSkill, setHoveredSkill] = useState(null);
+    const [, setHoveredSkill] = useState(null);
 
     const skillCategories = {
         'all': t('skills.categories.all'),

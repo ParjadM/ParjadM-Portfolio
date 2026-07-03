@@ -3,7 +3,7 @@ import {
   formatPathStr, getNodeByPath, resolvePath, GUEST_PATH, saveFileSystem,
 } from './filesystem.js';
 import { resolveAppId, listAppsHelp, APP_META } from './apps.js';
-import { launchApp, notify, setPendingLaunch } from './events.js';
+import { notify, setPendingLaunch } from './events.js';
 import { unlockAchievement } from './achievements.js';
 import { pushCommandHistory, pushRecentApp } from './session.js';
 import { CLI_AI_HELP, getCliPageSummary, getCliStaticAnswer } from './aiStatic.js';
@@ -139,8 +139,8 @@ function openAppByName(name, ctx) {
 export async function executeCommand(rawCmd, ctx) {
   const {
     pushToHistory, currentPath, setCurrentPath, fileSystem, setFileSystem,
-    mode, navigate, openApp, emailState, setEmailState, aiState, setAiState,
-    fetchedProjects, setFetchedProjects,
+    mode, navigate, setEmailState, setAiState,
+    fetchedProjects,
   } = ctx;
 
   const cmdParts = rawCmd.split(' ').filter(Boolean);

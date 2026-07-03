@@ -1,26 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation, Link, Routes, Route, useParams } from 'react-router-dom';
-import { Mail, Github, Linkedin, Code, BrainCircuit, Palette, Menu, Sun, Moon } from '../components/ui/Icons.jsx';
+import React, { useState } from 'react';
+import { Github, Linkedin } from '../components/ui/Icons.jsx';
 import { GlassCard } from '../components/ui/GlassCard.jsx';
-import { RippleButton } from '../components/ui/RippleButton.jsx';
-import { Toast } from '../components/ui/Toast.jsx';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { Reveal } from '../components/Reveal.jsx';
-import { getAuthToken } from '../utils/auth.jsx';
 import { useTranslation } from 'react-i18next';
 import { PageTransition } from '../components/ui/PageTransition.jsx';
 import { SEO } from '../components/SEO.jsx';
 import { JobFitChecker } from '../components/JobFitChecker.jsx';
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 import ParjadImage from '../Images/Parjad.webp';
-import GitHubStats from '../components/GitHubStats.tsx';
-import LeetCodeStats from '../components/LeetCodeStats.tsx';
-import ParjadM from '../Images/ParjadM.webp';
-import Logo from '../Images/Logo.webp';
-import CodeQuestImage from '../Images/CodeQuest.webp';
-import BinaryGeneratorImage from '../Images/Binary 1010 Generator.webp';
-import SpaceShooterImage from '../Images/SpaceShooter.webp';
 
 export const AboutSection = ({ theme }) => {
     const { t } = useTranslation();
@@ -75,7 +62,7 @@ export const AboutSection = ({ theme }) => {
                     </div>
                     <div className="border-l-4 border-white/20 pl-6">
                         <h4 className="text-xl font-bold text-white mb-2">Psychology</h4>
-                        <p className="text-gray-400 mb-1">Bachelor's Degree</p>
+                        <p className="text-gray-400 mb-1">Bachelor&apos;s Degree</p>
                         <p className="text-gray-300">Focused on human behavior and cognition. This background provides a unique edge in User Experience (UX) design, understanding how users interact with technology and complex interfaces.</p>
                     </div>
                 </div>

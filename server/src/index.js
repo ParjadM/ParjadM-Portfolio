@@ -7,7 +7,6 @@ dotenv.config()
 const PORT = config.port
 const app = await createApp()
 app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
   console.log(`Server listening on http://localhost:${PORT}`)
 })
 
