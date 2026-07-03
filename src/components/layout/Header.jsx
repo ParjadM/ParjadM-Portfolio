@@ -23,7 +23,36 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
     const [paletteRect, setPaletteRect] = useState(null);
     const paletteTriggerRef = useRef(null);
     const mobilePaletteTriggerRef = useRef(null);
+    const activePaletteTriggerRef = useRef(null);
     const paletteDropdownRef = useRef(null);
+
+    const togglePalette = (triggerRef) => {
+        activePaletteTriggerRef.current = triggerRef;
+        setIsPaletteOpen((open) => !open);
+    };
+
+    const getPaletteTriggerEl = () => {
+        const isVisible = (el) => {
+            if (!el) return false;
+            const { width, height } = el.getBoundingClientRect();
+            return width > 0 && height > 0;
+        };
+        const active = activePaletteTriggerRef.current?.current;
+        if (isVisible(active)) return active;
+        if (isVisible(mobilePaletteTriggerRef.current)) return mobilePaletteTriggerRef.current;
+        if (isVisible(paletteTriggerRef.current)) return paletteTriggerRef.current;
+        return active || mobilePaletteTriggerRef.current || paletteTriggerRef.current;
+    };
+
+    const updatePaletteRect = () => {
+        const trigger = getPaletteTriggerEl();
+        if (!trigger) return;
+        const rect = trigger.getBoundingClientRect();
+        const w = 192;
+        const margin = 8;
+        const left = Math.max(margin, Math.min(rect.right - w, window.innerWidth - w - margin));
+        setPaletteRect({ top: rect.bottom + margin, left });
+    };
     const [isMoreOpen, setIsMoreOpen] = useState(false);
     const [moreRect, setMoreRect] = useState(null);
     const moreDropdownRef = useRef(null);
@@ -96,15 +125,17 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
     }, []);
 
     useEffect(() => {
-        if (isPaletteOpen && typeof window !== 'undefined') {
-            const trigger = mobilePaletteTriggerRef.current || paletteTriggerRef.current;
-            if (!trigger) return;
-            const rect = trigger.getBoundingClientRect();
-            const w = 192;
-            setPaletteRect({ top: rect.bottom + 8, left: Math.max(8, rect.right - w) });
-        } else {
+        if (!isPaletteOpen || typeof window === 'undefined') {
             setPaletteRect(null);
+            return;
         }
+        updatePaletteRect();
+        window.addEventListener('resize', updatePaletteRect);
+        window.addEventListener('scroll', updatePaletteRect, true);
+        return () => {
+            window.removeEventListener('resize', updatePaletteRect);
+            window.removeEventListener('scroll', updatePaletteRect, true);
+        };
     }, [isPaletteOpen]);
 
     useEffect(() => {
@@ -266,13 +297,12 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                             <div className="relative">
                                 <button
                                     ref={paletteTriggerRef}
-                                    onClick={() => setIsPaletteOpen(!isPaletteOpen)}
+                                    onClick={() => togglePalette(paletteTriggerRef)}
                                     className="p-2 rounded-full bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/20 transition-all duration-300"
                                     aria-label="Theme Palette"
                                 >
                                     <Palette className="w-4 h-4" />
                                 </button>
-                                {paletteEl}
                             </div>
                         </div>
                     </div>
@@ -292,7 +322,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                             <button
                                 ref={mobilePaletteTriggerRef}
                                 type="button"
-                                onClick={() => setIsPaletteOpen(!isPaletteOpen)}
+                                onClick={() => togglePalette(mobilePaletteTriggerRef)}
                                 className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/20 transition-all"
                                 aria-label="Theme palette"
                             >
@@ -310,7 +340,6 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                         </div>
                     </div>
                 </GlassCard>
-                {paletteEl}
 
                 {/* Full-Screen Mobile Menu Overlay */}
                 {isMobileMenuOpen && typeof document !== 'undefined' && createPortal(
@@ -381,6 +410,8 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                     document.body
                 )}
             </nav>
+
+            {paletteEl}
         </header>
     );
 };
