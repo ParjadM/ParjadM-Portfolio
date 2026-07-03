@@ -7,7 +7,7 @@ import { GlassCard } from '../ui/GlassCard.jsx';
 import { RippleButton } from '../ui/RippleButton.jsx';
 import { Toast } from '../ui/Toast.jsx';
 import { getAuthToken } from '../../utils/auth.jsx';
-import Logo from '../../Images/Logo.png';
+import Logo from '../../Images/Logo.webp';
 import { NewsFeed } from '../ui/NewsFeed.jsx';
 import { THEMES } from '../../utils/themeConfig.js';
 import { createPortal } from 'react-dom';

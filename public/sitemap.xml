@@ -1,15 +1,148 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://parjadm.ca/</loc></url>
-  <url><loc>https://parjadm.ca/about</loc></url>
-  <url><loc>https://parjadm.ca/projects</loc></url>
-  <url><loc>https://parjadm.ca/stats</loc></url>
-  <url><loc>https://parjadm.ca/blog</loc></url>
-  <url><loc>https://parjadm.ca/contact</loc></url>
-  <url><loc>https://parjadm.ca/explore</loc></url>
-  <url><loc>https://parjadm.ca/tech-news</loc></url>
-  <url><loc>https://parjadm.ca/cli</loc></url>
-  <url><loc>https://parjadm.ca/os</loc></url>
-  <url><loc>https://parjadm.ca/intro</loc></url>
-  <url><loc>https://parjadm.ca/interview</loc></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://parjadm.ca/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/about</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/about"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/about"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/about"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/fr/about</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/about"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/about"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/about"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/projects</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/projects"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/projects"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/projects"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/fr/projects</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/projects"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/projects"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/projects"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/stats</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/stats"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/stats"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/stats"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/fr/stats</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/stats"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/stats"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/stats"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/blog</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/blog"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/blog"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/blog"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/fr/blog</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/blog"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/blog"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/blog"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/contact</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/contact"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/contact"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/contact"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/fr/contact</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/contact"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/contact"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/contact"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/explore</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/explore"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/explore"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/explore"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/fr/explore</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/explore"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/explore"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/explore"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/tech-news</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/tech-news"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/tech-news"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/tech-news"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/fr/tech-news</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/tech-news"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/tech-news"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/tech-news"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/cli</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/cli"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/cli"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/cli"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/fr/cli</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/cli"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/cli"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/cli"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/os</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/os"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/os"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/os"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/fr/os</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/os"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/os"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/os"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/intro</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/intro"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/intro"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/intro"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/fr/intro</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/intro"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/intro"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/intro"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/interview</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/interview"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/interview"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/interview"/>
+  </url>
+  <url>
+    <loc>https://parjadm.ca/fr/interview</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://parjadm.ca/interview"/>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://parjadm.ca/fr/interview"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://parjadm.ca/interview"/>
+  </url>
 </urlset>

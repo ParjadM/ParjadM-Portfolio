@@ -14,14 +14,14 @@ import { setActivePageContext, clearActivePageContext, buildBlogPageContext } fr
 import { BlogAiExplain } from '../components/BlogAiExplain.jsx';
 
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
-import ParjadImage from '../Images/Parjad.jpg';
+import ParjadImage from '../Images/Parjad.webp';
 import GitHubStats from '../components/GitHubStats.tsx';
 import LeetCodeStats from '../components/LeetCodeStats.tsx';
-import ParjadM from '../Images/ParjadM.png';
-import Logo from '../Images/Logo.png';
-import CodeQuestImage from '../Images/CodeQuest.jpg';
-import BinaryGeneratorImage from '../Images/Binary 1010 Generator.jpg';
-import SpaceShooterImage from '../Images/SpaceShooter.jpg';
+import ParjadM from '../Images/ParjadM.webp';
+import Logo from '../Images/Logo.webp';
+import CodeQuestImage from '../Images/CodeQuest.webp';
+import BinaryGeneratorImage from '../Images/Binary 1010 Generator.webp';
+import SpaceShooterImage from '../Images/SpaceShooter.webp';
 
 export const BlogPostPage = ({ theme }) => {
     const { t } = useTranslation();
