@@ -479,7 +479,7 @@ export const DesktopOS = ({ theme }) => {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 20, scale: 0.95 }}
                             transition={{ duration: 0.2, ease: "easeOut" }}
-                            className="absolute bottom-14 left-1/2 -translate-x-1/2 w-[90%] max-w-2xl max-h-[calc(100%-4.5rem)] bg-gray-900/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-2xl p-4 sm:p-6 z-[60] flex flex-col overflow-hidden"
+                            className="absolute bottom-14 inset-x-0 mx-auto w-[90%] max-w-2xl max-h-[calc(100%-4.5rem)] bg-gray-900/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-2xl p-4 sm:p-6 z-[60] flex flex-col overflow-hidden"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="relative mb-4 sm:mb-6 shrink-0">
