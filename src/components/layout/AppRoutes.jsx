@@ -1,24 +1,25 @@
 import React, { Suspense } from 'react';
 import { Route, useRoutes } from 'react-router-dom';
 import { RequireAuth } from '../../utils/auth.jsx';
+import { lazyWithRetry } from '../../utils/lazyWithRetry.js';
 
-const HomeSection = React.lazy(() => import('../../pages/HomeSection.jsx').then(m => ({ default: m.HomeSection })));
-const AboutSection = React.lazy(() => import('../../pages/AboutSection.jsx').then(m => ({ default: m.AboutSection })));
-const ProjectsSection = React.lazy(() => import('../../pages/ProjectsSection.jsx').then(m => ({ default: m.ProjectsSection })));
-const LQFTBenchmarkPage = React.lazy(() => import('../../pages/LQFTBenchmarkPage.jsx').then(m => ({ default: m.LQFTBenchmarkPage })));
-const StatsPage = React.lazy(() => import('../../pages/StatsPage.jsx').then(m => ({ default: m.StatsPage })));
-const BlogSection = React.lazy(() => import('../../pages/BlogSection.jsx').then(m => ({ default: m.BlogSection })));
-const BlogPostPage = React.lazy(() => import('../../pages/BlogPostPage.jsx').then(m => ({ default: m.BlogPostPage })));
-const ContactSection = React.lazy(() => import('../../pages/ContactSection.jsx').then(m => ({ default: m.ContactSection })));
-const AdminLoginPage = React.lazy(() => import('../../pages/admin/AdminLoginPage.jsx').then(m => ({ default: m.AdminLoginPage })));
-const AdminDashboard = React.lazy(() => import('../../pages/admin/AdminDashboard.jsx').then(m => ({ default: m.AdminDashboard })));
-const NotFoundPage = React.lazy(() => import('../../pages/NotFoundPage.jsx').then(m => ({ default: m.NotFoundPage })));
-const IntroCinematic = React.lazy(() => import('../../pages/IntroCinematic.jsx').then(m => ({ default: m.IntroCinematic })));
-const CliMode = React.lazy(() => import('../../pages/CliMode.jsx').then(m => ({ default: m.CliMode })));
-const MockInterviewPage = React.lazy(() => import('../../pages/MockInterviewPage.jsx').then(m => ({ default: m.MockInterviewPage })));
-const TechNews = React.lazy(() => import('../../pages/TechNews.jsx').then(m => ({ default: m.TechNews })));
-const DesktopOS = React.lazy(() => import('../../pages/DesktopOS.jsx').then(m => ({ default: m.DesktopOS })));
-const ExplorePage = React.lazy(() => import('../../pages/ExplorePage.jsx').then(m => ({ default: m.ExplorePage })));
+const HomeSection = lazyWithRetry(() => import('../../pages/HomeSection.jsx').then(m => ({ default: m.HomeSection })));
+const AboutSection = lazyWithRetry(() => import('../../pages/AboutSection.jsx').then(m => ({ default: m.AboutSection })));
+const ProjectsSection = lazyWithRetry(() => import('../../pages/ProjectsSection.jsx').then(m => ({ default: m.ProjectsSection })));
+const LQFTBenchmarkPage = lazyWithRetry(() => import('../../pages/LQFTBenchmarkPage.jsx').then(m => ({ default: m.LQFTBenchmarkPage })));
+const StatsPage = lazyWithRetry(() => import('../../pages/StatsPage.jsx').then(m => ({ default: m.StatsPage })));
+const BlogSection = lazyWithRetry(() => import('../../pages/BlogSection.jsx').then(m => ({ default: m.BlogSection })));
+const BlogPostPage = lazyWithRetry(() => import('../../pages/BlogPostPage.jsx').then(m => ({ default: m.BlogPostPage })));
+const ContactSection = lazyWithRetry(() => import('../../pages/ContactSection.jsx').then(m => ({ default: m.ContactSection })));
+const AdminLoginPage = lazyWithRetry(() => import('../../pages/admin/AdminLoginPage.jsx').then(m => ({ default: m.AdminLoginPage })));
+const AdminDashboard = lazyWithRetry(() => import('../../pages/admin/AdminDashboard.jsx').then(m => ({ default: m.AdminDashboard })));
+const NotFoundPage = lazyWithRetry(() => import('../../pages/NotFoundPage.jsx').then(m => ({ default: m.NotFoundPage })));
+const IntroCinematic = lazyWithRetry(() => import('../../pages/IntroCinematic.jsx').then(m => ({ default: m.IntroCinematic })));
+const CliMode = lazyWithRetry(() => import('../../pages/CliMode.jsx').then(m => ({ default: m.CliMode })));
+const MockInterviewPage = lazyWithRetry(() => import('../../pages/MockInterviewPage.jsx').then(m => ({ default: m.MockInterviewPage })));
+const TechNews = lazyWithRetry(() => import('../../pages/TechNews.jsx').then(m => ({ default: m.TechNews })));
+const DesktopOS = lazyWithRetry(() => import('../../pages/DesktopOS.jsx').then(m => ({ default: m.DesktopOS })));
+const ExplorePage = lazyWithRetry(() => import('../../pages/ExplorePage.jsx').then(m => ({ default: m.ExplorePage })));
 
 const PUBLIC_ROUTES = [
   { path: '/', Component: HomeSection },

@@ -7,7 +7,9 @@ import './i18n.js'
 import { ErrorBoundary } from './components/ErrorBoundary.jsx'
 import { installErrorReporter } from './utils/errorReporter.js'
 import { installWebVitalsReporter } from './utils/webVitals.js'
+import { installChunkLoadRecovery } from './utils/lazyWithRetry.js'
 
+installChunkLoadRecovery()
 installErrorReporter()
 installWebVitalsReporter()
 
