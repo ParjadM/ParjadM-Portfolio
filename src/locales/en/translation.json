@@ -109,6 +109,9 @@
     "articlesLabel": "Articles",
     "minRead": "{{count}} min read",
     "related": "Related posts",
+    "tocTitle": "On this page",
+    "tocLabel": "Table of contents",
+    "comments": "Comments",
     "notFound": "Post not found",
     "backToBlog": "← Back to Blog"
   },
@@ -135,6 +138,25 @@
     "proficiency": "Proficiency",
     "technologies": "Technologies",
     "yearsExperience": "Years Experience"
+  },
+  "offline": {
+    "message": "You're offline — some content may be unavailable."
+  },
+  "pwa": {
+    "title": "Install this site as an app",
+    "subtitle": "Works offline, opens full screen.",
+    "install": "Install",
+    "dismiss": "Dismiss install prompt"
+  },
+  "os": {
+    "newFolder": "New Folder",
+    "newDocument": "New Document",
+    "openTerminal": "Open Terminal",
+    "openCli": "Open CLI Mode",
+    "changeWallpaper": "Change Wallpaper",
+    "closeAll": "Close All Windows",
+    "start": "Start",
+    "shutDown": "Shut Down"
   },
   "footer": {
     "desc": "Software Engineer passionate about creating beautiful, functional web applications with a focus on user experience.",

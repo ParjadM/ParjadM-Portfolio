@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import mongoose from 'mongoose'
-import { BlogPost, Project, Analytics, Visitor, AnalyticsDaily, AiKnowledge, DeviceStats, HourlyStats, AccessLog, CommunityApp, ClientError } from '../db/mongo.js'
+import { BlogPost, Project, Analytics, Visitor, AnalyticsDaily, AiKnowledge, DeviceStats, HourlyStats, AccessLog, CommunityApp, ClientError, WebVital } from '../db/mongo.js'
 import { getAdminAiStats } from '../ai/analytics.js'
 import { clearKnowledgeMemoryCache } from '../ai/knowledge.js'
 import crypto from 'crypto'
@@ -480,6 +480,33 @@ router.get('/client-errors', async (req, res) => {
   try {
     const docs = await ClientError.find({}).sort({ createdAt: -1 }).limit(100).lean()
     res.json({ errors: docs.map(d => ({ id: d._id.toString(), ...d })) })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// GET /api/admin/metrics/vitals - Core Web Vitals p75 summary (last 7 days)
+router.get('/metrics/vitals', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.json({ vitals: [] })
+  try {
+    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    const docs = await WebVital.find({ createdAt: { $gte: since } }).lean()
+    const byName = {}
+    for (const d of docs) {
+      if (!byName[d.name]) byName[d.name] = []
+      byName[d.name].push(d.value)
+    }
+    const p75 = (arr) => {
+      if (!arr.length) return 0
+      const sorted = [...arr].sort((a, b) => a - b)
+      return sorted[Math.floor(sorted.length * 0.75)] ?? sorted[sorted.length - 1]
+    }
+    const vitals = ['LCP', 'INP', 'CLS', 'FCP', 'TTFB'].map((name) => ({
+      name,
+      p75: p75(byName[name] || []),
+      samples: (byName[name] || []).length,
+    }))
+    res.json({ vitals })
   } catch (err) {
     res.status(500).json({ error: err.message })
   }

@@ -109,6 +109,9 @@
     "articlesLabel": "Articles",
     "minRead": "{{count}} min de lecture",
     "related": "Articles similaires",
+    "tocTitle": "Sur cette page",
+    "tocLabel": "Table des matières",
+    "comments": "Commentaires",
     "notFound": "Article introuvable",
     "backToBlog": "← Retour au Blog"
   },
@@ -135,6 +138,25 @@
     "proficiency": "Compétence",
     "technologies": "Technologies",
     "yearsExperience": "Années d'expérience"
+  },
+  "offline": {
+    "message": "Vous êtes hors ligne — une partie du contenu peut être indisponible."
+  },
+  "pwa": {
+    "title": "Installer ce site comme application",
+    "subtitle": "Fonctionne hors ligne, s'ouvre en plein écran.",
+    "install": "Installer",
+    "dismiss": "Fermer l'invite d'installation"
+  },
+  "os": {
+    "newFolder": "Nouveau dossier",
+    "newDocument": "Nouveau document",
+    "openTerminal": "Ouvrir le terminal",
+    "openCli": "Mode CLI",
+    "changeWallpaper": "Changer le fond d'écran",
+    "closeAll": "Fermer toutes les fenêtres",
+    "start": "Démarrer",
+    "shutDown": "Arrêter"
   },
   "footer": {
     "desc": "Ingénieur logiciel passionné par la création d'applications web belles et fonctionnelles, axées sur l'expérience utilisateur.",

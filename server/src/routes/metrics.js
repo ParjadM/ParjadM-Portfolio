@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { currentEngine } from '../db/index.js'
-import { Analytics, Visitor, AnalyticsDaily, VisitorDay, VisitorDayPath, DeviceStats, HourlyStats, AccessLog } from '../db/mongo.js'
+import { Analytics, Visitor, AnalyticsDaily, VisitorDay, VisitorDayPath, DeviceStats, HourlyStats, AccessLog, WebVital } from '../db/mongo.js'
 const router = Router()
 
 async function ensureAnalyticsDoc() {
@@ -155,6 +155,30 @@ router.get('/paths', async (req, res) => {
     res.json({ paths })
   } catch (err) {
     res.status(500).json({ error: err.message })
+  }
+})
+
+// POST /api/metrics/vitals { name, value, rating?, path?, visitorId? }
+router.post('/vitals', async (req, res) => {
+  try {
+    if (currentEngine !== 'mongo') return res.json({ ok: true })
+
+    const { name, value, rating, path, visitorId } = req.body || {}
+    const allowed = ['CLS', 'INP', 'LCP', 'FCP', 'TTFB']
+    if (!allowed.includes(name) || typeof value !== 'number' || !Number.isFinite(value)) {
+      return res.status(400).json({ error: 'Invalid vital' })
+    }
+
+    await WebVital.create({
+      name,
+      value,
+      rating: String(rating || '').slice(0, 20),
+      path: String(path || '/').slice(0, 200),
+      visitorId: String(visitorId || '').slice(0, 64),
+    })
+    res.json({ ok: true })
+  } catch {
+    res.json({ ok: true })
   }
 })
 

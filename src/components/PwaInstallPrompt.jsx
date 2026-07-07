@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Download, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const DISMISS_KEY = 'pwa_install_dismissed';
 
 export const PwaInstallPrompt = ({ theme = 'green' }) => {
+    const { t } = useTranslation();
     const [deferredPrompt, setDeferredPrompt] = useState(null);
     const [visible, setVisible] = useState(false);
 
@@ -59,19 +61,19 @@ export const PwaInstallPrompt = ({ theme = 'green' }) => {
                     <Download className="w-5 h-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-white">Install this site as an app</p>
-                    <p className="text-xs text-gray-400">Works offline, opens full screen.</p>
+                    <p className="text-sm font-semibold text-white">{t('pwa.title')}</p>
+                    <p className="text-xs text-gray-400">{t('pwa.subtitle')}</p>
                 </div>
                 <button
                     onClick={install}
                     className={`shrink-0 px-3 py-2 rounded-xl border text-sm font-semibold ${accent}`}
                 >
-                    Install
+                    {t('pwa.install')}
                 </button>
                 <button
                     onClick={dismiss}
                     className="shrink-0 p-2 rounded-lg text-gray-500 hover:text-white hover:bg-white/10"
-                    aria-label="Dismiss install prompt"
+                    aria-label={t('pwa.dismiss')}
                 >
                     <X className="w-4 h-4" />
                 </button>

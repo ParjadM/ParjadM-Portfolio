@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { ClientError, RateLimit } from '../db/mongo.js'
 import { currentEngine } from '../db/index.js'
+import { notifyErrorSpike } from '../utils/alertNotify.js'
 
 const router = Router()
 
@@ -43,6 +44,20 @@ router.post('/', async (req, res) => {
       url: String(url || '').slice(0, 300),
       userAgent: String(userAgent || '').slice(0, 300),
     })
+
+    // Alert if errors are spiking (async, non-blocking)
+    const windowMinutes = Number(process.env.ERROR_ALERT_WINDOW_MINUTES || 15);
+    const since = new Date(Date.now() - windowMinutes * 60 * 1000);
+    Promise.all([
+      ClientError.countDocuments({ createdAt: { $gte: since } }),
+      ClientError.find({ createdAt: { $gte: since } }).sort({ createdAt: -1 }).limit(5).lean(),
+    ])
+      .then(([count, samples]) => {
+        if (count === 0) return;
+        notifyErrorSpike({ count, windowMinutes, samples });
+      })
+      .catch(() => {});
+
     res.json({ ok: true })
   } catch {
     // Never let error reporting cause more errors client-side

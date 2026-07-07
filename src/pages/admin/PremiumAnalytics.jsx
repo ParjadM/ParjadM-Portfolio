@@ -12,6 +12,7 @@ export const PremiumAnalytics = ({ theme, dbStatus }) => {
   const [heatmapData, setHeatmapData] = useState([]);
   const [logs, setLogs] = useState([]);
   const [clientErrors, setClientErrors] = useState([]);
+  const [webVitals, setWebVitals] = useState([]);
 
   useEffect(() => {
     const token = getAuthToken();
@@ -41,6 +42,10 @@ export const PremiumAnalytics = ({ theme, dbStatus }) => {
     fetch('/api/admin/client-errors', { headers: { Authorization: `Bearer ${token}` } })
       .then(res => res.ok ? res.json() : { errors: [] })
       .then(d => setClientErrors(Array.isArray(d.errors) ? d.errors : [])).catch(() => {});
+
+    fetch('/api/admin/metrics/vitals', { headers: { Authorization: `Bearer ${token}` } })
+      .then(res => res.ok ? res.json() : { vitals: [] })
+      .then(d => setWebVitals(Array.isArray(d.vitals) ? d.vitals : [])).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -227,6 +232,23 @@ export const PremiumAnalytics = ({ theme, dbStatus }) => {
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+
+      {/* Core Web Vitals (p75, last 7 days) */}
+      <div className="p-4 bg-white/5 border border-white/10 rounded-xl">
+        <h4 className="text-white font-semibold mb-4">Core Web Vitals (p75, 7 days)</h4>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+          {webVitals.map((v) => (
+            <div key={v.name} className="text-center p-3 rounded-lg bg-black/20">
+              <div className="text-xs text-gray-400 mb-1">{v.name}</div>
+              <div className="text-lg font-bold text-white">
+                {v.name === 'CLS' ? v.p75.toFixed(3) : `${Math.round(v.p75)}ms`}
+              </div>
+              <div className="text-[10px] text-gray-500">{v.samples} samples</div>
+            </div>
+          ))}
+          {webVitals.length === 0 && <div className="col-span-full text-gray-500 text-sm">No vitals data yet</div>}
         </div>
       </div>
 

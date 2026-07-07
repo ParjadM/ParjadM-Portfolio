@@ -37,3 +37,7 @@ jobs:
 
       - name: Smoke test (rendered pages)
         run: npm run test:smoke
+
+      - name: Lighthouse CI (performance budget)
+        run: npm run test:lighthouse
+        continue-on-error: true

@@ -7,7 +7,7 @@
  * Run: node scripts/generate-assets.mjs
  */
 import sharp from 'sharp';
-import { mkdir, copyFile } from 'node:fs/promises';
+import { mkdir, copyFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -28,6 +28,11 @@ const WEBP_SOURCES = [
 
 // Project card images also get a 640px variant for phone-sized srcsets.
 const SM_VARIANTS = ['CodeQuest.jpg', 'Binary 1010 Generator.jpg', 'SpaceShooter.jpg'];
+const PLACEHOLDER_TITLES = {
+  'CodeQuest.jpg': 'CodeQuest',
+  'Binary 1010 Generator.jpg': 'Binary 1010 Generator',
+  'SpaceShooter.jpg': 'SpaceShooter',
+};
 
 async function generateWebp() {
   for (const { file, maxWidth } of WEBP_SOURCES) {
@@ -114,8 +119,22 @@ async function copyOgFont() {
   console.log('font  outfit-latin-600.woff -> server/assets/');
 }
 
+async function generatePlaceholders() {
+  const placeholders = {};
+  for (const file of SM_VARIANTS) {
+    const src = path.join(imagesDir, file);
+    const buf = await sharp(src).resize(16).webp({ quality: 30 }).toBuffer();
+    placeholders[PLACEHOLDER_TITLES[file]] = `data:image/webp;base64,${buf.toString('base64')}`;
+  }
+  const outPath = path.join(root, 'src', 'data', 'imagePlaceholders.json');
+  await mkdir(path.dirname(outPath), { recursive: true });
+  await writeFile(outPath, `${JSON.stringify(placeholders, null, 2)}\n`);
+  console.log('lqip  imagePlaceholders.json');
+}
+
 await generateWebp();
 await generateIcons();
 await generateOgImage();
 await copyOgFont();
+await generatePlaceholders();
 console.log('Done.');

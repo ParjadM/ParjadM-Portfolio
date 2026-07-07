@@ -17,6 +17,7 @@ import appsRouter from './routes/apps.js'
 import clientErrorsRouter from './routes/clientErrors.js'
 import ogRouter from './routes/og.js'
 import { buildRssFeed } from './routes/blog.js'
+import { buildSitemap } from './utils/sitemap.js'
 
 export async function createApp() {
   const app = express()
@@ -39,6 +40,17 @@ export async function createApp() {
       res.setHeader('Content-Type', 'application/rss+xml; charset=utf-8')
       res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=600')
       res.send(await buildRssFeed())
+    } catch (err) {
+      res.status(500).json({ error: err.message })
+    }
+  })
+
+  // Dynamic sitemap (static routes + published blog posts)
+  app.get('/sitemap.xml', async (_req, res) => {
+    try {
+      res.setHeader('Content-Type', 'application/xml; charset=utf-8')
+      res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=600')
+      res.send(await buildSitemap())
     } catch (err) {
       res.status(500).json({ error: err.message })
     }

@@ -12,6 +12,7 @@ export const SEO = ({
     type = 'website',
     image = `${SITE_URL}/og-image.jpg`,
     url,
+    jsonLd,
 }) => {
     const location = useLocation();
     const { t } = useTranslation();
@@ -49,6 +50,9 @@ export const SEO = ({
             <meta name="twitter:title" content={resolvedTitle} />
             <meta name="twitter:description" content={resolvedDescription} />
             <meta name="twitter:image" content={image} />
+            {jsonLd && (
+                <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+            )}
         </Helmet>
     );
 };

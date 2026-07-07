@@ -8,6 +8,8 @@ import { SEO } from '../components/SEO.jsx';
 import { useFetchWithCache } from '../utils/useFetchWithCache.js';
 import { ProjectAskAi } from '../components/ProjectAskAi.jsx';
 import { ProjectCardSkeleton } from '../components/ui/Skeleton.jsx';
+import { BlurImage } from '../components/ui/BlurImage.jsx';
+import placeholders from '../data/imagePlaceholders.json';
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 import CodeQuestImage from '../Images/CodeQuest.webp';
 import BinaryGeneratorImage from '../Images/Binary 1010 Generator.webp';
@@ -57,7 +59,7 @@ export const ProjectsSection = ({ theme }) => {
                     <GlassCard className="p-0 flex flex-col overflow-hidden">
                         {/* Project Image */}
                         <div className="w-full h-48 bg-gradient-to-br from-white/5 to-white/10 flex items-center justify-center overflow-hidden">
-                            <img 
+                            <BlurImage
                                 src={project.image || imageMap[project.title] || `https://placehold.co/600x400/${theme === 'pink' ? 'E94560' : '10B981'}/FFFFFF?text=${encodeURIComponent(project.title)}`}
                                 srcSet={!project.image && imageMapSm[project.title]
                                     ? `${imageMapSm[project.title]} 640w, ${imageMap[project.title]} 1280w`
@@ -66,9 +68,9 @@ export const ProjectsSection = ({ theme }) => {
                                     ? '(max-width: 768px) 100vw, 33vw'
                                     : undefined}
                                 alt={project.title}
-                                loading="lazy"
-                                decoding="async"
-                                className="w-full h-full object-cover opacity-100 md:opacity-80 md:hover:opacity-100 hover:scale-105 transition-all duration-300"
+                                placeholder={placeholders[project.title]}
+                                wrapperClassName="w-full h-full"
+                                className="opacity-100 md:opacity-80 md:hover:opacity-100 hover:scale-105 transition-all duration-300"
                             />
                         </div>
                         

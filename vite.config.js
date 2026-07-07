@@ -50,6 +50,16 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      '/sitemap.xml': {
+        target: 'http://localhost:5175',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/feed.xml': {
+        target: 'http://localhost:5175',
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 })

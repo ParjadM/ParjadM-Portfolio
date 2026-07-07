@@ -295,3 +295,20 @@ const AccessLogSchema = new mongoose.Schema(
   }
 )
 export const AccessLog = mongoose.models.AccessLog || mongoose.model('AccessLog', AccessLogSchema, 'access_logs')
+
+// Core Web Vitals samples from real users (capped).
+const WebVitalSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, enum: ['CLS', 'INP', 'LCP', 'FCP', 'TTFB'] },
+    value: { type: Number, required: true },
+    rating: { type: String, default: '' },
+    path: { type: String, default: '/' },
+    visitorId: { type: String, default: '' },
+  },
+  {
+    timestamps: true,
+    capped: { size: 5242880, max: 2000 },
+  }
+)
+export const WebVital = mongoose.models.WebVital
+  || mongoose.model('WebVital', WebVitalSchema, 'web_vitals')
