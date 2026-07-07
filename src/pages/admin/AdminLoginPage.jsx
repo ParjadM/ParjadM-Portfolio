@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GlassCard } from '../../components/ui/GlassCard.jsx';
+import { getAdminPath } from '../../utils/i18nRouting.js';
 
 export const AdminLoginPage = ({ theme }) => {
   const navigate = useNavigate();
@@ -10,12 +11,13 @@ export const AdminLoginPage = ({ theme }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); setError('');
+    setLoading(true);
+    setError('');
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
@@ -25,7 +27,7 @@ export const AdminLoginPage = ({ theme }) => {
       if (!res.ok) throw new Error('Invalid credentials');
       const data = await res.json();
       try { localStorage.setItem('authToken', data.token); } catch {}
-      navigate('/admin', { replace: true });
+      navigate(getAdminPath(window.location.pathname), { replace: true });
     } catch (err) {
       setError(err.message || 'Login failed');
     } finally {
@@ -33,12 +35,12 @@ export const AdminLoginPage = ({ theme }) => {
     }
   };
 
-  const gradientClass = theme === 'pink' 
-    ? 'bg-gradient-to-r from-pink-500 to-red-500' 
+  const gradientClass = theme === 'pink'
+    ? 'bg-gradient-to-r from-pink-500 to-red-500'
     : 'bg-gradient-to-r from-emerald-500 to-teal-500';
 
   return (
-    <section className="min-h-screen flex items-center justify-center py-20 px-4">
+    <section className="min-h-screen flex items-center justify-center py-20 px-4 bg-gray-950">
       <div className="container mx-auto max-w-md w-full">
         <GlassCard className="p-8" theme={theme}>
           <h2 className="text-3xl font-bold text-white mb-6 text-center">Admin Login</h2>
@@ -58,7 +60,7 @@ export const AdminLoginPage = ({ theme }) => {
             {error && <div className="text-red-300 text-sm">{error}</div>}
             <button type="submit" disabled={loading}
               className={`w-full py-3 rounded-lg font-semibold text-white ${gradientClass} disabled:opacity-50`}>
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? 'Signing in…' : 'Sign In'}
             </button>
           </form>
         </GlassCard>
@@ -66,4 +68,3 @@ export const AdminLoginPage = ({ theme }) => {
     </section>
   );
 };
-

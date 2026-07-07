@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { getAuthToken } from '../../utils/auth.jsx';
+import { adminJson } from '../../utils/adminApi.js';
+import { AdminPanelSkeleton } from './components/AdminSkeleton.jsx';
 
 function AiUsageChart({ data, theme }) {
   const width = 640;
@@ -41,7 +42,6 @@ function AiUsageChart({ data, theme }) {
 }
 
 export const AdminAICostDashboard = ({ theme }) => {
-  const token = getAuthToken();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -49,18 +49,15 @@ export const AdminAICostDashboard = ({ theme }) => {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/admin/ai/stats?range=${range}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('Failed'))))
+    adminJson(`/api/admin/ai/stats?range=${range}`)
       .then(setStats)
       .catch(() => setError('Failed to load AI stats'))
       .finally(() => setLoading(false));
-  }, [token, range]);
+  }, [range]);
 
   const accent = theme === 'pink' ? 'text-pink-400' : 'text-emerald-400';
 
-  if (loading) return <div className="text-gray-400">Loading AI cost dashboard...</div>;
+  if (loading) return <AdminPanelSkeleton />;
   if (error) return <div className="text-red-300">{error}</div>;
   if (!stats) return null;
 

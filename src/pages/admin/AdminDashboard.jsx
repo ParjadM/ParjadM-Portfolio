@@ -1,71 +1,57 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { GlassCard } from '../../components/ui/GlassCard.jsx';
+import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { adminJson } from '../../utils/adminApi.js';
+import { AdminProvider } from './AdminContext.jsx';
+import { AdminLayout } from './AdminLayout.jsx';
+import { AdminOverview } from './AdminOverview.jsx';
 import { AdminBlogManager } from './AdminBlogManager.jsx';
 import { AdminProjectsManager } from './AdminProjectsManager.jsx';
 import { AdminAIManager } from './AdminAIManager.jsx';
 import { AdminAICostDashboard } from './AdminAICostDashboard.jsx';
 import { AdminInterviewManager } from './AdminInterviewManager.jsx';
 import { AdminAppStoreManager } from './AdminAppStoreManager.jsx';
+import { AdminContactInbox } from './AdminContactInbox.jsx';
+import { AdminMediaLibrary } from './AdminMediaLibrary.jsx';
+import { AdminAuditLog } from './AdminAuditLog.jsx';
 import { PremiumAnalytics } from './PremiumAnalytics.jsx';
-import { getAuthToken } from '../../utils/auth.jsx';
 
-export const AdminDashboard = ({ theme }) => {
-  const navigate = useNavigate();
+function AdminDashboardContent({ theme }) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'home';
   const [dbStatus, setDbStatus] = useState(null);
-  const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState('blog'); // 'blog' | 'projects' | 'analytics' | 'ai'
+
+  const setTab = (tab) => setSearchParams({ tab }, { replace: true });
+
   useEffect(() => {
-    const token = getAuthToken();
-    if (!token) return;
-    fetch('/api/admin/db-status', { headers: { Authorization: `Bearer ${token}` } })
-      .then(res => res.ok ? res.json() : Promise.reject(new Error('Failed to load')))
-      .then(setDbStatus)
-      .catch(() => setError('Failed to load admin data'))
+    adminJson('/api/admin/db-status').then(setDbStatus).catch(() => {});
   }, []);
 
-  const handleLogout = async () => {
-    const token = getAuthToken();
-    if (token) {
-      try { await fetch('/api/auth/logout', { method: 'POST', headers: { Authorization: `Bearer ${token}` } }); } catch {}
-      try { localStorage.removeItem('authToken'); } catch {}
+  const renderTab = () => {
+    switch (activeTab) {
+      case 'home': return <AdminOverview onNavigate={setTab} />;
+      case 'blog': return <AdminBlogManager />;
+      case 'projects': return <AdminProjectsManager theme={theme} />;
+      case 'analytics': return <PremiumAnalytics theme={theme} dbStatus={dbStatus} />;
+      case 'contact': return <AdminContactInbox />;
+      case 'app_store': return <AdminAppStoreManager />;
+      case 'ai': return <AdminAIManager theme={theme} />;
+      case 'ai_cost': return <AdminAICostDashboard theme={theme} />;
+      case 'interview_ai': return <AdminInterviewManager theme={theme} />;
+      case 'media': return <AdminMediaLibrary />;
+      case 'audit': return <AdminAuditLog />;
+      default: return <AdminOverview onNavigate={setTab} />;
     }
-    navigate('/admin/login', { replace: true });
   };
 
   return (
-    <section className="min-h-screen flex items-center justify-center py-20 px-4">
-      <div className="container mx-auto max-w-5xl">
-        <GlassCard className="p-8" theme={theme}>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-white">Admin Dashboard</h2>
-            <button onClick={handleLogout} className="px-4 py-2 rounded bg-white/10 text-gray-200 hover:bg-white/20">Log out</button>
-          </div>
-          {error && <div className="text-red-300 mb-4">{error}</div>}
-
-          {/* Tabs */}
-          <div className="mb-6 flex gap-2 flex-wrap">
-            {['blog','projects','analytics','ai','ai_cost','interview_ai','app_store'].map(tab => (
-              <button key={tab} onClick={() => setActiveTab(tab)}
-                className={`px-3 py-2 rounded ${activeTab===tab ? 'bg-white/20 text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`}>
-                {tab === 'blog' ? 'Blog' : tab === 'projects' ? 'Projects' : tab === 'analytics' ? 'Analytics' : tab === 'ai' ? 'AI Context' : tab === 'ai_cost' ? 'AI Cost' : tab === 'interview_ai' ? 'Interview AI' : 'App Store'}
-              </button>
-            ))}
-          </div>
-
-          {activeTab === 'analytics' && (
-            <PremiumAnalytics theme={theme} dbStatus={dbStatus} />
-          )}
-
-          {activeTab === 'blog' && <AdminBlogManager theme={theme} />}
-          {activeTab === 'projects' && <AdminProjectsManager theme={theme} />}
-          {activeTab === 'ai' && <AdminAIManager theme={theme} />}
-          {activeTab === 'ai_cost' && <AdminAICostDashboard theme={theme} />}
-          {activeTab === 'interview_ai' && <AdminInterviewManager theme={theme} />}
-          {activeTab === 'app_store' && <AdminAppStoreManager theme={theme} />}
-        </GlassCard>
-      </div>
-    </section>
+    <AdminLayout activeTab={activeTab} setTab={setTab}>
+      {renderTab()}
+    </AdminLayout>
   );
-};
+}
 
+export const AdminDashboard = ({ theme }) => (
+  <AdminProvider>
+    <AdminDashboardContent theme={theme} />
+  </AdminProvider>
+);

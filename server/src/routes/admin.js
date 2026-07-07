@@ -1,8 +1,9 @@
 import { Router } from 'express'
 import mongoose from 'mongoose'
-import { BlogPost, Project, Analytics, Visitor, AnalyticsDaily, AiKnowledge, DeviceStats, HourlyStats, AccessLog, CommunityApp, ClientError, WebVital } from '../db/mongo.js'
+import { BlogPost, Project, Analytics, Visitor, AnalyticsDaily, AiKnowledge, DeviceStats, HourlyStats, AccessLog, CommunityApp, ClientError, WebVital, ContactMessage, AuditLog, MediaAsset } from '../db/mongo.js'
 import { getAdminAiStats } from '../ai/analytics.js'
 import { clearKnowledgeMemoryCache } from '../ai/knowledge.js'
+import { logAdminAction } from '../utils/auditLog.js'
 import crypto from 'crypto'
 import { currentEngine } from '../db/index.js'
 import { redisClient } from '../db/redis.js'
@@ -216,8 +217,6 @@ router.post('/set-latest-blog-date', async (req, res) => {
   }
 })
 
-export default router
-
 // --- Blog Management (Admin) ---
 router.get('/blog', async (req, res) => {
   if (currentEngine !== 'mongo') return res.json({ posts: [] })
@@ -244,6 +243,7 @@ router.post('/blog', async (req, res) => {
       featured: !!body.featured,
       publishAt,
     })
+    await logAdminAction(req, 'blog.create', { id: doc._id.toString(), title: body.title })
     res.status(201).json({ id: doc._id.toString() })
   } catch (err) {
     res.status(400).json({ error: err.message })
@@ -261,19 +261,7 @@ router.put('/blog/:id', async (req, res) => {
       { _id: id },
       { $set: update, $currentDate: { updatedAt: true } }
     )
-    res.json({ ok: true })
-  } catch (err) {
-    res.status(400).json({ error: err.message })
-  }
-})
-
-// Feature/unfeature a blog post
-router.post('/blog/:id/feature', async (req, res) => {
-  if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
-  try {
-    const { id } = req.params
-    const featured = !!(req.body && req.body.featured)
-    await BlogPost.updateOne({ _id: id }, { featured })
+    await logAdminAction(req, 'blog.update', { id })
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
@@ -285,6 +273,7 @@ router.delete('/blog/:id', async (req, res) => {
   try {
     const { id } = req.params
     await BlogPost.deleteOne({ _id: id })
+    await logAdminAction(req, 'blog.delete', { id })
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
@@ -303,19 +292,20 @@ router.post('/blog/:id/publish', async (req, res) => {
         $currentDate: { updatedAt: true },
       }
     )
+    await logAdminAction(req, 'blog.publish', { id })
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
   }
 })
 
-// POST /api/admin/blog/:id/feature { featured: boolean }
 router.post('/blog/:id/feature', async (req, res) => {
   if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
   try {
     const { id } = req.params
     const featured = !!(req.body && req.body.featured)
     await BlogPost.updateOne({ _id: id }, { featured })
+    await logAdminAction(req, 'blog.feature', { id, featured })
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
@@ -345,6 +335,7 @@ router.post('/projects', async (req, res) => {
       featured: !!body.featured,
       order: typeof body.order === 'number' ? body.order : Date.now(),
     })
+    await logAdminAction(req, 'project.create', { id: doc._id.toString(), title: body.title })
     res.status(201).json({ id: doc._id.toString() })
   } catch (err) {
     res.status(400).json({ error: err.message })
@@ -356,6 +347,7 @@ router.put('/projects/:id', async (req, res) => {
   try {
     const { id } = req.params
     await Project.updateOne({ _id: id }, req.body || {})
+    await logAdminAction(req, 'project.update', { id })
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
@@ -367,6 +359,7 @@ router.delete('/projects/:id', async (req, res) => {
   try {
     const { id } = req.params
     await Project.deleteOne({ _id: id })
+    await logAdminAction(req, 'project.delete', { id })
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
@@ -478,7 +471,10 @@ router.get('/metrics/hourly', async (req, res) => {
 router.get('/client-errors', async (req, res) => {
   if (currentEngine !== 'mongo') return res.json({ errors: [] })
   try {
-    const docs = await ClientError.find({}).sort({ createdAt: -1 }).limit(100).lean()
+    const filter = req.query.resolved === 'true' ? { resolved: true }
+      : req.query.resolved === 'all' ? {}
+      : { resolved: false }
+    const docs = await ClientError.find(filter).sort({ createdAt: -1 }).limit(100).lean()
     res.json({ errors: docs.map(d => ({ id: d._id.toString(), ...d })) })
   } catch (err) {
     res.status(500).json({ error: err.message })
@@ -533,6 +529,7 @@ router.post('/apps/:id/approve', async (req, res) => {
       { _id: req.params.id },
       { $set: { status: 'approved', approvedAt: new Date(), rejectionReason: '' } }
     )
+    await logAdminAction(req, 'app.approve', { id: req.params.id })
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
@@ -546,6 +543,7 @@ router.post('/apps/:id/reject', async (req, res) => {
       { _id: req.params.id },
       { $set: { status: 'rejected', rejectionReason: (req.body?.reason || '').slice(0, 300) } }
     )
+    await logAdminAction(req, 'app.reject', { id: req.params.id })
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
@@ -556,6 +554,7 @@ router.delete('/apps/:id', async (req, res) => {
   if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
   try {
     await CommunityApp.deleteOne({ _id: req.params.id })
+    await logAdminAction(req, 'app.delete', { id: req.params.id })
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
@@ -572,3 +571,136 @@ router.get('/metrics/logs', async (req, res) => {
     res.status(500).json({ error: err.message })
   }
 })
+
+// GET /api/admin/overview — dashboard home KPIs
+router.get('/overview', async (req, res) => {
+  if (currentEngine !== 'mongo') {
+    return res.json({ pageviews: 0, uniqueVisitors: 0, pendingApps: 0, unreadContacts: 0, openErrors: 0, todayPageviews: 0 })
+  }
+  try {
+    const today = new Date().toISOString().slice(0, 10)
+    const [analytics, todayStats, pendingApps, unreadContacts, openErrors] = await Promise.all([
+      Analytics.findOne({ key: 'global' }).lean(),
+      AnalyticsDaily.findOne({ key: 'global', date: today }).lean(),
+      CommunityApp.countDocuments({ status: 'pending' }),
+      ContactMessage.countDocuments({ read: false }),
+      ClientError.countDocuments({ resolved: false }),
+    ])
+    res.json({
+      pageviews: analytics?.pageviews || 0,
+      uniqueVisitors: analytics?.uniqueVisitors || 0,
+      todayPageviews: todayStats?.pageviews || 0,
+      pendingApps,
+      unreadContacts,
+      openErrors,
+    })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// --- Contact inbox ---
+router.get('/contact', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.json({ messages: [] })
+  const docs = await ContactMessage.find({}).sort({ createdAt: -1 }).limit(200).lean()
+  res.json({ messages: docs.map(d => ({ id: d._id.toString(), ...d })) })
+})
+
+router.patch('/contact/:id/read', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.json({ ok: true })
+  await ContactMessage.updateOne({ _id: req.params.id }, { read: !!req.body?.read })
+  await logAdminAction(req, 'contact.read', { id: req.params.id })
+  res.json({ ok: true })
+})
+
+router.delete('/contact/:id', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.json({ ok: true })
+  await ContactMessage.deleteOne({ _id: req.params.id })
+  await logAdminAction(req, 'contact.delete', { id: req.params.id })
+  res.json({ ok: true })
+})
+
+// --- Audit log ---
+router.get('/audit-log', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.json({ entries: [] })
+  const docs = await AuditLog.find({}).sort({ createdAt: -1 }).limit(100).lean()
+  res.json({ entries: docs.map(d => ({ id: d._id.toString(), ...d })) })
+})
+
+// --- Media library ---
+router.get('/media', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.json({ assets: [] })
+  const docs = await MediaAsset.find({}).sort({ createdAt: -1 }).limit(100).lean()
+  res.json({ assets: docs.map(d => ({ id: d._id.toString(), ...d })) })
+})
+
+router.post('/media', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
+  const { url, folder, publicId, filename, bytes } = req.body || {}
+  if (!url) return res.status(400).json({ error: 'Missing url' })
+  const doc = await MediaAsset.create({ url, folder: folder || 'uploads', publicId: publicId || '', filename: filename || '', bytes: bytes || 0 })
+  await logAdminAction(req, 'media.upload', { url })
+  res.status(201).json({ id: doc._id.toString() })
+})
+
+router.delete('/media/:id', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.json({ ok: true })
+  await MediaAsset.deleteOne({ _id: req.params.id })
+  await logAdminAction(req, 'media.delete', { id: req.params.id })
+  res.json({ ok: true })
+})
+
+// --- Client error resolve ---
+router.post('/client-errors/:id/resolve', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.json({ ok: true })
+  await ClientError.updateOne({ _id: req.params.id }, { resolved: true })
+  await logAdminAction(req, 'error.resolve', { id: req.params.id })
+  res.json({ ok: true })
+})
+
+router.post('/client-errors/resolve-all', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.json({ ok: true })
+  await ClientError.updateMany({ resolved: false }, { resolved: true })
+  await logAdminAction(req, 'error.resolve_all')
+  res.json({ ok: true })
+})
+
+// GET /api/admin/metrics/export?range=7 — CSV download
+router.get('/metrics/export', async (req, res) => {
+  if (currentEngine !== 'mongo') return res.status(400).json({ error: 'No data' })
+  try {
+    const range = Math.min(30, Math.max(1, Number(req.query.range || 7)))
+    const today = new Date()
+    const dates = Array.from({ length: range }).map((_, i) => {
+      const d = new Date(today)
+      d.setDate(d.getDate() - (range - 1 - i))
+      return d.toISOString().slice(0, 10)
+    })
+    const docs = await AnalyticsDaily.find({ key: 'global', date: { $in: dates } }).lean()
+    const byDate = new Map(docs.map(d => [d.date, d]))
+    const lines = ['date,pageviews,unique_visitors']
+    for (const d of dates) {
+      const row = byDate.get(d)
+      lines.push(`${d},${row?.pageviews || 0},${row?.uniqueVisitors || 0}`)
+    }
+    res.setHeader('Content-Type', 'text/csv')
+    res.setHeader('Content-Disposition', `attachment; filename="analytics-${range}d.csv"`)
+    res.send(lines.join('\n'))
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// POST /api/admin/actions/clear-ai-cache
+router.post('/actions/clear-ai-cache', async (req, res) => {
+  try {
+    clearKnowledgeMemoryCache()
+    if (redisClient) await redisClient.flushdb().catch(() => {})
+    await logAdminAction(req, 'ai.clear_cache')
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+export default router

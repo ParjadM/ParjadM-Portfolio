@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { currentEngine } from '../db/index.js'
 import { Analytics, Visitor, AnalyticsDaily, VisitorDay, VisitorDayPath, DeviceStats, HourlyStats, AccessLog, WebVital } from '../db/mongo.js'
+import { parseUserAgent } from '../utils/userAgent.js'
 const router = Router()
 
 async function ensureAnalyticsDoc() {
@@ -57,8 +58,7 @@ router.post('/visit', async (req, res) => {
 
     // Parse User Agent manually or fallback to Unknown to prevent Vercel crashes
     const uaString = req.headers['user-agent'] || ''
-    const browserName = 'Unknown'
-    const osName = 'Unknown'
+    const { browser: browserName, os: osName } = parseUserAgent(uaString)
 
     // Update Device Stats
     await DeviceStats.updateOne(

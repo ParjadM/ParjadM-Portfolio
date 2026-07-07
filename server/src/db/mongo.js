@@ -251,6 +251,7 @@ const ClientErrorSchema = new mongoose.Schema(
     url: { type: String, default: '' },
     userAgent: { type: String, default: '' },
     count: { type: Number, default: 1 },
+    resolved: { type: Boolean, default: false },
   },
   {
     timestamps: true,
@@ -312,3 +313,45 @@ const WebVitalSchema = new mongoose.Schema(
 )
 export const WebVital = mongoose.models.WebVital
   || mongoose.model('WebVital', WebVitalSchema, 'web_vitals')
+
+const ContactMessageSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    subject: { type: String, required: true },
+    message: { type: String, required: true },
+    read: { type: Boolean, default: false },
+    ip: { type: String, default: '' },
+  },
+  { timestamps: true }
+)
+export const ContactMessage = mongoose.models.ContactMessage
+  || mongoose.model('ContactMessage', ContactMessageSchema, 'contact_messages')
+
+const AuditLogSchema = new mongoose.Schema(
+  {
+    username: { type: String, default: 'admin' },
+    action: { type: String, required: true },
+    details: { type: mongoose.Schema.Types.Mixed, default: {} },
+    ip: { type: String, default: '' },
+  },
+  {
+    timestamps: true,
+    capped: { size: 2097152, max: 1000 },
+  }
+)
+export const AuditLog = mongoose.models.AuditLog
+  || mongoose.model('AuditLog', AuditLogSchema, 'audit_logs')
+
+const MediaAssetSchema = new mongoose.Schema(
+  {
+    url: { type: String, required: true },
+    folder: { type: String, default: 'uploads' },
+    publicId: { type: String, default: '' },
+    filename: { type: String, default: '' },
+    bytes: { type: Number, default: 0 },
+  },
+  { timestamps: true }
+)
+export const MediaAsset = mongoose.models.MediaAsset
+  || mongoose.model('MediaAsset', MediaAssetSchema, 'media_assets')

@@ -29,5 +29,13 @@ export function localizePath(path, locale = DEFAULT_LOCALE) {
 
 export function isFullscreenPath(pathname) {
   const path = stripLocalePrefix(pathname);
-  return path === '/intro' || path === '/cli' || path === '/os';
+  return path === '/intro' || path === '/cli' || path === '/os' || path.startsWith('/admin');
+}
+
+export function getAdminLoginPath(pathname = '/') {
+  return getLocaleFromPath(pathname) === 'fr' ? '/fr/admin/login' : '/admin/login';
+}
+
+export function getAdminPath(pathname = '/') {
+  return getLocaleFromPath(pathname) === 'fr' ? '/fr/admin' : '/admin';
 }

@@ -1,6 +1,7 @@
 import express from 'express'
 import nodemailer from 'nodemailer'
-import { RateLimit } from '../db/mongo.js'
+import { RateLimit, ContactMessage } from '../db/mongo.js'
+import { currentEngine } from '../db/index.js'
 
 const router = express.Router()
 
@@ -85,6 +86,13 @@ router.post('/', async (req, res) => {
     }
 
     await transporter.sendMail(mailOptions)
+
+    if (currentEngine === 'mongo') {
+      try {
+        await ContactMessage.create({ name, email, subject, message, ip });
+      } catch {}
+    }
+
     return res.json({ ok: true })
   } catch (err) {
     console.error('Contact mail error:', err)
