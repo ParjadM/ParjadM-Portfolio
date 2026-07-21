@@ -91,7 +91,7 @@ Respond EXCLUSIVELY in valid JSON format using the following schema:
     );
 
     const makeRequest = () => ai.models.generateContent({
-      model: 'gemini-3.1-flash-lite',
+      model: 'gemini-3.5-flash-lite',
       contents: [{ role: 'user', parts: [{ text: combinedCode }] }],
       config: {
         systemInstruction: systemInstruction,

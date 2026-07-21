@@ -21,6 +21,6 @@ export const aiConfig = {
   maxOutputTokensDetailed: Number(process.env.AI_MAX_OUTPUT_TOKENS_DETAILED || 512),
   maxHistoryTurns: Number(process.env.AI_MAX_HISTORY_TURNS || 4),
   knowledgeCacheMs: Number(process.env.AI_KNOWLEDGE_CACHE_MS || 60000),
-  model: process.env.AI_GEMINI_MODEL || 'gemini-3.1-flash-lite',
+  model: process.env.AI_GEMINI_MODEL || 'gemini-3.5-flash-lite',
   streamingEnabled: process.env.AI_STREAMING_ENABLED !== 'false',
 }

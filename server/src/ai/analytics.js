@@ -79,7 +79,7 @@ export async function getAdminAiStats(rangeDays = 7) {
       today: { total: 0, gemini: 0, free: 0, cacheHitRate: 0, byFeature: {} },
       series: dates.map((date) => ({ date, gemini: 0, free: 0, total: 0 })),
       topTopics: [],
-      model: process.env.AI_GEMINI_MODEL || 'gemini-3.1-flash-lite',
+      model: process.env.AI_GEMINI_MODEL || 'gemini-3.5-flash-lite',
     }
   }
 
@@ -150,6 +150,6 @@ export async function getAdminAiStats(rangeDays = 7) {
     },
     series,
     topTopics,
-    model: process.env.AI_GEMINI_MODEL || 'gemini-3.1-flash-lite',
+    model: process.env.AI_GEMINI_MODEL || 'gemini-3.5-flash-lite',
   }
 }
