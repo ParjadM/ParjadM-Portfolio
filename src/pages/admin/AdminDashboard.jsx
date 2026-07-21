@@ -1,19 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { adminJson } from '../../utils/adminApi.js';
 import { AdminProvider } from './AdminContext.jsx';
 import { AdminLayout } from './AdminLayout.jsx';
-import { AdminOverview } from './AdminOverview.jsx';
-import { AdminBlogManager } from './AdminBlogManager.jsx';
-import { AdminProjectsManager } from './AdminProjectsManager.jsx';
-import { AdminAIManager } from './AdminAIManager.jsx';
-import { AdminAICostDashboard } from './AdminAICostDashboard.jsx';
-import { AdminInterviewManager } from './AdminInterviewManager.jsx';
-import { AdminAppStoreManager } from './AdminAppStoreManager.jsx';
-import { AdminContactInbox } from './AdminContactInbox.jsx';
-import { AdminMediaLibrary } from './AdminMediaLibrary.jsx';
-import { AdminAuditLog } from './AdminAuditLog.jsx';
-import { PremiumAnalytics } from './PremiumAnalytics.jsx';
+import { AdminPanelSkeleton } from './components/AdminSkeleton.jsx';
+
+const AdminOverview = React.lazy(() => import('./AdminOverview.jsx'));
+const AdminBlogManager = React.lazy(() => import('./AdminBlogManager.jsx'));
+const AdminProjectsManager = React.lazy(() => import('./AdminProjectsManager.jsx'));
+const AdminAIManager = React.lazy(() => import('./AdminAIManager.jsx'));
+const AdminAICostDashboard = React.lazy(() => import('./AdminAICostDashboard.jsx'));
+const AdminInterviewManager = React.lazy(() => import('./AdminInterviewManager.jsx'));
+const AdminAppStoreManager = React.lazy(() => import('./AdminAppStoreManager.jsx'));
+const AdminContactInbox = React.lazy(() => import('./AdminContactInbox.jsx'));
+const AdminMediaLibrary = React.lazy(() => import('./AdminMediaLibrary.jsx'));
+const AdminAuditLog = React.lazy(() => import('./AdminAuditLog.jsx'));
+const PremiumAnalytics = React.lazy(() => import('./PremiumAnalytics.jsx'));
 
 function AdminDashboardContent({ theme }) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -45,7 +47,9 @@ function AdminDashboardContent({ theme }) {
 
   return (
     <AdminLayout activeTab={activeTab} setTab={setTab}>
-      {renderTab()}
+      <Suspense fallback={<AdminPanelSkeleton />}>
+        {renderTab()}
+      </Suspense>
     </AdminLayout>
   );
 }

@@ -3,16 +3,22 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
 import translationEN from './locales/en/translation.json';
-import translationFR from './locales/fr/translation.json';
 
 const resources = {
   en: { translation: translationEN },
-  fr: { translation: translationFR },
 };
 
 function syncDocumentLanguage(lng) {
   if (typeof document === 'undefined') return;
   document.documentElement.lang = lng?.startsWith('fr') ? 'fr-CA' : 'en';
+}
+
+export async function ensureLocale(lng) {
+  const code = lng?.startsWith('fr') ? 'fr' : 'en';
+  if (code === 'en' || i18n.hasResourceBundle('fr', 'translation')) return code;
+  const { default: translationFR } = await import('./locales/fr/translation.json');
+  i18n.addResourceBundle('fr', 'translation', translationFR, true, true);
+  return 'fr';
 }
 
 i18n

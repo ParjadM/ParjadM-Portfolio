@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getLocaleFromPath } from '../utils/i18nRouting.js';
+import { ensureLocale } from '../i18n.js';
 
 export function LocaleSync() {
   const location = useLocation();
@@ -9,10 +10,17 @@ export function LocaleSync() {
 
   useEffect(() => {
     const locale = getLocaleFromPath(location.pathname);
-    if (i18n.language !== locale) {
-      i18n.changeLanguage(locale);
-    }
-    document.documentElement.lang = locale === 'fr' ? 'fr-CA' : 'en';
+    let cancelled = false;
+
+    ensureLocale(locale).then((resolved) => {
+      if (cancelled) return;
+      if (i18n.language !== resolved) {
+        i18n.changeLanguage(resolved);
+      }
+      document.documentElement.lang = resolved === 'fr' ? 'fr-CA' : 'en';
+    });
+
+    return () => { cancelled = true; };
   }, [location.pathname, i18n]);
 
   return null;

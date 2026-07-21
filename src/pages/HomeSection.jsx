@@ -51,7 +51,8 @@ export const HomeSection = ({ theme }) => {
         <img 
           src={ParjadM} 
           alt="Parjad Minooei"
-          loading="lazy"
+          loading="eager"
+          fetchPriority="high"
           decoding="async"
           className="w-64 md:w-80 lg:w-[28rem]"
         />

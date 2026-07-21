@@ -57,9 +57,9 @@ const SpeakerOffIcon = (props) => (
   </svg>
 );
 
-const Chatbot = ({ theme = 'green' }) => {
+const Chatbot = ({ theme = 'green', autoOpenDetail = null }) => {
   const { t, i18n } = useTranslation();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(!!autoOpenDetail);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -84,21 +84,27 @@ const Chatbot = ({ theme = 'green' }) => {
     return () => window.removeEventListener(PAGE_CONTEXT_EVENT, onPageContext);
   }, []);
 
+  const applyOpenDetail = useCallback((detail) => {
+    const { message, pageContext, autoSend } = detail || {};
+    if (pageContext) setSessionPageContext(pageContext);
+    setIsOpen(true);
+    if (message) {
+      setInput(message);
+      if (autoSend) pendingSendRef.current = message;
+    } else {
+      refreshGreeting(location.pathname, pageContext);
+    }
+  }, [location.pathname, refreshGreeting]);
+
   useEffect(() => {
-    const onOpen = (event) => {
-      const { message, pageContext, autoSend } = event.detail || {};
-      if (pageContext) setSessionPageContext(pageContext);
-      setIsOpen(true);
-      if (message) {
-        setInput(message);
-        if (autoSend) pendingSendRef.current = message;
-      } else {
-        refreshGreeting(location.pathname, pageContext);
-      }
-    };
+    if (autoOpenDetail) applyOpenDetail(autoOpenDetail);
+  }, [autoOpenDetail, applyOpenDetail]);
+
+  useEffect(() => {
+    const onOpen = (event) => applyOpenDetail(event.detail);
     window.addEventListener(CHATBOT_OPEN_EVENT, onOpen);
     return () => window.removeEventListener(CHATBOT_OPEN_EVENT, onOpen);
-  }, [location.pathname, refreshGreeting]);
+  }, [applyOpenDetail]);
 
   useEffect(() => {
     const pageContext = buildChatPayloadContext(location, sessionPageContext);

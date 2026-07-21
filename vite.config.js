@@ -13,6 +13,14 @@ export default defineConfig({
       manifest: false,
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,webp,woff2}'],
+        globIgnores: [
+          '**/AdminDashboard*.js',
+          '**/DesktopOS*.js',
+          '**/CliMode*.js',
+          '**/IntroCinematic*.js',
+          '**/LQFTBenchmarkPage*.js',
+          '**/MockInterviewPage*.js',
+        ],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         skipWaiting: true,
         clientsClaim: true,

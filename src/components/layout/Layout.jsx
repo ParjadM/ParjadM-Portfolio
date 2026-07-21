@@ -7,7 +7,7 @@ import { Footer } from './Footer.jsx';
 import { BottomNav } from './BottomNav.jsx';
 import { buildAppRouteElements } from './AppRoutes.jsx';
 import { LocaleSync } from '../LocaleSync.jsx';
-import Chatbot from '../Chatbot.jsx';
+import { ChatbotLauncher } from '../ChatbotLauncher.jsx';
 import { Toast } from '../ui/Toast.jsx';
 import { OfflineBanner } from '../OfflineBanner.jsx';
 import { PwaInstallPrompt } from '../PwaInstallPrompt.jsx';
@@ -57,6 +57,7 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
     useEffect(() => {
         try {
             const path = stripLocalePrefix(location?.pathname || '/')
+            if (path.startsWith('/admin') || path === '/os' || path === '/cli') return
             fetch('/api/metrics/visit', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -149,7 +150,7 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
             {!isFullscreenRoute && <BottomNav theme={themeConfig.accentPrefix} />}
             
             {/* AI Chatbot */}
-            {!isFullscreenRoute && <Chatbot theme={themeConfig.accentPrefix} />}
+            {!isFullscreenRoute && <ChatbotLauncher theme={themeConfig.accentPrefix} />}
             
             <OfflineBanner />
             <PwaInstallPrompt theme={themeConfig.accentPrefix} />
