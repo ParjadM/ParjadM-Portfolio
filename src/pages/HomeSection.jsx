@@ -48,8 +48,8 @@ export const HomeSection = ({ theme }) => {
   const accentText = isPink ? 'text-pink-400' : 'text-emerald-400';
   const tagClasses = isPink ? 'bg-pink-500/20 text-pink-300' : 'bg-emerald-500/20 text-emerald-300';
   const gradientText = isPink ? 'from-pink-400 via-red-400 to-purple-400' : 'from-emerald-400 via-teal-400 to-cyan-400';
-  const glow = isPink ? 'bg-pink-500/25' : 'bg-emerald-500/25';
-  const photoFrame = isPink ? 'from-pink-500/50 to-red-500/50' : 'from-emerald-500/50 to-teal-500/50';
+  const borderTheme = isPink ? 'portrait-border--pink' : '';
+  const glowTheme = isPink ? 'portrait-border-glow--pink' : '';
 
   return (
   <PageTransition className="text-white relative overflow-hidden">
@@ -94,9 +94,9 @@ export const HomeSection = ({ theme }) => {
         {/* Right: Portrait image */}
         <div className="flex justify-center md:justify-end mt-4 md:mt-0">
           <Reveal>
-          <div className="relative">
-            <div aria-hidden="true" className={`absolute -inset-8 rounded-full blur-3xl ${glow}`} />
-            <div className={`relative rounded-[2rem] p-1 bg-gradient-to-br ${photoFrame} shadow-2xl`}>
+          <div className="relative inline-block">
+            <div aria-hidden="true" className={`portrait-border-glow ${glowTheme}`} />
+            <div className={`portrait-border ${borderTheme}`}>
               <img 
                 src={ParjadM} 
                 alt="Parjad Minooei"
@@ -105,7 +105,7 @@ export const HomeSection = ({ theme }) => {
                 loading="eager"
                 fetchPriority="high"
                 decoding="async"
-                className="w-60 sm:w-72 md:w-80 lg:w-[26rem] h-auto rounded-[1.75rem]"
+                className="w-60 sm:w-72 md:w-80 lg:w-[26rem] h-auto"
               />
             </div>
           </div>
