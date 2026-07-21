@@ -14,7 +14,7 @@ import ParjadM from '../Images/ParjadM.webp';
 
 const SKILLS = [
   'React', 'Node.js', 'Express', 'MongoDB', 'Python',
-  'JavaScript', 'TypeScript', 'Tailwind CSS', 'SQL', 'Git',
+  'JavaScript', 'C++', 'Java', 'SQL', 'Git',
 ];
 
 const ChevronDownIcon = (props) => (
