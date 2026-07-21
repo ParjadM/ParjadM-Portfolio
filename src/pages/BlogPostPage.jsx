@@ -95,18 +95,30 @@ export const BlogPostPage = ({ theme }) => {
     const headings = extractHeadings(post.content);
     const readMins = readingTimeMinutes(post.content);
 
-    const jsonLd = {
-        '@context': 'https://schema.org',
-        '@type': 'BlogPosting',
-        headline: post.title,
-        description: post.excerpt || post.content?.slice(0, 160),
-        image: ogImage,
-        datePublished: post.date,
-        author: { '@type': 'Person', name: SITE_NAME, url: SITE_URL },
-        publisher: { '@type': 'Person', name: SITE_NAME },
-        mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/blog/${post.id || id}` },
-        keywords: (post.tags || []).join(', '),
-    };
+    const jsonLd = [
+        {
+            '@context': 'https://schema.org',
+            '@type': 'BlogPosting',
+            headline: post.title,
+            description: post.excerpt || post.content?.slice(0, 160),
+            image: ogImage,
+            datePublished: post.date,
+            dateModified: post.updatedAt || post.date,
+            author: { '@type': 'Person', name: SITE_NAME, url: SITE_URL },
+            publisher: { '@type': 'Person', name: SITE_NAME },
+            mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/blog/${post.id || id}` },
+            keywords: (post.tags || []).join(', '),
+        },
+        {
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+                { '@type': 'ListItem', position: 2, name: 'Blog', item: `${SITE_URL}/blog` },
+                { '@type': 'ListItem', position: 3, name: post.title, item: `${SITE_URL}/blog/${post.id || id}` },
+            ],
+        },
+    ];
 
     return (
         <section className="min-h-screen flex items-center justify-center py-20 px-4">

@@ -9,6 +9,45 @@
   outline-offset: 2px;
 }
 
+/* Scroll reveal (CSS replacement for framer-motion Reveal) */
+.reveal {
+  opacity: 0;
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal-up { transform: translateY(40px) scale(0.95); }
+.reveal-down { transform: translateY(-40px) scale(0.95); }
+.reveal-left { transform: translateX(-40px) scale(0.95); }
+.reveal-right { transform: translateX(40px) scale(0.95); }
+.reveal-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Page enter animation (CSS replacement for framer-motion PageTransition) */
+.page-transition {
+  animation: page-enter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dropdown pop-in (CSS replacement for framer-motion header dropdown) */
+.dropdown-pop {
+  animation: dropdown-pop 0.2s ease-out both;
+  transform-origin: top center;
+}
+@keyframes dropdown-pop {
+  from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .page-transition, .dropdown-pop { animation: none; }
+}
+
 body {
   font-family: 'Outfit Variable', 'Outfit', sans-serif;
   margin: 0;

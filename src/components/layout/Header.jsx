@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Palette, Menu } from '../ui/Icons.jsx';
 import { Monitor, Newspaper, Film, Terminal, MessageSquare, Activity, ChevronDown } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { GlassCard } from '../ui/GlassCard.jsx';
 import Logo from '../../Images/Logo.webp';
 import { THEMES } from '../../utils/themeConfig.js';
@@ -185,37 +184,29 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
         document.body
     );
 
-    const moreEl = typeof document !== 'undefined' && createPortal(
-        <AnimatePresence>
-            {isMoreOpen && moreRect && (
-                <motion.div
-                    id="more-dropdown-portal"
-                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                    transition={{ duration: 0.2, ease: "easeOut" }}
-                    className="fixed z-[9999] w-64 rounded-2xl bg-gray-900/90 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden p-2 flex flex-col gap-1"
-                    style={{ top: moreRect.top, left: moreRect.left }}
+    const moreEl = typeof document !== 'undefined' && isMoreOpen && moreRect && createPortal(
+        <div
+            id="more-dropdown-portal"
+            className="dropdown-pop fixed z-[9999] w-64 rounded-2xl bg-gray-900/90 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden p-2 flex flex-col gap-1"
+            style={{ top: moreRect.top, left: moreRect.left }}
+        >
+            {MORE_ITEMS.map((item, idx) => (
+                <LocalizedLink 
+                    key={idx}
+                    to={item.path} 
+                    onClick={() => setIsMoreOpen(false)} 
+                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
                 >
-                    {MORE_ITEMS.map((item, idx) => (
-                        <LocalizedLink 
-                            key={idx}
-                            to={item.path} 
-                            onClick={() => setIsMoreOpen(false)} 
-                            className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
-                        >
-                            <div className="mt-0.5 p-2 rounded-lg bg-white/5 text-gray-400 group-hover:text-white group-hover:bg-white/20 transition-colors">
-                                {item.icon}
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-sm font-semibold text-gray-200 group-hover:text-white transition-colors">{item.name}</span>
-                                <span className="text-[10px] text-gray-500 group-hover:text-gray-400 transition-colors">{item.description}</span>
-                            </div>
-                        </LocalizedLink>
-                    ))}
-                </motion.div>
-            )}
-        </AnimatePresence>,
+                    <div className="mt-0.5 p-2 rounded-lg bg-white/5 text-gray-400 group-hover:text-white group-hover:bg-white/20 transition-colors">
+                        {item.icon}
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-sm font-semibold text-gray-200 group-hover:text-white transition-colors">{item.name}</span>
+                        <span className="text-[10px] text-gray-500 group-hover:text-gray-400 transition-colors">{item.description}</span>
+                    </div>
+                </LocalizedLink>
+            ))}
+        </div>,
         document.body
     );
 

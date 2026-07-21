@@ -1,36 +1,37 @@
-import React, { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
 
+// CSS-driven scroll reveal (replaces framer-motion to keep the 43KB gzip
+// motion chunk out of the critical path). Classes live in index.css.
 export const Reveal = ({ children, className = '', delay = 0, direction = 'up' }) => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
+  const [visible, setVisible] = useState(false);
 
-  const getVariants = () => {
-    switch(direction) {
-      case 'up': return { hidden: { opacity: 0, y: 40, scale: 0.95 }, visible: { opacity: 1, y: 0, scale: 1 } };
-      case 'down': return { hidden: { opacity: 0, y: -40, scale: 0.95 }, visible: { opacity: 1, y: 0, scale: 1 } };
-      case 'left': return { hidden: { opacity: 0, x: -40, scale: 0.95 }, visible: { opacity: 1, x: 0, scale: 1 } };
-      case 'right': return { hidden: { opacity: 0, x: 40, scale: 0.95 }, visible: { opacity: 1, x: 0, scale: 1 } };
-      default: return { hidden: { opacity: 0, y: 40, scale: 0.95 }, visible: { opacity: 1, y: 0, scale: 1 } };
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      setVisible(true);
+      return;
     }
-  };
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '-50px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <motion.div
+    <div
       ref={ref}
-      variants={getVariants()}
-      initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
-      transition={{ 
-        type: 'spring', 
-        stiffness: 100, 
-        damping: 20, 
-        delay: delay,
-        duration: 0.6
-      }}
-      className={className}
+      className={`reveal reveal-${direction}${visible ? ' reveal-visible' : ''} ${className}`}
+      style={delay ? { transitionDelay: `${delay}s` } : undefined}
     >
       {children}
-    </motion.div>
+    </div>
   );
 };

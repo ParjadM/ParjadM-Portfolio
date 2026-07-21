@@ -13,6 +13,7 @@ export const SEO = ({
     image = `${SITE_URL}/og-image.jpg`,
     url,
     jsonLd,
+    noindex = false,
 }) => {
     const location = useLocation();
     const { t } = useTranslation();
@@ -31,6 +32,7 @@ export const SEO = ({
             <html lang={locale === 'fr' ? 'fr-CA' : 'en'} />
             <title>{resolvedTitle}</title>
             <meta name='description' content={resolvedDescription} />
+            {noindex && <meta name="robots" content="noindex, nofollow" />}
             <link rel="canonical" href={canonical} />
             <link rel="alternate" hrefLang="en" href={enUrl} />
             <link rel="alternate" hrefLang="fr-CA" href={frUrl} />

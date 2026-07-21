@@ -19,6 +19,13 @@ export const HomeSection = ({ theme }) => {
     <SEO 
         title="Parjad Minooei — Software Engineer Portfolio"
         description="Software Engineer building beautiful, fast, user-centric apps."
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'WebSite',
+          name: 'Parjad Minooei',
+          url: 'https://parjadm.ca/',
+          inLanguage: ['en', 'fr-CA'],
+        }}
     />
     <div className="z-10 container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
       {/* Left: Text content */}
@@ -51,10 +58,12 @@ export const HomeSection = ({ theme }) => {
         <img 
           src={ParjadM} 
           alt="Parjad Minooei"
+          width={368}
+          height={368}
           loading="eager"
           fetchPriority="high"
           decoding="async"
-          className="w-64 md:w-80 lg:w-[28rem]"
+          className="w-64 md:w-80 lg:w-[28rem] h-auto"
         />
         </Reveal>
       </div>

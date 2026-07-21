@@ -39,11 +39,14 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
+        // NOTE: framer-motion and react-markdown are intentionally NOT listed.
+        // They are only imported by lazy chunks, so Rollup splits them into
+        // async chunks automatically. Listing them here forced their shared
+        // dependencies into the vendor chunk, which made the entry chunk
+        // statically import vendor-markdown (~47KB gzip) on every page.
         manualChunks: {
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-motion': ['framer-motion'],
           'vendor-i18n': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
-          'vendor-markdown': ['react-markdown', 'remark-gfm'],
         },
       },
     },

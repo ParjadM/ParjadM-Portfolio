@@ -42,7 +42,7 @@ router.get('/', async (req, res) => {
 
     const cached = cacheGet(LIST_CACHE_KEY)
     if (cached) {
-      res.setHeader('Cache-Control', 'no-store')
+      res.setHeader('Cache-Control', 'public, max-age=30, stale-while-revalidate=300')
       return res.json(cached)
     }
 
@@ -53,7 +53,7 @@ router.get('/', async (req, res) => {
     const payload = { projects: docs.map(d => ({ id: d._id.toString(), ...d })) }
     cacheSet(LIST_CACHE_KEY, payload, LIST_CACHE_TTL_MS)
 
-    res.setHeader('Cache-Control', 'no-store')
+    res.setHeader('Cache-Control', 'public, max-age=30, stale-while-revalidate=300')
     res.json(payload)
   } catch (err) {
     // Fail-soft: return empty list to avoid client crash in production

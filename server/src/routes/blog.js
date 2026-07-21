@@ -86,7 +86,7 @@ router.get('/', async (req, res) => {
 
     const cached = cacheGet('blog:list')
     if (cached) {
-      res.setHeader('Cache-Control', 'no-store')
+      res.setHeader('Cache-Control', 'public, max-age=30, stale-while-revalidate=300')
       return res.json(cached)
     }
 
@@ -97,9 +97,9 @@ router.get('/', async (req, res) => {
     )
       .sort({ featured: -1, publishAt: -1 })
       .lean()
-    // Browser cache stays no-store so admin edits (which invalidate the
-    // server cache) appear immediately.
-    res.setHeader('Cache-Control', 'no-store')
+    // Short browser cache only (no s-maxage): the CDN would outlive the
+    // admin cache invalidation, but a 30s browser cache is a safe trade.
+    res.setHeader('Cache-Control', 'public, max-age=30, stale-while-revalidate=300')
     const posts = docs.map(d => ({ id: d._id.toString(), ...d, publishAt: d.publishAt?.toISOString?.() ?? d.publishAt }))
     const payload = { posts }
     cacheSet('blog:list', payload, LIST_TTL_MS)
@@ -123,14 +123,14 @@ router.get('/:id', async (req, res) => {
     const cacheKey = `blog:post:${id}`
     const cached = cacheGet(cacheKey)
     if (cached) {
-      res.setHeader('Cache-Control', 'no-store')
+      res.setHeader('Cache-Control', 'public, max-age=30, stale-while-revalidate=300')
       return res.json(cached)
     }
 
     const now = new Date()
     const doc = await BlogPost.findOne({ _id: id, status: 'published', publishAt: { $lte: now } }).lean()
     if (!doc) return res.status(404).json({ error: 'Not found' })
-    res.setHeader('Cache-Control', 'no-store')
+    res.setHeader('Cache-Control', 'public, max-age=30, stale-while-revalidate=300')
     const payload = { post: { id: doc._id.toString(), ...doc } }
     cacheSet(cacheKey, payload, POST_TTL_MS)
     res.json(payload)

@@ -1,38 +1,11 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 
-const pageVariants = {
-    initial: {
-        opacity: 0,
-        y: 20,
-    },
-    in: {
-        opacity: 1,
-        y: 0,
-    },
-    out: {
-        opacity: 0,
-        y: -20,
-    }
-};
-
-const pageTransition = {
-    type: "tween",
-    ease: "anticipate",
-    duration: 0.5
-};
-
+// CSS enter animation (replaces framer-motion; route-level exit animations
+// were never triggered because <Routes> is not wrapped in AnimatePresence).
 export const PageTransition = ({ children, className = '' }) => {
     return (
-        <motion.div
-            initial="initial"
-            animate="in"
-            exit="out"
-            variants={pageVariants}
-            transition={pageTransition}
-            className={className}
-        >
+        <div className={`page-transition ${className}`}>
             {children}
-        </motion.div>
+        </div>
     );
 };
