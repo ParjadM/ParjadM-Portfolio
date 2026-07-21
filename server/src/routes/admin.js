@@ -7,8 +7,13 @@ import { logAdminAction } from '../utils/auditLog.js'
 import crypto from 'crypto'
 import { currentEngine } from '../db/index.js'
 import { redisClient } from '../db/redis.js'
+import { cacheInvalidate } from '../utils/microCache.js'
 
 const router = Router()
+
+// Clear the public read caches so admin edits are visible immediately.
+const invalidateBlogCaches = () => cacheInvalidate('blog')
+const invalidateProjectCaches = () => cacheInvalidate('projects')
 
 async function ensureLqftBenchmarkProject() {
   await Project.updateOne(
@@ -106,6 +111,7 @@ This website is more than just a portfolio; it's a living document of my journey
       readTime: '6 min read',
       tags: ['Career', 'Learning', 'Personal'],
     })
+    invalidateBlogCaches()
     res.json({ ok: true, seeded: true, id: doc._id.toString() })
   } catch (err) {
     res.status(500).json({ error: err.message })
@@ -150,6 +156,7 @@ router.post('/seed-projects', async (req, res) => {
       },
     ]
     await Project.insertMany(demo)
+    invalidateProjectCaches()
     res.json({ ok: true, seeded: true, count: demo.length })
   } catch (err) {
     res.status(500).json({ error: err.message })
@@ -211,6 +218,7 @@ router.post('/set-latest-blog-date', async (req, res) => {
     if (!doc) return res.status(404).json({ error: 'No blog posts found' })
     doc.date = desiredDate
     await doc.save()
+    invalidateBlogCaches()
     res.json({ ok: true, id: doc._id.toString(), date: doc.date })
   } catch (err) {
     res.status(500).json({ error: err.message })
@@ -244,6 +252,7 @@ router.post('/blog', async (req, res) => {
       publishAt,
     })
     await logAdminAction(req, 'blog.create', { id: doc._id.toString(), title: body.title })
+    invalidateBlogCaches()
     res.status(201).json({ id: doc._id.toString() })
   } catch (err) {
     res.status(400).json({ error: err.message })
@@ -262,6 +271,7 @@ router.put('/blog/:id', async (req, res) => {
       { $set: update, $currentDate: { updatedAt: true } }
     )
     await logAdminAction(req, 'blog.update', { id })
+    invalidateBlogCaches()
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
@@ -274,6 +284,7 @@ router.delete('/blog/:id', async (req, res) => {
     const { id } = req.params
     await BlogPost.deleteOne({ _id: id })
     await logAdminAction(req, 'blog.delete', { id })
+    invalidateBlogCaches()
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
@@ -293,6 +304,7 @@ router.post('/blog/:id/publish', async (req, res) => {
       }
     )
     await logAdminAction(req, 'blog.publish', { id })
+    invalidateBlogCaches()
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
@@ -306,6 +318,7 @@ router.post('/blog/:id/feature', async (req, res) => {
     const featured = !!(req.body && req.body.featured)
     await BlogPost.updateOne({ _id: id }, { featured })
     await logAdminAction(req, 'blog.feature', { id, featured })
+    invalidateBlogCaches()
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
@@ -336,6 +349,7 @@ router.post('/projects', async (req, res) => {
       order: typeof body.order === 'number' ? body.order : Date.now(),
     })
     await logAdminAction(req, 'project.create', { id: doc._id.toString(), title: body.title })
+    invalidateProjectCaches()
     res.status(201).json({ id: doc._id.toString() })
   } catch (err) {
     res.status(400).json({ error: err.message })
@@ -348,6 +362,7 @@ router.put('/projects/:id', async (req, res) => {
     const { id } = req.params
     await Project.updateOne({ _id: id }, req.body || {})
     await logAdminAction(req, 'project.update', { id })
+    invalidateProjectCaches()
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
@@ -360,6 +375,7 @@ router.delete('/projects/:id', async (req, res) => {
     const { id } = req.params
     await Project.deleteOne({ _id: id })
     await logAdminAction(req, 'project.delete', { id })
+    invalidateProjectCaches()
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
@@ -370,11 +386,15 @@ router.post('/projects/reorder', async (req, res) => {
   if (currentEngine !== 'mongo') return res.status(400).json({ error: 'Not using MongoDB' })
   try {
     const ids = Array.isArray(req.body?.ids) ? req.body.ids : []
-    let order = 1
-    for (const id of ids) {
-      await Project.updateOne({ _id: id }, { order })
-      order += 1
+    if (ids.length > 0) {
+      // Single round trip instead of N sequential updates
+      await Project.bulkWrite(
+        ids.map((id, index) => ({
+          updateOne: { filter: { _id: id }, update: { order: index + 1 } },
+        }))
+      )
     }
+    invalidateProjectCaches()
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })
@@ -387,6 +407,7 @@ router.post('/projects/:id/feature', async (req, res) => {
     const { id } = req.params
     const featured = !!(req.body && req.body.featured)
     await Project.updateOne({ _id: id }, { featured })
+    invalidateProjectCaches()
     res.json({ ok: true })
   } catch (err) {
     res.status(400).json({ error: err.message })

@@ -1,28 +1,9 @@
 import { Router } from 'express'
-import { CommunityApp, RateLimit } from '../db/mongo.js'
+import { CommunityApp } from '../db/mongo.js'
 import { currentEngine } from '../db/index.js'
+import { checkRateLimit } from '../utils/rateLimit.js'
 
 const router = Router()
-
-async function checkRateLimit(key, limit = 3, windowMs = 60 * 60 * 1000) {
-  const now = Date.now()
-  const doc = await RateLimit.findOne({ key })
-  if (!doc) {
-    await RateLimit.create({ key, windowStart: new Date(now), count: 1 })
-    return true
-  }
-  const start = doc.windowStart?.getTime?.() || new Date(doc.windowStart).getTime()
-  if (now - start > windowMs) {
-    doc.windowStart = new Date(now)
-    doc.count = 1
-    await doc.save()
-    return true
-  }
-  if (doc.count >= limit) return false
-  doc.count += 1
-  await doc.save()
-  return true
-}
 
 function isValidHttpsUrl(value, { allowHttp = false } = {}) {
   try {
@@ -77,7 +58,7 @@ router.post('/submit', async (req, res) => {
     }
 
     const ip = (req.headers['x-forwarded-for'] || '').toString().split(',')[0].trim() || req.ip || 'unknown'
-    const allowed = await checkRateLimit(`appsubmit:${ip}`)
+    const allowed = await checkRateLimit(`appsubmit:${ip}`, 3, 60 * 60 * 1000)
     if (!allowed) return res.status(429).json({ error: 'Too many submissions. Try again later.' })
 
     // Avoid duplicate pending/approved entries for the same URL

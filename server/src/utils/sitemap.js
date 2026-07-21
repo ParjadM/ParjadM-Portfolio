@@ -1,6 +1,9 @@
 import { currentEngine } from '../db/index.js';
 import { BlogPost } from '../db/mongo.js';
 import { SITE_URL } from '../config/site.js';
+import { cacheGet, cacheSet } from './microCache.js';
+
+const SITEMAP_TTL_MS = 5 * 60 * 1000;
 
 const STATIC_PATHS = [
   '/',
@@ -39,6 +42,9 @@ function urlEntry(loc, enPath) {
 }
 
 export async function buildSitemap() {
+  const cached = cacheGet('blog:sitemap');
+  if (cached) return cached;
+
   const entries = [];
 
   for (const path of STATIC_PATHS) {
@@ -70,8 +76,10 @@ export async function buildSitemap() {
     }
   }
 
-  return `<?xml version="1.0" encoding="UTF-8"?>
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">${entries.join('')}
 </urlset>`;
+  cacheSet('blog:sitemap', xml, SITEMAP_TTL_MS);
+  return xml;
 }

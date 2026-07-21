@@ -3,7 +3,7 @@ import { Github, Linkedin } from '../ui/Icons.jsx';
 import { useTranslation } from 'react-i18next';
 import { LocalizedLink } from '../ui/LocalizedLink.jsx';
 
-export const Footer = ({ theme }) => {
+export const Footer = React.memo(function Footer({ theme }) {
     const { t } = useTranslation();
     const navLinks = [
         { name: t('nav.Home'), path: '/' },
@@ -95,5 +95,5 @@ export const Footer = ({ theme }) => {
             </div>
         </footer>
     );
-};
+});
 

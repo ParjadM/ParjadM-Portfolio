@@ -1,29 +1,10 @@
 import { Router } from 'express'
-import { ClientError, RateLimit } from '../db/mongo.js'
+import { ClientError } from '../db/mongo.js'
 import { currentEngine } from '../db/index.js'
 import { notifyErrorSpike } from '../utils/alertNotify.js'
+import { checkRateLimit } from '../utils/rateLimit.js'
 
 const router = Router()
-
-async function checkRateLimit(key, limit = 20, windowMs = 60 * 60 * 1000) {
-  const now = Date.now()
-  const doc = await RateLimit.findOne({ key })
-  if (!doc) {
-    await RateLimit.create({ key, windowStart: new Date(now), count: 1 })
-    return true
-  }
-  const start = doc.windowStart?.getTime?.() || new Date(doc.windowStart).getTime()
-  if (now - start > windowMs) {
-    doc.windowStart = new Date(now)
-    doc.count = 1
-    await doc.save()
-    return true
-  }
-  if (doc.count >= limit) return false
-  doc.count += 1
-  await doc.save()
-  return true
-}
 
 // POST /api/client-errors - browser error reports
 router.post('/', async (req, res) => {
@@ -34,7 +15,7 @@ router.post('/', async (req, res) => {
     if (!message) return res.status(400).json({ error: 'Missing message' })
 
     const ip = (req.headers['x-forwarded-for'] || '').toString().split(',')[0].trim() || req.ip || 'unknown'
-    const allowed = await checkRateLimit(`clienterr:${ip}`)
+    const allowed = await checkRateLimit(`clienterr:${ip}`, 20, 60 * 60 * 1000)
     if (!allowed) return res.json({ ok: true })
 
     await ClientError.create({

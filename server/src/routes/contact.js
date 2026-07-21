@@ -1,7 +1,8 @@
 import express from 'express'
 import nodemailer from 'nodemailer'
-import { RateLimit, ContactMessage } from '../db/mongo.js'
+import { ContactMessage } from '../db/mongo.js'
 import { currentEngine } from '../db/index.js'
+import { checkRateLimit } from '../utils/rateLimit.js'
 
 const router = express.Router()
 
@@ -22,26 +23,6 @@ function createTransporter() {
     secure,
     auth: { user, pass },
   })
-}
-
-async function checkRateLimit(key, limit = 5, windowMs = 60 * 60 * 1000) {
-  const now = Date.now()
-  const doc = await RateLimit.findOne({ key })
-  if (!doc) {
-    await RateLimit.create({ key, windowStart: new Date(now), count: 1 })
-    return true
-  }
-  const start = doc.windowStart?.getTime?.() || new Date(doc.windowStart).getTime()
-  if (now - start > windowMs) {
-    doc.windowStart = new Date(now)
-    doc.count = 1
-    await doc.save()
-    return true
-  }
-  if (doc.count >= limit) return false
-  doc.count += 1
-  await doc.save()
-  return true
 }
 
 router.post('/', async (req, res) => {

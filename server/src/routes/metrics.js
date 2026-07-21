@@ -17,84 +17,75 @@ router.post('/visit', async (req, res) => {
 
     await ensureAnalyticsDoc()
 
-    let incUnique = 0
     const visitorId = (req.body && String(req.body.visitorId || '').trim()) || ''
     const path = (req.body && String(req.body.path || '').trim()) || '/'
     const today = new Date().toISOString().slice(0, 10)
-    if (visitorId) {
-      const result = await Visitor.updateOne({ visitorId }, { $setOnInsert: { visitorId } }, { upsert: true })
-      if (result.upsertedCount && result.upsertedCount > 0) incUnique = 1
-    }
 
-    const updated = await Analytics.findOneAndUpdate(
-      { key: 'global' },
-      { $inc: { pageviews: 1, uniqueVisitors: incUnique } },
-      { new: true }
-    ).lean()
-
-    // Daily global
-    let dayIncUnique = 0
-    if (visitorId) {
-      const r = await VisitorDay.updateOne({ date: today, visitorId }, { $setOnInsert: { date: today, visitorId } }, { upsert: true })
-      if (r.upsertedCount && r.upsertedCount > 0) dayIncUnique = 1
-    }
-    await AnalyticsDaily.updateOne(
-      { date: today, key: 'global' },
-      { $setOnInsert: { date: today, key: 'global' }, $inc: { pageviews: 1, uniqueVisitors: dayIncUnique } },
-      { upsert: true }
-    )
-
-    // Daily per-path
-    let pathIncUnique = 0
-    if (visitorId) {
-      const r2 = await VisitorDayPath.updateOne({ date: today, path, visitorId }, { $setOnInsert: { date: today, path, visitorId } }, { upsert: true })
-      if (r2.upsertedCount && r2.upsertedCount > 0) pathIncUnique = 1
-    }
-    await AnalyticsDaily.updateOne(
-      { date: today, key: `path:${path}` },
-      { $setOnInsert: { date: today, key: `path:${path}` }, $inc: { pageviews: 1, uniqueVisitors: pathIncUnique } },
-      { upsert: true }
-    )
+    // Stage 1: visitor uniqueness upserts (independent of each other)
+    const [globalRes, dayRes, pathRes] = await Promise.all([
+      visitorId
+        ? Visitor.updateOne({ visitorId }, { $setOnInsert: { visitorId } }, { upsert: true })
+        : null,
+      visitorId
+        ? VisitorDay.updateOne({ date: today, visitorId }, { $setOnInsert: { date: today, visitorId } }, { upsert: true })
+        : null,
+      visitorId
+        ? VisitorDayPath.updateOne({ date: today, path, visitorId }, { $setOnInsert: { date: today, path, visitorId } }, { upsert: true })
+        : null,
+    ])
+    const incUnique = globalRes?.upsertedCount > 0 ? 1 : 0
+    const dayIncUnique = dayRes?.upsertedCount > 0 ? 1 : 0
+    const pathIncUnique = pathRes?.upsertedCount > 0 ? 1 : 0
 
     // Parse User Agent manually or fallback to Unknown to prevent Vercel crashes
     const uaString = req.headers['user-agent'] || ''
     const { browser: browserName, os: osName } = parseUserAgent(uaString)
-
-    // Update Device Stats
-    await DeviceStats.updateOne(
-      { type: 'browser', name: browserName },
-      { $inc: { count: 1 } },
-      { upsert: true }
-    )
-    await DeviceStats.updateOne(
-      { type: 'os', name: osName },
-      { $inc: { count: 1 } },
-      { upsert: true }
-    )
-
-    // Update Hourly Stats
     const currentHour = new Date().getHours()
-    await HourlyStats.updateOne(
-      { date: today, hour: currentHour },
-      { $setOnInsert: { date: today, hour: currentHour }, $inc: { pageviews: 1, uniqueVisitors: dayIncUnique } },
-      { upsert: true }
-    )
 
-    // Insert Access Log (capped collection handles truncation)
-    // Only attempt insert if we successfully parsed the connection
-    try {
-      await AccessLog.create({
+    // Stage 2: all counter updates and the access log, in parallel
+    const [updated] = await Promise.all([
+      Analytics.findOneAndUpdate(
+        { key: 'global' },
+        { $inc: { pageviews: 1, uniqueVisitors: incUnique } },
+        { new: true }
+      ).lean(),
+      AnalyticsDaily.updateOne(
+        { date: today, key: 'global' },
+        { $setOnInsert: { date: today, key: 'global' }, $inc: { pageviews: 1, uniqueVisitors: dayIncUnique } },
+        { upsert: true }
+      ),
+      AnalyticsDaily.updateOne(
+        { date: today, key: `path:${path}` },
+        { $setOnInsert: { date: today, key: `path:${path}` }, $inc: { pageviews: 1, uniqueVisitors: pathIncUnique } },
+        { upsert: true }
+      ),
+      DeviceStats.updateOne(
+        { type: 'browser', name: browserName },
+        { $inc: { count: 1 } },
+        { upsert: true }
+      ),
+      DeviceStats.updateOne(
+        { type: 'os', name: osName },
+        { $inc: { count: 1 } },
+        { upsert: true }
+      ),
+      HourlyStats.updateOne(
+        { date: today, hour: currentHour },
+        { $setOnInsert: { date: today, hour: currentHour }, $inc: { pageviews: 1, uniqueVisitors: dayIncUnique } },
+        { upsert: true }
+      ),
+      // Access log is best-effort (capped collection handles truncation)
+      AccessLog.create({
         path: path,
         method: req.method || 'POST',
         visitorId: visitorId,
         userAgent: uaString,
         browser: browserName,
         os: osName
-      })
-    } catch (logErr) {
-      // Ignore log insertion errors if capped collection isn't initialized properly
-      console.error("Access log error:", logErr.message)
-    }
+      }).catch((logErr) => {
+        console.error("Access log error:", logErr.message)
+      }),
+    ])
 
     res.json({ ok: true, pageviews: updated?.pageviews || 0, uniqueVisitors: updated?.uniqueVisitors || 0 })
   } catch (err) {
