@@ -47,6 +47,9 @@ export default function LeetCodeStats({ theme = 'green' as 'green' | 'pink' }) {
   const ring = theme === 'pink' ? 'ring-pink-400/40' : 'ring-emerald-400/40'
   const accent = theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'
 
+  const solvedTotal = data.easySolved + data.mediumSolved + data.hardSolved
+  const pct = (n: number) => (solvedTotal > 0 ? (n / solvedTotal) * 100 : 0)
+
   return (
     <div className={`p-6 rounded-xl bg-white/5 border border-white/10 ring-1 ${ring}`}>
       <div className="flex items-center justify-between mb-6">
@@ -59,6 +62,20 @@ export default function LeetCodeStats({ theme = 'green' as 'green' | 'pink' }) {
         <Stat label="Medium" value={data.mediumSolved} />
         <Stat label="Hard" value={data.hardSolved} />
       </div>
+      {solvedTotal > 0 && (
+        <div className="mt-6">
+          <div className="flex h-2.5 w-full rounded-full overflow-hidden bg-white/10" role="img" aria-label={`Easy ${data.easySolved}, Medium ${data.mediumSolved}, Hard ${data.hardSolved}`}>
+            <div className="bg-emerald-400" style={{ width: `${pct(data.easySolved)}%` }} />
+            <div className="bg-amber-400" style={{ width: `${pct(data.mediumSolved)}%` }} />
+            <div className="bg-rose-400" style={{ width: `${pct(data.hardSolved)}%` }} />
+          </div>
+          <div className="mt-2 flex items-center gap-4 text-xs text-gray-400">
+            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-400" />Easy</span>
+            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-400" />Medium</span>
+            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-rose-400" />Hard</span>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

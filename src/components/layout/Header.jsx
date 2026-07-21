@@ -53,6 +53,8 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
     const [isMoreOpen, setIsMoreOpen] = useState(false);
     const [moreRect, setMoreRect] = useState(null);
     const moreDropdownRef = useRef(null);
+    const navLinksRef = useRef(null);
+    const [navIndicator, setNavIndicator] = useState(null);
     const [visitors, setVisitors] = useState(() => {
         try {
             const cached = localStorage.getItem('cachedVisitors');
@@ -119,6 +121,23 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
             window.removeEventListener('scroll', updatePaletteRect, true);
         };
     }, [isPaletteOpen]);
+
+    // Sliding indicator that follows the active desktop nav link.
+    useEffect(() => {
+        const update = () => {
+            const container = navLinksRef.current;
+            if (!container) return;
+            const active = container.querySelector('a[aria-current="page"]');
+            if (!active) {
+                setNavIndicator(null);
+                return;
+            }
+            setNavIndicator({ left: active.offsetLeft, width: active.offsetWidth });
+        };
+        update();
+        window.addEventListener('resize', update);
+        return () => window.removeEventListener('resize', update);
+    }, [location.pathname, t]);
 
     useEffect(() => {
         const onOpenMenu = () => setIsMobileMenuOpen?.(true);
@@ -224,17 +243,25 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                 <GlassCard className="!rounded-full border border-white/10 shadow-lg backdrop-blur-md" theme={theme}>
                     <div className="flex items-center px-2 py-1.5">
                         {/* Navigation Links */}
-                        <div className="flex items-center space-x-1 pr-4 border-r border-white/10">
+                        <div ref={navLinksRef} className="relative flex items-center space-x-1 pr-4 border-r border-white/10">
+                            {/* Sliding active pill */}
+                            {navIndicator && (
+                                <span
+                                    aria-hidden="true"
+                                    className={`absolute top-1/2 -translate-y-1/2 h-9 rounded-full transition-all duration-300 ease-out pointer-events-none ${theme === 'pink' ? 'bg-pink-500/20 border border-pink-500/20' : 'bg-emerald-500/20 border border-emerald-500/20'}`}
+                                    style={{ left: navIndicator.left, width: navIndicator.width }}
+                                />
+                            )}
                             {navItems.map(item => {
                                 const isItemActive = isActive(item.path);
                                 return (
                                     <LocalizedLink
                                         key={item.name}
                                         to={item.path}
-                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                                        className={`relative z-10 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-300 border border-transparent ${
                                             isItemActive 
-                                            ? (theme === 'pink' ? 'bg-pink-500/20 text-pink-200 border border-pink-500/20' : 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/20') 
-                                            : 'text-gray-300 hover:text-white hover:bg-white/10 border border-transparent'
+                                            ? (theme === 'pink' ? 'text-pink-200' : 'text-emerald-200') 
+                                            : 'text-gray-300 hover:text-white hover:bg-white/10'
                                         }`}
                                         aria-current={isItemActive ? 'page' : undefined}
                                     >

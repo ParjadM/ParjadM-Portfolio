@@ -4,6 +4,7 @@ import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { Reveal } from '../components/Reveal.jsx';
 import { useTranslation } from 'react-i18next';
 import { BlogCardSkeleton } from '../components/ui/Skeleton.jsx';
+import { formatDate } from '../utils/formatDate.js';
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 
 export const BlogSection = ({ theme }) => {
@@ -91,7 +92,7 @@ export const BlogSection = ({ theme }) => {
                         <Link to={`/blog/${featuredPost.id}`} className="block">
                             <GlassCard className="p-0 md:p-0 group cursor-pointer hover:scale-[1.01] transition-transform duration-300 overflow-hidden">
                                 {featuredPost.image && (
-                                  <div className="w-full h-56 md:h-72 overflow-hidden">
+                                  <div className="w-full h-48 md:h-60 overflow-hidden">
                                     <img src={featuredPost.image} alt="" className="w-full h-full object-cover" />
                                   </div>
                                 )}
@@ -100,7 +101,7 @@ export const BlogSection = ({ theme }) => {
                                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${tagColor}`}>
                                         {categories[featuredPost.category] || 'Post'}
                                     </span>
-                                    <span className="text-gray-400 text-xs">{featuredPost.readTime} • {featuredPost.date}</span>
+                                    <span className="text-gray-400 text-xs">{featuredPost.readTime} • {formatDate(featuredPost.date, i18n.language)}</span>
                                 </div>
                                 <h4 className="text-2xl font-bold text-white mb-3 group-hover:text-gray-200 transition-colors duration-300">
                                     {featuredPost.title}
@@ -161,7 +162,7 @@ export const BlogSection = ({ theme }) => {
                                     ))}
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-gray-400 text-xs">{post.date}</span>
+                                    <span className="text-gray-400 text-xs">{formatDate(post.date, i18n.language)}</span>
                                     <span className={`text-xs font-medium ${iconColor} group-hover:translate-x-1 transition-transform duration-300`}>
                                         {t('blog.read')}
                                     </span>

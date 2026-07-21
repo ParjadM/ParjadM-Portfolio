@@ -9,7 +9,9 @@ export function LocalizedLink({ to, children, ...props }) {
   const href = localizePath(to, locale);
 
   return (
-    <Link to={href} {...props}>
+    // viewTransition enables the browser View Transitions API cross-fade on
+    // supporting browsers (progressive enhancement, no-op elsewhere).
+    <Link to={href} viewTransition {...props}>
       {children}
     </Link>
   );

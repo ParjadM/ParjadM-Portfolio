@@ -55,10 +55,10 @@ export const ProjectsSection = ({ theme }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {loading && Array.from({ length: 6 }, (_, i) => <ProjectCardSkeleton key={`skeleton-${i}`} />)}
                 {projects.map((project) => (
-                    <Reveal key={project.id || project.title}>
-                    <GlassCard className="p-0 flex flex-col overflow-hidden">
-                        {/* Project Image */}
-                        <div className="w-full h-48 bg-gradient-to-br from-white/5 to-white/10 flex items-center justify-center overflow-hidden">
+                    <Reveal key={project.id || project.title} className="h-full">
+                    <GlassCard className="p-0 flex flex-col overflow-hidden h-full">
+                        {/* Project Image — uniform aspect ratio so grid rows align */}
+                        <div className="w-full aspect-video bg-gradient-to-br from-white/5 to-white/10 flex items-center justify-center overflow-hidden relative">
                             <BlurImage
                                 src={project.image || imageMap[project.title] || `https://placehold.co/600x400/${theme === 'pink' ? 'E94560' : '10B981'}/FFFFFF?text=${encodeURIComponent(project.title)}`}
                                 srcSet={!project.image && imageMapSm[project.title]
@@ -72,14 +72,16 @@ export const ProjectsSection = ({ theme }) => {
                                 wrapperClassName="w-full h-full"
                                 className="opacity-100 md:opacity-80 md:hover:opacity-100 hover:scale-105 transition-all duration-300"
                             />
+                            {/* Subtle overlay ties visually different thumbnails together */}
+                            <div aria-hidden="true" className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/10 bg-gradient-to-t from-black/20 to-transparent" />
                         </div>
                         
                         <div className="p-6 flex flex-col flex-grow">
                         <h3 className="text-2xl font-bold text-white mb-2">{project.title}</h3>
-                        <div className="flex flex-wrap gap-2 mb-4">
+                        <div className="flex flex-wrap gap-2 mb-4 min-h-[1.75rem]">
                             {(project.tags || []).map(tag => <span key={tag} className={`${tagClasses} text-xs font-semibold px-2.5 py-1 rounded-full`}>{tag}</span>)}
                         </div>
-                        <p className="text-gray-300 mb-6 flex-grow">{project.description}</p>
+                        <p className="text-gray-300 mb-6 flex-grow line-clamp-4" title={project.description}>{project.description}</p>
                         <div className="flex items-center justify-between mt-auto gap-3">
                           <ProjectAskAi project={project} theme={theme} />
                           <div className="flex space-x-4">

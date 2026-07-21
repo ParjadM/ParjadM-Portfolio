@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Github, Linkedin } from '../components/ui/Icons.jsx';
 import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { Reveal } from '../components/Reveal.jsx';
@@ -12,6 +12,22 @@ import ParjadImage from '../Images/Parjad.webp';
 export const AboutSection = ({ theme }) => {
     const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState('story');
+    const [quickStats, setQuickStats] = useState({ repos: null, leetcode: null });
+
+    useEffect(() => {
+        let cancelled = false;
+        Promise.allSettled([
+            fetch('/api/github-stats').then((r) => (r.ok ? r.json() : null)),
+            fetch('/api/leetcode-stats').then((r) => (r.ok ? r.json() : null)),
+        ]).then(([gh, lc]) => {
+            if (cancelled) return;
+            setQuickStats({
+                repos: gh.status === 'fulfilled' && gh.value ? gh.value.public_repos : null,
+                leetcode: lc.status === 'fulfilled' && lc.value ? lc.value.totalSolved : null,
+            });
+        });
+        return () => { cancelled = true; };
+    }, []);
 
     const tabs = [
         { id: 'story', label: t('about.tabs.story') },
@@ -146,10 +162,18 @@ export const AboutSection = ({ theme }) => {
                             </p>
                             
                             {/* Quick Stats */}
-                            <div className="grid grid-cols-1 gap-4 mb-6">
-                                <div className="text-center">
+                            <div className="grid grid-cols-3 gap-3 mb-6">
+                                <div className="text-center p-3 rounded-xl bg-white/5 border border-white/10">
                                     <div className={`text-2xl font-bold ${iconColor}`}>3+</div>
-                                    <div className="text-gray-400 text-sm">{t('about.yearsLearning')}</div>
+                                    <div className="text-gray-400 text-xs mt-1">{t('about.yearsLearning')}</div>
+                                </div>
+                                <div className="text-center p-3 rounded-xl bg-white/5 border border-white/10">
+                                    <div className={`text-2xl font-bold ${iconColor}`}>{quickStats.repos ?? '—'}</div>
+                                    <div className="text-gray-400 text-xs mt-1">{t('about.publicRepos')}</div>
+                                </div>
+                                <div className="text-center p-3 rounded-xl bg-white/5 border border-white/10">
+                                    <div className={`text-2xl font-bold ${iconColor}`}>{quickStats.leetcode ?? '—'}</div>
+                                    <div className="text-gray-400 text-xs mt-1">{t('about.leetcodeSolved')}</div>
                                 </div>
                             </div>
 
@@ -200,7 +224,7 @@ export const AboutSection = ({ theme }) => {
                 </div>
 
                 <Reveal>
-                <div className="mt-10">
+                <div className={`mt-10 rounded-2xl p-[1.5px] bg-gradient-to-r ${theme === 'pink' ? 'from-pink-500/60 via-red-500/30 to-purple-500/60' : 'from-emerald-500/60 via-teal-500/30 to-cyan-500/60'}`}>
                     <JobFitChecker theme={theme} />
                 </div>
                 </Reveal>

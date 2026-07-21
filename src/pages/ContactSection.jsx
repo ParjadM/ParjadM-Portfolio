@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Github, Linkedin } from '../components/ui/Icons.jsx';
+import { Github, Linkedin, Mail } from '../components/ui/Icons.jsx';
 import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { Reveal } from '../components/Reveal.jsx';
 import { useTranslation } from 'react-i18next';
@@ -52,6 +52,13 @@ export const ContactSection = ({ theme }) => {
     };
 
     const contactMethods = [
+        {
+            icon: <Mail size={24} />,
+            title: "Email",
+            value: "minooeip@gmail.com",
+            href: "mailto:minooeip@gmail.com",
+            description: t('contact.info.emailDesc')
+        },
         {
             icon: <Github size={24} />,
             title: "GitHub",
@@ -225,7 +232,7 @@ export const ContactSection = ({ theme }) => {
                                             <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
                                                 {method.description}
                                             </p>
-                                            <p className="text-xs text-gray-500 mt-1 truncate">
+                                            <p className={`text-xs mt-1 truncate font-medium ${theme === 'pink' ? 'text-pink-300/90' : 'text-emerald-300/90'}`}>
                                                 {method.value}
                                             </p>
                                         </div>
@@ -250,13 +257,10 @@ export const ContactSection = ({ theme }) => {
                                     <div className="text-gray-400 text-sm">{t('contact.info.responseTime')}</div>
                                     <div className="text-white font-medium">{t('contact.info.responseTimeValue')}</div>
                                 </div>
-                            </div>
-                            
-                            {/* Decorative chart-like background */}
-                            <div className="absolute bottom-0 right-0 w-32 h-32 opacity-10">
-                                <svg viewBox="0 0 100 100" className="w-full h-full fill-current text-white">
-                                    <path d="M0 100 L20 80 L40 90 L60 50 L80 60 L100 20 V100 Z" />
-                                </svg>
+                                <div className="mt-3 p-4 bg-white/5 rounded-lg border border-white/10 flex items-center justify-between">
+                                    <div className="text-gray-400 text-sm">{t('contact.info.location')}</div>
+                                    <div className="text-white font-medium">{t('contact.info.locationValue')}</div>
+                                </div>
                             </div>
                         </GlassCard>
                         </Reveal>

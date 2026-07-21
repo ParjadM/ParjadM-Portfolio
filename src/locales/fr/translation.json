@@ -39,7 +39,15 @@
     "cta": "Contactez-moi",
     "mainPath": "Par ici",
     "exploreLabel": "Ou explorer",
-    "exploreAll": "Tout explorer →"
+    "exploreAll": "Tout explorer →",
+    "scroll": "Défiler",
+    "featuredTitle": "Projets en vedette",
+    "viewAllProjects": "Voir tous les projets →",
+    "skillsTitle": "Technologies utilisées",
+    "latestPosts": "Derniers articles du blog",
+    "viewBlog": "Voir tous les articles →",
+    "ctaTitle": "Ouvert à de nouvelles opportunités",
+    "ctaSubtitle": "Vous avez un poste ou un projet en tête ? J'aimerais en entendre parler."
   },
   "about": {
     "title": "À propos de moi",
@@ -47,6 +55,8 @@
     "role": "Ingénieur Logiciel",
     "location": "Basé à Scarborough, ON • Profil multidisciplinaire",
     "yearsLearning": "Années d'apprentissage",
+    "publicRepos": "Dépôts publics",
+    "leetcodeSolved": "LeetCode résolus",
     "tabs": {
       "story": "Mon Histoire",
       "education": "Éducation",
@@ -85,10 +95,13 @@
       "title": "Contactez-moi",
       "githubDesc": "Consultez mon code",
       "linkedinDesc": "Connectons-nous professionnellement",
+      "emailDesc": "Écrivez-moi directement",
       "availability": "Disponibilité",
       "availabilityStatus": "Ouvert à de nouvelles opportunités",
       "responseTime": "Temps de réponse",
-      "responseTimeValue": "Dans les 24 heures"
+      "responseTimeValue": "Dans les 24 heures",
+      "location": "Emplacement",
+      "locationValue": "Scarborough, ON, Canada"
     }
   },
   "blog": {

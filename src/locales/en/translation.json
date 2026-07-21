@@ -39,7 +39,15 @@
     "cta": "Get in Touch",
     "mainPath": "Start here",
     "exploreLabel": "Or explore",
-    "exploreAll": "Explore all →"
+    "exploreAll": "Explore all →",
+    "scroll": "Scroll",
+    "featuredTitle": "Featured Projects",
+    "viewAllProjects": "View all projects →",
+    "skillsTitle": "Tech I Work With",
+    "latestPosts": "Latest from the Blog",
+    "viewBlog": "View all posts →",
+    "ctaTitle": "Open to new opportunities",
+    "ctaSubtitle": "Have a role or a project in mind? I'd love to hear about it."
   },
   "about": {
     "title": "About Me",
@@ -47,6 +55,8 @@
     "role": "Software Engineer",
     "location": "Based in Scarborough, ON • Multidisciplinary background",
     "yearsLearning": "Years Learning",
+    "publicRepos": "Public Repos",
+    "leetcodeSolved": "LeetCode Solved",
     "tabs": {
       "story": "My Story",
       "education": "Education",
@@ -85,10 +95,13 @@
       "title": "Get in touch",
       "githubDesc": "Check out my code",
       "linkedinDesc": "Connect professionally",
+      "emailDesc": "Email me directly",
       "availability": "Availability",
       "availabilityStatus": "Open to new opportunities",
       "responseTime": "Response Time",
-      "responseTimeValue": "Within 24 hours"
+      "responseTimeValue": "Within 24 hours",
+      "location": "Location",
+      "locationValue": "Scarborough, ON, Canada"
     }
   },
   "blog": {

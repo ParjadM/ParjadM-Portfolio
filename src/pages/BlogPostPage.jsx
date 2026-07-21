@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { setActivePageContext, clearActivePageContext, buildBlogPageContext } from '../utils/chatbotEvents.js';
 import { BlogAiExplain } from '../components/BlogAiExplain.jsx';
 import { readingTimeMinutes } from '../utils/readingTime.js';
+import { formatDate } from '../utils/formatDate.js';
 import { extractHeadings } from '../utils/extractHeadings.js';
 import { LocalizedLink } from '../components/ui/LocalizedLink.jsx';
 import { BlogTableOfContents } from '../components/blog/BlogTableOfContents.jsx';
@@ -15,7 +16,7 @@ import { BlogComments } from '../components/blog/BlogComments.jsx';
 import { SITE_URL, SITE_NAME } from '../config/site.js';
 
 export const BlogPostPage = ({ theme }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -143,7 +144,7 @@ export const BlogPostPage = ({ theme }) => {
                         <GlassCard className="p-8">
                             <div className="flex items-center justify-between mb-4">
                                 <span className={`px-2 py-1 rounded-full text-xs font-semibold ${tagColor}`}>{post.category || 'personal'}</span>
-                                <span className="text-gray-400 text-xs">{post.readTime || t('blog.minRead', { count: readMins })} • {post.date}</span>
+                                <span className="text-gray-400 text-xs">{post.readTime || t('blog.minRead', { count: readMins })} • {formatDate(post.date, i18n.language)}</span>
                             </div>
                             {post.image && (
                                 <div className="w-full h-60 md:h-80 overflow-hidden rounded mb-6">
