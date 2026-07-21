@@ -131,7 +131,7 @@ export const AboutSection = ({ theme }) => {
             />
             <div className="container mx-auto max-w-6xl">
                 {/* Header */}
-                <div className="text-center mb-16">
+                <div className="text-center mb-10 md:mb-16">
                     <Reveal>
                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">{t('about.title')}</h2>
                     <p className="text-gray-300 max-w-2xl mx-auto text-lg">
@@ -140,11 +140,11 @@ export const AboutSection = ({ theme }) => {
                     </Reveal>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
                     {/* Profile Section */}
                     <div className="lg:col-span-1">
                         <Reveal>
-                        <GlassCard className="p-8 text-center" theme={theme}>
+                        <GlassCard className="p-6 md:p-8 text-center" theme={theme}>
                             <div className={`w-48 h-48 mx-auto mb-6 rounded-full p-2 shadow-lg ${theme === 'pink' ? 'bg-gradient-to-br from-pink-500/50 to-red-500/50' : 'bg-gradient-to-br from-emerald-500/50 to-teal-500/50'}`}>
                                 <img 
                                     src={ParjadImage}
@@ -186,7 +186,7 @@ export const AboutSection = ({ theme }) => {
                     {/* Content Section */}
                     <div className="lg:col-span-2">
                         <Reveal>
-                        <GlassCard className="p-8" theme={theme}>
+                        <GlassCard className="p-6 md:p-8" theme={theme}>
                             {/* Tab Navigation */}
                             <div className="flex flex-wrap gap-2 mb-8">
                                 {tabs.map(tab => (

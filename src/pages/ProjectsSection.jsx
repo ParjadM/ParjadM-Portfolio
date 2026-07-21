@@ -48,7 +48,7 @@ export const ProjectsSection = ({ theme }) => {
                 description="Selected projects with code and live demos."
             />
             <Reveal>
-            <h2 className="text-4xl font-bold text-white mb-12 text-center">{t('projects.title')}</h2>
+            <h2 className="text-4xl font-bold text-white mb-8 md:mb-12 text-center">{t('projects.title')}</h2>
             </Reveal>
             {error && <div className="text-red-300 mb-4">{error}</div>}
             <div className="container mx-auto">

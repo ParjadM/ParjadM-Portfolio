@@ -66,12 +66,12 @@ export const HomeSection = ({ theme }) => {
     />
 
     {/* Hero */}
-    <section className="relative min-h-[calc(100vh-6rem)] flex items-center">
-      <div className="z-10 container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+    <section className="relative py-10 md:py-0 md:min-h-[calc(100vh-6rem)] flex items-center">
+      <div className="z-10 container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-10 items-center">
         {/* Left: Text content */}
-        <div className="p-6 md:p-0 text-left">
+        <div className="text-left">
           <Reveal>
-          <h1 className={`text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-tight bg-gradient-to-r ${gradientText} bg-clip-text text-transparent`}>
+          <h1 className={`text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-tight bg-gradient-to-r ${gradientText} bg-clip-text text-transparent`}>
             {t('home.title')}
           </h1>
           <p className="mt-4 text-xl md:text-2xl text-gray-300 max-w-2xl">
@@ -83,7 +83,7 @@ export const HomeSection = ({ theme }) => {
           </div>
           <RippleButton 
             onClick={() => navigate('/contact')} 
-            className="mt-10 px-8 py-3 rounded-full text-lg font-semibold shadow-lg"
+            className="mt-10 w-full sm:w-auto px-8 py-3.5 rounded-full text-lg font-semibold shadow-lg"
             theme={theme}
           >
             {t('home.cta')}
@@ -92,7 +92,7 @@ export const HomeSection = ({ theme }) => {
         </div>
 
         {/* Right: Portrait image */}
-        <div className="flex justify-center md:justify-end p-6 md:p-0">
+        <div className="flex justify-center md:justify-end mt-4 md:mt-0">
           <Reveal>
           <div className="relative">
             <div aria-hidden="true" className={`absolute -inset-8 rounded-full blur-3xl ${glow}`} />
@@ -105,7 +105,7 @@ export const HomeSection = ({ theme }) => {
                 loading="eager"
                 fetchPriority="high"
                 decoding="async"
-                className="w-64 md:w-80 lg:w-[26rem] h-auto rounded-[1.75rem]"
+                className="w-60 sm:w-72 md:w-80 lg:w-[26rem] h-auto rounded-[1.75rem]"
               />
             </div>
           </div>
@@ -122,11 +122,11 @@ export const HomeSection = ({ theme }) => {
 
     {/* Featured projects */}
     {featuredProjects.length > 0 && (
-      <section className="relative py-20 px-6 section-glow">
+      <section className="relative py-12 md:py-20 px-6 section-glow">
         <div className="container mx-auto max-w-6xl">
           <Reveal>
-          <div className="flex items-end justify-between mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold text-white">{t('home.featuredTitle')}</h2>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between mb-8 md:mb-10">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">{t('home.featuredTitle')}</h2>
             <LocalizedLink to="/projects" className={`text-sm font-semibold ${accentText} hover:underline shrink-0`}>
               {t('home.viewAllProjects')}
             </LocalizedLink>
@@ -163,11 +163,11 @@ export const HomeSection = ({ theme }) => {
     )}
 
     {/* Skills strip */}
-    <section className="relative py-14 px-6 bg-dots">
+    <section className="relative py-10 md:py-14 px-6 bg-dots">
       <div className="container mx-auto max-w-5xl text-center">
         <Reveal>
-        <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">{t('home.skillsTitle')}</h2>
-        <div className="flex flex-wrap justify-center gap-3">
+        <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 md:mb-8">{t('home.skillsTitle')}</h2>
+        <div className="flex flex-wrap justify-center gap-2.5 md:gap-3">
           {SKILLS.map((skill) => (
             <span key={skill} className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-gray-200 text-sm font-medium hover:bg-white/10 hover:border-white/20 transition-colors">
               {skill}
@@ -180,11 +180,11 @@ export const HomeSection = ({ theme }) => {
 
     {/* Latest blog posts */}
     {latestPosts.length > 0 && (
-      <section className="relative py-20 px-6">
+      <section className="relative py-12 md:py-20 px-6">
         <div className="container mx-auto max-w-5xl">
           <Reveal>
-          <div className="flex items-end justify-between mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold text-white">{t('home.latestPosts')}</h2>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between mb-8 md:mb-10">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">{t('home.latestPosts')}</h2>
             <LocalizedLink to="/blog" className={`text-sm font-semibold ${accentText} hover:underline shrink-0`}>
               {t('home.viewBlog')}
             </LocalizedLink>
@@ -211,15 +211,15 @@ export const HomeSection = ({ theme }) => {
     )}
 
     {/* Closing CTA */}
-    <section className="relative py-20 px-6 section-glow">
+    <section className="relative py-12 md:py-20 px-6 section-glow">
       <div className="container mx-auto max-w-4xl">
         <Reveal>
-        <GlassCard className="p-10 md:p-14 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">{t('home.ctaTitle')}</h2>
-          <p className="text-gray-300 text-lg mb-8 max-w-xl mx-auto">{t('home.ctaSubtitle')}</p>
+        <GlassCard className="p-7 md:p-14 text-center">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3">{t('home.ctaTitle')}</h2>
+          <p className="text-gray-300 text-base md:text-lg mb-8 max-w-xl mx-auto">{t('home.ctaSubtitle')}</p>
           <RippleButton
             onClick={() => navigate('/contact')}
-            className="px-10 py-3.5 rounded-full text-lg font-semibold shadow-lg"
+            className="w-full sm:w-auto px-10 py-3.5 rounded-full text-lg font-semibold shadow-lg"
             theme={theme}
           >
             {t('home.cta')}

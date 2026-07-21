@@ -50,7 +50,7 @@ export const BlogSection = ({ theme }) => {
             <div className="container mx-auto max-w-7xl">
                 {/* Header */}
                 <Reveal>
-                <div className="text-center mb-16">
+                <div className="text-center mb-10 md:mb-16">
                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">{t('blog.title')}</h2>
                     <p className="text-gray-300 max-w-2xl mx-auto text-lg">
                         {t('blog.subtitle')}
@@ -68,12 +68,12 @@ export const BlogSection = ({ theme }) => {
 
                 {/* Category Filter */}
                 <Reveal>
-                <div className="flex flex-wrap justify-center gap-3 mb-12">
+                <div className="flex flex-wrap justify-center gap-2.5 md:gap-3 mb-10 md:mb-12">
                     {Object.entries(categories).map(([key, label]) => (
                         <button
                             key={key}
                             onClick={() => setSelectedCategory(key)}
-                            className={`px-6 py-3 rounded-full font-medium transition-all duration-300 ${
+                            className={`px-4 py-2.5 text-sm md:px-6 md:py-3 md:text-base rounded-full font-medium transition-all duration-300 ${
                                 selectedCategory === key
                                     ? `${categoryBgColor} text-white border-2 border-white/30`
                                     : 'bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white border-2 border-transparent'

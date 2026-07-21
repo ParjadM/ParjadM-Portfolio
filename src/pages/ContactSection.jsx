@@ -88,7 +88,7 @@ export const ContactSection = ({ theme }) => {
             <div className="container mx-auto max-w-6xl">
                 {/* Header */}
                 <Reveal>
-                <div className="text-center mb-16">
+                <div className="text-center mb-10 md:mb-16">
                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">{t('contact.title')}</h2>
                     <p className="text-gray-300 max-w-2xl mx-auto text-lg">
                         {t('contact.subtitle')}
@@ -96,10 +96,10 @@ export const ContactSection = ({ theme }) => {
                 </div>
                 </Reveal>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
                     {/* Contact Form */}
                     <Reveal>
-                    <GlassCard className="p-8">
+                    <GlassCard className="p-6 md:p-8">
                         <h3 className="text-2xl font-bold text-white mb-6">{t('contact.form.title')}</h3>
                         <form onSubmit={handleSubmit} className="space-y-6 mobile-input">
                             {/* Honeypot field */}
@@ -209,9 +209,9 @@ export const ContactSection = ({ theme }) => {
                     </Reveal>
 
                     {/* Contact Methods */}
-                    <div className="space-y-8">
+                    <div className="space-y-6 md:space-y-8">
                         <Reveal>
-                        <GlassCard className="p-8">
+                        <GlassCard className="p-6 md:p-8">
                             <h3 className="text-2xl font-bold text-white mb-6">{t('contact.info.title')}</h3>
                             <div className="space-y-6">
                                 {contactMethods.map((method, index) => (
@@ -243,7 +243,7 @@ export const ContactSection = ({ theme }) => {
                         </Reveal>
                         
                         <Reveal>
-                        <GlassCard className="p-8 overflow-hidden relative">
+                        <GlassCard className="p-6 md:p-8 overflow-hidden relative">
                             <div className="relative z-10">
                                 <h3 className="text-2xl font-bold text-white mb-4">{t('contact.info.availability')}</h3>
                                 <div className="flex items-center space-x-4">
