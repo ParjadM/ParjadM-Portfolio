@@ -34,8 +34,11 @@ export function lazyWithRetry(factory) {
 
 export function installChunkLoadRecovery() {
   window.addEventListener('vite:preloadError', (event) => {
-    event.preventDefault();
+    // Only swallow the error when we actually reload. Preventing the event
+    // without reloading makes the dynamic import resolve with `undefined`,
+    // which surfaces later as "Cannot read properties of undefined".
     if (!sessionStorage.getItem(RELOAD_KEY)) {
+      event.preventDefault();
       try { sessionStorage.setItem(RELOAD_KEY, '1'); } catch {}
       window.location.reload();
     }

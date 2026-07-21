@@ -12,15 +12,11 @@ export default defineConfig({
       // provides the service worker + precaching.
       manifest: false,
       workbox: {
+        // Precache ALL JS chunks. Excluding route chunks (tried once) breaks
+        // PWA clients after a deploy: their cached index.html references old
+        // hashed chunks that no longer exist on the server, and the SPA
+        // fallback returns HTML instead of JS ("reading 'DesktopOS'" errors).
         globPatterns: ['**/*.{js,css,html,svg,png,webp,woff2}'],
-        globIgnores: [
-          '**/AdminDashboard*.js',
-          '**/DesktopOS*.js',
-          '**/CliMode*.js',
-          '**/IntroCinematic*.js',
-          '**/LQFTBenchmarkPage*.js',
-          '**/MockInterviewPage*.js',
-        ],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         skipWaiting: true,
         clientsClaim: true,
