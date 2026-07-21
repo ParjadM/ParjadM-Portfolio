@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Github, Linkedin, Mail } from '../components/ui/Icons.jsx';
+import { Github, Linkedin } from '../components/ui/Icons.jsx';
 import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { Reveal } from '../components/Reveal.jsx';
 import { useTranslation } from 'react-i18next';
@@ -52,13 +52,6 @@ export const ContactSection = ({ theme }) => {
     };
 
     const contactMethods = [
-        {
-            icon: <Mail size={24} />,
-            title: "Email",
-            value: "minooeip@gmail.com",
-            href: "mailto:minooeip@gmail.com",
-            description: t('contact.info.emailDesc')
-        },
         {
             icon: <Github size={24} />,
             title: "GitHub",
