@@ -4,15 +4,25 @@ import { GardenMark } from '../db/mongo.js'
 import { currentEngine } from '../db/index.js'
 import { checkRateLimit } from '../utils/rateLimit.js'
 import { cacheGet, cacheSet, cacheInvalidate } from '../utils/microCache.js'
+import {
+  MAX_MARKS,
+  TICK_MIN_INTERVAL_MS,
+  buildGenome,
+  phenotypeFromGenome,
+  morphTick,
+  buildField,
+  serializeMark,
+} from '../utils/gardenMorph.js'
 
 const router = Router()
 const LIST_CACHE_KEY = 'garden:marks'
-const LIST_TTL_MS = 20_000
-const MAX_MARKS_RESPONSE = 1200
+const LIST_TTL_MS = 18_000
 
 /** In-memory fallback when Mongo is unavailable (local/dev). */
 const memoryGarden = []
 const memoryRate = new Map()
+let lastTickAt = 0
+let tickInFlight = null
 
 function clientIp(req) {
   return (req.headers['x-forwarded-for'] || '').toString().split(',')[0].trim() || req.ip || 'unknown'
@@ -22,28 +32,6 @@ function hashVisitor(raw) {
   const s = String(raw || '').slice(0, 128)
   if (!s) return ''
   return createHash('sha256').update(s).digest('hex').slice(0, 16)
-}
-
-function serialize(doc) {
-  return {
-    id: doc._id?.toString?.() || doc.id,
-    x: doc.x,
-    y: doc.y,
-    hue: doc.hue,
-    size: doc.size,
-    shape: doc.shape,
-    createdAt: doc.createdAt,
-  }
-}
-
-function seedMark(visitorKey) {
-  let h = 0
-  for (let i = 0; i < visitorKey.length; i++) h = (h * 31 + visitorKey.charCodeAt(i)) >>> 0
-  return {
-    hue: h % 360,
-    size: 0.55 + ((h >>> 8) % 70) / 100,
-    shape: (h >>> 16) % 4,
-  }
 }
 
 async function allowRate(key, limit, windowMs) {
@@ -64,11 +52,174 @@ async function allowRate(key, limit, windowMs) {
   return entry.count <= limit
 }
 
+async function loadMarks() {
+  if (currentEngine === 'mongo') {
+    const docs = await GardenMark.find({})
+      .sort({ createdAt: 1 })
+      .limit(MAX_MARKS)
+      .lean()
+    return docs.map((d) => ({
+      id: d._id.toString(),
+      x: d.x,
+      y: d.y,
+      hue: d.hue,
+      size: d.size,
+      shape: d.shape,
+      energy: d.energy,
+      generation: d.generation,
+      species: d.species,
+      genome: d.genome,
+      visitorKey: d.visitorKey || '',
+      branchedFrom: d.branchedFrom || '',
+      createdAt: d.createdAt,
+      lastTickedAt: d.lastTickedAt,
+    }))
+  }
+  return memoryGarden.map((m) => ({ ...m }))
+}
+
+async function persistMorphResult(before, after) {
+  if (currentEngine !== 'mongo') {
+    memoryGarden.length = 0
+    for (const m of after) {
+      memoryGarden.push({
+        id: m.id && !String(m.id).startsWith('branch-')
+          ? m.id
+          : `m-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        x: m.x,
+        y: m.y,
+        hue: m.hue,
+        size: m.size,
+        shape: m.shape,
+        energy: m.energy,
+        generation: m.generation,
+        species: m.species,
+        genome: m.genome,
+        visitorKey: m.visitorKey || '',
+        branchedFrom: m.branchedFrom || '',
+        createdAt: m.createdAt || new Date(),
+        lastTickedAt: m.lastTickedAt || new Date(),
+      })
+    }
+    return
+  }
+
+  const beforeIds = new Set(before.map((m) => m.id).filter(Boolean))
+  const survivingIds = new Set(
+    after
+      .map((m) => m.id)
+      .filter((id) => id && beforeIds.has(id)),
+  )
+  const toDelete = [...beforeIds].filter((id) => !survivingIds.has(id))
+
+  if (toDelete.length) {
+    await GardenMark.deleteMany({ _id: { $in: toDelete } })
+  }
+
+  const ops = []
+  for (const m of after) {
+    if (m.id && beforeIds.has(m.id)) {
+      ops.push({
+        updateOne: {
+          filter: { _id: m.id },
+          update: {
+            $set: {
+              x: m.x,
+              y: m.y,
+              hue: m.hue,
+              size: m.size,
+              shape: m.shape,
+              energy: m.energy,
+              generation: m.generation || 0,
+              species: m.species || 'spore',
+              genome: m.genome || null,
+              lastTickedAt: m.lastTickedAt || new Date(),
+            },
+          },
+        },
+      })
+    } else {
+      ops.push({
+        insertOne: {
+          document: {
+            x: m.x,
+            y: m.y,
+            hue: m.hue,
+            size: m.size,
+            shape: m.shape,
+            energy: m.energy,
+            generation: m.generation || 0,
+            species: m.species || 'spore',
+            genome: m.genome || null,
+            visitorKey: m.visitorKey || '',
+            branchedFrom: m.branchedFrom || '',
+            lastTickedAt: m.lastTickedAt || new Date(),
+            createdAt: m.createdAt || new Date(),
+          },
+        },
+      })
+    }
+  }
+
+  if (ops.length) {
+    const chunk = 200
+    for (let i = 0; i < ops.length; i += chunk) {
+      await GardenMark.bulkWrite(ops.slice(i, i + chunk), { ordered: false })
+    }
+  }
+}
+
+async function maybeMorphTick() {
+  const now = Date.now()
+  if (now - lastTickAt < TICK_MIN_INTERVAL_MS) {
+    return { ran: false, spawned: 0, merged: 0, decayed: 0 }
+  }
+  if (tickInFlight) return tickInFlight
+
+  tickInFlight = (async () => {
+    try {
+      const before = await loadMarks()
+      if (!before.length) {
+        lastTickAt = now
+        return { ran: true, spawned: 0, merged: 0, decayed: 0 }
+      }
+      const result = morphTick(before, now)
+      await persistMorphResult(before, result.marks)
+      lastTickAt = now
+      cacheInvalidate('garden:')
+      return {
+        ran: true,
+        spawned: result.spawned,
+        merged: result.merged,
+        decayed: result.decayed,
+      }
+    } finally {
+      tickInFlight = null
+    }
+  })()
+
+  return tickInFlight
+}
+
+function buildPayload(marks, total, tick = null) {
+  const field = buildField(marks)
+  return {
+    marks: marks.map(serializeMark),
+    total,
+    field,
+    morph: tick
+      ? { ticked: tick.ran, spawned: tick.spawned, merged: tick.merged, decayed: tick.decayed }
+      : { ticked: false, spawned: 0, merged: 0, decayed: 0 },
+  }
+}
+
 router.get('/', async (_req, res) => {
   try {
+    const tick = await maybeMorphTick()
+
     const cached = cacheGet(LIST_CACHE_KEY)
-    if (cached) {
-      res.setHeader('Cache-Control', 'public, max-age=15, stale-while-revalidate=60')
+    if (cached && !tick.ran) {
+      res.setHeader('Cache-Control', 'public, max-age=12, stale-while-revalidate=45')
       return res.json(cached)
     }
 
@@ -77,19 +228,31 @@ router.get('/', async (_req, res) => {
 
     if (currentEngine === 'mongo') {
       total = await GardenMark.estimatedDocumentCount()
-      const docs = await GardenMark.find({}, { x: 1, y: 1, hue: 1, size: 1, shape: 1, createdAt: 1 })
-        .sort({ createdAt: -1 })
-        .limit(MAX_MARKS_RESPONSE)
+      const docs = await GardenMark.find({})
+        .sort({ createdAt: 1 })
+        .limit(MAX_MARKS)
         .lean()
-      marks = docs.reverse().map(serialize)
+      marks = docs.map((d) => ({
+        id: d._id.toString(),
+        x: d.x,
+        y: d.y,
+        hue: d.hue,
+        size: d.size,
+        shape: d.shape,
+        energy: d.energy,
+        generation: d.generation,
+        species: d.species,
+        genome: d.genome,
+        createdAt: d.createdAt,
+      }))
     } else {
       total = memoryGarden.length
-      marks = memoryGarden.slice(-MAX_MARKS_RESPONSE).map(serialize)
+      marks = memoryGarden.slice(-MAX_MARKS)
     }
 
-    const payload = { marks, total }
+    const payload = buildPayload(marks, total, tick)
     cacheSet(LIST_CACHE_KEY, payload, LIST_TTL_MS)
-    res.setHeader('Cache-Control', 'public, max-age=15, stale-while-revalidate=60')
+    res.setHeader('Cache-Control', 'public, max-age=12, stale-while-revalidate=45')
     res.json(payload)
   } catch (err) {
     res.status(500).json({ error: err.message || 'Failed to load garden' })
@@ -98,7 +261,7 @@ router.get('/', async (_req, res) => {
 
 router.post('/plant', async (req, res) => {
   try {
-    const { x, y, visitorId } = req.body || {}
+    const { x, y, visitorId, signals } = req.body || {}
     const nx = Number(x)
     const ny = Number(y)
 
@@ -115,20 +278,26 @@ router.post('/plant', async (req, res) => {
     const allowedBurst = await allowRate(`garden:burst:${visitorKey || ip}`, 1, 12_000)
     if (!allowedBurst) return res.status(429).json({ error: 'Slow down — let your last bloom settle.' })
 
-    const { hue, size, shape } = seedMark(visitorKey || String(Date.now()))
+    const genome = buildGenome(signals || {}, visitorKey || String(Date.now()))
+    const pheno = phenotypeFromGenome(genome, visitorKey || String(Date.now()))
     const mark = {
       x: Math.min(1, Math.max(0, nx)),
       y: Math.min(1, Math.max(0, ny)),
-      hue: (hue + Math.floor(Math.random() * 24) - 12 + 360) % 360,
-      size: Math.min(1.4, Math.max(0.35, size + (Math.random() - 0.5) * 0.2)),
-      shape,
+      hue: (pheno.hue + Math.floor(Math.random() * 18) - 9 + 360) % 360,
+      size: Math.min(1.35, Math.max(0.35, pheno.size + (Math.random() - 0.5) * 0.12)),
+      shape: pheno.shape,
+      energy: 0.78 + Math.random() * 0.15,
+      generation: 0,
+      species: pheno.species,
+      genome,
       visitorKey,
+      lastTickedAt: new Date(),
     }
 
     let saved
     if (currentEngine === 'mongo') {
       const doc = await GardenMark.create(mark)
-      saved = serialize(doc.toObject())
+      saved = serializeMark(doc.toObject())
     } else {
       saved = {
         id: `m-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
@@ -136,14 +305,14 @@ router.post('/plant', async (req, res) => {
         createdAt: new Date(),
       }
       memoryGarden.push(saved)
-      if (memoryGarden.length > MAX_MARKS_RESPONSE) {
-        memoryGarden.splice(0, memoryGarden.length - MAX_MARKS_RESPONSE)
+      if (memoryGarden.length > MAX_MARKS) {
+        memoryGarden.splice(0, memoryGarden.length - MAX_MARKS)
       }
-      saved = serialize(saved)
+      saved = serializeMark(saved)
     }
 
     cacheInvalidate('garden:')
-    res.status(201).json({ ok: true, mark: saved })
+    res.status(201).json({ ok: true, mark: saved, species: mark.species })
   } catch (err) {
     res.status(500).json({ error: err.message || 'Failed to plant' })
   }

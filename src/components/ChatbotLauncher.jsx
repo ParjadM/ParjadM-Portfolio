@@ -50,7 +50,10 @@ export function ChatbotLauncher({ theme = 'green' }) {
     <div className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 z-[9999] pointer-events-none">
       <button
         type="button"
-        onClick={() => loadChatbot({})}
+        onClick={() => {
+          try { sessionStorage.setItem('garden_used_ai', '1'); } catch {}
+          loadChatbot({});
+        }}
         className={`absolute bottom-safe-fab right-4 sm:bottom-0 sm:right-0 p-4 min-w-[56px] min-h-[56px] flex items-center justify-center rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 shadow-emerald-500/20 pointer-events-auto ${gradientClass}`}
         aria-label="Open chat"
       >

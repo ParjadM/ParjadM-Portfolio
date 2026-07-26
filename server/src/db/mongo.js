@@ -362,12 +362,19 @@ const GardenMarkSchema = new mongoose.Schema(
     x: { type: Number, required: true, min: 0, max: 1 },
     y: { type: Number, required: true, min: 0, max: 1 },
     hue: { type: Number, default: 160, min: 0, max: 360 },
-    size: { type: Number, default: 1, min: 0.35, max: 1.4 },
+    size: { type: Number, default: 1, min: 0.3, max: 1.45 },
     shape: { type: Number, default: 0, min: 0, max: 3 },
+    energy: { type: Number, default: 0.72, min: 0, max: 1 },
+    generation: { type: Number, default: 0, min: 0 },
+    species: { type: String, default: 'spore' },
+    genome: { type: mongoose.Schema.Types.Mixed, default: null },
     visitorKey: { type: String, default: '', index: true },
+    branchedFrom: { type: String, default: '' },
+    lastTickedAt: { type: Date, default: () => new Date() },
   },
-  { timestamps: { createdAt: true, updatedAt: false } }
+  { timestamps: { createdAt: true, updatedAt: true } }
 )
 GardenMarkSchema.index({ createdAt: -1 })
+GardenMarkSchema.index({ energy: -1 })
 export const GardenMark = mongoose.models.GardenMark
   || mongoose.model('GardenMark', GardenMarkSchema, 'garden_marks')
