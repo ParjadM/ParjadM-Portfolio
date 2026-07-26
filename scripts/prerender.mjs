@@ -52,6 +52,11 @@ const ROUTES = [
     fr: { title: 'Explorer — Parjad Minooei', desc: 'Fonctionnalit\u00e9s exp\u00e9rimentales : OS de bureau, mode CLI, entrevue IA et plus.' },
   },
   {
+    path: '/garden',
+    en: { title: 'Collaborative Garden — Parjad Minooei', desc: 'A shared morphogenesis canvas that grows with every visitor bloom.' },
+    fr: { title: 'Jardin collaboratif — Parjad Minooei', desc: 'Une toile de morphogen\u00e8se partag\u00e9e qui grandit avec chaque fleur de visiteur.' },
+  },
+  {
     path: '/tech-news',
     en: { title: 'Tech Hub — Parjad Minooei', desc: 'Top software engineering articles of the day from the global developer community.' },
     fr: { title: 'Actualit\u00e9s tech — Parjad Minooei', desc: 'Les meilleurs articles du jour en g\u00e9nie logiciel de la communaut\u00e9 mondiale.' },

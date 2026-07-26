@@ -29,6 +29,8 @@
     "cliDesc": "Command-line interface",
     "interview": "Mock Interview",
     "interviewDesc": "Practice with an AI",
+    "garden": "Collaborative Garden",
+    "gardenDesc": "Shared morphogenesis canvas",
     "statsDesc": "Site statistics and metrics"
   },
   "home": {
@@ -194,8 +196,24 @@
       "techNews": { "label": "Tech Hub", "desc": "Top dev articles today" },
       "stats": { "label": "Stats & ClickUp", "desc": "GitHub, LeetCode, and the counter" },
       "blog": { "label": "Blog", "desc": "Articles and tutorials" },
-      "lqft": { "label": "LQFT Benchmark", "desc": "Performance playground" }
+      "lqft": { "label": "LQFT Benchmark", "desc": "Performance playground" },
+      "garden": { "label": "Collaborative Garden", "desc": "A living canvas grown by every visitor" }
     }
+  },
+  "garden": {
+    "badge": "Shared morphogenesis",
+    "title": "Collaborative Garden",
+    "subtitle": "Every visitor plants a bloom. Over time, this canvas becomes a living map of everyone who has explored the site.",
+    "seoTitle": "Collaborative Garden — Parjad Minooei",
+    "seoDesc": "A shared morphogenesis canvas that grows with every visitor bloom on parjadm.ca.",
+    "bloomCount": "blooms planted by visitors",
+    "plantRandom": "Plant a bloom",
+    "planting": "Planting…",
+    "planted": "Your bloom took root — thank you for growing the garden.",
+    "error": "Could not plant right now. Try again in a moment.",
+    "hint": "Click or tap anywhere in the garden to plant. Limited to a few blooms per day so growth stays organic.",
+    "loading": "Waking the garden…",
+    "canvasLabel": "Collaborative garden canvas"
   },
   "chatbot": {
     "title": "AI Assistant",

@@ -10,6 +10,7 @@ import { SITE_URL } from '../config/site.js';
 const EXPLORE_LINK_KEYS = [
   { path: '/cli', labelKey: 'explore.links.cli.label', descKey: 'explore.links.cli.desc' },
   { path: '/os', labelKey: 'explore.links.os.label', descKey: 'explore.links.os.desc' },
+  { path: '/garden', labelKey: 'explore.links.garden.label', descKey: 'explore.links.garden.desc' },
   { path: '/intro', labelKey: 'explore.links.intro.label', descKey: 'explore.links.intro.desc' },
   { path: '/interview', labelKey: 'explore.links.interview.label', descKey: 'explore.links.interview.desc' },
   { path: '/tech-news', labelKey: 'explore.links.techNews.label', descKey: 'explore.links.techNews.desc' },

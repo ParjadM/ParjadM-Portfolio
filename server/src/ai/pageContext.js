@@ -13,6 +13,7 @@ const PAGE_HINTS = {
   '/os': 'The user is in the ParjadOS desktop environment.',
   '/tech-news': 'The user is reading curated tech news.',
   '/explore': 'The user is on the Explore page.',
+  '/garden': 'The user is in the Collaborative Garden — a shared morphogenesis canvas where visitors plant blooms.',
 }
 
 function formatProjectContext(project) {

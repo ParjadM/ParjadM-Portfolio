@@ -29,6 +29,8 @@
     "cliDesc": "Interface en ligne de commande",
     "interview": "Entrevue simulée",
     "interviewDesc": "S'entraîner avec une IA",
+    "garden": "Jardin collaboratif",
+    "gardenDesc": "Toile de morphogenèse partagée",
     "statsDesc": "Statistiques et métriques du site"
   },
   "home": {
@@ -194,8 +196,24 @@
       "techNews": { "label": "Hub tech", "desc": "Meilleurs articles dev du jour" },
       "stats": { "label": "Stats et ClickUp", "desc": "GitHub, LeetCode et le compteur" },
       "blog": { "label": "Blog", "desc": "Articles et tutoriels" },
-      "lqft": { "label": "Benchmark LQFT", "desc": "Terrain de jeu performance" }
+      "lqft": { "label": "Benchmark LQFT", "desc": "Terrain de jeu performance" },
+      "garden": { "label": "Jardin collaboratif", "desc": "Une toile vivante cultivée par chaque visiteur" }
     }
+  },
+  "garden": {
+    "badge": "Morphogenèse partagée",
+    "title": "Jardin collaboratif",
+    "subtitle": "Chaque visiteur plante une fleur. Avec le temps, cette toile devient une carte vivante de toutes les personnes qui ont exploré le site.",
+    "seoTitle": "Jardin collaboratif — Parjad Minooei",
+    "seoDesc": "Une toile de morphogenèse partagée qui grandit avec chaque fleur plantée sur parjadm.ca.",
+    "bloomCount": "fleurs plantées par les visiteurs",
+    "plantRandom": "Planter une fleur",
+    "planting": "Plantation…",
+    "planted": "Votre fleur a pris racine — merci de faire grandir le jardin.",
+    "error": "Impossible de planter pour le moment. Réessayez dans un instant.",
+    "hint": "Cliquez ou touchez n'importe où dans le jardin pour planter. Quelques fleurs par jour pour garder une croissance organique.",
+    "loading": "Réveil du jardin…",
+    "canvasLabel": "Toile du jardin collaboratif"
   },
   "chatbot": {
     "title": "Assistant IA",

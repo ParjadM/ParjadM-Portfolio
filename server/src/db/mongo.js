@@ -355,3 +355,19 @@ const MediaAssetSchema = new mongoose.Schema(
 )
 export const MediaAsset = mongoose.models.MediaAsset
   || mongoose.model('MediaAsset', MediaAssetSchema, 'media_assets')
+
+// Collaborative garden — shared morphogenesis marks from visitors.
+const GardenMarkSchema = new mongoose.Schema(
+  {
+    x: { type: Number, required: true, min: 0, max: 1 },
+    y: { type: Number, required: true, min: 0, max: 1 },
+    hue: { type: Number, default: 160, min: 0, max: 360 },
+    size: { type: Number, default: 1, min: 0.35, max: 1.4 },
+    shape: { type: Number, default: 0, min: 0, max: 3 },
+    visitorKey: { type: String, default: '', index: true },
+  },
+  { timestamps: { createdAt: true, updatedAt: false } }
+)
+GardenMarkSchema.index({ createdAt: -1 })
+export const GardenMark = mongoose.models.GardenMark
+  || mongoose.model('GardenMark', GardenMarkSchema, 'garden_marks')

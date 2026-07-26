@@ -16,6 +16,7 @@ import aiRouter from './routes/ai.js'
 import appsRouter from './routes/apps.js'
 import clientErrorsRouter from './routes/clientErrors.js'
 import ogRouter from './routes/og.js'
+import gardenRouter from './routes/garden.js'
 import { buildRssFeed } from './routes/blog.js'
 import { buildSitemap } from './utils/sitemap.js'
 
@@ -71,6 +72,7 @@ export async function createApp() {
   app.use('/api/apps', appsRouter)
   app.use('/api/client-errors', clientErrorsRouter)
   app.use('/api/og', ogRouter)
+  app.use('/api/garden', gardenRouter)
 
   return app
 }

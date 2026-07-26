@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Palette, Menu } from '../ui/Icons.jsx';
-import { Monitor, Newspaper, Film, Terminal, MessageSquare, Activity, ChevronDown } from 'lucide-react';
+import { Monitor, Newspaper, Film, Terminal, MessageSquare, Activity, ChevronDown, Sprout } from 'lucide-react';
 import { GlassCard } from '../ui/GlassCard.jsx';
 import Logo from '../../Images/Logo.webp';
 import { THEMES } from '../../utils/themeConfig.js';
@@ -85,6 +85,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
 
     const MORE_ITEMS = [
         { name: t('more.os'), path: '/os', icon: <Monitor className="w-4 h-4" />, description: t('more.osDesc') },
+        { name: t('more.garden'), path: '/garden', icon: <Sprout className="w-4 h-4" />, description: t('more.gardenDesc') },
         { name: t('more.techNews'), path: '/tech-news', icon: <Newspaper className="w-4 h-4" />, description: t('more.techNewsDesc') },
         { name: t('more.intro'), path: '/intro', icon: <Film className="w-4 h-4" />, description: t('more.introDesc') },
         { name: t('more.cli'), path: '/cli', icon: <Terminal className="w-4 h-4" />, description: t('more.cliDesc') },

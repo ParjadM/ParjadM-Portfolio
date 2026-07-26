@@ -20,6 +20,7 @@ const MockInterviewPage = lazyWithRetry(() => import('../../pages/MockInterviewP
 const TechNews = lazyWithRetry(() => import('../../pages/TechNews.jsx').then(m => ({ default: m.TechNews })));
 const DesktopOS = lazyWithRetry(() => import('../../pages/DesktopOS.jsx').then(m => ({ default: m.DesktopOS })));
 const ExplorePage = lazyWithRetry(() => import('../../pages/ExplorePage.jsx').then(m => ({ default: m.ExplorePage })));
+const CollaborativeGardenPage = lazyWithRetry(() => import('../../pages/CollaborativeGardenPage.jsx').then(m => ({ default: m.CollaborativeGardenPage })));
 
 const PUBLIC_ROUTES = [
   { path: '/', Component: HomeSection },
@@ -31,6 +32,7 @@ const PUBLIC_ROUTES = [
   { path: '/blog/:id', Component: BlogPostPage },
   { path: '/contact', Component: ContactSection },
   { path: '/explore', Component: ExplorePage },
+  { path: '/garden', Component: CollaborativeGardenPage },
   { path: '/tech-news', Component: TechNews },
   { path: '/os', Component: DesktopOS },
   { path: '/intro', Component: IntroCinematic },
