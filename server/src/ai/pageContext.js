@@ -5,6 +5,7 @@ const PAGE_HINTS = {
   '/about': 'The user is reading the About page (background, experience, education).',
   '/projects': 'The user is browsing the Projects gallery.',
   '/projects/lqftBenchmark': 'The user is on the LQFT Benchmark interactive demo page.',
+  '/algorithm-memorizer': 'The user is on the Algorithm Memorizer — timed Python algorithm practice with Pyodide tests.',
   '/stats': 'The user is on the Stats page (GitHub, LeetCode, complexity analyzer).',
   '/blog': 'The user is browsing the blog index.',
   '/contact': 'The user is on the Contact page.',

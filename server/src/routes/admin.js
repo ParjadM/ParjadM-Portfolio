@@ -44,6 +44,25 @@ async function ensureLqftBenchmarkProject() {
   )
 }
 
+async function ensureAlgorithmMemorizerProject() {
+  await Project.updateOne(
+    { liveUrl: '/algorithm-memorizer' },
+    {
+      $setOnInsert: {
+        title: 'Algorithm Memorizer',
+        description: 'Practice typing classic Python algorithms from memory. Easy/Hard modes, timed attempts, personal bests, and client-side Pyodide test validation in a Web Worker sandbox.',
+        tags: ['Python', 'Algorithms', 'Education', 'Pyodide'],
+        liveUrl: '/algorithm-memorizer',
+        githubUrl: '',
+        image: '',
+        featured: true,
+        order: Date.now() + 1,
+      },
+    },
+    { upsert: true }
+  )
+}
+
 router.get('/db-status', async (req, res) => {
   if (currentEngine !== 'mongo') {
     return res.json({ engine: currentEngine, connected: false, info: 'Using in-memory store' })
@@ -339,6 +358,7 @@ router.post('/blog/:id/feature', async (req, res) => {
 router.get('/projects', async (req, res) => {
   if (currentEngine !== 'mongo') return res.json({ projects: [] })
   await ensureLqftBenchmarkProject()
+  await ensureAlgorithmMemorizerProject()
   const docs = await Project.find({}).sort({ featured: -1, createdAt: -1 }).lean()
   const projects = docs.map(d => ({ id: d._id.toString(), ...d }))
   res.json({ projects })
