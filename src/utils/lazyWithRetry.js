@@ -41,6 +41,9 @@ export function installChunkLoadRecovery() {
       event.preventDefault();
       try { sessionStorage.setItem(RELOAD_KEY, '1'); } catch {}
       window.location.reload();
+      return;
     }
+    // Second failure after reload: clear flag so a later navigation can retry.
+    try { sessionStorage.removeItem(RELOAD_KEY); } catch {}
   });
 }

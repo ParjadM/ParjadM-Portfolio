@@ -3,25 +3,50 @@ import { Route, useRoutes } from 'react-router-dom';
 import { RequireAuth } from '../../utils/auth.jsx';
 import { lazyWithRetry } from '../../utils/lazyWithRetry.js';
 
-const HomeSection = lazyWithRetry(() => import('../../pages/HomeSection.jsx').then(m => ({ default: m.HomeSection })));
-const AboutSection = lazyWithRetry(() => import('../../pages/AboutSection.jsx').then(m => ({ default: m.AboutSection })));
-const ProjectsSection = lazyWithRetry(() => import('../../pages/ProjectsSection.jsx').then(m => ({ default: m.ProjectsSection })));
-const LQFTBenchmarkPage = lazyWithRetry(() => import('../../pages/LQFTBenchmarkPage.jsx').then(m => ({ default: m.LQFTBenchmarkPage })));
-const StatsPage = lazyWithRetry(() => import('../../pages/StatsPage.jsx').then(m => ({ default: m.StatsPage })));
-const BlogSection = lazyWithRetry(() => import('../../pages/BlogSection.jsx').then(m => ({ default: m.BlogSection })));
-const BlogPostPage = lazyWithRetry(() => import('../../pages/BlogPostPage.jsx').then(m => ({ default: m.BlogPostPage })));
-const ContactSection = lazyWithRetry(() => import('../../pages/ContactSection.jsx').then(m => ({ default: m.ContactSection })));
-const AdminLoginPage = lazyWithRetry(() => import('../../pages/admin/AdminLoginPage.jsx').then(m => ({ default: m.AdminLoginPage })));
-const AdminDashboard = lazyWithRetry(() => import('../../pages/admin/AdminDashboard.jsx').then(m => ({ default: m.AdminDashboard })));
-const NotFoundPage = lazyWithRetry(() => import('../../pages/NotFoundPage.jsx').then(m => ({ default: m.NotFoundPage })));
-const IntroCinematic = lazyWithRetry(() => import('../../pages/IntroCinematic.jsx').then(m => ({ default: m.IntroCinematic })));
-const CliMode = lazyWithRetry(() => import('../../pages/CliMode.jsx').then(m => ({ default: m.CliMode })));
-const MockInterviewPage = lazyWithRetry(() => import('../../pages/MockInterviewPage.jsx').then(m => ({ default: m.MockInterviewPage })));
-const TechNews = lazyWithRetry(() => import('../../pages/TechNews.jsx').then(m => ({ default: m.TechNews })));
-const DesktopOS = lazyWithRetry(() => import('../../pages/DesktopOS.jsx').then(m => ({ default: m.DesktopOS })));
-const ExplorePage = lazyWithRetry(() => import('../../pages/ExplorePage.jsx').then(m => ({ default: m.ExplorePage })));
-const CollaborativeGardenPage = lazyWithRetry(() => import('../../pages/CollaborativeGardenPage.jsx').then(m => ({ default: m.CollaborativeGardenPage })));
-const AlgorithmMemorizerPage = lazyWithRetry(() => import('../../pages/AlgorithmMemorizerPage.jsx').then(m => ({ default: m.AlgorithmMemorizerPage })));
+/** Resolve default or named export from a lazy route module (Vite shared chunks vary). */
+function pickExport(mod, name) {
+  if (!mod) return undefined;
+  if (mod.default) return mod.default;
+  if (name && mod[name]) return mod[name];
+  // Shared admin chunk may expose a module namespace under `.f`
+  if (mod.f) {
+    if (mod.f.default) return mod.f.default;
+    if (name && mod.f[name]) return mod.f[name];
+  }
+  return undefined;
+}
+
+function lazyNamed(factory, name) {
+  return lazyWithRetry(() =>
+    factory().then((mod) => {
+      const Comp = pickExport(mod, name);
+      if (!Comp) {
+        throw new Error(`Failed to load route module export: ${name || 'default'}`);
+      }
+      return { default: Comp };
+    }),
+  );
+}
+
+const HomeSection = lazyNamed(() => import('../../pages/HomeSection.jsx'), 'HomeSection');
+const AboutSection = lazyNamed(() => import('../../pages/AboutSection.jsx'), 'AboutSection');
+const ProjectsSection = lazyNamed(() => import('../../pages/ProjectsSection.jsx'), 'ProjectsSection');
+const LQFTBenchmarkPage = lazyNamed(() => import('../../pages/LQFTBenchmarkPage.jsx'), 'LQFTBenchmarkPage');
+const StatsPage = lazyNamed(() => import('../../pages/StatsPage.jsx'), 'StatsPage');
+const BlogSection = lazyNamed(() => import('../../pages/BlogSection.jsx'), 'BlogSection');
+const BlogPostPage = lazyNamed(() => import('../../pages/BlogPostPage.jsx'), 'BlogPostPage');
+const ContactSection = lazyNamed(() => import('../../pages/ContactSection.jsx'), 'ContactSection');
+const AdminLoginPage = lazyNamed(() => import('../../pages/admin/AdminLoginPage.jsx'), 'AdminLoginPage');
+const AdminDashboard = lazyNamed(() => import('../../pages/admin/AdminDashboard.jsx'), 'AdminDashboard');
+const NotFoundPage = lazyNamed(() => import('../../pages/NotFoundPage.jsx'), 'NotFoundPage');
+const IntroCinematic = lazyNamed(() => import('../../pages/IntroCinematic.jsx'), 'IntroCinematic');
+const CliMode = lazyNamed(() => import('../../pages/CliMode.jsx'), 'CliMode');
+const MockInterviewPage = lazyNamed(() => import('../../pages/MockInterviewPage.jsx'), 'MockInterviewPage');
+const TechNews = lazyNamed(() => import('../../pages/TechNews.jsx'), 'TechNews');
+const DesktopOS = lazyNamed(() => import('../../pages/DesktopOS.jsx'), 'DesktopOS');
+const ExplorePage = lazyNamed(() => import('../../pages/ExplorePage.jsx'), 'ExplorePage');
+const CollaborativeGardenPage = lazyNamed(() => import('../../pages/CollaborativeGardenPage.jsx'), 'CollaborativeGardenPage');
+const AlgorithmMemorizerPage = lazyNamed(() => import('../../pages/AlgorithmMemorizerPage.jsx'), 'AlgorithmMemorizerPage');
 
 const PUBLIC_ROUTES = [
   { path: '/', Component: HomeSection },

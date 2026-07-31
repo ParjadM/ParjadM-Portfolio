@@ -5,18 +5,28 @@ import { AdminProvider } from './AdminContext.jsx';
 import { AdminLayout } from './AdminLayout.jsx';
 import { AdminPanelSkeleton } from './components/AdminSkeleton.jsx';
 
-const AdminOverview = React.lazy(() => import('./AdminOverview.jsx'));
-const AdminBlogManager = React.lazy(() => import('./AdminBlogManager.jsx'));
-const AdminProjectsManager = React.lazy(() => import('./AdminProjectsManager.jsx'));
-const AdminAIManager = React.lazy(() => import('./AdminAIManager.jsx'));
-const AdminAICostDashboard = React.lazy(() => import('./AdminAICostDashboard.jsx'));
-const AdminInterviewManager = React.lazy(() => import('./AdminInterviewManager.jsx'));
-const AdminAppStoreManager = React.lazy(() => import('./AdminAppStoreManager.jsx'));
-const AdminContactInbox = React.lazy(() => import('./AdminContactInbox.jsx'));
-const AdminMediaLibrary = React.lazy(() => import('./AdminMediaLibrary.jsx'));
-const AdminAuditLog = React.lazy(() => import('./AdminAuditLog.jsx'));
-const PremiumAnalytics = React.lazy(() => import('./PremiumAnalytics.jsx'));
-const AdminAlgorithmMemorizer = React.lazy(() => import('./AdminAlgorithmMemorizer.jsx'));
+function lazyAdmin(factory, name) {
+  return React.lazy(() =>
+    factory().then((mod) => {
+      const Comp = mod?.default || (name ? mod?.[name] : undefined) || mod?.f?.[name] || mod?.f?.default;
+      if (!Comp) throw new Error(`Admin panel missing export: ${name || 'default'}`);
+      return { default: Comp };
+    }),
+  );
+}
+
+const AdminOverview = lazyAdmin(() => import('./AdminOverview.jsx'), 'AdminOverview');
+const AdminBlogManager = lazyAdmin(() => import('./AdminBlogManager.jsx'), 'AdminBlogManager');
+const AdminProjectsManager = lazyAdmin(() => import('./AdminProjectsManager.jsx'), 'AdminProjectsManager');
+const AdminAIManager = lazyAdmin(() => import('./AdminAIManager.jsx'), 'AdminAIManager');
+const AdminAICostDashboard = lazyAdmin(() => import('./AdminAICostDashboard.jsx'), 'AdminAICostDashboard');
+const AdminInterviewManager = lazyAdmin(() => import('./AdminInterviewManager.jsx'), 'AdminInterviewManager');
+const AdminAppStoreManager = lazyAdmin(() => import('./AdminAppStoreManager.jsx'), 'AdminAppStoreManager');
+const AdminContactInbox = lazyAdmin(() => import('./AdminContactInbox.jsx'), 'AdminContactInbox');
+const AdminMediaLibrary = lazyAdmin(() => import('./AdminMediaLibrary.jsx'), 'AdminMediaLibrary');
+const AdminAuditLog = lazyAdmin(() => import('./AdminAuditLog.jsx'), 'AdminAuditLog');
+const PremiumAnalytics = lazyAdmin(() => import('./PremiumAnalytics.jsx'), 'PremiumAnalytics');
+const AdminAlgorithmMemorizer = lazyAdmin(() => import('./AdminAlgorithmMemorizer.jsx'), 'AdminAlgorithmMemorizer');
 
 function AdminDashboardContent({ theme }) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -61,3 +71,5 @@ export const AdminDashboard = ({ theme }) => (
     <AdminDashboardContent theme={theme} />
   </AdminProvider>
 );
+
+export default AdminDashboard;
