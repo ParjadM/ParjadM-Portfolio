@@ -237,7 +237,7 @@
     "runnerError": "Erreur du runtime Python",
     "antiCheatNote": "Pendant une tentative, copier/coller/couper et le menu contextuel sont bloqués dans l'éditeur. L'anti-triche navigateur ne peut pas être totalement garanti.",
     "progressNote": "La progression est liée à ce navigateur (ID visiteur dans localStorage) et peut être perdue si les données du site sont effacées.",
-    "easyHint": "Le mode Facile démarre avec le squelette Python comme guide.",
+    "easyHint": "Le mode Facile affiche un squelette estompé dans l'éditeur — tapez par-dessus pour vous entraîner.",
     "editorLabel": "Éditeur de solution Python",
     "testResults": "Résultats des tests",
     "history": "Tentatives récentes",

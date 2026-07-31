@@ -237,7 +237,7 @@
     "runnerError": "Python runtime error",
     "antiCheatNote": "During an attempt, copy/paste/cut and the context menu are blocked in the editor. Browser anti-cheat cannot be fully guaranteed.",
     "progressNote": "Progress is tied to this browser (visitor ID in localStorage) and may be lost if site data is cleared.",
-    "easyHint": "Easy mode starts with the Python skeleton as a guide.",
+    "easyHint": "Easy mode shows a faded skeleton in the editor — type over it to practise.",
     "editorLabel": "Python solution editor",
     "testResults": "Test results",
     "history": "Recent attempts",

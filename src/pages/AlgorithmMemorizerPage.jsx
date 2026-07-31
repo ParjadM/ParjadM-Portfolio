@@ -73,12 +73,13 @@ export const AlgorithmMemorizerPage = ({ theme }) => {
       if (!res.ok) throw new Error(data.error || 'Failed')
       setDetail(data.algorithm)
       if (!active) {
-        setCode(mode === 'easy' ? (data.algorithm.skeleton || '') : '')
+        // Easy Mode: keep editor empty so the skeleton shows as ghost shadow, not as typed text.
+        setCode('')
       }
     } catch {
       setStatus(t('algoMem.loadError'))
     }
-  }, [active, mode, t])
+  }, [active, t])
 
   const loadProgress = useCallback(async (id) => {
     if (!id) return
@@ -162,14 +163,15 @@ export const AlgorithmMemorizerPage = ({ theme }) => {
     setElapsed(0)
     setLastResult(null)
     setMode(next)
-    setCode(next === 'easy' ? (detail?.skeleton || '') : '')
+    setCode('')
   }
 
   const startAttempt = () => {
     if (!detail || !runnerReady) return
     setLastResult(null)
     setStatus('')
-    if (mode === 'easy') setCode(detail.skeleton || '')
+    // Easy Mode relies on shadowCode for the skeleton; never prefill the editor.
+    if (mode === 'easy') setCode('')
     else if (!code.trim()) setCode('')
     startAtRef.current = Date.now()
     setElapsed(0)
@@ -374,7 +376,8 @@ export const AlgorithmMemorizerPage = ({ theme }) => {
                   onChange={setCode}
                   locked={active}
                   readOnly={false}
-                  shadowCode={active && mode === 'easy' && !code.trim() ? (detail?.skeleton || '') : ''}
+                  shadowCode={mode === 'easy' ? (detail?.skeleton || '') : ''}
+                  placeholder={mode === 'easy' ? '' : undefined}
                   ariaLabel={t('algoMem.editorLabel')}
                   className="min-h-[320px]"
                 />

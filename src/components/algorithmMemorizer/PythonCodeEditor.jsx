@@ -1,12 +1,21 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { EditorState, Compartment } from '@codemirror/state'
 import { EditorView, keymap, lineNumbers, highlightActiveLine, placeholder as cmPlaceholder } from '@codemirror/view'
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands'
 import { python } from '@codemirror/lang-python'
 import { syntaxHighlighting, defaultHighlightStyle, bracketMatching, foldGutter } from '@codemirror/language'
 
+const EDITOR_FONT =
+  'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace'
+const FONT_SIZE = '14px'
+const LINE_HEIGHT = '1.5'
+const TAB_SIZE = 4
+
 /**
- * CodeMirror 6 Python editor with anti-cheat hooks while `locked` (attempt active).
+ * CodeMirror 6 Python editor with optional Easy-mode ghost skeleton and anti-cheat hooks while `locked`.
+ *
+ * Layout: relative container → non-interactive shadow layer (z-0) → transparent CM editor (z-10).
+ * Typed characters cover the ghost; empty positions show the skeleton.
  */
 export function PythonCodeEditor({
   value,
@@ -19,10 +28,31 @@ export function PythonCodeEditor({
   ariaLabel = 'Python editor',
 }) {
   const hostRef = useRef(null)
+  const shadowRef = useRef(null)
   const viewRef = useRef(null)
   const editableComp = useRef(new Compartment())
+  const placeholderComp = useRef(new Compartment())
   const onChangeRef = useRef(onChange)
+  const lockedRef = useRef(locked)
+  const gutterPadRef = useRef(42)
+  const [gutterPad, setGutterPad] = useState(42)
   onChangeRef.current = onChange
+  lockedRef.current = locked
+
+  const showShadow = Boolean(shadowCode)
+
+  const syncShadowFromView = (view) => {
+    const shadow = shadowRef.current
+    if (!shadow || !view) return
+    const gutters = view.dom.querySelector('.cm-gutters')
+    const gutterW = gutters ? Math.round(gutters.getBoundingClientRect().width) : 42
+    if (gutterW !== gutterPadRef.current) {
+      gutterPadRef.current = gutterW
+      setGutterPad(gutterW)
+    }
+    shadow.scrollTop = view.scrollDOM.scrollTop
+    shadow.scrollLeft = view.scrollDOM.scrollLeft
+  }
 
   useEffect(() => {
     if (!hostRef.current || viewRef.current) return undefined
@@ -36,77 +66,89 @@ export function PythonCodeEditor({
       python(),
       syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
       keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
+      EditorState.tabSize.of(TAB_SIZE),
       editableComp.current.of(EditorView.editable.of(!readOnly)),
+      placeholderComp.current.of(cmPlaceholder(shadowCode ? '' : (placeholder || 'Write your Python solution…'))),
       EditorView.updateListener.of((update) => {
         if (update.docChanged) {
           onChangeRef.current?.(update.state.doc.toString())
+        }
+        if (update.docChanged || update.geometryChanged || update.viewportChanged) {
+          syncShadowFromView(update.view)
         }
       }),
       EditorView.theme({
         '&': {
           height: '100%',
-          fontSize: '14px',
-          backgroundColor: 'rgba(0,0,0,0.35)',
+          fontSize: FONT_SIZE,
+          backgroundColor: 'transparent',
         },
         '.cm-scroller': {
-          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+          fontFamily: EDITOR_FONT,
+          fontSize: FONT_SIZE,
+          lineHeight: LINE_HEIGHT,
           overflow: 'auto',
+          backgroundColor: 'transparent',
         },
-        '.cm-content': { caretColor: '#6ee7b7', minHeight: '280px' },
+        '.cm-content': {
+          caretColor: '#6ee7b7',
+          minHeight: '280px',
+          padding: '4px 0',
+          fontFamily: EDITOR_FONT,
+          fontSize: FONT_SIZE,
+          lineHeight: LINE_HEIGHT,
+          tabSize: String(TAB_SIZE),
+          backgroundColor: 'transparent',
+        },
+        '.cm-line': {
+          padding: '0 2px 0 6px',
+          lineHeight: LINE_HEIGHT,
+        },
         '.cm-gutters': {
-          backgroundColor: 'rgba(0,0,0,0.25)',
+          backgroundColor: 'rgba(0,0,0,0.2)',
           color: '#6b7280',
           border: 'none',
         },
         '&.cm-focused': { outline: '2px solid rgba(16,185,129,0.45)' },
-        '.cm-shadow-layer': {
-          color: 'rgba(156, 163, 175, 0.45)',
-          pointerEvents: 'none',
-          whiteSpace: 'pre',
-          fontFamily: 'inherit',
-          padding: '4px 2px 4px 6px',
-          lineHeight: '1.5',
-        },
       }),
-      cmPlaceholder(placeholder || 'Write your Python solution…'),
       EditorView.domEventHandlers({
         copy(event) {
-          if (locked) {
+          if (lockedRef.current) {
             event.preventDefault()
             return true
           }
           return false
         },
         cut(event) {
-          if (locked) {
+          if (lockedRef.current) {
             event.preventDefault()
             return true
           }
           return false
         },
         paste(event) {
-          if (locked) {
+          if (lockedRef.current) {
             event.preventDefault()
             return true
           }
           return false
         },
         drop(event) {
-          if (locked) {
+          if (lockedRef.current) {
             event.preventDefault()
             return true
           }
           return false
         },
         dragstart(event) {
-          if (locked) {
+          if (lockedRef.current) {
             event.preventDefault()
             return true
           }
           return false
         },
         contextmenu(event) {
-          if (locked) {
+          if (lockedRef.current) {
             event.preventDefault()
             return true
           }
@@ -122,8 +164,12 @@ export function PythonCodeEditor({
     const view = new EditorView({ state, parent: hostRef.current })
     viewRef.current = view
 
+    const scroller = view.scrollDOM
+    const onScroll = () => syncShadowFromView(view)
+    scroller.addEventListener('scroll', onScroll, { passive: true })
+
     const onKeyDown = (e) => {
-      if (!locked) return
+      if (!lockedRef.current) return
       const key = e.key?.toLowerCase?.() || ''
       const mod = e.ctrlKey || e.metaKey
       if (mod && (key === 'v' || key === 'c' || key === 'x' || key === 'insert')) {
@@ -137,7 +183,10 @@ export function PythonCodeEditor({
     }
     view.dom.addEventListener('keydown', onKeyDown, true)
 
+    requestAnimationFrame(() => syncShadowFromView(view))
+
     return () => {
+      scroller.removeEventListener('scroll', onScroll)
       view.dom.removeEventListener('keydown', onKeyDown, true)
       view.destroy()
       viewRef.current = null
@@ -163,20 +212,48 @@ export function PythonCodeEditor({
     })
   }, [readOnly])
 
+  useEffect(() => {
+    const view = viewRef.current
+    if (!view) return
+    const text = shadowCode ? '' : (placeholder || 'Write your Python solution…')
+    view.dispatch({
+      effects: placeholderComp.current.reconfigure(cmPlaceholder(text)),
+    })
+  }, [shadowCode, placeholder])
+
+  useLayoutEffect(() => {
+    const view = viewRef.current
+    if (view) syncShadowFromView(view)
+  }, [shadowCode, value, showShadow, gutterPad])
+
   return (
-    <div className={`relative rounded-xl border border-white/10 overflow-hidden ${className}`}>
-      {shadowCode ? (
+    <div
+      className={`relative rounded-xl border border-white/10 overflow-hidden bg-black/35 ${className}`}
+    >
+      {showShadow ? (
         <pre
+          ref={shadowRef}
           aria-hidden="true"
-          className="cm-shadow-layer absolute inset-0 z-0 overflow-hidden p-2 pl-[42px] pt-[4px] text-[14px] leading-[1.5] pointer-events-none select-none"
-          style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' }}
+          className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none m-0"
+          style={{
+            fontFamily: EDITOR_FONT,
+            fontSize: FONT_SIZE,
+            lineHeight: LINE_HEIGHT,
+            tabSize: TAB_SIZE,
+            color: 'rgba(156, 163, 175, 0.42)',
+            paddingTop: 4,
+            paddingBottom: 4,
+            paddingRight: 2,
+            paddingLeft: gutterPad + 6,
+            whiteSpace: 'pre',
+          }}
         >
           {shadowCode}
         </pre>
       ) : null}
       <div
         ref={hostRef}
-        className="relative z-10 h-full min-h-[280px] [&_.cm-editor]:bg-transparent"
+        className="relative z-10 h-full min-h-[280px] bg-transparent [&_.cm-editor]:bg-transparent [&_.cm-scroller]:bg-transparent [&_.cm-content]:bg-transparent"
         role="textbox"
         aria-label={ariaLabel}
         aria-multiline="true"

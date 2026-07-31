@@ -3,14 +3,24 @@
  */
 import { currentEngine } from '../db/index.js'
 import { Algorithm, AlgorithmAttempt } from '../db/mongo.js'
-import { ALGORITHM_SEED } from '../data/algorithms.seed.js'
+import { ALGORITHM_SEED, ALGORITHM_SEED_VERSION } from '../data/algorithms.seed.js'
 
 const memoryAlgorithms = []
 const memoryAttempts = []
-let seeded = false
+let memorySeedVersion = 0
 
 function clone(obj) {
   return JSON.parse(JSON.stringify(obj))
+}
+
+function seedDocs() {
+  return ALGORITHM_SEED.map((a, i) => ({
+    ...clone(a),
+    enabled: true,
+    order: a.order ?? (i + 1) * 10,
+    image: '',
+    seedVersion: ALGORITHM_SEED_VERSION,
+  }))
 }
 
 function toPublicAlgo(doc, { includeReference = false, includeHiddenTests = false } = {}) {
@@ -60,41 +70,36 @@ function toAdminAlgo(doc) {
 }
 
 export async function ensureAlgorithmSeed() {
-  if (seeded && (currentEngine !== 'mongo' ? memoryAlgorithms.length > 0 : true)) {
-    if (currentEngine !== 'mongo' && memoryAlgorithms.length > 0) return { seeded: false, count: memoryAlgorithms.length }
-  }
-
   if (currentEngine === 'mongo') {
     const count = await Algorithm.countDocuments()
-    if (count > 0) {
-      seeded = true
+    const legacy = await Algorithm.exists({ slug: 'two-sum' })
+    const hasNew = await Algorithm.exists({ slug: 'merge-sort' })
+    const needsReplace = count === 0 || !!legacy || !hasNew
+
+    if (!needsReplace) {
       return { seeded: false, count }
     }
-    const docs = ALGORITHM_SEED.map((a, i) => ({
-      ...a,
-      enabled: true,
-      order: a.order ?? (i + 1) * 10,
-      image: '',
-    }))
+
+    await Algorithm.deleteMany({})
+    const docs = seedDocs()
     await Algorithm.insertMany(docs)
-    seeded = true
-    return { seeded: true, count: docs.length }
+    return { seeded: true, count: docs.length, replaced: true, version: ALGORITHM_SEED_VERSION }
   }
 
-  if (memoryAlgorithms.length === 0) {
-    ALGORITHM_SEED.forEach((a, i) => {
+  if (memoryAlgorithms.length === 0 || memorySeedVersion !== ALGORITHM_SEED_VERSION) {
+    memoryAlgorithms.length = 0
+    seedDocs().forEach((a) => {
       memoryAlgorithms.push({
         id: `algo-${a.slug}`,
-        ...clone(a),
-        enabled: true,
-        order: a.order ?? (i + 1) * 10,
-        image: '',
+        ...a,
         createdAt: new Date(),
       })
     })
+    memorySeedVersion = ALGORITHM_SEED_VERSION
+    return { seeded: true, count: memoryAlgorithms.length, replaced: true, version: ALGORITHM_SEED_VERSION }
   }
-  seeded = true
-  return { seeded: true, count: memoryAlgorithms.length }
+
+  return { seeded: false, count: memoryAlgorithms.length, version: ALGORITHM_SEED_VERSION }
 }
 
 export async function listAlgorithms({ admin = false } = {}) {
@@ -300,5 +305,5 @@ export async function getProgress(visitorId, algorithmId) {
 export function __resetMemoryStore() {
   memoryAlgorithms.length = 0
   memoryAttempts.length = 0
-  seeded = false
+  memorySeedVersion = 0
 }

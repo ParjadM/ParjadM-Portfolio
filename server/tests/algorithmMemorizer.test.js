@@ -17,13 +17,26 @@ describe('algorithm memorizer store', () => {
     __resetMemoryStore()
   })
 
-  it('seeds catalog into memory', async () => {
+  it('seeds classic CS algorithms catalog into memory', async () => {
     const result = await ensureAlgorithmSeed()
     assert.equal(result.seeded, true)
-    assert.ok(result.count >= 12)
+    assert.ok(result.count >= 20)
+    assert.equal(result.version, 2)
     const list = await listAlgorithms({ admin: false })
-    assert.ok(list.length >= 12)
+    assert.ok(list.length >= 20)
     assert.ok(list.every((a) => a.reference === undefined))
+    assert.ok(list.some((a) => a.slug === 'binary-search'))
+    assert.ok(list.some((a) => a.slug === 'merge-sort'))
+    assert.ok(!list.some((a) => a.slug === 'two-sum'))
+  })
+
+  it('reseeds memory store when seed version changes', async () => {
+    await ensureAlgorithmSeed()
+    const first = await listAlgorithms({ admin: true })
+    assert.ok(first.length >= 20)
+    const again = await ensureAlgorithmSeed()
+    assert.equal(again.seeded, false)
+    assert.ok(again.count >= 20)
   })
 
   it('supports admin CRUD', async () => {
