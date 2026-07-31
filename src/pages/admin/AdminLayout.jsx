@@ -5,13 +5,14 @@ import { getAdminLoginPath } from '../../utils/i18nRouting.js';
 import { getAuthToken } from '../../utils/auth.jsx';
 import {
   LayoutDashboard, FileText, FolderKanban, BarChart3, Bot, DollarSign,
-  MessageSquare, Store, Mail, Image, ScrollText, LogOut, ExternalLink,
+  MessageSquare, Store, Mail, Image, ScrollText, LogOut, ExternalLink, BrainCircuit,
 } from 'lucide-react';
 
 const TABS = [
   { id: 'home', label: 'Overview', icon: LayoutDashboard },
   { id: 'blog', label: 'Blog', icon: FileText },
   { id: 'projects', label: 'Projects', icon: FolderKanban },
+  { id: 'algorithms', label: 'Algorithms', icon: BrainCircuit },
   { id: 'analytics', label: 'Analytics', icon: BarChart3, wide: true },
   { id: 'contact', label: 'Contact', icon: Mail, badgeKey: 'unreadContacts' },
   { id: 'app_store', label: 'App Store', icon: Store, badgeKey: 'pendingApps' },

@@ -14,6 +14,7 @@ const STATIC_PATHS = [
   '/stats',
   '/explore',
   '/garden',
+  '/algorithm-memorizer',
   '/tech-news',
   '/cli',
   '/os',

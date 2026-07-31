@@ -1,6 +1,16 @@
 import { Router } from 'express'
 import mongoose from 'mongoose'
 import { BlogPost, Project, Analytics, Visitor, AnalyticsDaily, AiKnowledge, DeviceStats, HourlyStats, AccessLog, CommunityApp, ClientError, WebVital, ContactMessage, AuditLog, MediaAsset } from '../db/mongo.js'
+import {
+  listAlgorithms,
+  getAlgorithmById,
+  createAlgorithm,
+  updateAlgorithm,
+  deleteAlgorithm,
+  reorderAlgorithms,
+  ensureAlgorithmSeed,
+} from '../services/algorithmMemorizerStore.js'
+import { ALGORITHM_CATEGORIES_LIST } from '../data/algorithms.seed.js'
 import { getAdminAiStats } from '../ai/analytics.js'
 import { clearKnowledgeMemoryCache } from '../ai/knowledge.js'
 import { logAdminAction } from '../utils/auditLog.js'
@@ -721,6 +731,81 @@ router.post('/actions/clear-ai-cache', async (req, res) => {
     res.json({ ok: true })
   } catch (err) {
     res.status(500).json({ error: err.message })
+  }
+})
+
+// --- Algorithm Memorizer ---
+router.get('/algorithms', async (req, res) => {
+  try {
+    await ensureAlgorithmSeed()
+    const algorithms = await listAlgorithms({ admin: true })
+    res.json({ algorithms, categories: ALGORITHM_CATEGORIES_LIST })
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Failed to list algorithms' })
+  }
+})
+
+router.get('/algorithms/:id', async (req, res) => {
+  try {
+    const algo = await getAlgorithmById(req.params.id, { admin: true })
+    if (!algo) return res.status(404).json({ error: 'Not found' })
+    res.json({ algorithm: algo })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+router.post('/algorithms', async (req, res) => {
+  try {
+    const algo = await createAlgorithm(req.body || {})
+    await logAdminAction(req, 'algorithm.create', { id: algo.id, slug: algo.slug })
+    res.status(201).json({ algorithm: algo })
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message || 'Create failed' })
+  }
+})
+
+router.put('/algorithms/:id', async (req, res) => {
+  try {
+    const algo = await updateAlgorithm(req.params.id, req.body || {})
+    if (!algo) return res.status(404).json({ error: 'Not found' })
+    await logAdminAction(req, 'algorithm.update', { id: req.params.id })
+    res.json({ algorithm: algo })
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message || 'Update failed' })
+  }
+})
+
+router.delete('/algorithms/:id', async (req, res) => {
+  try {
+    const ok = await deleteAlgorithm(req.params.id)
+    if (!ok) return res.status(404).json({ error: 'Not found' })
+    await logAdminAction(req, 'algorithm.delete', { id: req.params.id })
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Delete failed' })
+  }
+})
+
+router.post('/algorithms/reorder', async (req, res) => {
+  try {
+    const ids = Array.isArray(req.body?.ids) ? req.body.ids : []
+    await reorderAlgorithms(ids)
+    await logAdminAction(req, 'algorithm.reorder', { count: ids.length })
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Reorder failed' })
+  }
+})
+
+router.post('/seed-algorithms', async (req, res) => {
+  try {
+    const result = await ensureAlgorithmSeed()
+    await logAdminAction(req, 'algorithm.seed', result)
+    const algorithms = await listAlgorithms({ admin: true })
+    res.json({ ok: true, ...result, count: algorithms.length })
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Seed failed' })
   }
 })
 

@@ -378,3 +378,72 @@ GardenMarkSchema.index({ createdAt: -1 })
 GardenMarkSchema.index({ energy: -1 })
 export const GardenMark = mongoose.models.GardenMark
   || mongoose.model('GardenMark', GardenMarkSchema, 'garden_marks')
+
+const ALGORITHM_CATEGORIES = [
+  'arrays-strings',
+  'searching',
+  'sorting',
+  'linked-lists',
+  'stacks-queues',
+  'trees-bst',
+  'heaps',
+  'graphs',
+  'recursion-backtracking',
+  'dynamic-programming',
+  'greedy',
+  'bit-manipulation',
+]
+
+const AlgorithmTestCaseSchema = new mongoose.Schema(
+  {
+    id: { type: String, required: true },
+    name: { type: String, default: '' },
+    visible: { type: Boolean, default: true },
+    expression: { type: String, required: true },
+    expected: { type: String, required: true },
+  },
+  { _id: false }
+)
+
+const AlgorithmSchema = new mongoose.Schema(
+  {
+    slug: { type: String, required: true, unique: true, index: true },
+    title: { type: String, required: true },
+    category: { type: String, required: true, enum: ALGORITHM_CATEGORIES },
+    difficulty: { type: String, required: true, enum: ['easy', 'medium', 'hard'], default: 'medium' },
+    description: { type: String, default: '' },
+    image: { type: String, default: '' },
+    skeleton: { type: String, default: '' },
+    reference: { type: String, default: '' },
+    testCases: { type: [AlgorithmTestCaseSchema], default: [] },
+    timeComplexity: { type: String, default: '' },
+    spaceComplexity: { type: String, default: '' },
+    enabled: { type: Boolean, default: true, index: true },
+    order: { type: Number, default: 0, index: true },
+  },
+  { timestamps: true }
+)
+AlgorithmSchema.index({ category: 1, order: 1 })
+export const Algorithm = mongoose.models.Algorithm
+  || mongoose.model('Algorithm', AlgorithmSchema, 'algorithms')
+export { ALGORITHM_CATEGORIES }
+
+const AlgorithmAttemptSchema = new mongoose.Schema(
+  {
+    visitorId: { type: String, required: true, index: true },
+    algorithmId: { type: String, required: true, index: true },
+    difficultyMode: { type: String, required: true, enum: ['easy', 'hard'] },
+    elapsedMilliseconds: { type: Number, required: true, min: 0 },
+    passed: { type: Boolean, required: true },
+    testResults: { type: mongoose.Schema.Types.Mixed, default: [] },
+    attemptedAt: { type: Date, default: () => new Date(), index: true },
+  },
+  { timestamps: { createdAt: true, updatedAt: false } }
+)
+AlgorithmAttemptSchema.index({ visitorId: 1, algorithmId: 1, difficultyMode: 1, attemptedAt: -1 })
+AlgorithmAttemptSchema.index(
+  { visitorId: 1, algorithmId: 1, difficultyMode: 1, elapsedMilliseconds: 1 },
+  { partialFilterExpression: { passed: true } }
+)
+export const AlgorithmAttempt = mongoose.models.AlgorithmAttempt
+  || mongoose.model('AlgorithmAttempt', AlgorithmAttemptSchema, 'algorithm_attempts')

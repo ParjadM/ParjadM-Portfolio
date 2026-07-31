@@ -16,6 +16,7 @@ const AdminContactInbox = React.lazy(() => import('./AdminContactInbox.jsx'));
 const AdminMediaLibrary = React.lazy(() => import('./AdminMediaLibrary.jsx'));
 const AdminAuditLog = React.lazy(() => import('./AdminAuditLog.jsx'));
 const PremiumAnalytics = React.lazy(() => import('./PremiumAnalytics.jsx'));
+const AdminAlgorithmMemorizer = React.lazy(() => import('./AdminAlgorithmMemorizer.jsx'));
 
 function AdminDashboardContent({ theme }) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -40,6 +41,7 @@ function AdminDashboardContent({ theme }) {
       case 'ai_cost': return <AdminAICostDashboard theme={theme} />;
       case 'interview_ai': return <AdminInterviewManager theme={theme} />;
       case 'media': return <AdminMediaLibrary />;
+      case 'algorithms': return <AdminAlgorithmMemorizer />;
       case 'audit': return <AdminAuditLog />;
       default: return <AdminOverview onNavigate={setTab} />;
     }

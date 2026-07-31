@@ -21,6 +21,7 @@ const TechNews = lazyWithRetry(() => import('../../pages/TechNews.jsx').then(m =
 const DesktopOS = lazyWithRetry(() => import('../../pages/DesktopOS.jsx').then(m => ({ default: m.DesktopOS })));
 const ExplorePage = lazyWithRetry(() => import('../../pages/ExplorePage.jsx').then(m => ({ default: m.ExplorePage })));
 const CollaborativeGardenPage = lazyWithRetry(() => import('../../pages/CollaborativeGardenPage.jsx').then(m => ({ default: m.CollaborativeGardenPage })));
+const AlgorithmMemorizerPage = lazyWithRetry(() => import('../../pages/AlgorithmMemorizerPage.jsx').then(m => ({ default: m.AlgorithmMemorizerPage })));
 
 const PUBLIC_ROUTES = [
   { path: '/', Component: HomeSection },
@@ -33,6 +34,7 @@ const PUBLIC_ROUTES = [
   { path: '/contact', Component: ContactSection },
   { path: '/explore', Component: ExplorePage },
   { path: '/garden', Component: CollaborativeGardenPage },
+  { path: '/algorithm-memorizer', Component: AlgorithmMemorizerPage },
   { path: '/tech-news', Component: TechNews },
   { path: '/os', Component: DesktopOS },
   { path: '/intro', Component: IntroCinematic },

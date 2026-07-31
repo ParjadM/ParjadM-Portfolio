@@ -57,6 +57,11 @@ const ROUTES = [
     fr: { title: 'Jardin collaboratif — Parjad Minooei', desc: 'Une toile de morphogen\u00e8se partag\u00e9e qui grandit avec chaque fleur de visiteur.' },
   },
   {
+    path: '/algorithm-memorizer',
+    en: { title: 'Algorithm Memorizer — Parjad Minooei', desc: 'Practice typing classic Python algorithms from memory with timed attempts.' },
+    fr: { title: 'M\u00e9moriseur d\u2019algorithmes — Parjad Minooei', desc: 'Entra\u00eenez-vous \u00e0 taper des algorithmes Python de m\u00e9moire avec chronom\u00e8tre.' },
+  },
+  {
     path: '/tech-news',
     en: { title: 'Tech Hub — Parjad Minooei', desc: 'Top software engineering articles of the day from the global developer community.' },
     fr: { title: 'Actualit\u00e9s tech — Parjad Minooei', desc: 'Les meilleurs articles du jour en g\u00e9nie logiciel de la communaut\u00e9 mondiale.' },

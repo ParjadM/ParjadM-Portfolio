@@ -17,8 +17,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@codemirror/commands": "^6.10.4",
+    "@codemirror/lang-python": "^6.2.1",
+    "@codemirror/language": "^6.12.4",
+    "@codemirror/state": "^6.7.1",
+    "@codemirror/view": "^6.43.7",
     "@fontsource-variable/outfit": "^5.2.8",
     "@google/genai": "^2.6.0",
+    "@lezer/highlight": "^1.2.3",
     "@resvg/resvg-js": "^2.6.2",
     "@upstash/redis": "^1.38.0",
     "cors": "^2.8.5",
@@ -43,8 +49,8 @@
     "web-vitals": "^5.0.3"
   },
   "devDependencies": {
-    "@lhci/cli": "^0.14.0",
     "@fontsource/outfit": "^5.2.8",
+    "@lhci/cli": "^0.14.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^18.2.43",

@@ -44,7 +44,10 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
         try {
             let vid = null
             try { vid = localStorage.getItem('visitorId') } catch {}
-            if (!vid && typeof window !== 'undefined' && window.crypto?.getRandomValues) {
+            if (!vid && typeof window !== 'undefined' && window.crypto?.randomUUID) {
+                vid = window.crypto.randomUUID()
+                try { localStorage.setItem('visitorId', vid) } catch {}
+            } else if (!vid && typeof window !== 'undefined' && window.crypto?.getRandomValues) {
                 const arr = new Uint8Array(16)
                 window.crypto.getRandomValues(arr)
                 vid = Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('')
