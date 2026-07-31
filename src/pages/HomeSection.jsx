@@ -133,9 +133,13 @@ export const HomeSection = ({ theme }) => {
           </div>
           </Reveal>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {featuredProjects.map((project) => (
+            {featuredProjects.map((project) => {
+              const href = typeof project.liveUrl === 'string' && project.liveUrl.startsWith('/') && !project.liveUrl.startsWith('//')
+                ? project.liveUrl
+                : '/projects';
+              return (
               <Reveal key={project.id || project.title}>
-                <LocalizedLink to="/projects" className="block h-full">
+                <LocalizedLink to={href} className="block h-full">
                   <GlassCard className="p-0 flex flex-col overflow-hidden h-full cursor-pointer">
                     <div className="w-full aspect-video bg-gradient-to-br from-white/5 to-white/10 overflow-hidden">
                       {project.image ? (
@@ -156,7 +160,8 @@ export const HomeSection = ({ theme }) => {
                   </GlassCard>
                 </LocalizedLink>
               </Reveal>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

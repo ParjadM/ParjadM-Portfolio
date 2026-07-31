@@ -5,12 +5,13 @@ function makeRequestId() {
 }
 
 /**
- * Create a dedicated Pyodide worker (Vite URL bundling).
+ * Create a dedicated Pyodide worker from the static public asset.
+ * Using /algo-pyodide-worker.js avoids Vite turning it into a module worker
+ * (which breaks CDN importScripts under CSP).
  * @param {typeof Worker} [WorkerImpl]
  */
 export function spawnPyodideWorker(WorkerImpl = Worker) {
-  return new WorkerImpl(new URL('./pyodide.worker.js', import.meta.url), {
-    type: 'module',
+  return new WorkerImpl('/algo-pyodide-worker.js', {
     name: 'algo-memorizer-pyodide',
   })
 }

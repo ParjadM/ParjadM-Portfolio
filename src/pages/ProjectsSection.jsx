@@ -9,6 +9,7 @@ import { useFetchWithCache } from '../utils/useFetchWithCache.js';
 import { ProjectAskAi } from '../components/ProjectAskAi.jsx';
 import { ProjectCardSkeleton } from '../components/ui/Skeleton.jsx';
 import { BlurImage } from '../components/ui/BlurImage.jsx';
+import { LocalizedLink } from '../components/ui/LocalizedLink.jsx';
 import placeholders from '../data/imagePlaceholders.json';
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 import CodeQuestImage from '../Images/CodeQuest.webp';
@@ -17,6 +18,10 @@ import SpaceShooterImage from '../Images/SpaceShooter.webp';
 import CodeQuestImageSm from '../Images/CodeQuest-sm.webp';
 import BinaryGeneratorImageSm from '../Images/Binary 1010 Generator-sm.webp';
 import SpaceShooterImageSm from '../Images/SpaceShooter-sm.webp';
+
+function isInternalAppPath(url) {
+    return typeof url === 'string' && url.startsWith('/') && !url.startsWith('//');
+}
 
 export const ProjectsSection = ({ theme }) => {
     const { t } = useTranslation();
@@ -85,10 +90,22 @@ export const ProjectsSection = ({ theme }) => {
                         <div className="flex items-center justify-between mt-auto gap-3">
                           <ProjectAskAi project={project} theme={theme} />
                           <div className="flex space-x-4">
-                           {project.githubUrl && <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110"><Github size={24} /></a>}
-                           {project.liveUrl && <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                           </a>}
+                           {project.githubUrl && <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110" aria-label={`${project.title} on GitHub`}><Github size={24} /></a>}
+                           {project.liveUrl && (
+                             isInternalAppPath(project.liveUrl) ? (
+                               <LocalizedLink
+                                 to={project.liveUrl}
+                                 className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110"
+                                 aria-label={`Open ${project.title}`}
+                               >
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                               </LocalizedLink>
+                             ) : (
+                               <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110" aria-label={`${project.title} live demo`}>
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                               </a>
+                             )
+                           )}
                           </div>
                             </div>
                         </div>
