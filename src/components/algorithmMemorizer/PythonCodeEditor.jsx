@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { EditorState, Compartment } from '@codemirror/state'
 import { EditorView, keymap, lineNumbers, highlightActiveLine, placeholder as cmPlaceholder } from '@codemirror/view'
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands'
@@ -10,12 +10,28 @@ const EDITOR_FONT =
 const FONT_SIZE = '14px'
 const LINE_HEIGHT = '1.5'
 const TAB_SIZE = 4
+const GHOST_CLASS = 'algo-mem-ghost'
 
 /**
- * CodeMirror 6 Python editor with optional Easy-mode ghost skeleton and anti-cheat hooks while `locked`.
- *
- * Layout: relative container → non-interactive shadow layer (z-0) → transparent CM editor (z-10).
- * Typed characters cover the ghost; empty positions show the skeleton.
+ * Build ghost text: matched typed prefix becomes invisible (same-width spaces/newlines),
+ * so only the untyped remainder of the skeleton shows as a guide.
+ */
+export function buildGhostText(skeleton, typed) {
+  if (!skeleton) return ''
+  const sk = String(skeleton)
+  const ty = String(typed || '')
+  let i = 0
+  while (i < ty.length && i < sk.length && ty[i] === sk[i]) i += 1
+  let hidden = ''
+  for (let j = 0; j < i; j += 1) {
+    hidden += sk[j] === '\n' ? '\n' : ' '
+  }
+  return hidden + sk.slice(i)
+}
+
+/**
+ * CodeMirror 6 Python editor with Easy-mode ghost skeleton injected into the scroller
+ * (scrolls with the doc, sits behind transparent content, pointer-events none).
  */
 export function PythonCodeEditor({
   value,
@@ -28,30 +44,62 @@ export function PythonCodeEditor({
   ariaLabel = 'Python editor',
 }) {
   const hostRef = useRef(null)
-  const shadowRef = useRef(null)
   const viewRef = useRef(null)
   const editableComp = useRef(new Compartment())
   const placeholderComp = useRef(new Compartment())
   const onChangeRef = useRef(onChange)
   const lockedRef = useRef(locked)
-  const gutterPadRef = useRef(42)
-  const [gutterPad, setGutterPad] = useState(42)
+  const shadowRef = useRef(shadowCode)
   onChangeRef.current = onChange
   lockedRef.current = locked
+  shadowRef.current = shadowCode
 
-  const showShadow = Boolean(shadowCode)
+  const syncGhost = (view) => {
+    if (!view) return
+    const skeleton = shadowRef.current || ''
+    const typed = view.state.doc.toString()
+    let ghost = view.scrollDOM.querySelector(`.${GHOST_CLASS}`)
 
-  const syncShadowFromView = (view) => {
-    const shadow = shadowRef.current
-    if (!shadow || !view) return
+    if (!skeleton) {
+      ghost?.remove()
+      return
+    }
+
     const gutters = view.dom.querySelector('.cm-gutters')
     const gutterW = gutters ? Math.round(gutters.getBoundingClientRect().width) : 42
-    if (gutterW !== gutterPadRef.current) {
-      gutterPadRef.current = gutterW
-      setGutterPad(gutterW)
+
+    if (!ghost) {
+      ghost = document.createElement('pre')
+      ghost.className = GHOST_CLASS
+      ghost.setAttribute('aria-hidden', 'true')
+      ghost.style.cssText = [
+        'position:absolute',
+        'top:0',
+        'right:0',
+        'margin:0',
+        'padding:4px 2px 4px 6px',
+        'box-sizing:border-box',
+        'pointer-events:none',
+        'user-select:none',
+        'white-space:pre',
+        `font-family:${EDITOR_FONT}`,
+        `font-size:${FONT_SIZE}`,
+        `line-height:${LINE_HEIGHT}`,
+        `tab-size:${TAB_SIZE}`,
+        'color:rgba(186, 198, 212, 0.58)',
+        'z-index:0',
+        'overflow:visible',
+      ].join(';')
+      // Sit behind content, inside the scroller so scroll stays in sync.
+      view.scrollDOM.style.position = 'relative'
+      view.contentDOM.style.position = 'relative'
+      view.contentDOM.style.zIndex = '1'
+      view.contentDOM.style.backgroundColor = 'transparent'
+      view.scrollDOM.insertBefore(ghost, view.contentDOM)
     }
-    shadow.scrollTop = view.scrollDOM.scrollTop
-    shadow.scrollLeft = view.scrollDOM.scrollLeft
+
+    ghost.style.left = `${gutterW}px`
+    ghost.textContent = buildGhostText(skeleton, typed)
   }
 
   useEffect(() => {
@@ -68,13 +116,15 @@ export function PythonCodeEditor({
       keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
       EditorState.tabSize.of(TAB_SIZE),
       editableComp.current.of(EditorView.editable.of(!readOnly)),
-      placeholderComp.current.of(cmPlaceholder(shadowCode ? '' : (placeholder || 'Write your Python solution…'))),
+      placeholderComp.current.of(
+        cmPlaceholder(shadowCode ? '' : (placeholder || 'Write your Python solution…')),
+      ),
       EditorView.updateListener.of((update) => {
         if (update.docChanged) {
           onChangeRef.current?.(update.state.doc.toString())
         }
         if (update.docChanged || update.geometryChanged || update.viewportChanged) {
-          syncShadowFromView(update.view)
+          syncGhost(update.view)
         }
       }),
       EditorView.theme({
@@ -103,11 +153,16 @@ export function PythonCodeEditor({
         '.cm-line': {
           padding: '0 2px 0 6px',
           lineHeight: LINE_HEIGHT,
+          backgroundColor: 'transparent',
+        },
+        '.cm-activeLine': {
+          backgroundColor: 'rgba(255,255,255,0.04)',
         },
         '.cm-gutters': {
           backgroundColor: 'rgba(0,0,0,0.2)',
           color: '#6b7280',
           border: 'none',
+          zIndex: '2',
         },
         '&.cm-focused': { outline: '2px solid rgba(16,185,129,0.45)' },
       }),
@@ -164,10 +219,6 @@ export function PythonCodeEditor({
     const view = new EditorView({ state, parent: hostRef.current })
     viewRef.current = view
 
-    const scroller = view.scrollDOM
-    const onScroll = () => syncShadowFromView(view)
-    scroller.addEventListener('scroll', onScroll, { passive: true })
-
     const onKeyDown = (e) => {
       if (!lockedRef.current) return
       const key = e.key?.toLowerCase?.() || ''
@@ -183,11 +234,11 @@ export function PythonCodeEditor({
     }
     view.dom.addEventListener('keydown', onKeyDown, true)
 
-    requestAnimationFrame(() => syncShadowFromView(view))
+    requestAnimationFrame(() => syncGhost(view))
 
     return () => {
-      scroller.removeEventListener('scroll', onScroll)
       view.dom.removeEventListener('keydown', onKeyDown, true)
+      view.scrollDOM.querySelector(`.${GHOST_CLASS}`)?.remove()
       view.destroy()
       viewRef.current = null
     }
@@ -222,35 +273,14 @@ export function PythonCodeEditor({
   }, [shadowCode, placeholder])
 
   useLayoutEffect(() => {
-    const view = viewRef.current
-    if (view) syncShadowFromView(view)
-  }, [shadowCode, value, showShadow, gutterPad])
+    shadowRef.current = shadowCode
+    syncGhost(viewRef.current)
+  }, [shadowCode, value])
 
   return (
     <div
       className={`relative rounded-xl border border-white/10 overflow-hidden bg-black/35 ${className}`}
     >
-      {showShadow ? (
-        <pre
-          ref={shadowRef}
-          aria-hidden="true"
-          className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none m-0"
-          style={{
-            fontFamily: EDITOR_FONT,
-            fontSize: FONT_SIZE,
-            lineHeight: LINE_HEIGHT,
-            tabSize: TAB_SIZE,
-            color: 'rgba(156, 163, 175, 0.42)',
-            paddingTop: 4,
-            paddingBottom: 4,
-            paddingRight: 2,
-            paddingLeft: gutterPad + 6,
-            whiteSpace: 'pre',
-          }}
-        >
-          {shadowCode}
-        </pre>
-      ) : null}
       <div
         ref={hostRef}
         className="relative z-10 h-full min-h-[280px] bg-transparent [&_.cm-editor]:bg-transparent [&_.cm-scroller]:bg-transparent [&_.cm-content]:bg-transparent"
