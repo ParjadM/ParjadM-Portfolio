@@ -92,8 +92,8 @@ export const BlogSection = ({ theme }) => {
                         <Link to={`/blog/${featuredPost.id}`} className="block">
                             <GlassCard className="p-0 md:p-0 group cursor-pointer hover:scale-[1.01] transition-transform duration-300 overflow-hidden">
                                 {featuredPost.image && (
-                                  <div className="w-full h-48 md:h-60 overflow-hidden">
-                                    <img src={featuredPost.image} alt="" className="w-full h-full object-cover" />
+                                  <div className="w-full h-48 md:h-60 overflow-hidden bg-black/20 flex items-center justify-center">
+                                    <img src={featuredPost.image} alt="" className="w-full h-full object-contain" />
                                   </div>
                                 )}
                                 <div className="p-6 md:p-8">
@@ -137,8 +137,8 @@ export const BlogSection = ({ theme }) => {
                             <Link to={`/blog/${post.id}`} className="block">
                             <GlassCard className="p-0 group cursor-pointer hover:scale-105 transition-transform duration-300 overflow-hidden">
                                 {post.image && (
-                                  <div className="w-full h-40 overflow-hidden">
-                                    <img src={post.image} alt="" className="w-full h-full object-cover" />
+                                  <div className="w-full h-40 overflow-hidden bg-black/20 flex items-center justify-center">
+                                    <img src={post.image} alt="" className="w-full h-full object-contain" />
                                   </div>
                                 )}
                                 <div className="p-6">

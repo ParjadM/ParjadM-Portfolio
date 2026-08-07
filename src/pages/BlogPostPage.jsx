@@ -147,8 +147,12 @@ export const BlogPostPage = ({ theme }) => {
                                 <span className="text-gray-400 text-xs">{post.readTime || t('blog.minRead', { count: readMins })} • {formatDate(post.date, i18n.language)}</span>
                             </div>
                             {post.image && (
-                                <div className="w-full h-60 md:h-80 overflow-hidden rounded mb-6">
-                                    <img src={post.image} alt="" className="w-full h-full object-cover" />
+                                <div className="w-full rounded mb-6 bg-black/20 overflow-hidden flex items-center justify-center">
+                                    <img
+                                      src={post.image}
+                                      alt=""
+                                      className="w-full h-auto max-h-[32rem] object-contain"
+                                    />
                                 </div>
                             )}
                             <h1 className="text-3xl font-bold text-white mb-6">{post.title}</h1>

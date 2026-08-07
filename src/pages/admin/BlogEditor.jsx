@@ -144,7 +144,11 @@ export const BlogEditor = ({ editing, form, onChange, onSave, onCancel, showToas
         <input ref={coverInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUpload(f); e.target.value = ''; }} />
       </div>
 
-      {form.image && <img src={form.image} alt="" className="w-32 h-20 object-cover rounded-lg" />}
+      {form.image && (
+        <div className="w-40 h-24 rounded-lg bg-black/30 overflow-hidden flex items-center justify-center">
+          <img src={form.image} alt="" className="max-w-full max-h-full object-contain" />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <input name="tags" value={form.tags} onChange={onChange} placeholder="Tags (comma separated)" className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg" />
