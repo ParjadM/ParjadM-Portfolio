@@ -76,6 +76,11 @@
     "error": "Failed to load projects",
     "empty": "No projects yet."
   },
+  "pagination": {
+    "prev": "Previous",
+    "next": "Next",
+    "status": "Page {{page}} of {{total}}"
+  },
   "contact": {
     "title": "Let's Connect",
     "subtitle": "I'm currently seeking new opportunities and am open to collaboration. Whether you have a question or just want to say hi, feel free to reach out.",

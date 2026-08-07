@@ -5,11 +5,12 @@ import { Reveal } from '../components/Reveal.jsx';
 import { useTranslation } from 'react-i18next';
 import { BlogCardSkeleton } from '../components/ui/Skeleton.jsx';
 import { formatDate } from '../utils/formatDate.js';
-// Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
+import { GRID_PAGE_SIZE, Pagination, paginateItems } from '../components/ui/Pagination.jsx';
 
 export const BlogSection = ({ theme }) => {
     const { t, i18n } = useTranslation();
     const [selectedCategory, setSelectedCategory] = useState('all');
+    const [page, setPage] = useState(1);
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -40,6 +41,14 @@ export const BlogSection = ({ theme }) => {
         ? posts 
         : posts.filter(post => post.category === selectedCategory);
     const featuredPost = selectedCategory === 'all' ? posts.find(p => p.featured) || null : null;
+    const totalPages = Math.max(1, Math.ceil(filteredPosts.length / GRID_PAGE_SIZE));
+    const safePage = Math.min(page, totalPages);
+    const pagePosts = paginateItems(filteredPosts, safePage, GRID_PAGE_SIZE);
+
+    const selectCategory = (key) => {
+        setSelectedCategory(key);
+        setPage(1);
+    };
 
     const iconColor = theme === 'pink' ? "text-pink-400" : "text-emerald-400";
     const categoryBgColor = theme === 'pink' ? "bg-pink-500/20" : "bg-emerald-500/20";
@@ -48,7 +57,6 @@ export const BlogSection = ({ theme }) => {
     return (
         <section id="blog" className="min-h-screen flex flex-col items-center justify-center py-20 px-4">
             <div className="container mx-auto max-w-7xl">
-                {/* Header */}
                 <Reveal>
                 <div className="text-center mb-10 md:mb-16">
                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">{t('blog.title')}</h2>
@@ -66,13 +74,12 @@ export const BlogSection = ({ theme }) => {
                 </Reveal>
                 )}
 
-                {/* Category Filter */}
                 <Reveal>
                 <div className="flex flex-wrap justify-center gap-2.5 md:gap-3 mb-10 md:mb-12">
                     {Object.entries(categories).map(([key, label]) => (
                         <button
                             key={key}
-                            onClick={() => setSelectedCategory(key)}
+                            onClick={() => selectCategory(key)}
                             className={`px-4 py-2.5 text-sm md:px-6 md:py-3 md:text-base rounded-full font-medium transition-all duration-300 ${
                                 selectedCategory === key
                                     ? `${categoryBgColor} text-white border-2 border-white/30`
@@ -85,7 +92,6 @@ export const BlogSection = ({ theme }) => {
                 </div>
                 </Reveal>
 
-                {/* Featured (Blog Section) */}
                 {selectedCategory === 'all' && featuredPost && (
                     <Reveal className="mb-12">
                         <h3 className="text-2xl font-bold text-white mb-6 text-center">{t('blog.featured')}</h3>
@@ -122,7 +128,6 @@ export const BlogSection = ({ theme }) => {
                     </Reveal>
                 )}
 
-                {/* Posts */}
                 <div>
                     <Reveal>
                     <h3 className="text-2xl font-bold text-white mb-8 text-center">
@@ -132,7 +137,7 @@ export const BlogSection = ({ theme }) => {
                     {error && <div className="text-center text-red-300">{error}</div>}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {loading && Array.from({ length: 6 }, (_, i) => <BlogCardSkeleton key={`skeleton-${i}`} />)}
-                        {filteredPosts.map(post => (
+                        {pagePosts.map(post => (
                             <Reveal key={post.id}>
                             <Link to={`/blog/${post.id}`} className="block">
                             <GlassCard className="p-0 group cursor-pointer hover:scale-105 transition-transform duration-300 overflow-hidden">
@@ -173,6 +178,18 @@ export const BlogSection = ({ theme }) => {
                             </Reveal>
                         ))}
                     </div>
+                    {!loading && (
+                      <Pagination
+                        page={safePage}
+                        totalItems={filteredPosts.length}
+                        pageSize={GRID_PAGE_SIZE}
+                        onChange={setPage}
+                        theme={theme}
+                        prevLabel={t('pagination.prev')}
+                        nextLabel={t('pagination.next')}
+                        pageLabel={t('pagination.status')}
+                      />
+                    )}
                 </div>
             </div>
         </section>

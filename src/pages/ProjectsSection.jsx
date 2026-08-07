@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Github } from '../components/ui/Icons.jsx';
 import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { Reveal } from '../components/Reveal.jsx';
@@ -10,8 +10,8 @@ import { ProjectAskAi } from '../components/ProjectAskAi.jsx';
 import { ProjectCardSkeleton } from '../components/ui/Skeleton.jsx';
 import { BlurImage } from '../components/ui/BlurImage.jsx';
 import { LocalizedLink } from '../components/ui/LocalizedLink.jsx';
+import { GRID_PAGE_SIZE, Pagination, paginateItems } from '../components/ui/Pagination.jsx';
 import placeholders from '../data/imagePlaceholders.json';
-// Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 import CodeQuestImage from '../Images/CodeQuest.webp';
 import BinaryGeneratorImage from '../Images/Binary 1010 Generator.webp';
 import SpaceShooterImage from '../Images/SpaceShooter.webp';
@@ -28,14 +28,21 @@ export const ProjectsSection = ({ theme }) => {
     const { data, isLoading: loading, error: fetchError } = useFetchWithCache('/api/projects');
     const projects = Array.isArray(data?.projects) ? data.projects : [];
     const error = fetchError ? t('projects.error') : '';
+    const [page, setPage] = useState(1);
 
-    // Map known titles to local images to keep visuals after API switch
+    useEffect(() => {
+        setPage(1);
+    }, [projects.length]);
+
+    const totalPages = Math.max(1, Math.ceil(projects.length / GRID_PAGE_SIZE));
+    const safePage = Math.min(page, totalPages);
+    const pageProjects = paginateItems(projects, safePage, GRID_PAGE_SIZE);
+
     const imageMap = {
         'CodeQuest': CodeQuestImage,
         'Binary 1010 Generator': BinaryGeneratorImage,
         'SpaceShooter': SpaceShooterImage,
     };
-    // Phone-sized variants served via srcset so mobile doesn't download 1280px images
     const imageMapSm = {
         'CodeQuest': CodeQuestImageSm,
         'Binary 1010 Generator': BinaryGeneratorImageSm,
@@ -59,10 +66,9 @@ export const ProjectsSection = ({ theme }) => {
             <div className="container mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {loading && Array.from({ length: 6 }, (_, i) => <ProjectCardSkeleton key={`skeleton-${i}`} />)}
-                {projects.map((project) => (
+                {pageProjects.map((project) => (
                     <Reveal key={project.id || project.title} className="h-full">
                     <GlassCard className="p-0 flex flex-col overflow-hidden h-full">
-                        {/* Project Image — uniform aspect ratio so grid rows align */}
                         <div className="w-full aspect-video bg-gradient-to-br from-white/5 to-white/10 flex items-center justify-center overflow-hidden relative">
                             <BlurImage
                                 src={project.image || imageMap[project.title] || `https://placehold.co/600x400/${theme === 'pink' ? 'E94560' : '10B981'}/FFFFFF?text=${encodeURIComponent(project.title)}`}
@@ -77,7 +83,6 @@ export const ProjectsSection = ({ theme }) => {
                                 wrapperClassName="w-full h-full"
                                 className="opacity-100 md:opacity-80 md:hover:opacity-100 hover:scale-105 transition-all duration-300"
                             />
-                            {/* Subtle overlay ties visually different thumbnails together */}
                             <div aria-hidden="true" className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/10 bg-gradient-to-t from-black/20 to-transparent" />
                         </div>
                         
@@ -116,6 +121,18 @@ export const ProjectsSection = ({ theme }) => {
                     <div className="col-span-full text-center text-gray-400">{t('projects.empty')}</div>
                 )}
                 </div>
+                {!loading && projects.length > 0 && (
+                  <Pagination
+                    page={safePage}
+                    totalItems={projects.length}
+                    pageSize={GRID_PAGE_SIZE}
+                    onChange={setPage}
+                    theme={theme}
+                    prevLabel={t('pagination.prev')}
+                    nextLabel={t('pagination.next')}
+                    pageLabel={t('pagination.status')}
+                  />
+                )}
             </div>
         </PageTransition>
     );

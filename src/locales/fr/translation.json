@@ -76,6 +76,11 @@
     "error": "Échec du chargement des projets",
     "empty": "Aucun projet pour le moment."
   },
+  "pagination": {
+    "prev": "Précédent",
+    "next": "Suivant",
+    "status": "Page {{page}} sur {{total}}"
+  },
   "contact": {
     "title": "Restons en contact",
     "subtitle": "Je suis actuellement à la recherche de nouvelles opportunités et je suis ouvert à la collaboration. Que vous ayez une question ou que vous vouliez simplement dire bonjour, n'hésitez pas à me contacter.",
