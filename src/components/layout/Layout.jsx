@@ -60,13 +60,6 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
     useEffect(() => {
         try {
             const path = stripLocalePrefix(location?.pathname || '/')
-            try {
-                const raw = sessionStorage.getItem('garden_session_paths')
-                const prev = raw ? JSON.parse(raw) : []
-                const list = Array.isArray(prev) ? prev.map(String) : []
-                const next = [...list.filter((p) => p !== path), path].slice(-40)
-                sessionStorage.setItem('garden_session_paths', JSON.stringify(next))
-            } catch {}
             if (path.startsWith('/admin') || path === '/os' || path === '/cli') return
             fetch('/api/metrics/visit', {
                 method: 'POST',

@@ -21,7 +21,6 @@ export function clearActivePageContext() {
 }
 
 export function openChatbot({ message, pageContext, autoSend = false } = {}) {
-  try { sessionStorage.setItem('garden_used_ai', '1'); } catch {}
   window.dispatchEvent(new CustomEvent(CHATBOT_OPEN_EVENT, {
     detail: { message, pageContext, autoSend },
   }));

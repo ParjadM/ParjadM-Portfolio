@@ -29,8 +29,6 @@
     "cliDesc": "Interface en ligne de commande",
     "interview": "Entrevue simulée",
     "interviewDesc": "S'entraîner avec une IA",
-    "garden": "Jardin collaboratif",
-    "gardenDesc": "Toile de morphogenèse partagée",
     "algoMem": "Mémoriseur d'algorithmes",
     "algoMemDesc": "Tapez des algorithmes de mémoire contre la montre",
     "statsDesc": "Statistiques et métriques du site"
@@ -204,7 +202,6 @@
       "stats": { "label": "Stats et ClickUp", "desc": "GitHub, LeetCode et le compteur" },
       "blog": { "label": "Blog", "desc": "Articles et tutoriels" },
       "lqft": { "label": "Benchmark LQFT", "desc": "Terrain de jeu performance" },
-      "garden": { "label": "Jardin collaboratif", "desc": "Une toile vivante cultivée par chaque visiteur" },
       "algoMem": { "label": "Mémoriseur d'algorithmes", "desc": "S'entraîner à taper des algorithmes contre la montre" }
     }
   },
@@ -264,23 +261,6 @@
       "greedy": "Glouton",
       "bit-manipulation": "Manipulation de bits"
     }
-  },
-  "garden": {
-    "badge": "Morphogenèse partagée",
-    "title": "Jardin collaboratif",
-    "subtitle": "Chaque visiteur plante une fleur façonnée par son parcours. Les fleurs grandissent, fusionnent, se ramifient et s’estompent — une carte vivante qui se réécrit.",
-    "seoTitle": "Jardin collaboratif — Parjad Minooei",
-    "seoDesc": "Un jardin morphogénétique partagé qui croît, décline et se ramifie selon le comportement des visiteurs sur parjadm.ca.",
-    "bloomCount": "fleurs dans le champ vivant",
-    "plantRandom": "Planter une fleur",
-    "planting": "Plantation…",
-    "planted": "Votre fleur a pris racine — merci de faire grandir le jardin.",
-    "species": "Souche : {{species}} — née de votre parcours sur le site.",
-    "morphTick": "Champ modifié : +{{spawned}} ramifiées · {{merged}} fusionnées · {{decayed}} estompées",
-    "error": "Impossible de planter pour le moment. Réessayez dans un instant.",
-    "hint": "Cliquez ou touchez pour planter. Couleur et forme reflètent les pages visitées, le temps passé, le thème et les outils utilisés. Les veines montrent où la densité s’accumule.",
-    "loading": "Réveil du jardin…",
-    "canvasLabel": "Toile du jardin collaboratif"
   },
   "chatbot": {
     "title": "Assistant IA",

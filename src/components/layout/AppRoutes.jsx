@@ -45,7 +45,6 @@ const MockInterviewPage = lazyNamed(() => import('../../pages/MockInterviewPage.
 const TechNews = lazyNamed(() => import('../../pages/TechNews.jsx'), 'TechNews');
 const DesktopOS = lazyNamed(() => import('../../pages/DesktopOS.jsx'), 'DesktopOS');
 const ExplorePage = lazyNamed(() => import('../../pages/ExplorePage.jsx'), 'ExplorePage');
-const CollaborativeGardenPage = lazyNamed(() => import('../../pages/CollaborativeGardenPage.jsx'), 'CollaborativeGardenPage');
 const AlgorithmMemorizerPage = lazyNamed(() => import('../../pages/AlgorithmMemorizerPage.jsx'), 'AlgorithmMemorizerPage');
 
 const PUBLIC_ROUTES = [
@@ -58,7 +57,6 @@ const PUBLIC_ROUTES = [
   { path: '/blog/:id', Component: BlogPostPage },
   { path: '/contact', Component: ContactSection },
   { path: '/explore', Component: ExplorePage },
-  { path: '/garden', Component: CollaborativeGardenPage },
   { path: '/algorithm-memorizer', Component: AlgorithmMemorizerPage },
   { path: '/tech-news', Component: TechNews },
   { path: '/os', Component: DesktopOS },

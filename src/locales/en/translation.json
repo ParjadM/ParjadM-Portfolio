@@ -29,8 +29,6 @@
     "cliDesc": "Command-line interface",
     "interview": "Mock Interview",
     "interviewDesc": "Practice with an AI",
-    "garden": "Collaborative Garden",
-    "gardenDesc": "Shared morphogenesis canvas",
     "algoMem": "Algorithm Memorizer",
     "algoMemDesc": "Type algorithms from memory against the clock",
     "statsDesc": "Site statistics and metrics"
@@ -204,7 +202,6 @@
       "stats": { "label": "Stats & ClickUp", "desc": "GitHub, LeetCode, and the counter" },
       "blog": { "label": "Blog", "desc": "Articles and tutorials" },
       "lqft": { "label": "LQFT Benchmark", "desc": "Performance playground" },
-      "garden": { "label": "Collaborative Garden", "desc": "A living canvas grown by every visitor" },
       "algoMem": { "label": "Algorithm Memorizer", "desc": "Practice typing algorithms against the clock" }
     }
   },
@@ -264,23 +261,6 @@
       "greedy": "Greedy",
       "bit-manipulation": "Bit manipulation"
     }
-  },
-  "garden": {
-    "badge": "Shared morphogenesis",
-    "title": "Collaborative Garden",
-    "subtitle": "Every visitor plants a bloom shaped by how they explored the site. Blooms grow, merge, branch, and fade — a living map that keeps rewriting itself.",
-    "seoTitle": "Collaborative Garden — Parjad Minooei",
-    "seoDesc": "A shared morphogenetic garden that grows, decays, and branches from visitor behavior on parjadm.ca.",
-    "bloomCount": "blooms in the living field",
-    "plantRandom": "Plant a bloom",
-    "planting": "Planting…",
-    "planted": "Your bloom took root — thank you for growing the garden.",
-    "species": "Strain: {{species}} — grown from your path through the site.",
-    "morphTick": "Field shifted: +{{spawned}} branched · {{merged}} merged · {{decayed}} faded",
-    "error": "Could not plant right now. Try again in a moment.",
-    "hint": "Click or tap to plant. Your bloom’s color and shape reflect pages you’ve visited, time spent, theme, and tools you’ve used. Soft veins show where density pools.",
-    "loading": "Waking the garden…",
-    "canvasLabel": "Collaborative garden canvas"
   },
   "chatbot": {
     "title": "AI Assistant",

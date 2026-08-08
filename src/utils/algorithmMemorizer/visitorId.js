@@ -6,7 +6,7 @@ export function getOrCreateVisitorId() {
     let id = localStorage.getItem(KEY)
     if (id && /^[0-9a-f-]{36}$/i.test(id)) return id
     if (id && id.length >= 16) {
-      // Migrate legacy hex ids — keep them so garden/metrics history stays linked
+      // Preserve legacy visitor IDs so existing metrics history stays linked.
       return id
     }
     id = typeof crypto !== 'undefined' && crypto.randomUUID

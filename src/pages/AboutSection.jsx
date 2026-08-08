@@ -161,7 +161,7 @@ export const AboutSection = ({ theme }) => {
                             {/* Quick Stats */}
                             <div className="grid grid-cols-2 gap-3 mb-6">
                                 <div className="text-center p-3 rounded-xl bg-white/5 border border-white/10">
-                                    <div className={`text-2xl font-bold ${iconColor}`}>3+</div>
+                                    <div className={`text-2xl font-bold ${iconColor}`}>4+</div>
                                     <div className="text-gray-400 text-xs mt-1">{t('about.yearsLearning')}</div>
                                 </div>
                                 <div className="text-center p-3 rounded-xl bg-white/5 border border-white/10">
