@@ -419,7 +419,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                         ref={menuTrapRef}
                         role="dialog"
                         aria-modal="true"
-                        aria-label={t('a11y.moreMenu')}
+                        aria-label={t('a11y.siteMenu')}
                         className="fixed inset-0 z-[99999] bg-gray-900/90 backdrop-blur-3xl flex flex-col items-center justify-center p-6 transition-all duration-300 overflow-y-auto"
                         {...menuSwipeHandlers}
                     >
