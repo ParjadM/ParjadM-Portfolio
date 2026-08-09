@@ -8,8 +8,9 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const DIST = path.join(__dirname, '..', 'dist')
-// App shell only (HTML/JS/CSS/fonts/portrait). Install icons are not precached.
-// Fail loudly if heavy route chunks are pulled back into precache.
+// App shell + small install icons (192 / apple-touch). Large 512px icons stay
+// out of precache so we remain under budget; they load from the network/manifest
+// when needed. Fail loudly if heavy route chunks return to precache.
 const MAX_PRECACHE_BYTES = 700 * 1024
 const FORBIDDEN = [
   'AlgorithmMemorizer',

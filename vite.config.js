@@ -18,8 +18,10 @@ export default defineConfig({
           'index.html',
           'manifest.webmanifest',
           'favicon.svg',
-          // Install icons stay in public/manifest only — precaching 512px PNGs
-          // bloated the SW past the shell budget without helping first load.
+          // Small install icons only — keep offline PWA icon UX without the
+          // ~340 KiB 512px pair that blew the shell precache budget.
+          'icons/icon-192.png',
+          'icons/apple-touch-icon.png',
           'assets/app-*.js',
           'assets/vendor-react-*.js',
           'assets/vendor-i18n-*.js',
@@ -36,6 +38,8 @@ export default defineConfig({
           '**/IntroCinematic*',
           '**/MockInterview*',
           '**/garden/**',
+          '**/icons/icon-512.png',
+          '**/icons/icon-maskable-512.png',
         ],
         maximumFileSizeToCacheInBytes: 1 * 1024 * 1024,
         clientsClaim: true,
