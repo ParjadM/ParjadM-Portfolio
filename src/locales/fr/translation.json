@@ -209,7 +209,37 @@
       "stats": { "label": "Stats et ClickUp", "desc": "GitHub, LeetCode et le compteur" },
       "blog": { "label": "Blog", "desc": "Articles et tutoriels" },
       "lqft": { "label": "Benchmark LQFT", "desc": "Terrain de jeu performance" },
+      "cameraFx": { "label": "Camera FX", "desc": "Effets néon suivis par la caméra" },
       "algoMem": { "label": "Mémoriseur d'algorithmes", "desc": "S'entraîner à taper des algorithmes contre la montre" }
+    }
+  },
+  "cameraFx": {
+    "title": "Camera FX",
+    "subtitle": "Bougez devant votre webcam et peignez l'image avec des effets néon suivis en direct. Tout reste sur votre appareil.",
+    "back": "← Retour aux projets",
+    "live": "En direct",
+    "idleTitle": "Prêt quand vous l'êtes",
+    "idleBody": "Autorisez la caméra pour commencer. Agitez la main, dansez ou penchez la tête — le suivi suit le mouvement.",
+    "start": "Démarrer la caméra",
+    "stop": "Arrêter la caméra",
+    "capture": "Capturer l'image",
+    "captureAlt": "Capture Camera FX",
+    "downloadShot": "Télécharger la capture",
+    "controls": "Effets",
+    "intensity": "Intensité",
+    "sensitivity": "Sensibilité au mouvement",
+    "privacy": "Confidentialité : la vidéo ne quitte jamais cet onglet. Arrêter la caméra coupe le flux immédiatement.",
+    "tip": "Astuce : placez-vous dans une bonne lumière et bougez un peu — les traînées apparaissent où le mouvement est le plus fort.",
+    "modes": {
+      "aurora": "Aurore",
+      "constellation": "Constellation",
+      "prism": "Prisme",
+      "ember": "Braise"
+    },
+    "errors": {
+      "denied": "L'accès à la caméra a été refusé. Autorisez-le dans les réglages du navigateur, puis réessayez.",
+      "unsupported": "Ce navigateur n'expose pas d'API caméra.",
+      "generic": "Impossible de démarrer la caméra. Vérifiez qu'aucune autre appli ne l'utilise."
     }
   },
   "algoMem": {
@@ -280,6 +310,7 @@
     "greetingProject": "Bonjour! Posez-moi des questions sur {{title}} — pile technique, choix de design ou construction.",
     "greetingBlog": "Bonjour! Je peux expliquer « {{title}} » ou répondre à vos questions sur cet article.",
     "greetingLqft": "Bonjour! Vous êtes sur la page Benchmark LQFT. Demandez-moi les arbres persistants, la complexité ou la démo.",
+    "greetingCameraFx": "Bonjour! Vous êtes sur Camera FX — un terrain de jeu webcam. Demandez comment marchent les effets ou quoi essayer.",
     "greetingBlogPost": "Bonjour! Vous lisez un article? Je peux le résumer ou l'expliquer simplement.",
     "greetingStats": "Bonjour! Sur la page Stats — posez des questions sur GitHub/LeetCode ou l'analyseur de complexité.",
     "greetingInterview": "Bonjour! Prêt à pratiquer? Je peux expliquer l'entrevue simulée ou répondre sur Parjad.",
@@ -341,6 +372,8 @@
     "projectsDesc": "Projets sélectionnés avec code source et démos en ligne.",
     "lqftTitle": "Benchmark LQFT — Parjad Minooei",
     "lqftDesc": "Benchmark interactif et démo LQFT dans le navigateur.",
+    "cameraFxTitle": "Camera FX — Parjad Minooei",
+    "cameraFxDesc": "Terrain de jeu webcam avec aurore, constellation, prisme et braise suivis en local sur l'appareil.",
     "contactTitle": "Contact — Parjad Minooei",
     "contactDesc": "Contactez-moi pour des opportunités et des collaborations.",
     "statsTitle": "Statistiques — Parjad Minooei",

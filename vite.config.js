@@ -37,6 +37,7 @@ export default defineConfig({
           '**/CliMode*',
           '**/IntroCinematic*',
           '**/MockInterview*',
+          '**/CameraFx*',
           '**/garden/**',
           '**/icons/icon-512.png',
           '**/icons/icon-maskable-512.png',

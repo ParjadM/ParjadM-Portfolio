@@ -41,6 +41,15 @@ export const PUBLIC_STATIC_ROUTES = [
     indexable: true,
   },
   {
+    path: '/projects/cameraFx',
+    id: 'cameraFx',
+    titleKey: 'seo.cameraFxTitle',
+    descriptionKey: 'seo.cameraFxDesc',
+    sitemap: true,
+    prerender: true,
+    indexable: true,
+  },
+  {
     path: '/blog',
     id: 'blog',
     titleKey: 'blog.seoTitle',

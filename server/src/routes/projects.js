@@ -61,6 +61,22 @@ function ensureBuiltInProjects() {
         },
         { upsert: true },
       ),
+      Project.updateOne(
+        { liveUrl: '/projects/cameraFx' },
+        {
+          $setOnInsert: {
+            title: 'Camera FX',
+            description: 'Point your webcam at yourself and paint the frame with motion-tracked neon effects — aurora trails, constellations, prism ghosts, and ember ash. Everything runs locally in the browser.',
+            tags: ['WebRTC', 'Canvas', 'Creative Coding', 'Motion Tracking'],
+            liveUrl: '/projects/cameraFx',
+            githubUrl: '',
+            image: '',
+            featured: true,
+            order: Date.now() + 2,
+          },
+        },
+        { upsert: true },
+      ),
     ]).catch(() => { seedPromise = null })
   }
   return seedPromise

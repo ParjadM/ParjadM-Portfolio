@@ -12,9 +12,10 @@ describe('publicRoutes manifest', () => {
     }
   });
 
-  it('prerenders LQFT and does not include the removed Garden route', () => {
+  it('prerenders LQFT and Camera FX and does not include the removed Garden route', () => {
     const paths = prerenderRoutes().map((r) => r.path);
     expect(paths).toContain('/projects/lqftBenchmark');
+    expect(paths).toContain('/projects/cameraFx');
     expect(paths).not.toContain('/garden');
   });
 

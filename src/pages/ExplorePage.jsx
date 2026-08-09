@@ -16,6 +16,7 @@ const EXPLORE_LINK_KEYS = [
   { path: '/stats', labelKey: 'explore.links.stats.label', descKey: 'explore.links.stats.desc' },
   { path: '/blog', labelKey: 'explore.links.blog.label', descKey: 'explore.links.blog.desc' },
   { path: '/projects/lqftBenchmark', labelKey: 'explore.links.lqft.label', descKey: 'explore.links.lqft.desc' },
+  { path: '/projects/cameraFx', labelKey: 'explore.links.cameraFx.label', descKey: 'explore.links.cameraFx.desc' },
 ];
 
 export const ExplorePage = ({ theme }) => {

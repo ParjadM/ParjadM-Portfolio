@@ -209,7 +209,37 @@
       "stats": { "label": "Stats & ClickUp", "desc": "GitHub, LeetCode, and the counter" },
       "blog": { "label": "Blog", "desc": "Articles and tutorials" },
       "lqft": { "label": "LQFT Benchmark", "desc": "Performance playground" },
+      "cameraFx": { "label": "Camera FX", "desc": "Motion-tracked neon webcam effects" },
       "algoMem": { "label": "Algorithm Memorizer", "desc": "Practice typing algorithms against the clock" }
+    }
+  },
+  "cameraFx": {
+    "title": "Camera FX",
+    "subtitle": "Move in front of your webcam and paint the frame with live neon motion effects. Everything stays on your device.",
+    "back": "← Back to projects",
+    "live": "Live",
+    "idleTitle": "Ready when you are",
+    "idleBody": "Allow camera access to start. Wave, dance, or just tilt your head — the tracker follows the motion.",
+    "start": "Start camera",
+    "stop": "Stop camera",
+    "capture": "Capture frame",
+    "captureAlt": "Captured Camera FX frame",
+    "downloadShot": "Download snapshot",
+    "controls": "Effects",
+    "intensity": "Intensity",
+    "sensitivity": "Motion sensitivity",
+    "privacy": "Privacy: video never leaves this browser tab. Stopping the camera ends the stream immediately.",
+    "tip": "Tip: stand in good light and move a bit — trails bloom where motion is strongest.",
+    "modes": {
+      "aurora": "Aurora",
+      "constellation": "Constellation",
+      "prism": "Prism",
+      "ember": "Ember"
+    },
+    "errors": {
+      "denied": "Camera permission was denied. Allow access in your browser settings, then try again.",
+      "unsupported": "This browser does not expose a camera API.",
+      "generic": "Could not start the camera. Check that no other app is using it."
     }
   },
   "algoMem": {
@@ -280,6 +310,7 @@
     "greetingProject": "Hi! Ask me anything about {{title}} — tech stack, design choices, or how it was built.",
     "greetingBlog": "Hi! I can help explain \"{{title}}\" or answer questions about this article.",
     "greetingLqft": "Hi! You're on the LQFT Benchmark page. Ask about persistent trees, complexity, or how the demo works.",
+    "greetingCameraFx": "Hi! You're on Camera FX — a webcam motion playground. Ask how the effects work or what to try next.",
     "greetingBlogPost": "Hi! Reading a blog post? I can summarize or explain it in plain language.",
     "greetingStats": "Hi! On the Stats page — ask about GitHub/LeetCode metrics or how the complexity analyzer works.",
     "greetingInterview": "Hi! Ready to practice? I can explain how Mock Interview works or answer questions about Parjad.",
@@ -341,6 +372,8 @@
     "projectsDesc": "Selected projects with code and live demos.",
     "lqftTitle": "LQFT Benchmark — Parjad Minooei",
     "lqftDesc": "Interactive browser benchmark and LQFT demo.",
+    "cameraFxTitle": "Camera FX — Parjad Minooei",
+    "cameraFxDesc": "Webcam motion-tracking playground with neon aurora, constellation, prism, and ember effects — all on-device.",
     "contactTitle": "Contact — Parjad Minooei",
     "contactDesc": "Get in touch for opportunities and collaborations.",
     "statsTitle": "Stats — Parjad Minooei",

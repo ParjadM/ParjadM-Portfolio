@@ -19,6 +19,7 @@ const FORBIDDEN = [
   'CliMode',
   'MockInterview',
   'IntroCinematic',
+  'CameraFx',
 ]
 
 function findSw() {

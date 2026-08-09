@@ -63,6 +63,25 @@ async function ensureAlgorithmMemorizerProject() {
   )
 }
 
+async function ensureCameraFxProject() {
+  await Project.updateOne(
+    { liveUrl: '/projects/cameraFx' },
+    {
+      $setOnInsert: {
+        title: 'Camera FX',
+        description: 'Point your webcam at yourself and paint the frame with motion-tracked neon effects — aurora trails, constellations, prism ghosts, and ember ash. Everything runs locally in the browser.',
+        tags: ['WebRTC', 'Canvas', 'Creative Coding', 'Motion Tracking'],
+        liveUrl: '/projects/cameraFx',
+        githubUrl: '',
+        image: '',
+        featured: true,
+        order: Date.now() + 2,
+      },
+    },
+    { upsert: true }
+  )
+}
+
 router.get('/db-status', async (req, res) => {
   if (currentEngine !== 'mongo') {
     return res.json({ engine: currentEngine, connected: false, info: 'Using in-memory store' })
@@ -359,6 +378,7 @@ router.get('/projects', async (req, res) => {
   if (currentEngine !== 'mongo') return res.json({ projects: [] })
   await ensureLqftBenchmarkProject()
   await ensureAlgorithmMemorizerProject()
+  await ensureCameraFxProject()
   const docs = await Project.find({}).sort({ featured: -1, createdAt: -1 }).lean()
   const projects = docs.map(d => ({ id: d._id.toString(), ...d }))
   res.json({ projects })

@@ -72,6 +72,7 @@ export function getChatGreeting(pathname, pageContext) {
 
   const path = stripLocalePrefix(pathname || pageContext?.pathname || '/');
   if (path.includes('lqftBenchmark')) return t('chatbot.greetingLqft');
+  if (path.includes('cameraFx')) return t('chatbot.greetingCameraFx');
   if (path.startsWith('/blog/')) return t('chatbot.greetingBlogPost');
   if (path === '/stats') return t('chatbot.greetingStats');
   if (path === '/interview') return t('chatbot.greetingInterview');
