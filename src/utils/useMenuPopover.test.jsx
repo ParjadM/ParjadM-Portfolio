@@ -1,10 +1,10 @@
 import React, { useRef, useState } from 'react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import { useMenuPopover } from './useMenuPopover.js';
 
 function MenuDemo() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const triggerRef = useRef(null);
   const { menuId, menuRef } = useMenuPopover({
     open,
@@ -14,7 +14,12 @@ function MenuDemo() {
 
   return (
     <div>
-      <button ref={triggerRef} type="button" aria-controls={menuId}>
+      <button
+        ref={triggerRef}
+        type="button"
+        aria-controls={menuId}
+        onClick={() => setOpen(true)}
+      >
         Trigger
       </button>
       {open && (
@@ -29,41 +34,48 @@ function MenuDemo() {
   );
 }
 
+async function openMenu(utils) {
+  const trigger = utils.getByText('Trigger');
+  trigger.focus();
+  fireEvent.click(trigger);
+  await waitFor(() => expect(document.activeElement).toBe(utils.getByText('One')));
+}
+
 describe('useMenuPopover', () => {
   it('focuses the first menuitem when opened', async () => {
-    const { getByText } = render(<MenuDemo />);
-    await waitFor(() => expect(document.activeElement).toBe(getByText('One')));
+    const utils = render(<MenuDemo />);
+    await openMenu(utils);
   });
 
   it('moves with ArrowDown / ArrowUp / Home / End', async () => {
-    const { getByText } = render(<MenuDemo />);
-    await waitFor(() => expect(document.activeElement).toBe(getByText('One')));
+    const utils = render(<MenuDemo />);
+    await openMenu(utils);
 
     fireEvent.keyDown(document, { key: 'ArrowDown' });
-    expect(document.activeElement).toBe(getByText('Two'));
+    expect(document.activeElement).toBe(utils.getByText('Two'));
 
     fireEvent.keyDown(document, { key: 'End' });
-    expect(document.activeElement).toBe(getByText('Three'));
+    expect(document.activeElement).toBe(utils.getByText('Three'));
 
     fireEvent.keyDown(document, { key: 'Home' });
-    expect(document.activeElement).toBe(getByText('One'));
+    expect(document.activeElement).toBe(utils.getByText('One'));
 
     fireEvent.keyDown(document, { key: 'ArrowUp' });
-    expect(document.activeElement).toBe(getByText('Three'));
+    expect(document.activeElement).toBe(utils.getByText('Three'));
   });
 
   it('closes on Escape and restores trigger focus', async () => {
-    const { getByText, getByTestId } = render(<MenuDemo />);
-    await waitFor(() => expect(document.activeElement).toBe(getByText('One')));
+    const utils = render(<MenuDemo />);
+    await openMenu(utils);
     fireEvent.keyDown(document, { key: 'Escape' });
-    expect(getByTestId('closed')).toBeTruthy();
-    await waitFor(() => expect(document.activeElement).toBe(getByText('Trigger')));
+    expect(utils.getByTestId('closed')).toBeTruthy();
+    await waitFor(() => expect(document.activeElement).toBe(utils.getByText('Trigger')));
   });
 
   it('closes on Tab without forcing focus back to the trigger', async () => {
-    const { getByText, getByTestId } = render(<MenuDemo />);
-    await waitFor(() => expect(document.activeElement).toBe(getByText('One')));
+    const utils = render(<MenuDemo />);
+    await openMenu(utils);
     fireEvent.keyDown(document, { key: 'Tab' });
-    expect(getByTestId('closed')).toBeTruthy();
+    expect(utils.getByTestId('closed')).toBeTruthy();
   });
 });

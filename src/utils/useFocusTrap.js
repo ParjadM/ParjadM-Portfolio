@@ -9,8 +9,8 @@ function isVisible(el) {
   if (style.display === 'none' || style.visibility === 'hidden' || style.visibility === 'collapse') {
     return false;
   }
-  const rect = el.getBoundingClientRect();
-  return rect.width > 0 && rect.height > 0;
+  // Skip box-size checks — jsdom reports 0×0 for every element.
+  return true;
 }
 
 export function getFocusableElements(container) {

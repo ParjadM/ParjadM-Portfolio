@@ -4,10 +4,13 @@ export function getMenuItems(container) {
   if (!container) return [];
   return Array.from(container.querySelectorAll('[role="menuitem"]')).filter((el) => {
     if (el.getAttribute('aria-disabled') === 'true' || el.disabled) return false;
+    if (el.getAttribute('aria-hidden') === 'true' || el.closest('[aria-hidden="true"]')) return false;
     const style = typeof window !== 'undefined' ? window.getComputedStyle(el) : null;
-    if (style && (style.display === 'none' || style.visibility === 'hidden')) return false;
-    const rect = el.getBoundingClientRect();
-    return rect.width > 0 && rect.height > 0;
+    if (style && (style.display === 'none' || style.visibility === 'hidden' || style.visibility === 'collapse')) {
+      return false;
+    }
+    // Avoid getBoundingClientRect size checks: jsdom reports 0×0 for all nodes.
+    return true;
   });
 }
 

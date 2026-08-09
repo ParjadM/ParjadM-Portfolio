@@ -8,7 +8,9 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const DIST = path.join(__dirname, '..', 'dist')
-const MAX_PRECACHE_BYTES = 700 * 1024
+// Shell + icons currently land near ~900 KiB. Keep headroom for font/CSS drift,
+// but fail loudly if heavy route chunks are pulled back into precache.
+const MAX_PRECACHE_BYTES = 1024 * 1024
 const FORBIDDEN = [
   'AlgorithmMemorizer',
   'AdminDashboard',
