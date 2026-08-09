@@ -1,6 +1,7 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { adminJson } from '../../utils/adminApi.js';
+import { SEO } from '../../components/SEO.jsx';
 import { AdminProvider } from './AdminContext.jsx';
 import { AdminLayout } from './AdminLayout.jsx';
 import { AdminPanelSkeleton } from './components/AdminSkeleton.jsx';
@@ -59,6 +60,7 @@ function AdminDashboardContent({ theme }) {
 
   return (
     <AdminLayout activeTab={activeTab} setTab={setTab}>
+      <SEO title="Admin — Parjad Minooei" description="Private admin area." noindex canonicalPath="/admin" englishOnly />
       <Suspense fallback={<AdminPanelSkeleton />}>
         {renderTab()}
       </Suspense>

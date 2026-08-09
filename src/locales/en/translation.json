@@ -131,7 +131,9 @@
     "tocLabel": "Table of contents",
     "comments": "Comments",
     "notFound": "Post not found",
-    "backToBlog": "← Back to Blog"
+    "backToBlog": "← Back to Blog",
+    "seoTitle": "Blog — Parjad Minooei",
+    "seoDesc": "Articles on web development and learning."
   },
   "stats": {
     "title": "Developer Stats",
@@ -164,7 +166,12 @@
     "title": "Install this site as an app",
     "subtitle": "Works offline, opens full screen.",
     "install": "Install",
-    "dismiss": "Dismiss install prompt"
+    "dismiss": "Dismiss install prompt",
+    "updateTitle": "New version available",
+    "updateBody": "Refresh to load the latest site update.",
+    "refresh": "Refresh",
+    "later": "Later",
+    "offlineReady": "Ready to work offline"
   },
   "os": {
     "newFolder": "New Folder",
@@ -325,6 +332,41 @@
   },
   "seo": {
     "defaultTitle": "Parjad Minooei — Software Engineer Portfolio",
-    "defaultDesc": "Software Engineer building beautiful, fast, user-centric web apps."
+    "defaultDesc": "Software Engineer building beautiful, fast, user-centric web apps.",
+    "homeTitle": "Parjad Minooei — Software Engineer Portfolio",
+    "homeDesc": "Software Engineer building beautiful, fast, user-centric apps.",
+    "aboutTitle": "About — Parjad Minooei",
+    "aboutDesc": "Learn about Parjad's background and skills.",
+    "projectsTitle": "Projects — Parjad Minooei",
+    "projectsDesc": "Selected projects with code and live demos.",
+    "lqftTitle": "LQFT Benchmark — Parjad Minooei",
+    "lqftDesc": "Interactive browser benchmark and LQFT demo.",
+    "contactTitle": "Contact — Parjad Minooei",
+    "contactDesc": "Get in touch for opportunities and collaborations.",
+    "statsTitle": "Stats — Parjad Minooei",
+    "statsDesc": "A quick look at my open-source presence and coding practice.",
+    "techNewsTitle": "Tech Hub — Parjad Minooei",
+    "techNewsDesc": "Top software engineering articles of the day from the global developer community.",
+    "interviewTitle": "Mock Interview — Parjad Minooei",
+    "interviewDesc": "Chat with an AI trained on Parjad's resume and experience.",
+    "osTitle": "Desktop OS — Parjad Minooei",
+    "osDesc": "A playful desktop environment on parjadm.ca.",
+    "cliTitle": "CLI Mode — Parjad Minooei",
+    "cliDesc": "Navigate parjadm.ca from the terminal.",
+    "introTitle": "Intro — Parjad Minooei",
+    "introDesc": "An animated welcome to parjadm.ca.",
+    "notFoundTitle": "Page not found — Parjad Minooei",
+    "notFoundDesc": "The page you requested could not be found."
+  },
+  "a11y": {
+    "skipToContent": "Skip to main content",
+    "themeMenu": "Theme palette",
+    "moreMenu": "More pages",
+    "siteMenu": "Site menu",
+    "themes": "Themes",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "uniqueVisitors": "Unique visitors",
+    "routeAnnouncement": "Navigated to {{title}}"
   }
 }

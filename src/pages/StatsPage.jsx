@@ -16,8 +16,8 @@ export const StatsPage = ({ theme }) => {
   return (
     <PageTransition className="min-h-screen flex items-center justify-center py-24 px-4">
       <SEO 
-        title="Stats — Parjad Minooei"
-        description="A quick look at my open-source presence and coding practice."
+        titleKey="seo.statsTitle"
+        descriptionKey="seo.statsDesc"
       />
       <div className="container mx-auto max-w-6xl w-full">
         {/* Header */}

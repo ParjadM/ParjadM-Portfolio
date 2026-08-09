@@ -131,7 +131,9 @@
     "tocLabel": "Table des matières",
     "comments": "Commentaires",
     "notFound": "Article introuvable",
-    "backToBlog": "← Retour au Blog"
+    "backToBlog": "← Retour au Blog",
+    "seoTitle": "Blogue — Parjad Minooei",
+    "seoDesc": "Articles sur le développement web et l'apprentissage."
   },
   "stats": {
     "title": "Statistiques de développeur",
@@ -164,7 +166,12 @@
     "title": "Installer ce site comme application",
     "subtitle": "Fonctionne hors ligne, s'ouvre en plein écran.",
     "install": "Installer",
-    "dismiss": "Fermer l'invite d'installation"
+    "dismiss": "Fermer l'invite d'installation",
+    "updateTitle": "Nouvelle version disponible",
+    "updateBody": "Actualisez pour charger la dernière mise à jour du site.",
+    "refresh": "Actualiser",
+    "later": "Plus tard",
+    "offlineReady": "Prêt à fonctionner hors ligne"
   },
   "os": {
     "newFolder": "Nouveau dossier",
@@ -325,6 +332,41 @@
   },
   "seo": {
     "defaultTitle": "Parjad Minooei — Portfolio d'ingénieur logiciel",
-    "defaultDesc": "Ingénieur logiciel créant des applications web rapides et centrées sur l'utilisateur."
+    "defaultDesc": "Ingénieur logiciel créant des applications web rapides et centrées sur l'utilisateur.",
+    "homeTitle": "Parjad Minooei — Portfolio d'ingénieur logiciel",
+    "homeDesc": "Ingénieur logiciel créant des applications belles, rapides et centrées sur l'utilisateur.",
+    "aboutTitle": "À propos — Parjad Minooei",
+    "aboutDesc": "Découvrez le parcours et les compétences de Parjad.",
+    "projectsTitle": "Projets — Parjad Minooei",
+    "projectsDesc": "Projets sélectionnés avec code source et démos en ligne.",
+    "lqftTitle": "Benchmark LQFT — Parjad Minooei",
+    "lqftDesc": "Benchmark interactif et démo LQFT dans le navigateur.",
+    "contactTitle": "Contact — Parjad Minooei",
+    "contactDesc": "Contactez-moi pour des opportunités et des collaborations.",
+    "statsTitle": "Statistiques — Parjad Minooei",
+    "statsDesc": "Un aperçu de ma présence open source et de ma pratique du code.",
+    "techNewsTitle": "Actualités tech — Parjad Minooei",
+    "techNewsDesc": "Les meilleurs articles du jour en génie logiciel de la communauté mondiale.",
+    "interviewTitle": "Entrevue simulée — Parjad Minooei",
+    "interviewDesc": "Discutez avec une IA entraînée sur le CV et l'expérience de Parjad.",
+    "osTitle": "OS de bureau — Parjad Minooei",
+    "osDesc": "Un environnement de bureau ludique sur parjadm.ca.",
+    "cliTitle": "Mode CLI — Parjad Minooei",
+    "cliDesc": "Naviguez sur parjadm.ca depuis le terminal.",
+    "introTitle": "Intro — Parjad Minooei",
+    "introDesc": "Une bienvenue animée sur parjadm.ca.",
+    "notFoundTitle": "Page introuvable — Parjad Minooei",
+    "notFoundDesc": "La page demandée est introuvable."
+  },
+  "a11y": {
+    "skipToContent": "Aller au contenu principal",
+    "themeMenu": "Palette de thèmes",
+    "moreMenu": "Plus de pages",
+    "siteMenu": "Menu du site",
+    "themes": "Thèmes",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "uniqueVisitors": "Visiteurs uniques",
+    "routeAnnouncement": "Navigation vers {{title}}"
   }
 }

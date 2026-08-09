@@ -335,7 +335,7 @@ export const IntroCinematic = ({ theme }) => {
 
     return (
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black perspective-1000">
-            <SEO title="Intro — Parjad Minooei" description="An animated welcome to parjadm.ca." />
+            <SEO titleKey="seo.introTitle" descriptionKey="seo.introDesc" />
 
             <style>{`
                 .perspective-1000 { perspective: 1200px; }

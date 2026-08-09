@@ -4,7 +4,6 @@ import { PageTransition } from '../components/ui/PageTransition.jsx'
 import { SEO } from '../components/SEO.jsx'
 import { GlassCard } from '../components/ui/GlassCard.jsx'
 import { Reveal } from '../components/Reveal.jsx'
-import { SITE_URL } from '../config/site.js'
 import { PythonCodeEditor } from '../components/algorithmMemorizer/PythonCodeEditor.jsx'
 import { createPythonRunner } from '../utils/algorithmMemorizer/createPythonRunner.js'
 import { formatElapsed, isNewPersonalBest, pickPersonalBest } from '../utils/algorithmMemorizer/timing.js'
@@ -256,9 +255,8 @@ export const AlgorithmMemorizerPage = ({ theme }) => {
   return (
     <PageTransition className="min-h-screen py-20 md:py-24 px-4">
       <SEO
-        title={t('algoMem.seoTitle')}
-        description={t('algoMem.seoDesc')}
-        url={`${SITE_URL}/algorithm-memorizer`}
+        titleKey="algoMem.seoTitle"
+        descriptionKey="algoMem.seoDesc"
       />
       <div className="container mx-auto max-w-6xl">
         <Reveal>

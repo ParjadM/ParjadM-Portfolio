@@ -14,6 +14,7 @@ import { LocalizedLink } from '../components/ui/LocalizedLink.jsx';
 import { BlogTableOfContents } from '../components/blog/BlogTableOfContents.jsx';
 import { BlogComments } from '../components/blog/BlogComments.jsx';
 import { SITE_URL, SITE_NAME } from '../config/site.js';
+import { fetchApi } from '../utils/apiClient.js';
 
 export const BlogPostPage = ({ theme }) => {
     const { t, i18n } = useTranslation();
@@ -26,42 +27,43 @@ export const BlogPostPage = ({ theme }) => {
     const [related, setRelated] = useState([]);
 
     useEffect(() => {
+        const controller = new AbortController();
         const fetchPost = async () => {
+            setLoading(true);
+            setError('');
             try {
-                const res = await fetch(`/api/blog/${id}`);
-                if (!res.ok) throw new Error('Not found');
-                const data = await res.json();
+                const data = await fetchApi(`/api/blog/${id}`, { signal: controller.signal, ttlMs: 30_000 });
                 setPost(data.post);
-            } catch {
+            } catch (err) {
+                if (err?.name === 'AbortError') return;
                 setError('Post not found');
+                setPost(null);
             } finally {
                 setLoading(false);
             }
         };
         fetchPost();
+        return () => controller.abort();
     }, [id]);
 
     useEffect(() => {
-        if (!post) return;
+        if (!post) return undefined;
         let cancelled = false;
+        const controller = new AbortController();
         (async () => {
             try {
-                const res = await fetch('/api/blog');
-                const data = await res.json();
-                const posts = Array.isArray(data.posts) ? data.posts : [];
-                const myTags = new Set(post.tags || []);
-                const scored = posts
-                    .filter((p) => p.id !== (post.id || id))
-                    .map((p) => {
-                        const sharedTags = (p.tags || []).filter((tag) => myTags.has(tag)).length;
-                        const sameCategory = p.category && p.category === post.category ? 1 : 0;
-                        return { post: p, score: sharedTags * 2 + sameCategory };
-                    })
-                    .sort((a, b) => b.score - a.score);
-                if (!cancelled) setRelated(scored.slice(0, 3).map((s) => s.post));
-            } catch {}
+                const data = await fetchApi(`/api/blog/${id}/related?limit=3`, {
+                    signal: controller.signal,
+                });
+                if (!cancelled) setRelated(Array.isArray(data.posts) ? data.posts : []);
+            } catch {
+                if (!cancelled) setRelated([]);
+            }
         })();
-        return () => { cancelled = true; };
+        return () => {
+            cancelled = true;
+            controller.abort();
+        };
     }, [post, id]);
 
     useEffect(() => {
@@ -73,6 +75,7 @@ export const BlogPostPage = ({ theme }) => {
     if (loading) {
         return (
             <section className="min-h-screen py-32 px-4">
+                <SEO titleKey="blog.seoTitle" descriptionKey="blog.seoDesc" noindex canonicalPath={`/blog/${id}`} englishOnly />
                 <ArticleSkeleton />
             </section>
         );
@@ -81,6 +84,7 @@ export const BlogPostPage = ({ theme }) => {
     if (error || !post) {
         return (
             <section className="min-h-screen flex items-center justify-center py-20 px-4">
+                <SEO titleKey="seo.notFoundTitle" descriptionKey="seo.notFoundDesc" noindex canonicalPath={`/blog/${id}`} englishOnly />
                 <div className="container mx-auto max-w-3xl text-center">
                     <GlassCard className="p-8">
                         <h2 className="text-2xl font-bold text-white mb-4">{t('blog.notFound')}</h2>
@@ -129,6 +133,8 @@ export const BlogPostPage = ({ theme }) => {
                 image={ogImage}
                 type="article"
                 jsonLd={jsonLd}
+                englishOnly
+                canonicalPath={`/blog/${id}`}
             />
             <div className="container mx-auto max-w-5xl">
                 <div className="mb-6">

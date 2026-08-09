@@ -9,6 +9,7 @@ import { SEO } from '../components/SEO.jsx';
 import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { LocalizedLink } from '../components/ui/LocalizedLink.jsx';
 import { useFetchWithCache } from '../utils/useFetchWithCache.js';
+import { fetchApi } from '../utils/apiClient.js';
 import { formatDate } from '../utils/formatDate.js';
 import ParjadM from '../Images/ParjadM.webp';
 
@@ -28,21 +29,23 @@ export const HomeSection = ({ theme }) => {
   const { t, i18n } = useTranslation();
   const isPink = theme === 'pink';
 
-  const { data: projectsData } = useFetchWithCache('/api/projects');
-  const featuredProjects = (Array.isArray(projectsData?.projects) ? projectsData.projects : []).slice(0, 3);
+  const { data: projectsData } = useFetchWithCache('/api/projects?page=1&limit=3');
+  const featuredProjects = Array.isArray(projectsData?.projects) ? projectsData.projects : [];
 
   const [latestPosts, setLatestPosts] = useState([]);
   useEffect(() => {
     let cancelled = false;
-    fetch('/api/blog')
-      .then((res) => (res.ok ? res.json() : null))
+    const controller = new AbortController();
+    fetchApi('/api/blog?page=1&limit=2', { signal: controller.signal })
       .then((data) => {
         if (cancelled || !data) return;
-        const posts = Array.isArray(data.posts) ? data.posts : [];
-        setLatestPosts(posts.slice(0, 2));
+        setLatestPosts(Array.isArray(data.posts) ? data.posts : []);
       })
       .catch(() => {});
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
   }, []);
 
   const accentText = isPink ? 'text-pink-400' : 'text-emerald-400';
@@ -53,9 +56,9 @@ export const HomeSection = ({ theme }) => {
 
   return (
   <PageTransition className="text-white relative overflow-hidden">
-    <SEO 
-        title="Parjad Minooei — Software Engineer Portfolio"
-        description="Software Engineer building beautiful, fast, user-centric apps."
+    <SEO
+        titleKey="seo.homeTitle"
+        descriptionKey="seo.homeDesc"
         jsonLd={{
           '@context': 'https://schema.org',
           '@type': 'WebSite',
@@ -105,7 +108,7 @@ export const HomeSection = ({ theme }) => {
                 loading="eager"
                 fetchPriority="high"
                 decoding="async"
-                className="w-60 sm:w-72 md:w-80 lg:w-[26rem] h-auto"
+                className="w-60 sm:w-72 md:w-80 lg:w-[23rem] h-auto max-w-[368px]"
               />
             </div>
           </div>

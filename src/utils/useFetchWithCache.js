@@ -1,56 +1,57 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
+import { fetchApi, peekApi, apiCache } from './apiClient.js'
 
-// Global cache object to persist across component mounts
-export const apiCache = new Map();
+export { apiCache, fetchApi, peekApi }
+export { invalidateApi, canonicalizeUrl, __resetApiClient } from './apiClient.js'
 
-export const useFetchWithCache = (url) => {
-    // Initialize data from cache if available to prevent any layout shift
-    const [data, setData] = useState(apiCache.get(url) || null);
-    // Only load if we don't have it in cache
-    const [isLoading, setIsLoading] = useState(!apiCache.has(url));
-    const [error, setError] = useState(null);
+/**
+ * React hook over fetchApi — shows cached data immediately, revalidates in background.
+ */
+export const useFetchWithCache = (url, { ttlMs, swrMs } = {}) => {
+  const cached = url ? peekApi(url) : null
+  const [data, setData] = useState(cached || null)
+  const [isLoading, setIsLoading] = useState(!cached)
+  const [error, setError] = useState(null)
 
-    useEffect(() => {
-        if (!url) return;
+  useEffect(() => {
+    if (!url) return undefined
 
-        let isMounted = true;
+    let cancelled = false
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null
 
-        const fetchData = async () => {
-            try {
-                // If it's not in cache, ensure loading is true
-                if (!apiCache.has(url)) {
-                    setIsLoading(true);
-                }
-                
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`Error: ${response.status} ${response.statusText}`);
-                }
-                const result = await response.json();
-                
-                if (isMounted) {
-                    apiCache.set(url, result);
-                    setData(result);
-                    setError(null);
-                }
-            } catch (err) {
-                if (isMounted) {
-                    setError(err.message);
-                }
-            } finally {
-                if (isMounted) {
-                    setIsLoading(false);
-                }
-            }
-        };
+    const run = async () => {
+      const existing = peekApi(url)
+      if (existing !== undefined && !cancelled) {
+        setData(existing)
+        setIsLoading(false)
+      } else if (!cancelled) {
+        setIsLoading(true)
+      }
 
-        // Always fetch behind the scenes to keep data fresh (stale-while-revalidate pattern)
-        fetchData();
+      try {
+        const result = await fetchApi(url, {
+          ttlMs,
+          swrMs,
+          signal: controller?.signal,
+        })
+        if (!cancelled) {
+          setData(result)
+          setError(null)
+        }
+      } catch (err) {
+        if (cancelled || err?.name === 'AbortError') return
+        setError(err.message || String(err))
+      } finally {
+        if (!cancelled) setIsLoading(false)
+      }
+    }
 
-        return () => {
-            isMounted = false;
-        };
-    }, [url]);
+    run()
+    return () => {
+      cancelled = true
+      controller?.abort()
+    }
+  }, [url, ttlMs, swrMs])
 
-    return { data, isLoading, error };
-};
+  return { data, isLoading, error }
+}

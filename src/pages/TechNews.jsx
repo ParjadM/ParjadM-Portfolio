@@ -47,8 +47,8 @@ export const TechNews = ({ theme }) => {
     return (
         <PageTransition>
             <SEO
-                title="Tech Hub — Parjad Minooei"
-                description="Top software engineering articles of the day from the global developer community."
+                titleKey="seo.techNewsTitle"
+                descriptionKey="seo.techNewsDesc"
             />
             <div className="container mx-auto px-4 lg:px-8 max-w-6xl pb-24">
                 <div className="mb-12 text-center md:text-left pt-8">

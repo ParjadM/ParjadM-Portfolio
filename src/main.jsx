@@ -16,6 +16,11 @@ installWebVitalsReporter()
 async function bootstrap() {
   const initialLocale = window.location.pathname.startsWith('/fr') ? 'fr' : 'en'
   await ensureLocale(initialLocale)
+  // URL locale must win over detector/localStorage before first paint.
+  const { default: i18n } = await import('./i18n.js')
+  if (i18n.language !== initialLocale) {
+    await i18n.changeLanguage(initialLocale)
+  }
 
   ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>

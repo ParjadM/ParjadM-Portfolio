@@ -1,4 +1,4 @@
-import { apiCache } from '../utils/useFetchWithCache.js';
+import { apiCache, fetchApi } from '../utils/apiClient.js';
 import {
   formatPathStr, getNodeByPath, resolvePath, GUEST_PATH, saveFileSystem,
 } from './filesystem.js';
@@ -47,7 +47,9 @@ async function fetchProjects(ctx) {
     pushToHistory('system', lines.join('\n'));
     return;
   }
-  const cached = apiCache.get('/api/projects');
+  // CLI needs the full catalog for numbered open — request an explicit high limit.
+  const listUrl = '/api/projects?page=1&limit=50';
+  const cached = apiCache.get(listUrl);
   if (cached?.projects?.length) {
     setFetchedProjects?.(cached.projects);
     const lines = cached.projects.map((p, i) => `> ${i + 1}. ${p.title} - ${(p.tags || []).join(', ')}`);
@@ -57,10 +59,8 @@ async function fetchProjects(ctx) {
   }
   pushToHistory('system', '> Fetching projects...');
   try {
-    const res = await fetch('/api/projects');
-    const data = await res.json();
+    const data = await fetchApi(listUrl);
     if (data.projects?.length) {
-      apiCache.set('/api/projects', data);
       setFetchedProjects?.(data.projects);
       const lines = data.projects.map((p, i) => `> ${i + 1}. ${p.title} - ${(p.tags || []).join(', ')}`);
       lines.push('> Type "open <number>" or project name to launch.');

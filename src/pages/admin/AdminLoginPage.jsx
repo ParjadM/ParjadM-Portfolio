@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GlassCard } from '../../components/ui/GlassCard.jsx';
+import { SEO } from '../../components/SEO.jsx';
 import { getAdminPath } from '../../utils/i18nRouting.js';
 
 export const AdminLoginPage = ({ theme }) => {
@@ -41,6 +42,7 @@ export const AdminLoginPage = ({ theme }) => {
 
   return (
     <section className="min-h-screen flex items-center justify-center py-20 px-4 bg-gray-950">
+      <SEO title="Admin Login — Parjad Minooei" description="Private admin area." noindex canonicalPath="/admin/login" englishOnly />
       <div className="container mx-auto max-w-md w-full">
         <GlassCard className="p-8" theme={theme}>
           <h2 className="text-3xl font-bold text-white mb-6 text-center">Admin Login</h2>

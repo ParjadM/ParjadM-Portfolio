@@ -57,3 +57,6 @@ coverage/
 tmp/
 temp/
 .temp/
+
+# Lighthouse CI local output
+.lighthouseci/

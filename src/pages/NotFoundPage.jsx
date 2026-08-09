@@ -14,7 +14,7 @@ export const NotFoundPage = ({ theme }) => {
 
     return (
         <section className="min-h-screen flex items-center justify-center py-20 px-4">
-            <SEO title="Page not found — Parjad Minooei" description="The page you requested does not exist on parjadm.ca." noindex />
+            <SEO titleKey="seo.notFoundTitle" descriptionKey="seo.notFoundDesc" noindex />
             <div className="container mx-auto max-w-2xl text-center">
                 <Reveal>
                 <GlassCard className="p-12 md:p-16" theme={theme}>

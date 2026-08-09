@@ -28,7 +28,9 @@ function lazyNamed(factory, name) {
   );
 }
 
-const HomeSection = lazyNamed(() => import('../../pages/HomeSection.jsx'), 'HomeSection');
+// Eager-load the homepage so the LCP portrait is discoverable without a route-chunk waterfall.
+import { HomeSection } from '../../pages/HomeSection.jsx';
+import { PUBLIC_STATIC_ROUTES } from '../../config/publicRoutes.js';
 const AboutSection = lazyNamed(() => import('../../pages/AboutSection.jsx'), 'AboutSection');
 const ProjectsSection = lazyNamed(() => import('../../pages/ProjectsSection.jsx'), 'ProjectsSection');
 const LQFTBenchmarkPage = lazyNamed(() => import('../../pages/LQFTBenchmarkPage.jsx'), 'LQFTBenchmarkPage');
@@ -47,22 +49,30 @@ const DesktopOS = lazyNamed(() => import('../../pages/DesktopOS.jsx'), 'DesktopO
 const ExplorePage = lazyNamed(() => import('../../pages/ExplorePage.jsx'), 'ExplorePage');
 const AlgorithmMemorizerPage = lazyNamed(() => import('../../pages/AlgorithmMemorizerPage.jsx'), 'AlgorithmMemorizerPage');
 
+const ROUTE_COMPONENTS = {
+  home: HomeSection,
+  about: AboutSection,
+  projects: ProjectsSection,
+  lqft: LQFTBenchmarkPage,
+  blog: BlogSection,
+  contact: ContactSection,
+  stats: StatsPage,
+  explore: ExplorePage,
+  algoMem: AlgorithmMemorizerPage,
+  techNews: TechNews,
+  interview: MockInterviewPage,
+  os: DesktopOS,
+  cli: CliMode,
+  intro: IntroCinematic,
+};
+
 const PUBLIC_ROUTES = [
-  { path: '/', Component: HomeSection },
-  { path: '/about', Component: AboutSection },
-  { path: '/projects', Component: ProjectsSection },
-  { path: '/projects/lqftBenchmark', Component: LQFTBenchmarkPage },
-  { path: '/stats', Component: StatsPage },
-  { path: '/blog', Component: BlogSection },
+  ...PUBLIC_STATIC_ROUTES.map((route) => ({
+    path: route.path,
+    Component: ROUTE_COMPONENTS[route.id],
+  })).filter((route) => route.Component),
+  // Dynamic article pages are not part of the static SEO manifest.
   { path: '/blog/:id', Component: BlogPostPage },
-  { path: '/contact', Component: ContactSection },
-  { path: '/explore', Component: ExplorePage },
-  { path: '/algorithm-memorizer', Component: AlgorithmMemorizerPage },
-  { path: '/tech-news', Component: TechNews },
-  { path: '/os', Component: DesktopOS },
-  { path: '/intro', Component: IntroCinematic },
-  { path: '/cli', Component: CliMode },
-  { path: '/interview', Component: MockInterviewPage },
 ];
 
 function routePath(prefix, path) {

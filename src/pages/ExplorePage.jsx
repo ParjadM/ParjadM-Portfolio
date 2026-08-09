@@ -5,7 +5,6 @@ import { Reveal } from '../components/Reveal.jsx';
 import { PageTransition } from '../components/ui/PageTransition.jsx';
 import { SEO } from '../components/SEO.jsx';
 import { LocalizedLink } from '../components/ui/LocalizedLink.jsx';
-import { SITE_URL } from '../config/site.js';
 
 const EXPLORE_LINK_KEYS = [
   { path: '/cli', labelKey: 'explore.links.cli.label', descKey: 'explore.links.cli.desc' },
@@ -27,9 +26,8 @@ export const ExplorePage = ({ theme }) => {
   return (
     <PageTransition className="min-h-screen py-24 px-4">
       <SEO
-        title={t('explore.seoTitle')}
-        description={t('explore.seoDesc')}
-        url={`${SITE_URL}/explore`}
+        titleKey="explore.seoTitle"
+        descriptionKey="explore.seoDesc"
       />
       <div className="container mx-auto max-w-4xl">
         <Reveal>
