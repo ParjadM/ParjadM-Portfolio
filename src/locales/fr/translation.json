@@ -209,37 +209,52 @@
       "stats": { "label": "Stats et ClickUp", "desc": "GitHub, LeetCode et le compteur" },
       "blog": { "label": "Blog", "desc": "Articles et tutoriels" },
       "lqft": { "label": "Benchmark LQFT", "desc": "Terrain de jeu performance" },
-      "cameraFx": { "label": "Camera FX", "desc": "Effets néon suivis par la caméra" },
+      "cameraFx": { "label": "Camera FX", "desc": "Gestes des mains et lumières néon" },
       "algoMem": { "label": "Mémoriseur d'algorithmes", "desc": "S'entraîner à taper des algorithmes contre la montre" }
     }
   },
   "cameraFx": {
     "title": "Camera FX",
-    "subtitle": "Bougez devant votre webcam et peignez l'image avec des effets néon suivis en direct. Tout reste sur votre appareil.",
+    "subtitle": "Suivez vos deux mains, illuminez chaque doigt et réagissez aux gestes — le tout en local avec votre webcam.",
     "back": "← Retour aux projets",
     "live": "En direct",
-    "idleTitle": "Prêt quand vous l'êtes",
-    "idleBody": "Autorisez la caméra pour commencer. Agitez la main, dansez ou penchez la tête — le suivi suit le mouvement.",
+    "idleTitle": "Montrez vos mains",
+    "idleBody": "Autorisez la caméra, puis levez une ou deux mains. Les doigts s'illuminent en néon ; pince, peace et paume ouverte changent la lueur.",
     "start": "Démarrer la caméra",
     "stop": "Arrêter la caméra",
     "capture": "Capturer l'image",
     "captureAlt": "Capture Camera FX",
     "downloadShot": "Télécharger la capture",
     "controls": "Effets",
+    "handLights": "Lumières des doigts",
+    "handsLoading": "Chargement du modèle de mains…",
+    "handsReady": "{{count}} main(s) suivie(s)",
     "intensity": "Intensité",
     "sensitivity": "Sensibilité au mouvement",
-    "privacy": "Confidentialité : la vidéo ne quitte jamais cet onglet. Arrêter la caméra coupe le flux immédiatement.",
-    "tip": "Astuce : placez-vous dans une bonne lumière et bougez un peu — les traînées apparaissent où le mouvement est le plus fort.",
+    "privacy": "Confidentialité : la vidéo et le suivi des mains ne quittent jamais cet onglet. Arrêter la caméra coupe le flux immédiatement.",
+    "tip": "Astuce : une bonne lumière aide. Essayez pince, peace, pointer, poing ou paume ouverte avec une ou deux mains.",
     "modes": {
+      "hands": "Mains",
       "aurora": "Aurore",
       "constellation": "Constellation",
       "prism": "Prisme",
       "ember": "Braise"
     },
+    "gestures": {
+      "none": "—",
+      "hand": "Main",
+      "open": "Paume ouverte",
+      "fist": "Poing",
+      "pinch": "Pince",
+      "peace": "Peace",
+      "point": "Pointer",
+      "thumbsUp": "Pouce en l'air"
+    },
     "errors": {
       "denied": "L'accès à la caméra a été refusé. Autorisez-le dans les réglages du navigateur, puis réessayez.",
       "unsupported": "Ce navigateur n'expose pas d'API caméra.",
-      "generic": "Impossible de démarrer la caméra. Vérifiez qu'aucune autre appli ne l'utilise."
+      "generic": "Impossible de démarrer la caméra. Vérifiez qu'aucune autre appli ne l'utilise.",
+      "handsModel": "Le modèle de suivi des mains n'a pas pu charger. Les effets de mouvement fonctionnent encore — essayez d'actualiser."
     }
   },
   "algoMem": {
@@ -373,7 +388,7 @@
     "lqftTitle": "Benchmark LQFT — Parjad Minooei",
     "lqftDesc": "Benchmark interactif et démo LQFT dans le navigateur.",
     "cameraFxTitle": "Camera FX — Parjad Minooei",
-    "cameraFxDesc": "Terrain de jeu webcam avec aurore, constellation, prisme et braise suivis en local sur l'appareil.",
+    "cameraFxDesc": "Suivi des gestes des deux mains avec éclairage néon des doigts, plus aurore, constellation, prisme et braise — le tout en local.",
     "contactTitle": "Contact — Parjad Minooei",
     "contactDesc": "Contactez-moi pour des opportunités et des collaborations.",
     "statsTitle": "Statistiques — Parjad Minooei",

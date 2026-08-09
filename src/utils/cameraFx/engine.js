@@ -1,12 +1,15 @@
 /**
- * Lightweight camera motion tracker + canvas FX (no ML deps).
- * Samples a downscaled frame, diffs against the previous one, and drives effects.
+ * Camera motion tracker + dual-hand neon FX.
+ * Motion modes use frame differencing; Hands mode uses MediaPipe landmarks.
  */
+
+import { createHandTracker, FINGER_CHAINS } from './handTracker.js'
 
 const SAMPLE_W = 96
 const SAMPLE_H = 54
 
 export const CAMERA_FX_MODES = [
+  { id: 'hands', labelKey: 'cameraFx.modes.hands' },
   { id: 'aurora', labelKey: 'cameraFx.modes.aurora' },
   { id: 'constellation', labelKey: 'cameraFx.modes.constellation' },
   { id: 'prism', labelKey: 'cameraFx.modes.prism' },
@@ -33,7 +36,18 @@ function createParticles(count) {
   return particles
 }
 
-export function createCameraFxEngine({ canvas, video, getSettings }) {
+function toCanvasPoint(lm, w, h) {
+  // Mirror X to match selfie preview.
+  return { x: (1 - lm.x) * w, y: lm.y * h }
+}
+
+export function createCameraFxEngine({
+  canvas,
+  video,
+  getSettings,
+  onHandsUpdate,
+  onHandTrackerStatus,
+}) {
   const ctx = canvas.getContext('2d', { alpha: false })
   const sampleCanvas = document.createElement('canvas')
   sampleCanvas.width = SAMPLE_W
@@ -43,12 +57,35 @@ export function createCameraFxEngine({ canvas, video, getSettings }) {
   let prevGray = null
   let raf = 0
   let running = false
-  let particles = createParticles(140)
+  let particles = createParticles(160)
   let trailCanvas = document.createElement('canvas')
   let trailCtx = trailCanvas.getContext('2d')
   let lastW = 0
   let lastH = 0
   let pulse = 0
+  let handTracker = null
+  let handTrackerPromise = null
+  let lastHandResult = { hands: [], handCount: 0 }
+  let gesturePulse = 0
+
+  const ensureHandTracker = () => {
+    if (handTracker) return Promise.resolve(handTracker)
+    if (handTrackerPromise) return handTrackerPromise
+    onHandTrackerStatus?.('loading')
+    handTrackerPromise = createHandTracker()
+      .then((tracker) => {
+        handTracker = tracker
+        onHandTrackerStatus?.('ready')
+        return tracker
+      })
+      .catch((err) => {
+        console.error(err)
+        handTrackerPromise = null
+        onHandTrackerStatus?.('error')
+        throw err
+      })
+    return handTrackerPromise
+  }
 
   const resize = () => {
     const dpr = Math.min(window.devicePixelRatio || 1, 2)
@@ -151,13 +188,134 @@ export function createCameraFxEngine({ canvas, video, getSettings }) {
     }
   }
 
-  const updateParticles = (motion, intensity, mode) => {
+  const spawnAt = (nx, ny, hue, burst = 1) => {
+    let spawned = 0
+    for (const p of particles) {
+      if (p.life > 0 || spawned >= burst) continue
+      p.x = nx
+      p.y = ny
+      p.vx = (Math.random() - 0.5) * 0.012
+      p.vy = (Math.random() - 0.5) * 0.012 - 0.002
+      p.life = 0.45 + Math.random() * 0.7
+      p.hue = hue
+      spawned += 1
+    }
+  }
+
+  const drawFingerLights = (hands, intensity, mode) => {
+    if (!hands?.length) return
+
+    const palmPoints = []
+
+    for (const hand of hands) {
+      const lms = hand.landmarks
+      const wrist = toCanvasPoint(lms[0], lastW, lastH)
+      const middleMcp = toCanvasPoint(lms[9], lastW, lastH)
+      const palm = {
+        x: (wrist.x + middleMcp.x) / 2,
+        y: (wrist.y + middleMcp.y) / 2,
+      }
+      palmPoints.push(palm)
+
+      const gestureBoost = hand.gesture === 'pinch' || hand.gesture === 'peace' ? 1.35 : 1
+      const sideHueShift = hand.side === 'Left' ? -18 : 18
+
+      // Palm glow
+      const palmR = (34 + intensity * 28) * gestureBoost
+      const palmGrad = trailCtx.createRadialGradient(palm.x, palm.y, 0, palm.x, palm.y, palmR)
+      palmGrad.addColorStop(0, `hsla(${190 + sideHueShift}, 95%, 70%, ${0.28 * intensity})`)
+      palmGrad.addColorStop(1, `hsla(${190 + sideHueShift}, 90%, 50%, 0)`)
+      trailCtx.fillStyle = palmGrad
+      trailCtx.beginPath()
+      trailCtx.arc(palm.x, palm.y, palmR, 0, Math.PI * 2)
+      trailCtx.fill()
+
+      for (const finger of FINGER_CHAINS) {
+        const hue = finger.hue + sideHueShift + (mode === 'ember' ? -40 : 0)
+        const pts = [0, ...finger.points].map((idx) => toCanvasPoint(lms[idx], lastW, lastH))
+
+        // Soft outer glow stroke
+        trailCtx.lineCap = 'round'
+        trailCtx.lineJoin = 'round'
+        trailCtx.strokeStyle = `hsla(${hue}, 95%, 62%, ${0.22 * intensity * gestureBoost})`
+        trailCtx.lineWidth = 14 * intensity
+        trailCtx.beginPath()
+        trailCtx.moveTo(pts[0].x, pts[0].y)
+        for (let i = 1; i < pts.length; i += 1) trailCtx.lineTo(pts[i].x, pts[i].y)
+        trailCtx.stroke()
+
+        // Bright core
+        trailCtx.strokeStyle = `hsla(${hue}, 100%, 72%, ${0.75 * intensity})`
+        trailCtx.lineWidth = 3.5 + intensity * 2
+        trailCtx.beginPath()
+        trailCtx.moveTo(pts[0].x, pts[0].y)
+        for (let i = 1; i < pts.length; i += 1) trailCtx.lineTo(pts[i].x, pts[i].y)
+        trailCtx.stroke()
+
+        // Fingertip light
+        const tip = toCanvasPoint(lms[finger.tip], lastW, lastH)
+        const tipR = (10 + intensity * 14) * gestureBoost
+        const tipGrad = trailCtx.createRadialGradient(tip.x, tip.y, 0, tip.x, tip.y, tipR)
+        tipGrad.addColorStop(0, `hsla(${hue}, 100%, 85%, ${0.9})`)
+        tipGrad.addColorStop(0.35, `hsla(${hue}, 95%, 65%, ${0.45})`)
+        tipGrad.addColorStop(1, `hsla(${hue}, 90%, 50%, 0)`)
+        trailCtx.fillStyle = tipGrad
+        trailCtx.beginPath()
+        trailCtx.arc(tip.x, tip.y, tipR, 0, Math.PI * 2)
+        trailCtx.fill()
+
+        spawnAt(tip.x / lastW, tip.y / lastH, hue, hand.gesture === 'open' ? 2 : 1)
+
+        if (hand.gesture === 'pinch' && finger.id === 'index') {
+          const thumb = toCanvasPoint(lms[4], lastW, lastH)
+          trailCtx.strokeStyle = `hsla(${hue}, 100%, 80%, 0.85)`
+          trailCtx.lineWidth = 2
+          trailCtx.beginPath()
+          trailCtx.moveTo(thumb.x, thumb.y)
+          trailCtx.lineTo(tip.x, tip.y)
+          trailCtx.stroke()
+          spawnAt((thumb.x + tip.x) / 2 / lastW, (thumb.y + tip.y) / 2 / lastH, hue, 4)
+        }
+      }
+    }
+
+    // Light bridge across both hands
+    if (palmPoints.length >= 2) {
+      const [a, b] = palmPoints
+      const midX = (a.x + b.x) / 2
+      const midY = (a.y + b.y) / 2
+      trailCtx.strokeStyle = `rgba(180, 255, 240, ${0.35 + gesturePulse * 0.4})`
+      trailCtx.lineWidth = 2 + intensity * 3
+      trailCtx.shadowColor = 'rgba(120, 255, 230, 0.8)'
+      trailCtx.shadowBlur = 18
+      trailCtx.beginPath()
+      trailCtx.moveTo(a.x, a.y)
+      trailCtx.quadraticCurveTo(midX, midY - 40, b.x, b.y)
+      trailCtx.stroke()
+      trailCtx.shadowBlur = 0
+
+      const bridgeGrad = trailCtx.createRadialGradient(midX, midY, 0, midX, midY, 40)
+      bridgeGrad.addColorStop(0, `rgba(200,255,255,${0.35 + gesturePulse})`)
+      bridgeGrad.addColorStop(1, 'rgba(200,255,255,0)')
+      trailCtx.fillStyle = bridgeGrad
+      trailCtx.beginPath()
+      trailCtx.arc(midX, midY, 40, 0, Math.PI * 2)
+      trailCtx.fill()
+    }
+  }
+
+  const updateParticles = (motion, intensity, mode, hands) => {
     const target = motion.centroid || { x: 0.5, y: 0.45 }
+    if (hands?.length) {
+      const tip = hands[0].landmarks[8]
+      target.x = 1 - tip.x
+      target.y = tip.y
+    }
     const spawnBudget = Math.floor(motion.energy * 40 * intensity)
     let spawned = 0
 
     for (const p of particles) {
-      if (p.life <= 0 && spawned < spawnBudget && motion.hotspots.length) {
+      if (p.life <= 0 && spawned < spawnBudget && motion.hotspots.length && mode !== 'hands') {
         const spot = motion.hotspots[(Math.random() * motion.hotspots.length) | 0]
         p.x = spot.x
         p.y = spot.y
@@ -246,25 +404,51 @@ export function createCameraFxEngine({ canvas, video, getSettings }) {
     const intensity = clamp(settings.intensity ?? 0.7, 0.15, 1.5)
     const sensitivity = clamp(settings.sensitivity ?? 0.45, 0.1, 0.9)
     const threshold = 18 + (1 - sensitivity) * 50
-    const mode = settings.mode || 'aurora'
+    const mode = settings.mode || 'hands'
+    const handLights = settings.handLights !== false
+    const wantHands = mode === 'hands' || handLights
+
+    if (wantHands && !handTracker) {
+      ensureHandTracker().catch(() => {})
+    }
+
     const motion = sampleMotion(threshold)
     pulse = pulse * 0.9 + motion.energy * 0.1
 
-    fadeTrails(0.08 + (1 - intensity) * 0.1)
+    if (handTracker && wantHands) {
+      try {
+        lastHandResult = handTracker.detect(video, performance.now())
+        const hotGesture = lastHandResult.hands.some((h) => h.gesture === 'pinch' || h.gesture === 'peace')
+        gesturePulse = gesturePulse * 0.85 + (hotGesture ? 0.15 : 0)
+        onHandsUpdate?.(lastHandResult)
+      } catch (err) {
+        console.warn('hand detect failed', err)
+      }
+    } else {
+      lastHandResult = { hands: [], handCount: 0 }
+      onHandsUpdate?.(lastHandResult)
+    }
+
+    fadeTrails(mode === 'hands' ? 0.06 : 0.08 + (1 - intensity) * 0.1)
 
     if (mode === 'aurora' || mode === 'ember') {
       paintHotspots(motion.hotspots, intensity, mode)
     }
 
-    // Base mirrored feed
     if (mode === 'prism') {
       drawMirroredVideo(lastW, lastH, 'rgba(6,8,20,0.28)')
       drawPrismGhost(motion, intensity)
     } else if (mode === 'ember') {
       drawMirroredVideo(lastW, lastH, 'rgba(20,6,4,0.35)')
       drawEmberAsh(motion, intensity)
+    } else if (mode === 'hands') {
+      drawMirroredVideo(lastW, lastH, 'rgba(3,8,16,0.35)')
     } else {
       drawMirroredVideo(lastW, lastH, 'rgba(4,10,18,0.22)')
+    }
+
+    if (wantHands) {
+      drawFingerLights(lastHandResult.hands, intensity, mode)
     }
 
     ctx.save()
@@ -272,12 +456,11 @@ export function createCameraFxEngine({ canvas, video, getSettings }) {
     ctx.drawImage(trailCanvas, 0, 0, lastW, lastH)
     ctx.restore()
 
-    updateParticles(motion, intensity, mode)
-    if (mode === 'constellation' || mode === 'aurora') {
+    updateParticles(motion, intensity, mode, lastHandResult.hands)
+    if (mode === 'constellation' || mode === 'aurora' || mode === 'hands') {
       drawConstellation(intensity)
     }
 
-    // Soft vignette + motion pulse ring
     const grd = ctx.createRadialGradient(
       lastW * 0.5,
       lastH * 0.5,
@@ -287,11 +470,11 @@ export function createCameraFxEngine({ canvas, video, getSettings }) {
       Math.max(lastW, lastH) * 0.7,
     )
     grd.addColorStop(0, 'rgba(0,0,0,0)')
-    grd.addColorStop(1, `rgba(0,0,0,${0.45 + pulse})`)
+    grd.addColorStop(1, `rgba(0,0,0,${0.4 + pulse * 0.5})`)
     ctx.fillStyle = grd
     ctx.fillRect(0, 0, lastW, lastH)
 
-    if (motion.centroid) {
+    if (mode !== 'hands' && motion.centroid) {
       const cx = motion.centroid.x * lastW
       const cy = motion.centroid.y * lastH
       const ring = 36 + pulse * 120
@@ -306,17 +489,22 @@ export function createCameraFxEngine({ canvas, video, getSettings }) {
   }
 
   return {
-    start() {
+    async start() {
       if (running) return
       running = true
       prevGray = null
-      particles = createParticles(140)
+      particles = createParticles(160)
       resize()
+      // Warm the hand model in the background so Hands mode is snappy.
+      ensureHandTracker().catch(() => {})
       frame()
     },
     stop() {
       running = false
       cancelAnimationFrame(raf)
+      handTracker?.close?.()
+      handTracker = null
+      handTrackerPromise = null
     },
     capture() {
       return canvas.toDataURL('image/jpeg', 0.92)

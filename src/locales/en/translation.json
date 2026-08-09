@@ -209,37 +209,52 @@
       "stats": { "label": "Stats & ClickUp", "desc": "GitHub, LeetCode, and the counter" },
       "blog": { "label": "Blog", "desc": "Articles and tutorials" },
       "lqft": { "label": "LQFT Benchmark", "desc": "Performance playground" },
-      "cameraFx": { "label": "Camera FX", "desc": "Motion-tracked neon webcam effects" },
+      "cameraFx": { "label": "Camera FX", "desc": "Hand gestures with neon finger lights" },
       "algoMem": { "label": "Algorithm Memorizer", "desc": "Practice typing algorithms against the clock" }
     }
   },
   "cameraFx": {
     "title": "Camera FX",
-    "subtitle": "Move in front of your webcam and paint the frame with live neon motion effects. Everything stays on your device.",
+    "subtitle": "Track both hands, light up every finger, and react to gestures — all on-device with your webcam.",
     "back": "← Back to projects",
     "live": "Live",
-    "idleTitle": "Ready when you are",
-    "idleBody": "Allow camera access to start. Wave, dance, or just tilt your head — the tracker follows the motion.",
+    "idleTitle": "Show your hands",
+    "idleBody": "Allow camera access, then hold up one or both hands. Fingers get neon lighting; pinch, peace, and open palm change the glow.",
     "start": "Start camera",
     "stop": "Stop camera",
     "capture": "Capture frame",
     "captureAlt": "Captured Camera FX frame",
     "downloadShot": "Download snapshot",
     "controls": "Effects",
+    "handLights": "Finger lights",
+    "handsLoading": "Loading hand model…",
+    "handsReady": "{{count}} hand(s) tracked",
     "intensity": "Intensity",
     "sensitivity": "Motion sensitivity",
-    "privacy": "Privacy: video never leaves this browser tab. Stopping the camera ends the stream immediately.",
-    "tip": "Tip: stand in good light and move a bit — trails bloom where motion is strongest.",
+    "privacy": "Privacy: video and hand tracking never leave this browser tab. Stopping the camera ends the stream immediately.",
+    "tip": "Tip: good lighting helps. Try pinch, peace, point, fist, or open palm with one or both hands.",
     "modes": {
+      "hands": "Hands",
       "aurora": "Aurora",
       "constellation": "Constellation",
       "prism": "Prism",
       "ember": "Ember"
     },
+    "gestures": {
+      "none": "—",
+      "hand": "Hand",
+      "open": "Open palm",
+      "fist": "Fist",
+      "pinch": "Pinch",
+      "peace": "Peace",
+      "point": "Point",
+      "thumbsUp": "Thumbs up"
+    },
     "errors": {
       "denied": "Camera permission was denied. Allow access in your browser settings, then try again.",
       "unsupported": "This browser does not expose a camera API.",
-      "generic": "Could not start the camera. Check that no other app is using it."
+      "generic": "Could not start the camera. Check that no other app is using it.",
+      "handsModel": "Hand tracking model couldn’t load. Motion effects still work — try refreshing."
     }
   },
   "algoMem": {
@@ -373,7 +388,7 @@
     "lqftTitle": "LQFT Benchmark — Parjad Minooei",
     "lqftDesc": "Interactive browser benchmark and LQFT demo.",
     "cameraFxTitle": "Camera FX — Parjad Minooei",
-    "cameraFxDesc": "Webcam motion-tracking playground with neon aurora, constellation, prism, and ember effects — all on-device.",
+    "cameraFxDesc": "Dual-hand gesture tracking with neon finger lighting, plus aurora, constellation, prism, and ember webcam effects — all on-device.",
     "contactTitle": "Contact — Parjad Minooei",
     "contactDesc": "Get in touch for opportunities and collaborations.",
     "statsTitle": "Stats — Parjad Minooei",

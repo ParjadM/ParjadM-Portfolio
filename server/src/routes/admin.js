@@ -69,8 +69,8 @@ async function ensureCameraFxProject() {
     {
       $setOnInsert: {
         title: 'Camera FX',
-        description: 'Point your webcam at yourself and paint the frame with motion-tracked neon effects — aurora trails, constellations, prism ghosts, and ember ash. Everything runs locally in the browser.',
-        tags: ['WebRTC', 'Canvas', 'Creative Coding', 'Motion Tracking'],
+        description: 'Dual-hand gesture tracking with neon finger lighting across both hands — plus aurora, constellation, prism, and ember webcam effects. Everything runs locally in the browser.',
+        tags: ['WebRTC', 'MediaPipe', 'Hand Tracking', 'Canvas'],
         liveUrl: '/projects/cameraFx',
         githubUrl: '',
         image: '',

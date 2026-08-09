@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Camera, Download, Sparkles, Aperture, CircleStop } from 'lucide-react'
+import { Camera, Download, Sparkles, Aperture, CircleStop, Hand } from 'lucide-react'
 import { PageTransition } from '../components/ui/PageTransition.jsx'
 import { SEO } from '../components/SEO.jsx'
 import { LocalizedLink } from '../components/ui/LocalizedLink.jsx'
@@ -13,14 +13,22 @@ export const CameraFxPage = ({ theme }) => {
   const canvasRef = useRef(null)
   const engineRef = useRef(null)
   const streamRef = useRef(null)
-  const settingsRef = useRef({ mode: 'aurora', intensity: 0.75, sensitivity: 0.55 })
+  const settingsRef = useRef({
+    mode: 'hands',
+    intensity: 0.85,
+    sensitivity: 0.55,
+    handLights: true,
+  })
 
   const [active, setActive] = useState(false)
   const [error, setError] = useState('')
-  const [mode, setMode] = useState('aurora')
-  const [intensity, setIntensity] = useState(0.75)
+  const [mode, setMode] = useState('hands')
+  const [intensity, setIntensity] = useState(0.85)
   const [sensitivity, setSensitivity] = useState(0.55)
+  const [handLights, setHandLights] = useState(true)
   const [shotUrl, setShotUrl] = useState('')
+  const [handStatus, setHandStatus] = useState('idle')
+  const [handInfo, setHandInfo] = useState({ handCount: 0, gestures: [] })
 
   const isPink = theme === 'pink'
 
@@ -29,16 +37,16 @@ export const CameraFxPage = ({ theme }) => {
       type: 'project',
       pathname: '/projects/cameraFx',
       title: 'Camera FX',
-      description: 'Browser camera playground with motion-tracked neon visual effects. All processing stays on-device.',
-      tags: ['WebRTC', 'Canvas', 'Creative Coding', 'Motion Tracking'],
+      description: 'Webcam playground with dual-hand gesture tracking and neon finger lighting. All processing stays on-device.',
+      tags: ['WebRTC', 'MediaPipe', 'Hand Tracking', 'Canvas'],
       liveUrl: '/projects/cameraFx',
     })
     return () => clearActivePageContext()
   }, [])
 
   useEffect(() => {
-    settingsRef.current = { mode, intensity, sensitivity }
-  }, [mode, intensity, sensitivity])
+    settingsRef.current = { mode, intensity, sensitivity, handLights }
+  }, [mode, intensity, sensitivity, handLights])
 
   const stopCamera = useCallback(() => {
     engineRef.current?.stop()
@@ -49,6 +57,8 @@ export const CameraFxPage = ({ theme }) => {
     }
     if (videoRef.current) videoRef.current.srcObject = null
     setActive(false)
+    setHandStatus('idle')
+    setHandInfo({ handCount: 0, gestures: [] })
   }, [])
 
   const startCamera = useCallback(async () => {
@@ -75,9 +85,19 @@ export const CameraFxPage = ({ theme }) => {
         canvas: canvasRef.current,
         video,
         getSettings: () => settingsRef.current,
+        onHandTrackerStatus: (status) => setHandStatus(status),
+        onHandsUpdate: (result) => {
+          setHandInfo({
+            handCount: result.handCount,
+            gestures: (result.hands || []).map((h) => ({
+              side: h.side,
+              gesture: h.gesture,
+            })),
+          })
+        },
       })
       engineRef.current = engine
-      engine.start()
+      await engine.start()
       setActive(true)
     } catch (err) {
       console.error(err)
@@ -98,6 +118,8 @@ export const CameraFxPage = ({ theme }) => {
     const url = engineRef.current?.capture?.()
     if (url) setShotUrl(url)
   }
+
+  const gestureLabel = (gesture) => t(`cameraFx.gestures.${gesture}`, { defaultValue: gesture })
 
   return (
     <PageTransition className="relative min-h-[100dvh]">
@@ -154,8 +176,8 @@ export const CameraFxPage = ({ theme }) => {
                 {t('cameraFx.back')}
               </LocalizedLink>
               <div className="mt-3 flex items-center gap-3">
-                <span className={`inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-[var(--fx-accent)]`}>
-                  <Aperture className="h-5 w-5" aria-hidden="true" />
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-[var(--fx-accent)]">
+                  <Hand className="h-5 w-5" aria-hidden="true" />
                 </span>
                 <div>
                   <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
@@ -168,9 +190,21 @@ export const CameraFxPage = ({ theme }) => {
               </div>
             </div>
             {active && (
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/40 px-3 py-1.5 text-xs uppercase tracking-[0.2em] text-white/70">
-                <span className="camera-fx-live h-2 w-2 rounded-full bg-rose-400" aria-hidden="true" />
-                {t('cameraFx.live')}
+              <div className="flex flex-wrap gap-2">
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/40 px-3 py-1.5 text-xs uppercase tracking-[0.2em] text-white/70">
+                  <span className="camera-fx-live h-2 w-2 rounded-full bg-rose-400" aria-hidden="true" />
+                  {t('cameraFx.live')}
+                </div>
+                {handStatus === 'loading' && (
+                  <div className="inline-flex items-center rounded-full border border-amber-400/30 bg-amber-500/10 px-3 py-1.5 text-xs text-amber-100">
+                    {t('cameraFx.handsLoading')}
+                  </div>
+                )}
+                {handStatus === 'ready' && (
+                  <div className="inline-flex items-center rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1.5 text-xs text-emerald-100">
+                    {t('cameraFx.handsReady', { count: handInfo.handCount })}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -200,11 +234,29 @@ export const CameraFxPage = ({ theme }) => {
                     </button>
                   </div>
                 )}
+
+                {active && handInfo.gestures.length > 0 && (
+                  <div className="absolute left-3 bottom-3 flex flex-wrap gap-2">
+                    {handInfo.gestures.map((g, idx) => (
+                      <span
+                        key={`${g.side}-${idx}`}
+                        className="rounded-full border border-white/15 bg-black/55 px-3 py-1 text-xs font-medium backdrop-blur"
+                      >
+                        {g.side}: {gestureLabel(g.gesture)}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {error && (
                 <p className="mt-3 rounded-xl border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-100" role="alert">
                   {error}
+                </p>
+              )}
+              {handStatus === 'error' && (
+                <p className="mt-3 rounded-xl border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-50" role="status">
+                  {t('cameraFx.errors.handsModel')}
                 </p>
               )}
 
@@ -229,6 +281,20 @@ export const CameraFxPage = ({ theme }) => {
                   </button>
                 ))}
               </div>
+
+              <label className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm">
+                <span className="inline-flex items-center gap-2 text-white/80">
+                  <Aperture className="h-4 w-4 text-[var(--fx-accent)]" aria-hidden="true" />
+                  {t('cameraFx.handLights')}
+                </span>
+                <input
+                  type="checkbox"
+                  checked={handLights || mode === 'hands'}
+                  disabled={mode === 'hands'}
+                  onChange={(e) => setHandLights(e.target.checked)}
+                  className="h-4 w-4 accent-[var(--fx-accent)]"
+                />
+              </label>
 
               <label className="block mb-4">
                 <div className="mb-1.5 flex justify-between text-xs text-white/50">
