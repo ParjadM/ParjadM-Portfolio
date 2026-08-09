@@ -2,11 +2,27 @@ import { Router } from 'express'
 import { currentEngine } from '../db/index.js'
 import { Project } from '../db/mongo.js'
 import { cacheGet, cacheSet } from '../utils/microCache.js'
+import {
+  parsePaginationQuery,
+  buildPaginationMeta,
+  cacheKeyFromQuery,
+} from '../utils/pagination.js'
 
 const router = Router()
 
-const LIST_CACHE_KEY = 'projects:list'
 const LIST_CACHE_TTL_MS = Number(process.env.PROJECTS_CACHE_TTL_MS || 60 * 1000)
+const LIST_PROJECTION = {
+  title: 1,
+  description: 1,
+  tags: 1,
+  liveUrl: 1,
+  githubUrl: 1,
+  image: 1,
+  featured: 1,
+  order: 1,
+  updatedAt: 1,
+  createdAt: 1,
+}
 
 // Seed only needs to run once per process, not on every request.
 let seedPromise = null
@@ -27,7 +43,7 @@ function ensureBuiltInProjects() {
             order: Date.now(),
           },
         },
-        { upsert: true }
+        { upsert: true },
       ),
       Project.updateOne(
         { liveUrl: '/algorithm-memorizer' },
@@ -43,40 +59,97 @@ function ensureBuiltInProjects() {
             order: Date.now() + 1,
           },
         },
-        { upsert: true }
+        { upsert: true },
       ),
     ]).catch(() => { seedPromise = null })
   }
   return seedPromise
 }
 
-// GET /api/projects - public list of projects (ordered)
+function mapProject(d) {
+  return {
+    id: d._id.toString(),
+    title: d.title,
+    description: d.description || '',
+    tags: d.tags || [],
+    liveUrl: d.liveUrl || '',
+    githubUrl: d.githubUrl || '',
+    image: d.image || '',
+    featured: !!d.featured,
+    order: d.order,
+    updatedAt: d.updatedAt,
+    createdAt: d.createdAt,
+  }
+}
+
+// GET /api/projects - public list of projects (ordered; optional pagination)
 router.get('/', async (req, res) => {
   try {
+    const paging = parsePaginationQuery(req.query)
+
     if (currentEngine !== 'mongo') {
       res.setHeader('Cache-Control', 'no-store')
-      return res.json({ projects: [] })
+      const empty = { projects: [] }
+      if (paging.paginate) {
+        empty.pagination = buildPaginationMeta({
+          page: paging.page,
+          limit: paging.limit,
+          totalItems: 0,
+        })
+      }
+      return res.json(empty)
     }
 
-    const cached = cacheGet(LIST_CACHE_KEY)
+    const featuredOnly = String(req.query.featured || '')
+
+    const filter = {}
+    if (featuredOnly === 'true') filter.featured = true
+    if (featuredOnly === 'false') filter.featured = false
+
+    const cacheParams = {
+      page: paging.paginate ? paging.page : 'all',
+      limit: paging.paginate ? paging.limit : 'all',
+      featured: featuredOnly || 'any',
+    }
+    const cacheKey = cacheKeyFromQuery('projects:list', cacheParams)
+    const cached = cacheGet(cacheKey)
     if (cached) {
       res.setHeader('Cache-Control', 'public, max-age=30, stale-while-revalidate=300')
       return res.json(cached)
     }
 
     await ensureBuiltInProjects()
-    // Bust list cache after ensure so newly upserted built-ins appear promptly
-    const docs = await Project.find({}, { title: 1, description: 1, tags: 1, liveUrl: 1, githubUrl: 1, image: 1, featured: 1, updatedAt: 1 })
-      .sort({ featured: -1, createdAt: -1 })
-      .lean()
-    const payload = { projects: docs.map(d => ({ id: d._id.toString(), ...d })) }
-    // If Algorithm Memorizer is missing from a stale mental model, cache still refreshes each miss
-    cacheSet(LIST_CACHE_KEY, payload, LIST_CACHE_TTL_MS)
 
+    // Featured first, then admin order, then newest — matches reorder UX.
+    const sort = { featured: -1, order: 1, _id: 1 }
+    let docs
+    let totalItems
+    if (!paging.paginate) {
+      docs = await Project.find(filter, LIST_PROJECTION).sort(sort).lean()
+      totalItems = docs.length
+    } else {
+      totalItems = await Project.countDocuments(filter)
+      docs = await Project.find(filter, LIST_PROJECTION)
+        .sort(sort)
+        .skip(paging.skip)
+        .limit(paging.limit)
+        .lean()
+    }
+
+    const projects = docs.map(mapProject)
+    const payload = { projects }
+    if (paging.paginate) {
+      payload.pagination = buildPaginationMeta({
+        page: paging.page,
+        limit: paging.limit,
+        totalItems,
+      })
+    }
+
+    cacheSet(cacheKey, payload, LIST_CACHE_TTL_MS)
     res.setHeader('Cache-Control', 'public, max-age=30, stale-while-revalidate=300')
     res.json(payload)
   } catch (err) {
-    // Fail-soft: return empty list to avoid client crash in production
     res.setHeader('Cache-Control', 'no-store')
     res.json({ projects: [] })
   }

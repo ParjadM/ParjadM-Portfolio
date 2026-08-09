@@ -39,4 +39,31 @@ describe('useFocusTrap', () => {
         fireEvent.keyDown(document, { key: 'Tab', shiftKey: true });
         expect(document.activeElement).toBe(getByText('Second'));
     });
+
+    it('ignores hidden focusable elements when trapping', () => {
+        const HiddenTrap = ({ active }) => {
+            const trapRef = useFocusTrap(active, () => {});
+            return (
+                <div ref={trapRef} data-testid="panel">
+                    <button type="button" style={{ display: 'none' }}>Hidden</button>
+                    <button type="button">Visible</button>
+                </div>
+            );
+        };
+        const { getByText } = render(<HiddenTrap active />);
+        expect(document.activeElement).toBe(getByText('Visible'));
+    });
+
+    it('restores focus to the previously focused element when deactivated', () => {
+        const outside = document.createElement('button');
+        outside.textContent = 'Outside';
+        document.body.appendChild(outside);
+        outside.focus();
+
+        const { rerender, getByText } = render(<TrapPanel active onEscape={() => {}} />);
+        expect(document.activeElement).toBe(getByText('First'));
+        rerender(<TrapPanel active={false} onEscape={() => {}} />);
+        expect(document.activeElement).toBe(outside);
+        outside.remove();
+    });
 });

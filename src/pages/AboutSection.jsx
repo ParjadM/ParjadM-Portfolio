@@ -126,8 +126,8 @@ export const AboutSection = ({ theme }) => {
     return (
         <PageTransition className="min-h-screen flex items-center justify-center py-20 px-4">
             <SEO 
-                title="About — Parjad Minooei"
-                description="Learn about Parjad's background and skills."
+                titleKey="seo.aboutTitle"
+                descriptionKey="seo.aboutDesc"
             />
             <div className="container mx-auto max-w-6xl">
                 {/* Header */}

@@ -449,8 +449,8 @@ export const LQFTBenchmarkPage = ({ theme }) => {
     return (
         <PageTransition className="min-h-screen flex items-center justify-center py-20 px-4">
             <SEO 
-                title="LQFT Benchmark — Parjad Minooei"
-                description="Run the interactive LQFT Benchmark demo in your browser."
+                titleKey="seo.lqftTitle"
+                descriptionKey="seo.lqftDesc"
             />
             <div className="container mx-auto max-w-6xl">
                 <div className="mb-6">

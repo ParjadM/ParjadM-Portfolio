@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { GlassCard } from './ui/GlassCard.jsx';
+import { fetchApi } from '../utils/apiClient.js';
 
 function getVisitorId() {
   try {
@@ -40,11 +41,10 @@ export const ClickUpSection = ({ theme }) => {
       })
       .finally(() => setLoading(false));
 
-    fetch('/api/blog')
-      .then(res => res.ok ? res.json() : { posts: [] })
-      .then(d => {
+    fetchApi('/api/blog?search=clickup&limit=1')
+      .then((d) => {
         const posts = Array.isArray(d?.posts) ? d.posts : [];
-        const match = posts.find(p => /clickup/i.test(p.title || ''));
+        const match = posts.find((p) => /clickup/i.test(p.title || '')) || posts[0];
         if (match?.id) setBlogPostId(match.id);
       })
       .catch(() => {});

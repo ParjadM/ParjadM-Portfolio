@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Github } from '../components/ui/Icons.jsx';
 import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { Reveal } from '../components/Reveal.jsx';
@@ -10,7 +10,7 @@ import { ProjectAskAi } from '../components/ProjectAskAi.jsx';
 import { ProjectCardSkeleton } from '../components/ui/Skeleton.jsx';
 import { BlurImage } from '../components/ui/BlurImage.jsx';
 import { LocalizedLink } from '../components/ui/LocalizedLink.jsx';
-import { GRID_PAGE_SIZE, Pagination, paginateItems } from '../components/ui/Pagination.jsx';
+import { GRID_PAGE_SIZE, Pagination } from '../components/ui/Pagination.jsx';
 import placeholders from '../data/imagePlaceholders.json';
 import CodeQuestImage from '../Images/CodeQuest.webp';
 import BinaryGeneratorImage from '../Images/Binary 1010 Generator.webp';
@@ -25,18 +25,13 @@ function isInternalAppPath(url) {
 
 export const ProjectsSection = ({ theme }) => {
     const { t } = useTranslation();
-    const { data, isLoading: loading, error: fetchError } = useFetchWithCache('/api/projects');
-    const projects = Array.isArray(data?.projects) ? data.projects : [];
-    const error = fetchError ? t('projects.error') : '';
     const [page, setPage] = useState(1);
-
-    useEffect(() => {
-        setPage(1);
-    }, [projects.length]);
-
-    const totalPages = Math.max(1, Math.ceil(projects.length / GRID_PAGE_SIZE));
-    const safePage = Math.min(page, totalPages);
-    const pageProjects = paginateItems(projects, safePage, GRID_PAGE_SIZE);
+    const listUrl = `/api/projects?page=${page}&limit=${GRID_PAGE_SIZE}`;
+    const { data, isLoading: loading, error: fetchError } = useFetchWithCache(listUrl);
+    const projects = Array.isArray(data?.projects) ? data.projects : [];
+    const totalItems = data?.pagination?.totalItems ?? projects.length;
+    const error = fetchError ? t('projects.error') : '';
+    const pageProjects = projects;
 
     const imageMap = {
         'CodeQuest': CodeQuestImage,
@@ -56,8 +51,8 @@ export const ProjectsSection = ({ theme }) => {
     return (
         <PageTransition className="min-h-screen flex flex-col items-center justify-center py-20 px-4">
             <SEO 
-                title="Projects — Parjad Minooei"
-                description="Selected projects with code and live demos."
+                titleKey="seo.projectsTitle"
+                descriptionKey="seo.projectsDesc"
             />
             <Reveal>
             <h2 className="text-4xl font-bold text-white mb-8 md:mb-12 text-center">{t('projects.title')}</h2>
@@ -121,10 +116,10 @@ export const ProjectsSection = ({ theme }) => {
                     <div className="col-span-full text-center text-gray-400">{t('projects.empty')}</div>
                 )}
                 </div>
-                {!loading && projects.length > 0 && (
+                {!loading && totalItems > 0 && (
                   <Pagination
-                    page={safePage}
-                    totalItems={projects.length}
+                    page={page}
+                    totalItems={totalItems}
                     pageSize={GRID_PAGE_SIZE}
                     onChange={setPage}
                     theme={theme}

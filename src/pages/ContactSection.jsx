@@ -75,8 +75,8 @@ export const ContactSection = ({ theme }) => {
     return (
         <PageTransition className="min-h-screen flex items-center justify-center py-20 px-4">
             <SEO 
-                title="Contact — Parjad Minooei"
-                description="Get in touch for opportunities and collaborations."
+                titleKey="seo.contactTitle"
+                descriptionKey="seo.contactDesc"
             />
             <div className="container mx-auto max-w-6xl">
                 {/* Header */}

@@ -11,6 +11,8 @@ import { ChatbotLauncher } from '../ChatbotLauncher.jsx';
 import { Toast } from '../ui/Toast.jsx';
 import { OfflineBanner } from '../OfflineBanner.jsx';
 import { PwaInstallPrompt } from '../PwaInstallPrompt.jsx';
+import { PwaUpdatePrompt } from '../PwaUpdatePrompt.jsx';
+import { NavigationEffects } from './NavigationEffects.jsx';
 
 import { getThemeConfig } from '../../utils/themeConfig.js';
 import { useReducedMotion } from '../../utils/useReducedMotion.js';
@@ -155,8 +157,10 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
             {/* AI Chatbot */}
             {!isFullscreenRoute && <ChatbotLauncher theme={themeConfig.accentPrefix} />}
             
+            <NavigationEffects />
             <OfflineBanner />
             <PwaInstallPrompt theme={themeConfig.accentPrefix} />
+            <PwaUpdatePrompt theme={themeConfig.accentPrefix} />
 
             {/* Toast Notifications */}
             <Toast 

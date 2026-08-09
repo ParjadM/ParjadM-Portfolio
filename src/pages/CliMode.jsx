@@ -101,7 +101,7 @@ export const CliMode = ({ theme }) => {
 
     return (
         <section className={`min-h-screen flex items-center justify-center py-24 px-4 bg-black relative ${isExiting ? 'animate-crt-off' : 'animate-fade-in'}`}>
-            <SEO title="CLI Mode — Parjad Minooei" description="Navigate parjadm.ca from the terminal." />
+            <SEO titleKey="seo.cliTitle" descriptionKey="seo.cliDesc" />
             <style>{`
                 .animate-fade-in { animation: fadeIn 1s ease-out forwards; }
                 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

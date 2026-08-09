@@ -28,6 +28,9 @@ const BlogPostSchema = new mongoose.Schema(
   },
   { timestamps: true }
 )
+// Public list: published + featured-first + publishAt, with _id tie-break.
+BlogPostSchema.index({ status: 1, featured: -1, publishAt: -1, _id: -1 })
+BlogPostSchema.index({ status: 1, category: 1, featured: -1, publishAt: -1, _id: -1 })
 
 export const BlogPost = mongoose.models.BlogPost || mongoose.model('BlogPost', BlogPostSchema, 'blog')
 
@@ -44,6 +47,8 @@ const ProjectSchema = new mongoose.Schema(
   },
   { timestamps: true }
 )
+// Public list / admin reorder: featured first, then order.
+ProjectSchema.index({ featured: -1, order: 1, _id: 1 })
 
 export const Project = mongoose.models.Project || mongoose.model('Project', ProjectSchema, 'projects')
 
@@ -277,6 +282,7 @@ const CommunityAppSchema = new mongoose.Schema(
   },
   { timestamps: true }
 )
+CommunityAppSchema.index({ status: 1, approvedAt: -1 })
 export const CommunityApp = mongoose.models.CommunityApp
   || mongoose.model('CommunityApp', CommunityAppSchema, 'community_apps')
 
