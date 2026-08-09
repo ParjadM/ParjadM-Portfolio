@@ -34,6 +34,7 @@ import { PUBLIC_STATIC_ROUTES } from '../../config/publicRoutes.js';
 const AboutSection = lazyNamed(() => import('../../pages/AboutSection.jsx'), 'AboutSection');
 const ProjectsSection = lazyNamed(() => import('../../pages/ProjectsSection.jsx'), 'ProjectsSection');
 const LQFTBenchmarkPage = lazyNamed(() => import('../../pages/LQFTBenchmarkPage.jsx'), 'LQFTBenchmarkPage');
+const CameraFxPage = lazyNamed(() => import('../../pages/CameraFxPage.jsx'), 'CameraFxPage');
 const StatsPage = lazyNamed(() => import('../../pages/StatsPage.jsx'), 'StatsPage');
 const BlogSection = lazyNamed(() => import('../../pages/BlogSection.jsx'), 'BlogSection');
 const BlogPostPage = lazyNamed(() => import('../../pages/BlogPostPage.jsx'), 'BlogPostPage');
@@ -54,6 +55,7 @@ const ROUTE_COMPONENTS = {
   about: AboutSection,
   projects: ProjectsSection,
   lqft: LQFTBenchmarkPage,
+  cameraFx: CameraFxPage,
   blog: BlogSection,
   contact: ContactSection,
   stats: StatsPage,

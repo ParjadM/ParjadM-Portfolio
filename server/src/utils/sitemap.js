@@ -8,6 +8,7 @@ let STATIC_PATHS = [
   '/about',
   '/projects',
   '/projects/lqftBenchmark',
+  '/projects/cameraFx',
   '/blog',
   '/contact',
   '/stats',
