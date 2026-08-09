@@ -18,7 +18,8 @@ export default defineConfig({
           'index.html',
           'manifest.webmanifest',
           'favicon.svg',
-          'icons/**/*.{png,svg,webp}',
+          // Install icons stay in public/manifest only — precaching 512px PNGs
+          // bloated the SW past the shell budget without helping first load.
           'assets/app-*.js',
           'assets/vendor-react-*.js',
           'assets/vendor-i18n-*.js',
