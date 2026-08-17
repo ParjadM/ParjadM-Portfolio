@@ -144,6 +144,21 @@
       "complexity": "Analyseur de complexité",
       "codeReview": "Revue de code IA",
       "clickUp": "Défi ClickUp"
+    },
+    "clickUpCard": {
+      "subtitle": "Chacun ajoute +1. Jusqu'où irons-nous ?",
+      "button": "Click Up !",
+      "remaining": "{{count}} sur {{limit}} clics restants aujourd'hui",
+      "limitReached": "Limite quotidienne atteinte. Vous avez 5 ClickUp par jour.",
+      "offline": "Compteur hors ligne — base de données indisponible.",
+      "loadError": "Impossible de charger le compteur.",
+      "unavailable": "Compteur indisponible.",
+      "networkError": "Erreur réseau. Réessayez.",
+      "story": "Lire l'histoire de ClickUp →",
+      "postmanTitle": "Utilisez Postman pour ClickUp",
+      "postmanHint": "Collez cette URL dans Postman et envoyez une requête POST pour ajouter +1.",
+      "postmanLimit": "Limite : 5 requêtes par jour. Un GET sur la même URL lit le compteur actuel.",
+      "copyUrl": "Copier l'URL de l'API ClickUp"
     }
   },
   "skills": {

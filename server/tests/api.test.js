@@ -24,13 +24,17 @@ test('GET /api/health returns ok', async () => {
   });
 });
 
-test('GET /api/clickup returns count and availability', async () => {
+test('GET /api/clickup returns count, availability, and Postman docs', async () => {
   await withServer(async (base) => {
     const res = await fetch(`${base}/api/clickup`);
     assert.equal(res.status, 200);
     const json = await res.json();
     assert.ok(typeof json.count === 'number');
     assert.ok('available' in json);
+    assert.equal(json.limit, 5);
+    assert.equal(json.method, 'POST');
+    assert.match(json.url, /\/api\/clickup$/);
+    assert.match(String(json.postman || ''), /Postman/i);
   });
 });
 

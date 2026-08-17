@@ -144,6 +144,21 @@
       "complexity": "Complexity Analyzer",
       "codeReview": "AI Code Review",
       "clickUp": "ClickUp Challenge"
+    },
+    "clickUpCard": {
+      "subtitle": "Everyone adds +1. How high can we go?",
+      "button": "Click Up!",
+      "remaining": "{{count}} of {{limit}} clicks left today",
+      "limitReached": "Daily limit reached. You get 5 ClickUps per day.",
+      "offline": "Counter offline — database unavailable.",
+      "loadError": "Could not load counter.",
+      "unavailable": "Counter unavailable.",
+      "networkError": "Network error. Try again.",
+      "story": "Read the story behind ClickUp →",
+      "postmanTitle": "Use Postman to ClickUp",
+      "postmanHint": "Paste this URL in Postman and send a POST request to add +1.",
+      "postmanLimit": "Rate limit: 5 requests per day. GET the same URL to read the current count.",
+      "copyUrl": "Copy ClickUp API URL"
     }
   },
   "skills": {
