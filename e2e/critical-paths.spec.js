@@ -25,13 +25,13 @@ test.describe('Critical journeys', () => {
   test('Camera FX project page loads without crashing', async ({ page }) => {
     await page.goto('/projects/cameraFx')
     await expect(page.getByRole('heading', { name: /camera fx/i })).toBeVisible()
-    await expect(page.getByRole('button', { name: /start camera/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: /start camera/i }).first()).toBeVisible()
   })
 
   test('QA Lab showcase page loads', async ({ page }) => {
     await page.goto('/projects/qaLab')
     await expect(page.getByRole('heading', { name: /quality engineering/i })).toBeVisible()
-    await expect(page.getByText(/test pyramid/i)).toBeVisible()
+    await expect(page.getByRole('heading', { name: /test pyramid/i })).toBeVisible()
   })
 
   test('French locale keeps primary chrome and contact form', async ({ page }) => {
