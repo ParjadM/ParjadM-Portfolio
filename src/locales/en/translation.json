@@ -225,6 +225,7 @@
       "blog": { "label": "Blog", "desc": "Articles and tutorials" },
       "lqft": { "label": "LQFT Benchmark", "desc": "Performance playground" },
       "cameraFx": { "label": "Camera FX", "desc": "Hand gestures with neon finger lights" },
+      "qaLab": { "label": "QA Engineering Lab", "desc": "Test pyramid, risk matrix, and CI quality gates" },
       "algoMem": { "label": "Algorithm Memorizer", "desc": "Practice typing algorithms against the clock" }
     }
   },
@@ -271,6 +272,49 @@
       "generic": "Could not start the camera. Check that no other app is using it.",
       "handsModel": "Hand tracking model couldn’t load. Motion effects still work — try refreshing."
     }
+  },
+  "qaLab": {
+    "kicker": "IT Quality Assurance · Engineering",
+    "title": "Quality Engineering Lab",
+    "subtitle": "How this portfolio is tested like a product: risk-based coverage, a real test pyramid, CI quality gates, and evidence you can run locally.",
+    "back": "← Back to projects",
+    "pyramidTitle": "Test pyramid",
+    "pyramidBody": "More fast unit and contract tests at the base. Fewer high-value E2E journeys at the tip. Exploratory testing for judgment calls automation cannot own.",
+    "pyramid": {
+      "unit": "Unit + pure logic (Vitest)",
+      "contract": "API contracts (Node test)",
+      "e2e": "Critical-path E2E (Playwright)",
+      "explore": "Exploratory / UX judgment"
+    },
+    "riskTitle": "Risk → test mapping",
+    "riskBody": "QA prioritizes what breaks user trust — not every button equally. Each risk below maps to an automated gate or intentional manual check.",
+    "risks": {
+      "nav": "Broken navigation / blank routes → publicRoutes registry + E2E smoke",
+      "projects": "API pagination / contract drift → server contract tests",
+      "camera": "Showcase app crash (Camera FX) → critical-path E2E heading + CTA",
+      "locale": "FR/EN string gaps → structural i18n parity in CI",
+      "deploy": "Stale chunks / SW drift → build gates + smoke + LHCI budget"
+    },
+    "gatesTitle": "CI quality gates",
+    "gatesBody": "Nothing merges on hope — each gate blocks a different failure mode.",
+    "gates": {
+      "lint": "ESLint",
+      "i18n": "i18n structure",
+      "unit": "Vitest unit",
+      "server": "API contracts",
+      "build": "Production build",
+      "e2e": "Playwright E2E",
+      "lighthouse": "Lighthouse CI"
+    },
+    "improveTitle": "How to improve the suite (QA engineering)",
+    "improve": {
+      "one": "Trace requirements to risks, then to tests — skip low-value UI click soup.",
+      "two": "Keep the pyramid: grow unit/contract coverage first; add E2E only for money-path journeys.",
+      "three": "Treat flaky tests as defects — quarantine, fix root cause, or delete.",
+      "four": "Publish evidence: CI logs, Playwright report, Lighthouse scores — recruiters can verify."
+    },
+    "runTitle": "Reproduce the suite",
+    "runBody": "Same commands CI uses — copy, run, show the green path."
   },
   "algoMem": {
     "badge": "Practice from memory",
@@ -341,6 +385,7 @@
     "greetingBlog": "Hi! I can help explain \"{{title}}\" or answer questions about this article.",
     "greetingLqft": "Hi! You're on the LQFT Benchmark page. Ask about persistent trees, complexity, or how the demo works.",
     "greetingCameraFx": "Hi! You're on Camera FX — a webcam motion playground. Ask how the effects work or what to try next.",
+    "greetingQaLab": "Hi! You're in the QA Engineering Lab — ask about the test pyramid, risk mapping, or how CI gates work on this site.",
     "greetingBlogPost": "Hi! Reading a blog post? I can summarize or explain it in plain language.",
     "greetingStats": "Hi! On the Stats page — ask about GitHub/LeetCode metrics or how the complexity analyzer works.",
     "greetingInterview": "Hi! Ready to practice? I can explain how Mock Interview works or answer questions about Parjad.",
@@ -404,6 +449,8 @@
     "lqftDesc": "Interactive browser benchmark and LQFT demo.",
     "cameraFxTitle": "Camera FX — Parjad Minooei",
     "cameraFxDesc": "Dual-hand gesture tracking with neon finger lighting, plus aurora, constellation, prism, and ember webcam effects — all on-device.",
+    "qaLabTitle": "QA Engineering Lab — Parjad Minooei",
+    "qaLabDesc": "IT quality assurance engineering: test pyramid, risk-based coverage, CI quality gates, Playwright E2E, and API contracts — showcased as a live project.",
     "contactTitle": "Contact — Parjad Minooei",
     "contactDesc": "Get in touch for opportunities and collaborations.",
     "statsTitle": "Stats — Parjad Minooei",

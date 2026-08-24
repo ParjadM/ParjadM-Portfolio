@@ -82,6 +82,25 @@ async function ensureCameraFxProject() {
   )
 }
 
+async function ensureQaLabProject() {
+  await Project.updateOne(
+    { liveUrl: '/projects/qaLab' },
+    {
+      $setOnInsert: {
+        title: 'QA Engineering Lab',
+        description: 'IT quality assurance engineering showcase: risk-based test strategy, test pyramid, CI quality gates, Playwright critical-path E2E, and API contract tests — runnable evidence, not just a write-up.',
+        tags: ['QA', 'Playwright', 'Vitest', 'CI', 'API Contracts'],
+        liveUrl: '/projects/qaLab',
+        githubUrl: '',
+        image: '',
+        featured: true,
+        order: Date.now() + 3,
+      },
+    },
+    { upsert: true }
+  )
+}
+
 router.get('/db-status', async (req, res) => {
   if (currentEngine !== 'mongo') {
     return res.json({ engine: currentEngine, connected: false, info: 'Using in-memory store' })
@@ -379,6 +398,7 @@ router.get('/projects', async (req, res) => {
   await ensureLqftBenchmarkProject()
   await ensureAlgorithmMemorizerProject()
   await ensureCameraFxProject()
+  await ensureQaLabProject()
   const docs = await Project.find({}).sort({ featured: -1, createdAt: -1 }).lean()
   const projects = docs.map(d => ({ id: d._id.toString(), ...d }))
   res.json({ projects })

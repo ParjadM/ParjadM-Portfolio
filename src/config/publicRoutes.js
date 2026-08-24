@@ -50,6 +50,15 @@ export const PUBLIC_STATIC_ROUTES = [
     indexable: true,
   },
   {
+    path: '/projects/qaLab',
+    id: 'qaLab',
+    titleKey: 'seo.qaLabTitle',
+    descriptionKey: 'seo.qaLabDesc',
+    sitemap: true,
+    prerender: true,
+    indexable: true,
+  },
+  {
     path: '/blog',
     id: 'blog',
     titleKey: 'blog.seoTitle',

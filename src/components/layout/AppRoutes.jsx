@@ -51,6 +51,7 @@ const AboutSection = lazyNamed(() => import('../../pages/AboutSection.jsx'), 'Ab
 const ProjectsSection = lazyNamed(() => import('../../pages/ProjectsSection.jsx'), 'ProjectsSection');
 const LQFTBenchmarkPage = lazyNamed(() => import('../../pages/LQFTBenchmarkPage.jsx'), 'LQFTBenchmarkPage');
 const CameraFxPage = lazyNamed(() => import('../../pages/CameraFxPage.jsx'), 'CameraFxPage');
+const QaLabPage = lazyNamed(() => import('../../pages/QaLabPage.jsx'), 'QaLabPage');
 const StatsPage = lazyNamed(() => import('../../pages/StatsPage.jsx'), 'StatsPage');
 const BlogSection = lazyNamed(() => import('../../pages/BlogSection.jsx'), 'BlogSection');
 const BlogPostPage = lazyNamed(() => import('../../pages/BlogPostPage.jsx'), 'BlogPostPage');
@@ -72,6 +73,7 @@ const ROUTE_COMPONENTS = {
   projects: ProjectsSection,
   lqft: LQFTBenchmarkPage,
   cameraFx: CameraFxPage,
+  qaLab: QaLabPage,
   blog: BlogSection,
   contact: ContactSection,
   stats: StatsPage,

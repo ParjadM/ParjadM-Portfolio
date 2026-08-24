@@ -14,11 +14,14 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Install server dependencies
+        run: npm --prefix server ci
 
       - name: Lint
         run: npm run lint
@@ -29,11 +32,17 @@ jobs:
       - name: Unit tests
         run: npm run test:unit
 
+      - name: API contract tests
+        run: npm run test:server
+
       - name: Build
         run: npm run build
 
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
+
+      - name: E2E critical paths
+        run: npm run test:e2e
 
       - name: Smoke test (rendered pages)
         run: npm run test:smoke

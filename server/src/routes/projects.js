@@ -77,6 +77,22 @@ function ensureBuiltInProjects() {
         },
         { upsert: true },
       ),
+      Project.updateOne(
+        { liveUrl: '/projects/qaLab' },
+        {
+          $setOnInsert: {
+            title: 'QA Engineering Lab',
+            description: 'IT quality assurance engineering showcase: risk-based test strategy, test pyramid, CI quality gates, Playwright critical-path E2E, and API contract tests — runnable evidence, not just a write-up.',
+            tags: ['QA', 'Playwright', 'Vitest', 'CI', 'API Contracts'],
+            liveUrl: '/projects/qaLab',
+            githubUrl: '',
+            image: '',
+            featured: true,
+            order: Date.now() + 3,
+          },
+        },
+        { upsert: true },
+      ),
     ]).catch(() => { seedPromise = null })
   }
   return seedPromise

@@ -38,6 +38,7 @@ export default defineConfig({
           '**/IntroCinematic*',
           '**/MockInterview*',
           '**/CameraFx*',
+          '**/QaLab*',
           '**/garden/**',
           '**/icons/icon-512.png',
           '**/icons/icon-maskable-512.png',

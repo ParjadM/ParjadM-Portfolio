@@ -225,6 +225,7 @@
       "blog": { "label": "Blog", "desc": "Articles et tutoriels" },
       "lqft": { "label": "Benchmark LQFT", "desc": "Terrain de jeu performance" },
       "cameraFx": { "label": "Camera FX", "desc": "Gestes des mains et lumières néon" },
+      "qaLab": { "label": "Labo QA ingénierie", "desc": "Pyramide de tests, risques et portes CI" },
       "algoMem": { "label": "Mémoriseur d'algorithmes", "desc": "S'entraîner à taper des algorithmes contre la montre" }
     }
   },
@@ -271,6 +272,49 @@
       "generic": "Impossible de démarrer la caméra. Vérifiez qu'aucune autre appli ne l'utilise.",
       "handsModel": "Le modèle de suivi des mains n'a pas pu charger. Les effets de mouvement fonctionnent encore — essayez d'actualiser."
     }
+  },
+  "qaLab": {
+    "kicker": "Assurance qualité IT · Ingénierie",
+    "title": "Labo d'ingénierie qualité",
+    "subtitle": "Comment ce portfolio est testé comme un produit : couverture fondée sur le risque, vraie pyramide de tests, portes CI, et preuves exécutables en local.",
+    "back": "← Retour aux projets",
+    "pyramidTitle": "Pyramide de tests",
+    "pyramidBody": "Plus de tests unitaires et de contrats rapides à la base. Moins de parcours E2E à haute valeur au sommet. Exploration manuelle pour le jugement.",
+    "pyramid": {
+      "unit": "Unitaire + logique pure (Vitest)",
+      "contract": "Contrats API (tests Node)",
+      "e2e": "E2E chemins critiques (Playwright)",
+      "explore": "Exploratoire / jugement UX"
+    },
+    "riskTitle": "Risque → stratégie de test",
+    "riskBody": "La QA priorise ce qui casse la confiance — pas chaque bouton au même niveau. Chaque risque ci-dessous a une porte automatisée ou un contrôle manuel volontaire.",
+    "risks": {
+      "nav": "Navigation cassée / routes vides → registre publicRoutes + smoke E2E",
+      "projects": "Dérive pagination / contrats API → tests de contrat serveur",
+      "camera": "Crash d'app vitrine (Camera FX) → E2E titre + CTA",
+      "locale": "Écarts FR/EN → parité structurelle i18n en CI",
+      "deploy": "Chunks obsolètes / dérive SW → build + smoke + budget LHCI"
+    },
+    "gatesTitle": "Portes qualité CI",
+    "gatesBody": "Rien ne merge sur l'espoir — chaque porte bloque un mode de panne.",
+    "gates": {
+      "lint": "ESLint",
+      "i18n": "Structure i18n",
+      "unit": "Vitest unitaire",
+      "server": "Contrats API",
+      "build": "Build production",
+      "e2e": "Playwright E2E",
+      "lighthouse": "Lighthouse CI"
+    },
+    "improveTitle": "Comment améliorer la suite (ingénierie QA)",
+    "improve": {
+      "one": "Relier exigences → risques → tests — éviter le clic UI à faible valeur.",
+      "two": "Garder la pyramide : enrichir unit/contrat d'abord ; E2E seulement pour les parcours critiques.",
+      "three": "Traiter les tests flaky comme des défauts — quarantaine, cause racine, ou suppression.",
+      "four": "Publier les preuves : logs CI, rapport Playwright, scores Lighthouse — vérifiables."
+    },
+    "runTitle": "Reproduire la suite",
+    "runBody": "Les mêmes commandes que la CI — copiez, lancez, montrez le chemin vert."
   },
   "algoMem": {
     "badge": "Pratique de mémoire",
@@ -341,6 +385,7 @@
     "greetingBlog": "Bonjour! Je peux expliquer « {{title}} » ou répondre à vos questions sur cet article.",
     "greetingLqft": "Bonjour! Vous êtes sur la page Benchmark LQFT. Demandez-moi les arbres persistants, la complexité ou la démo.",
     "greetingCameraFx": "Bonjour! Vous êtes sur Camera FX — un terrain de jeu webcam. Demandez comment marchent les effets ou quoi essayer.",
+    "greetingQaLab": "Bonjour! Vous êtes dans le labo QA — demandez la pyramide de tests, la cartographie des risques ou les portes CI.",
     "greetingBlogPost": "Bonjour! Vous lisez un article? Je peux le résumer ou l'expliquer simplement.",
     "greetingStats": "Bonjour! Sur la page Stats — posez des questions sur GitHub/LeetCode ou l'analyseur de complexité.",
     "greetingInterview": "Bonjour! Prêt à pratiquer? Je peux expliquer l'entrevue simulée ou répondre sur Parjad.",
@@ -404,6 +449,8 @@
     "lqftDesc": "Benchmark interactif et démo LQFT dans le navigateur.",
     "cameraFxTitle": "Camera FX — Parjad Minooei",
     "cameraFxDesc": "Suivi des gestes des deux mains avec éclairage néon des doigts, plus aurore, constellation, prisme et braise — le tout en local.",
+    "qaLabTitle": "Labo QA ingénierie — Parjad Minooei",
+    "qaLabDesc": "Assurance qualité IT : pyramide de tests, couverture fondée sur le risque, portes CI, Playwright E2E et contrats API — présenté comme un projet live.",
     "contactTitle": "Contact — Parjad Minooei",
     "contactDesc": "Contactez-moi pour des opportunités et des collaborations.",
     "statsTitle": "Statistiques — Parjad Minooei",

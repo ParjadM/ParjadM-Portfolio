@@ -20,6 +20,7 @@ const FORBIDDEN = [
   'MockInterview',
   'IntroCinematic',
   'CameraFx',
+  'QaLab',
 ]
 
 function findSw() {
