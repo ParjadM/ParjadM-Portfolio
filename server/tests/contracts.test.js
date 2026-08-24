@@ -18,6 +18,16 @@ async function withServer(fn) {
   }
 }
 
+function assertPaginationMeta(pagination, { page, limit }) {
+  assert.equal(typeof pagination, 'object')
+  assert.equal(pagination.page, page)
+  assert.equal(pagination.limit, limit)
+  assert.equal(typeof pagination.totalItems, 'number')
+  assert.equal(typeof pagination.totalPages, 'number')
+  assert.equal(typeof pagination.hasPreviousPage, 'boolean')
+  assert.equal(typeof pagination.hasNextPage, 'boolean')
+}
+
 test('contract: GET /api/health', async () => {
   await withServer(async (base) => {
     const res = await fetch(`${base}/api/health`)
@@ -36,14 +46,25 @@ test('contract: GET /api/projects?page=1&limit=12', async () => {
     assert.equal(res.status, 200)
     const body = await res.json()
     assert.ok(Array.isArray(body.projects))
-    assert.equal(typeof body.pagination, 'object')
-    assert.equal(body.pagination.page, 1)
-    assert.equal(body.pagination.limit, 12)
-    assert.equal(typeof body.pagination.totalItems, 'number')
+    assertPaginationMeta(body.pagination, { page: 1, limit: 12 })
     for (const project of body.projects) {
       assert.equal(typeof project.title, 'string')
       assert.ok('liveUrl' in project)
       assert.ok(Array.isArray(project.tags))
+      assert.equal(typeof project.featured, 'boolean')
+    }
+  })
+})
+
+test('contract: GET /api/projects?featured=true&page=1&limit=12', async () => {
+  await withServer(async (base) => {
+    const res = await fetch(`${base}/api/projects?featured=true&page=1&limit=12`)
+    assert.equal(res.status, 200)
+    const body = await res.json()
+    assert.ok(Array.isArray(body.projects))
+    assertPaginationMeta(body.pagination, { page: 1, limit: 12 })
+    for (const project of body.projects) {
+      assert.equal(project.featured, true)
     }
   })
 })
@@ -54,9 +75,16 @@ test('contract: GET /api/blog?page=1&limit=12', async () => {
     assert.equal(res.status, 200)
     const body = await res.json()
     assert.ok(Array.isArray(body.posts))
-    assert.equal(typeof body.pagination, 'object')
-    assert.equal(body.pagination.page, 1)
-    assert.equal(body.pagination.limit, 12)
-    assert.equal(typeof body.pagination.totalItems, 'number')
+    assertPaginationMeta(body.pagination, { page: 1, limit: 12 })
+  })
+})
+
+test('contract: GET /api/projects without query stays unpaginated (legacy)', async () => {
+  await withServer(async (base) => {
+    const res = await fetch(`${base}/api/projects`)
+    assert.equal(res.status, 200)
+    const body = await res.json()
+    assert.ok(Array.isArray(body.projects))
+    assert.equal(body.pagination, undefined)
   })
 })

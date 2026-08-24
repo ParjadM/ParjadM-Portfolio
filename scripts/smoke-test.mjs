@@ -16,6 +16,8 @@ const ROUTES = [
   { path: '/fr', check: 'header' },
   { path: '/projects', check: 'header' },
   { path: '/fr/projects', check: 'header' },
+  { path: '/projects/cameraFx', check: 'header' },
+  { path: '/projects/qaLab', check: 'header' },
   { path: '/contact', check: 'form' },
   { path: '/blog', check: 'header' },
 ];
@@ -46,7 +48,7 @@ try {
   page.on('pageerror', (err) => pageErrors.push(err.message));
 
   for (const { path, check } of ROUTES) {
-    await page.goto(`${BASE}${path}`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE}${path}`, { waitUntil: 'domcontentloaded' });
 
     const headerVisible = await page.locator('header').first().isVisible().catch(() => false);
     const bodyText = (await page.textContent('body'))?.trim() ?? '';
@@ -65,7 +67,7 @@ try {
   // Mobile menu opens and closes
   const mobile = await browser.newContext({ ...devices['iPhone 13'] });
   const mobilePage = await mobile.newPage();
-  await mobilePage.goto(`${BASE}/`, { waitUntil: 'networkidle' });
+  await mobilePage.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
   const menuBtn = mobilePage.getByRole('button', { name: /menu/i }).first();
   if (await menuBtn.isVisible().catch(() => false)) {
     await menuBtn.click();

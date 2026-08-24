@@ -8,6 +8,7 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
+  // Flaky tests are defects: one CI retry for infra noise, then fail loudly.
   retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 2 : undefined,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
@@ -17,6 +18,8 @@ export default defineConfig({
     baseURL: process.env.E2E_BASE_URL || 'http://127.0.0.1:4173',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
+    // Prefer DOM readiness over networkidle (API proxy noise is flake fuel).
+    navigationTimeout: 30_000,
   },
   webServer: process.env.E2E_BASE_URL
     ? undefined

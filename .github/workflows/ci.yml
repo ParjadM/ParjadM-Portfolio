@@ -44,6 +44,16 @@ jobs:
       - name: E2E critical paths
         run: npm run test:e2e
 
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+
       - name: Smoke test (rendered pages)
         run: npm run test:smoke
 

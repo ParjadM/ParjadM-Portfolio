@@ -170,9 +170,10 @@ export const QaLabPage = ({ theme }) => {
             <pre className="overflow-x-auto rounded-xl bg-black/50 border border-white/10 p-4 text-xs md:text-sm text-teal-100/90 font-mono leading-relaxed">
 {`npm run lint && npm run test:i18n
 npm run test:unit
-npm --prefix server test
+npm run test:server
 npm run build
 npm run test:e2e
+npm run test:smoke
 npm run test:lighthouse`}
             </pre>
           </section>
