@@ -206,3 +206,5 @@ export const BlogSection = ({ theme }) => {
         </section>
     );
 };
+
+export default BlogSection;

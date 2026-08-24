@@ -146,3 +146,5 @@ export const CliMode = ({ theme }) => {
         </section>
     );
 };
+
+export default CliMode;

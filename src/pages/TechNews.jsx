@@ -170,3 +170,5 @@ export const TechNews = ({ theme }) => {
         </PageTransition>
     );
 };
+
+export default TechNews;

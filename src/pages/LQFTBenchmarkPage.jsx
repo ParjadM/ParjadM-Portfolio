@@ -847,3 +847,5 @@ export const LQFTBenchmarkPage = ({ theme }) => {
         </PageTransition>
     );
 };
+
+export default LQFTBenchmarkPage;

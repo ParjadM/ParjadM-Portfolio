@@ -6,12 +6,25 @@ import { lazyWithRetry } from '../../utils/lazyWithRetry.js';
 /** Resolve default or named export from a lazy route module (Vite shared chunks vary). */
 function pickExport(mod, name) {
   if (!mod) return undefined;
-  if (mod.default) return mod.default;
-  if (name && mod[name]) return mod[name];
-  // Shared admin chunk may expose a module namespace under `.f`
-  if (mod.f) {
-    if (mod.f.default) return mod.f.default;
-    if (name && mod.f[name]) return mod.f[name];
+
+  const candidates = [mod];
+  // Shared/admin chunks sometimes nest the real module under `.f` / `.module`.
+  if (mod.f && typeof mod.f === 'object') candidates.push(mod.f);
+  if (mod.module && typeof mod.module === 'object') candidates.push(mod.module);
+
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+    if (candidate.default) return candidate.default;
+    if (name && candidate[name]) return candidate[name];
+  }
+
+  // Last resort: first function-like export (covers odd interop shapes).
+  if (name) {
+    for (const candidate of candidates) {
+      for (const [key, value] of Object.entries(candidate || {})) {
+        if (key === name && value) return value;
+      }
+    }
   }
   return undefined;
 }
@@ -21,7 +34,10 @@ function lazyNamed(factory, name) {
     factory().then((mod) => {
       const Comp = pickExport(mod, name);
       if (!Comp) {
-        throw new Error(`Failed to load route module export: ${name || 'default'}`);
+        const err = new Error(`Failed to load route module export: ${name || 'default'}`);
+        // Treat as a stale-chunk style failure so recovery can refresh the shell.
+        err.name = 'ChunkLoadError';
+        throw err;
       }
       return { default: Comp };
     }),

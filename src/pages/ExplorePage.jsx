@@ -58,3 +58,5 @@ export const ExplorePage = ({ theme }) => {
     </PageTransition>
   );
 };
+
+export default ExplorePage;

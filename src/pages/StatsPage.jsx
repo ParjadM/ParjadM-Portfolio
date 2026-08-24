@@ -77,3 +77,5 @@ export const StatsPage = ({ theme }) => {
     </PageTransition>
   );
 };
+
+export default StatsPage;

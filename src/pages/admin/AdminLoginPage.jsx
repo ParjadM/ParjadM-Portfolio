@@ -70,3 +70,5 @@ export const AdminLoginPage = ({ theme }) => {
     </section>
   );
 };
+
+export default AdminLoginPage;

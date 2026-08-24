@@ -263,3 +263,5 @@ export const ContactSection = ({ theme }) => {
         </PageTransition>
     );
 };
+
+export default ContactSection;

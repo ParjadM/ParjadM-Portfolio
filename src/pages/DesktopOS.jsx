@@ -798,3 +798,5 @@ export const DesktopOS = ({ theme }) => {
         </div>
     );
 };
+
+export default DesktopOS;

@@ -426,3 +426,5 @@ export const AlgorithmMemorizerPage = ({ theme }) => {
     </PageTransition>
   )
 }
+
+export default AlgorithmMemorizerPage;

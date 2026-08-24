@@ -44,3 +44,5 @@ export const NotFoundPage = ({ theme }) => {
     );
 };
 
+
+export default NotFoundPage;

@@ -53,9 +53,32 @@ export default defineConfig({
             handler: 'NetworkOnly',
           },
           {
-            // Hashed Vite assets are immutable — CacheFirst is safe and preserves
-            // previously visited route chunks across deployments.
-            urlPattern: ({ url }) => url.origin === self.location.origin && url.pathname.startsWith('/assets/'),
+            // Prefer network for hashed JS so a new deploy's entry can fetch
+            // current chunks even if an older SW is still installed. Fall back
+            // to cache for offline / flaky networks. CSS/fonts/images stay
+            // CacheFirst via the catch-all below.
+            urlPattern: ({ url }) =>
+              url.origin === self.location.origin
+              && url.pathname.startsWith('/assets/')
+              && url.pathname.endsWith('.js'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'assets-js',
+              networkTimeoutSeconds: 3,
+              expiration: {
+                maxEntries: 60,
+                maxAgeSeconds: 60 * 60 * 24 * 7,
+              },
+              cacheableResponse: {
+                statuses: [200],
+              },
+            },
+          },
+          {
+            urlPattern: ({ url }) =>
+              url.origin === self.location.origin
+              && url.pathname.startsWith('/assets/')
+              && !url.pathname.endsWith('.js'),
             handler: 'CacheFirst',
             options: {
               cacheName: 'assets-immutable',

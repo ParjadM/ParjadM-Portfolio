@@ -440,3 +440,5 @@ export const IntroCinematic = ({ theme }) => {
         </section>
     );
 };
+
+export default IntroCinematic;

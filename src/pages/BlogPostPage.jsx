@@ -195,3 +195,5 @@ export const BlogPostPage = ({ theme }) => {
         </section>
     );
 };
+
+export default BlogPostPage;

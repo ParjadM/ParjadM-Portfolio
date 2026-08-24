@@ -284,3 +284,5 @@ export const MockInterviewPage = ({ theme }) => {
     </div>
   );
 };
+
+export default MockInterviewPage;

@@ -13,6 +13,15 @@ installChunkLoadRecovery()
 installErrorReporter()
 installWebVitalsReporter()
 
+// Drop one-shot recovery cache-bust param after a successful boot.
+try {
+  const url = new URL(window.location.href)
+  if (url.searchParams.has('_chunkfix')) {
+    url.searchParams.delete('_chunkfix')
+    window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`)
+  }
+} catch {}
+
 async function bootstrap() {
   const initialLocale = window.location.pathname.startsWith('/fr') ? 'fr' : 'en'
   await ensureLocale(initialLocale)

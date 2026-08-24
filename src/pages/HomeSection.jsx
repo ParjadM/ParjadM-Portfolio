@@ -239,3 +239,5 @@ export const HomeSection = ({ theme }) => {
   </PageTransition>
 );
 };
+
+export default HomeSection;

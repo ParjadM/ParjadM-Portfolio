@@ -132,3 +132,5 @@ export const ProjectsSection = ({ theme }) => {
         </PageTransition>
     );
 };
+
+export default ProjectsSection;
