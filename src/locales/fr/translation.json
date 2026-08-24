@@ -225,7 +225,7 @@
       "blog": { "label": "Blog", "desc": "Articles et tutoriels" },
       "lqft": { "label": "Benchmark LQFT", "desc": "Terrain de jeu performance" },
       "cameraFx": { "label": "Camera FX", "desc": "Gestes des mains et lumières néon" },
-      "qaLab": { "label": "Labo QA ingénierie", "desc": "Pyramide de tests, risques et portes CI" },
+      "qaLab": { "label": "Labo QA ingénierie", "desc": "Comment je teste ce site — pyramide, risques, CI" },
       "algoMem": { "label": "Mémoriseur d'algorithmes", "desc": "S'entraîner à taper des algorithmes contre la montre" }
     }
   },
@@ -274,29 +274,29 @@
     }
   },
   "qaLab": {
-    "kicker": "Assurance qualité IT · Ingénierie",
+    "kicker": "Mes notes d'ingénierie QA",
     "title": "Labo d'ingénierie qualité",
-    "subtitle": "Comment ce portfolio est testé comme un produit : couverture fondée sur le risque, vraie pyramide de tests, portes CI, et preuves exécutables en local.",
+    "subtitle": "Je traite ce portfolio comme un produit sous test. Je cartographie les risques d'abord, je construis une vraie pyramide, j'active des portes CI, et je laisse les commandes exactes que j'exécute — pour que vous puissiez vérifier le chemin vert vous-même.",
     "back": "← Retour aux projets",
-    "pyramidTitle": "Pyramide de tests",
-    "pyramidBody": "Plus de tests unitaires et de contrats rapides à la base. Moins de parcours E2E à haute valeur au sommet. Exploration manuelle pour le jugement.",
+    "pyramidTitle": "Ma pyramide de tests",
+    "pyramidBody": "Je garde l'essentiel de ma couverture dans des tests unitaires et de contrats rapides à la base. J'ajoute Playwright seulement pour les parcours que je ne voudrais pas casser en production. Je fais encore des passes exploratoires pour le jugement UX.",
     "pyramid": {
       "unit": "Unitaire + logique pure (Vitest)",
       "contract": "Contrats API (tests Node)",
       "e2e": "E2E chemins critiques (Playwright)",
       "explore": "Exploratoire / jugement UX"
     },
-    "riskTitle": "Risque → stratégie de test",
-    "riskBody": "La QA priorise ce qui casse la confiance — pas chaque bouton au même niveau. Chaque risque ci-dessous a une porte automatisée ou un contrôle manuel volontaire.",
+    "riskTitle": "Comment je relie risque → tests",
+    "riskBody": "Je ne teste pas chaque bouton de la même façon. Je commence par ce qui briserait la confiance — puis j'ajoute une porte automatisée ou un contrôle manuel volontaire.",
     "risks": {
-      "nav": "Navigation cassée / routes vides → registre publicRoutes + smoke E2E",
-      "projects": "Dérive pagination / contrats API → tests de contrat serveur",
-      "camera": "Crash d'app vitrine (Camera FX) → E2E titre + CTA",
-      "locale": "Écarts FR/EN → parité structurelle i18n en CI",
-      "deploy": "Chunks obsolètes / dérive SW → build + smoke + budget LHCI"
+      "nav": "Navigation cassée / routes vides — je protège avec publicRoutes + smoke E2E",
+      "projects": "Dérive pagination / contrats API — je verrouille la forme avec des tests de contrat",
+      "camera": "Crash d'app vitrine (Camera FX) — je smoke-teste titre + CTA en E2E",
+      "locale": "Écarts FR/EN — j'impose la parité structurelle i18n en CI",
+      "deploy": "Chunks obsolètes / dérive SW — je détecte via build, smoke et budget LHCI"
     },
-    "gatesTitle": "Portes qualité CI",
-    "gatesBody": "Rien ne merge sur l'espoir — chaque porte bloque un mode de panne.",
+    "gatesTitle": "Mes portes CI",
+    "gatesBody": "Je ne merge pas sur l'espoir. Chaque porte bloque un mode de panne avant la prod.",
     "gates": {
       "lint": "ESLint",
       "i18n": "Structure i18n",
@@ -306,15 +306,24 @@
       "e2e": "Playwright E2E",
       "lighthouse": "Lighthouse CI"
     },
-    "improveTitle": "Comment améliorer la suite (ingénierie QA)",
+    "improveTitle": "Comment j'améliore la suite",
     "improve": {
-      "one": "Relier exigences → risques → tests — éviter le clic UI à faible valeur.",
-      "two": "Garder la pyramide : enrichir unit/contrat d'abord ; E2E seulement pour les parcours critiques.",
-      "three": "Traiter les tests flaky comme des défauts — quarantaine, cause racine, ou suppression.",
-      "four": "Publier les preuves : logs CI, rapport Playwright, scores Lighthouse — vérifiables."
+      "one": "Je relie exigences → risques → tests, et j'évite le clic UI à faible valeur.",
+      "two": "J'enrichis d'abord unit/contrat ; E2E seulement pour les parcours critiques.",
+      "three": "Je traite les tests flaky comme des défauts — quarantaine, cause racine, ou suppression.",
+      "four": "Je publie les preuves : logs CI, rapports Playwright, scores Lighthouse — vérifiables."
     },
-    "runTitle": "Reproduire la suite",
-    "runBody": "Les mêmes commandes que la CI — copiez, lancez, montrez le chemin vert."
+    "futureTitle": "Ce que je veux améliorer ensuite",
+    "futureBody": "Backlog honnête — ce que j'attaquerais au prochain sprint qualité :",
+    "future": {
+      "one": "Snapshots de régression visuelle pour Camera FX et le hero d'accueil (diff Playwright).",
+      "two": "Tests de contrat contre une fixture Mongo seedée, pas seulement le moteur mémoire.",
+      "three": "Audits a11y au-delà du skip-link — axe-core en CI sur les routes critiques.",
+      "four": "E2E contre une API live en preview (Express + vite preview en CI).",
+      "five": "Tests de mutation sur la pagination et la récupération lazyWithRetry."
+    },
+    "runTitle": "Lancer ce que je lance",
+    "runBody": "Les mêmes commandes que ma CI — copiez, exécutez en local, vous verrez ce que je vois."
   },
   "algoMem": {
     "badge": "Pratique de mémoire",
@@ -385,7 +394,7 @@
     "greetingBlog": "Bonjour! Je peux expliquer « {{title}} » ou répondre à vos questions sur cet article.",
     "greetingLqft": "Bonjour! Vous êtes sur la page Benchmark LQFT. Demandez-moi les arbres persistants, la complexité ou la démo.",
     "greetingCameraFx": "Bonjour! Vous êtes sur Camera FX — un terrain de jeu webcam. Demandez comment marchent les effets ou quoi essayer.",
-    "greetingQaLab": "Bonjour! Vous êtes dans le labo QA — demandez la pyramide de tests, la cartographie des risques ou les portes CI.",
+    "greetingQaLab": "Bonjour! Vous êtes sur mon labo QA — demandez comment je cartographie les risques, la pyramide ou les portes CI.",
     "greetingBlogPost": "Bonjour! Vous lisez un article? Je peux le résumer ou l'expliquer simplement.",
     "greetingStats": "Bonjour! Sur la page Stats — posez des questions sur GitHub/LeetCode ou l'analyseur de complexité.",
     "greetingInterview": "Bonjour! Prêt à pratiquer? Je peux expliquer l'entrevue simulée ou répondre sur Parjad.",
@@ -450,7 +459,7 @@
     "cameraFxTitle": "Camera FX — Parjad Minooei",
     "cameraFxDesc": "Suivi des gestes des deux mains avec éclairage néon des doigts, plus aurore, constellation, prisme et braise — le tout en local.",
     "qaLabTitle": "Labo QA ingénierie — Parjad Minooei",
-    "qaLabDesc": "Assurance qualité IT : pyramide de tests, couverture fondée sur le risque, portes CI, Playwright E2E et contrats API — présenté comme un projet live.",
+    "qaLabDesc": "Comment je teste parjadm.ca comme un produit : carte des risques, pyramide, portes CI, Playwright E2E et contrats API — avec les commandes à lancer.",
     "contactTitle": "Contact — Parjad Minooei",
     "contactDesc": "Contactez-moi pour des opportunités et des collaborations.",
     "statsTitle": "Statistiques — Parjad Minooei",

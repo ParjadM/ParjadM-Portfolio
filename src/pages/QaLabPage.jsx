@@ -8,10 +8,12 @@ import { setActivePageContext, clearActivePageContext } from '../utils/chatbotEv
 
 const PYRAMID = [
   { id: 'unit', weight: '60%', cmd: 'npm run test:unit' },
-  { id: 'contract', weight: '20%', cmd: 'npm --prefix server test' },
+  { id: 'contract', weight: '20%', cmd: 'npm run test:server' },
   { id: 'e2e', weight: '15%', cmd: 'npm run test:e2e' },
   { id: 'explore', weight: '5%', cmd: 'manual / exploratory' },
 ]
+
+const FUTURE_KEYS = ['one', 'two', 'three', 'four', 'five']
 
 const GATES = [
   { id: 'lint', icon: Bug },
@@ -36,7 +38,7 @@ export const QaLabPage = ({ theme }) => {
       type: 'project',
       pathname: '/projects/qaLab',
       title: 'Quality Engineering Lab',
-      description: 'Risk-based test strategy, CI quality gates, and automated coverage for parjadm.ca — a QA engineering showcase.',
+      description: 'How I test parjadm.ca like a product — my risk map, test pyramid, CI gates, and runnable commands.',
       tags: ['QA', 'Playwright', 'Vitest', 'CI', 'API Contracts'],
       liveUrl: '/projects/qaLab',
     })
@@ -162,6 +164,19 @@ export const QaLabPage = ({ theme }) => {
                 </li>
               ))}
             </ol>
+          </section>
+
+          <section className="mb-16 rounded-[1.75rem] border border-dashed border-[var(--qa-line)] bg-black/20 backdrop-blur-md p-5 md:p-7">
+            <h2 className="text-sm uppercase tracking-[0.22em] text-white/45 mb-3">{t('qaLab.futureTitle')}</h2>
+            <p className="text-sm text-[var(--qa-muted)] mb-5 max-w-2xl">{t('qaLab.futureBody')}</p>
+            <ul className="space-y-3 text-sm md:text-base text-[var(--qa-muted)] max-w-3xl">
+              {FUTURE_KEYS.map((key) => (
+                <li key={key} className="flex gap-3">
+                  <span className={`mt-1 shrink-0 ${accent}`} aria-hidden="true">→</span>
+                  <span>{t(`qaLab.future.${key}`)}</span>
+                </li>
+              ))}
+            </ul>
           </section>
 
           <section className="rounded-[1.75rem] border border-[var(--qa-line)] bg-[var(--qa-panel)] backdrop-blur-xl p-5 md:p-7">

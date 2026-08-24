@@ -88,7 +88,7 @@ async function ensureQaLabProject() {
     {
       $setOnInsert: {
         title: 'QA Engineering Lab',
-        description: 'IT quality assurance engineering showcase: risk-based test strategy, test pyramid, CI quality gates, Playwright critical-path E2E, and API contract tests — runnable evidence, not just a write-up.',
+        description: 'How I test this portfolio like a product — my risk map, test pyramid, CI gates, Playwright E2E, and API contract tests, with commands you can run locally.',
         tags: ['QA', 'Playwright', 'Vitest', 'CI', 'API Contracts'],
         liveUrl: '/projects/qaLab',
         githubUrl: '',

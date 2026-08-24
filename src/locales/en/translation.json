@@ -225,7 +225,7 @@
       "blog": { "label": "Blog", "desc": "Articles and tutorials" },
       "lqft": { "label": "LQFT Benchmark", "desc": "Performance playground" },
       "cameraFx": { "label": "Camera FX", "desc": "Hand gestures with neon finger lights" },
-      "qaLab": { "label": "QA Engineering Lab", "desc": "Test pyramid, risk matrix, and CI quality gates" },
+      "qaLab": { "label": "QA Engineering Lab", "desc": "How I test this site — pyramid, risks, CI gates" },
       "algoMem": { "label": "Algorithm Memorizer", "desc": "Practice typing algorithms against the clock" }
     }
   },
@@ -274,29 +274,29 @@
     }
   },
   "qaLab": {
-    "kicker": "IT Quality Assurance · Engineering",
+    "kicker": "My QA engineering notes",
     "title": "Quality Engineering Lab",
-    "subtitle": "How this portfolio is tested like a product: risk-based coverage, a real test pyramid, CI quality gates, and evidence you can run locally.",
+    "subtitle": "I treat this portfolio like a product under test. I map risks first, shape a real test pyramid, wire CI gates, and leave the exact commands I run — so you can verify the green path yourself.",
     "back": "← Back to projects",
-    "pyramidTitle": "Test pyramid",
-    "pyramidBody": "More fast unit and contract tests at the base. Fewer high-value E2E journeys at the tip. Exploratory testing for judgment calls automation cannot own.",
+    "pyramidTitle": "My test pyramid",
+    "pyramidBody": "I keep most of my coverage in fast unit and contract tests at the base. I add Playwright only for journeys I'd be embarrassed to break in production. I still do exploratory passes for UX calls automation can't own.",
     "pyramid": {
       "unit": "Unit + pure logic (Vitest)",
       "contract": "API contracts (Node test)",
       "e2e": "Critical-path E2E (Playwright)",
       "explore": "Exploratory / UX judgment"
     },
-    "riskTitle": "Risk → test mapping",
-    "riskBody": "QA prioritizes what breaks user trust — not every button equally. Each risk below maps to an automated gate or intentional manual check.",
+    "riskTitle": "How I map risk → tests",
+    "riskBody": "I don't test every button equally. I start with what would break visitor trust — then I attach an automated gate or a deliberate manual check.",
     "risks": {
-      "nav": "Broken navigation / blank routes → publicRoutes registry + E2E smoke",
-      "projects": "API pagination / contract drift → server contract tests",
-      "camera": "Showcase app crash (Camera FX) → critical-path E2E heading + CTA",
-      "locale": "FR/EN string gaps → structural i18n parity in CI",
-      "deploy": "Stale chunks / SW drift → build gates + smoke + LHCI budget"
+      "nav": "Broken navigation / blank routes — I guard these with publicRoutes + E2E smoke",
+      "projects": "API pagination / contract drift — I lock shape with server contract tests",
+      "camera": "Showcase app crash (Camera FX) — I smoke-test heading + primary CTA in E2E",
+      "locale": "FR/EN string gaps — I enforce structural i18n parity in CI",
+      "deploy": "Stale chunks / SW drift — I catch these with build gates, smoke, and an LHCI budget"
     },
-    "gatesTitle": "CI quality gates",
-    "gatesBody": "Nothing merges on hope — each gate blocks a different failure mode.",
+    "gatesTitle": "My CI gates",
+    "gatesBody": "I don't merge on hope. Each gate blocks a different failure mode before it ships.",
     "gates": {
       "lint": "ESLint",
       "i18n": "i18n structure",
@@ -306,15 +306,24 @@
       "e2e": "Playwright E2E",
       "lighthouse": "Lighthouse CI"
     },
-    "improveTitle": "How to improve the suite (QA engineering)",
+    "improveTitle": "How I improve the suite",
     "improve": {
-      "one": "Trace requirements to risks, then to tests — skip low-value UI click soup.",
-      "two": "Keep the pyramid: grow unit/contract coverage first; add E2E only for money-path journeys.",
-      "three": "Treat flaky tests as defects — quarantine, fix root cause, or delete.",
-      "four": "Publish evidence: CI logs, Playwright report, Lighthouse scores — recruiters can verify."
+      "one": "I trace requirements → risks → tests, and I skip low-value UI click soup.",
+      "two": "I grow unit and contract coverage first; I add E2E only for money-path journeys.",
+      "three": "I treat flaky tests as defects — quarantine, fix root cause, or delete.",
+      "four": "I publish evidence: CI logs, Playwright reports, Lighthouse scores — so results are verifiable."
     },
-    "runTitle": "Reproduce the suite",
-    "runBody": "Same commands CI uses — copy, run, show the green path."
+    "futureTitle": "What I want to improve next",
+    "futureBody": "Honest backlog — what I'd tackle on the next quality sprint:",
+    "future": {
+      "one": "Visual regression snapshots for Camera FX and the homepage hero (Playwright screenshot diff).",
+      "two": "Contract tests against a seeded Mongo fixture, not just the in-memory engine.",
+      "three": "Accessibility audits beyond skip-link smoke — axe-core in CI on critical routes.",
+      "four": "E2E against a live API in preview (start Express alongside vite preview in CI).",
+      "five": "Mutation testing on pagination helpers and lazyWithRetry recovery logic."
+    },
+    "runTitle": "Run what I run",
+    "runBody": "Same commands my CI uses — copy, run locally, and you'll see what I see."
   },
   "algoMem": {
     "badge": "Practice from memory",
@@ -385,7 +394,7 @@
     "greetingBlog": "Hi! I can help explain \"{{title}}\" or answer questions about this article.",
     "greetingLqft": "Hi! You're on the LQFT Benchmark page. Ask about persistent trees, complexity, or how the demo works.",
     "greetingCameraFx": "Hi! You're on Camera FX — a webcam motion playground. Ask how the effects work or what to try next.",
-    "greetingQaLab": "Hi! You're in the QA Engineering Lab — ask about the test pyramid, risk mapping, or how CI gates work on this site.",
+    "greetingQaLab": "Hi! You're on my QA Engineering Lab — ask how I map risks, shape the pyramid, or wire CI gates on this site.",
     "greetingBlogPost": "Hi! Reading a blog post? I can summarize or explain it in plain language.",
     "greetingStats": "Hi! On the Stats page — ask about GitHub/LeetCode metrics or how the complexity analyzer works.",
     "greetingInterview": "Hi! Ready to practice? I can explain how Mock Interview works or answer questions about Parjad.",
@@ -450,7 +459,7 @@
     "cameraFxTitle": "Camera FX — Parjad Minooei",
     "cameraFxDesc": "Dual-hand gesture tracking with neon finger lighting, plus aurora, constellation, prism, and ember webcam effects — all on-device.",
     "qaLabTitle": "QA Engineering Lab — Parjad Minooei",
-    "qaLabDesc": "IT quality assurance engineering: test pyramid, risk-based coverage, CI quality gates, Playwright E2E, and API contracts — showcased as a live project.",
+    "qaLabDesc": "How I test parjadm.ca like a product: my risk map, test pyramid, CI gates, Playwright E2E, and API contracts — with commands you can run.",
     "contactTitle": "Contact — Parjad Minooei",
     "contactDesc": "Get in touch for opportunities and collaborations.",
     "statsTitle": "Stats — Parjad Minooei",
