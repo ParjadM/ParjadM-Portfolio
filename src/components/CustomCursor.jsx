@@ -7,10 +7,8 @@ export const CustomCursor = ({ theme, darkMode = true, reducedMotion = false }) 
   const rafRef = useRef(null);
   const positionRef = useRef({ x: 0, y: 0 });
   const hoveringRef = useRef(false);
+  const pressingRef = useRef(false);
   const visibleRef = useRef(false);
-
-  const dotColor = darkMode ? accent.cursor.dotDark : accent.cursor.dotLight;
-  const ringColor = accent.cursor.ring;
 
   useEffect(() => {
     if (reducedMotion) return;
@@ -20,13 +18,13 @@ export const CustomCursor = ({ theme, darkMode = true, reducedMotion = false }) 
     const applyPosition = () => {
       rafRef.current = null;
       const { x, y } = positionRef.current;
-      const hovering = hoveringRef.current;
       const opacity = visibleRef.current ? 1 : 0;
 
       if (rootRef.current) {
         rootRef.current.style.opacity = String(opacity);
         rootRef.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-        rootRef.current.dataset.hover = hovering ? 'true' : 'false';
+        rootRef.current.dataset.hover = hoveringRef.current ? 'true' : 'false';
+        rootRef.current.dataset.press = pressingRef.current ? 'true' : 'false';
       }
     };
 
@@ -51,6 +49,16 @@ export const CustomCursor = ({ theme, darkMode = true, reducedMotion = false }) 
       scheduleUpdate();
     };
 
+    const onMouseDown = () => {
+      pressingRef.current = true;
+      scheduleUpdate();
+    };
+
+    const onMouseUp = () => {
+      pressingRef.current = false;
+      scheduleUpdate();
+    };
+
     const onMouseLeave = () => {
       visibleRef.current = false;
       scheduleUpdate();
@@ -62,12 +70,16 @@ export const CustomCursor = ({ theme, darkMode = true, reducedMotion = false }) 
     };
 
     window.addEventListener('mousemove', onMouseMove, { passive: true });
+    window.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mouseup', onMouseUp);
     document.addEventListener('mouseleave', onMouseLeave);
     document.addEventListener('mouseenter', onMouseEnter);
 
     return () => {
       document.body.classList.remove('custom-cursor-active');
       window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('mouseleave', onMouseLeave);
       document.removeEventListener('mouseenter', onMouseEnter);
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
@@ -84,18 +96,16 @@ export const CustomCursor = ({ theme, darkMode = true, reducedMotion = false }) 
     <div
       ref={rootRef}
       className="custom-cursor-root fixed top-0 left-0 pointer-events-none z-[100] hidden md:block"
-      style={{ opacity: 0 }}
+      style={{
+        opacity: 0,
+        '--cursor-accent': accent.hex,
+        '--cursor-accent-soft': darkMode ? `${accent.hex}66` : `${accent.hex}88`,
+      }}
       aria-hidden="true"
     >
-      <div className="custom-cursor-body">
-        <div
-          className="custom-cursor-ring"
-          style={{ borderColor: ringColor }}
-        />
-        <div
-          className="custom-cursor-dot"
-          style={{ backgroundColor: dotColor, boxShadow: `0 0 8px ${ringColor}` }}
-        />
+      <div className="custom-cursor-focus" />
+      <div className="custom-cursor-pointer">
+        <span className="custom-cursor-dot" />
       </div>
     </div>
   );
