@@ -1,17 +1,13 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { BackgroundBlobs } from '../components/ui/BackgroundBlobs.jsx';
 import { Code, BrainCircuit, Palette } from '../components/ui/Icons.jsx';
 import { RippleButton } from '../components/ui/RippleButton.jsx';
 import { SEO } from '../components/SEO.jsx';
 import { useReducedMotion } from '../utils/useReducedMotion.js';
-
-const SUBTITLE = 'Welcome to a digital experience blending software engineering precision with artistic creativity.';
-const BOOT_LINES = [
-    '> initializing parjadm.ca...',
-    '> loading modules...',
-    '> interface ready.',
-];
+import { markIntroSeen } from '../utils/introSeen.js';
+import { localizePath } from '../utils/i18nRouting.js';
 
 function useDecoderText(text, delay = 0, instant = false) {
     const [displayText, setDisplayText] = useState(instant ? text : '');
@@ -59,6 +55,7 @@ const ParticleNetwork = ({ isPink, reducedMotion, lightMode = false }) => {
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         let animationFrameId;
+        let running = true;
 
         const resize = () => {
             canvas.width = window.innerWidth;
@@ -109,6 +106,7 @@ const ParticleNetwork = ({ isPink, reducedMotion, lightMode = false }) => {
         for (let i = 0; i < numParticles; i++) particles.push(new Particle());
 
         const animate = () => {
+            if (!running) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             for (let i = 0; i < particles.length; i++) {
                 particles[i].update();
@@ -133,13 +131,26 @@ const ParticleNetwork = ({ isPink, reducedMotion, lightMode = false }) => {
         };
         animate();
 
+        const onVisibility = () => {
+            if (document.hidden) {
+                running = false;
+                cancelAnimationFrame(animationFrameId);
+            } else {
+                running = true;
+                animate();
+            }
+        };
+
         window.addEventListener('mousemove', onMouseMove);
         window.addEventListener('mouseleave', onMouseLeave);
         window.addEventListener('resize', resize);
+        document.addEventListener('visibilitychange', onVisibility);
         return () => {
+            running = false;
             window.removeEventListener('mousemove', onMouseMove);
             window.removeEventListener('mouseleave', onMouseLeave);
             window.removeEventListener('resize', resize);
+            document.removeEventListener('visibilitychange', onVisibility);
             cancelAnimationFrame(animationFrameId);
         };
     }, [isPink, reducedMotion, lightMode]);
@@ -158,15 +169,25 @@ const BootSequence = ({ lines, visible, accentClass }) => {
 
     if (!visible) return null;
     return (
-        <div className="mb-8 text-left max-w-md mx-auto font-mono text-sm space-y-1.5">
+        <div className="mb-8 text-left max-w-md mx-auto font-mono text-sm space-y-1.5" aria-live="polite">
             {lines.slice(0, shown).map((line) => (
-                <p key={line} className={`${accentClass} opacity-80`}>{line}</p>
+                <p key={line} className={`${accentClass} text-white/80`}>{line}</p>
             ))}
         </div>
     );
 };
 
-const CinematicCard = ({ theme, reducedMotion, lightMode = false, onEnter, onReplay, isExiting }) => {
+const CinematicCard = ({
+    theme,
+    reducedMotion,
+    lightMode = false,
+    bootLines,
+    copy,
+    onNavigate,
+    onReplay,
+    isExiting,
+}) => {
+    const { t } = useTranslation();
     const cardRef = useRef(null);
     const [transform, setTransform] = useState({ x: 0, y: 0 });
     const [bootDone, setBootDone] = useState(reducedMotion);
@@ -174,15 +195,17 @@ const CinematicCard = ({ theme, reducedMotion, lightMode = false, onEnter, onRep
     const canTilt = !reducedMotion && typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches;
 
     const instant = reducedMotion || lightMode;
-    const { displayText: decodedTitle1, done: title1Done } = useDecoderText('Architecting', instant ? 0 : 1400, instant);
-    const { displayText: decodedTitle2, done: title2Done } = useDecoderText('Innovation', instant ? 0 : 1900, instant);
-    const { displayText: decodedSubtitle, done: subtitleDone } = useDecoderText(SUBTITLE, instant ? 0 : 2600, instant);
+    const { displayText: decodedTitle1, done: title1Done } = useDecoderText(copy.title1, instant ? 0 : 1400, instant);
+    const { displayText: decodedTitle2, done: title2Done } = useDecoderText(copy.title2, instant ? 0 : 1900, instant);
+    const { displayText: decodedSubtitle, done: subtitleDone } = useDecoderText(copy.subtitle, instant ? 0 : 2600, instant);
 
     const isPink = theme === 'pink';
     const gradientClass = isPink ? 'from-pink-500 to-red-500' : 'from-emerald-500 to-teal-500';
-    const accentClass = isPink ? 'text-pink-400' : 'text-emerald-400';
+    const accentClass = isPink ? 'text-pink-300' : 'text-emerald-300';
     const glowColor = isPink ? 'rgba(236, 72, 153, 0.35)' : 'rgba(52, 211, 153, 0.35)';
     const scanColor = isPink ? '#ec4899' : '#34d399';
+    const muted = 'text-white/80';
+    const subtle = 'text-white/55';
 
     useEffect(() => {
         if (reducedMotion) return;
@@ -229,11 +252,11 @@ const CinematicCard = ({ theme, reducedMotion, lightMode = false, onEnter, onRep
                 )}
 
                 <div className="relative p-8 md:p-16 text-center overflow-hidden card-content-3d">
-                    <p className={`text-xs font-mono uppercase tracking-[0.35em] mb-6 ${accentClass} opacity-70`}>
-                        parjadm.ca
+                    <p className={`text-xs font-mono uppercase tracking-[0.35em] mb-6 ${accentClass}`}>
+                        {copy.kicker}
                     </p>
 
-                    <BootSequence lines={BOOT_LINES} visible={!bootDone && !reducedMotion} accentClass={accentClass} />
+                    <BootSequence lines={bootLines} visible={!bootDone && !reducedMotion} accentClass={accentClass} />
 
                     <div className={`flex justify-center items-center gap-5 md:gap-6 mb-8 md:mb-10 transition-all duration-700 ${bootDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                         <div className="p-3 md:p-4 rounded-2xl bg-white/5 border border-white/10 text-white shadow-inner intro-icon intro-icon-delay-1">
@@ -247,12 +270,15 @@ const CinematicCard = ({ theme, reducedMotion, lightMode = false, onEnter, onRep
                         </div>
                     </div>
 
-                    <h1 className={`text-4xl sm:text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-4 min-h-[3.5rem] md:min-h-[5.5rem] font-mono transition-opacity duration-500 ${bootDone ? 'opacity-100' : 'opacity-0'}`}>
+                    <h1
+                        className={`text-4xl sm:text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-4 min-h-[3.5rem] md:min-h-[5.5rem] font-mono transition-opacity duration-500 ${bootDone ? 'opacity-100' : 'opacity-0'}`}
+                        aria-live="polite"
+                    >
                         <span className="block sm:inline">{decodedTitle1}</span>{' '}
                         <span className={`bg-gradient-to-r ${gradientClass} bg-clip-text text-transparent`}>{decodedTitle2}</span>
                     </h1>
 
-                    <p className="text-base md:text-xl text-gray-300 max-w-2xl mx-auto mb-6 leading-relaxed min-h-[3.5rem] md:min-h-[4rem] font-mono">
+                    <p className={`text-base md:text-xl ${muted} max-w-2xl mx-auto mb-6 leading-relaxed min-h-[3.5rem] md:min-h-[4rem] font-mono`}>
                         {bootDone ? decodedSubtitle : '\u00A0'}
                     </p>
 
@@ -264,29 +290,42 @@ const CinematicCard = ({ theme, reducedMotion, lightMode = false, onEnter, onRep
                                     style={{ width: `${decodeProgress}%` }}
                                 />
                             </div>
-                            <p className="text-[10px] font-mono uppercase tracking-widest text-gray-500 mt-2">
-                                Decoding {decodeProgress}%
+                            <p className={`text-[10px] font-mono uppercase tracking-widest ${subtle} mt-2`}>
+                                {t('introCinematic.decoding', { percent: decodeProgress })}
                             </p>
                         </div>
                     )}
 
                     <div className={`flex flex-wrap items-center justify-center gap-3 md:gap-4 transition-all duration-700 ${showActions ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3 pointer-events-none'}`}>
                         <RippleButton
-                            onClick={onEnter}
+                            onClick={() => onNavigate('/projects')}
                             className="px-7 md:px-8 py-3 rounded-full text-base md:text-lg font-bold min-w-[160px] md:min-w-[180px]"
                             style={{ boxShadow: `0 0 20px ${glowColor}` }}
                             theme={theme}
                         >
-                            Enter Portfolio
+                            {copy.ctaProjects}
                         </RippleButton>
                         <button
                             type="button"
-                            onClick={onReplay}
-                            className="px-7 md:px-8 py-3 rounded-full text-base md:text-lg font-semibold text-gray-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all min-w-[160px] md:min-w-[180px] active:scale-95"
+                            onClick={() => onNavigate('/contact')}
+                            className={`px-7 md:px-8 py-3 rounded-full text-base md:text-lg font-semibold ${muted} bg-white/10 border border-white/20 hover:bg-white/15 hover:text-white transition-all min-w-[160px] md:min-w-[180px] active:scale-95`}
                         >
-                            Replay
+                            {copy.ctaContact}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onReplay}
+                            className={`px-7 md:px-8 py-3 rounded-full text-base md:text-lg font-semibold ${muted} bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all min-w-[160px] md:min-w-[180px] active:scale-95`}
+                        >
+                            {copy.replay}
                         </button>
                     </div>
+
+                    {!reducedMotion && showActions && (
+                        <p className={`mt-6 text-[10px] font-mono uppercase tracking-widest ${subtle}`}>
+                            {copy.keyboardHints}
+                        </p>
+                    )}
                 </div>
             </div>
         </div>
@@ -295,6 +334,7 @@ const CinematicCard = ({ theme, reducedMotion, lightMode = false, onEnter, onRep
 
 export const IntroCinematic = ({ theme }) => {
     const navigate = useNavigate();
+    const { t, i18n } = useTranslation();
     const reducedMotion = useReducedMotion();
     const [lightMode] = useState(() => {
         if (typeof window === 'undefined') return false;
@@ -307,29 +347,53 @@ export const IntroCinematic = ({ theme }) => {
     const [isExiting, setIsExiting] = useState(false);
     const [flash, setFlash] = useState(false);
 
-    const handleEnter = useCallback(() => {
+    const locale = i18n.language?.startsWith('fr') ? 'fr' : 'en';
+
+    const bootLines = useMemo(() => {
+        const lines = t('introCinematic.bootLines', { returnObjects: true });
+        return Array.isArray(lines) ? lines : [];
+    }, [t, i18n.language]);
+
+    const copy = useMemo(() => ({
+        kicker: t('introCinematic.kicker'),
+        title1: t('introCinematic.title1'),
+        title2: t('introCinematic.title2'),
+        subtitle: t('introCinematic.subtitle'),
+        ctaProjects: t('introCinematic.ctaProjects'),
+        ctaContact: t('introCinematic.ctaContact'),
+        replay: t('introCinematic.replay'),
+        keyboardHints: t('introCinematic.keyboardHints'),
+    }), [t, i18n.language]);
+
+    const finishIntro = useCallback((path) => {
+        markIntroSeen();
         setIsExiting(true);
         setFlash(true);
-        setTimeout(() => navigate('/'), reducedMotion ? 300 : 900);
-    }, [navigate, reducedMotion]);
+        const delay = reducedMotion ? 300 : 900;
+        setTimeout(() => navigate(localizePath(path, locale)), delay);
+    }, [navigate, locale, reducedMotion]);
 
-    const handleSkip = useCallback(() => navigate('/'), [navigate]);
+    const handleSkip = useCallback(() => {
+        markIntroSeen();
+        navigate(localizePath('/', locale));
+    }, [navigate, locale]);
 
     const handleReplay = useCallback(() => {
         setIsExiting(false);
         setFlash(false);
-        setSequenceKey(k => k + 1);
+        setSequenceKey((k) => k + 1);
     }, []);
 
     useEffect(() => {
         const onKeyDown = (e) => {
-            if (e.key === 'Enter' && !isExiting) handleEnter();
+            if (isExiting) return;
+            if (e.key === 'Enter') finishIntro('/projects');
             if (e.key === 'Escape') handleSkip();
             if (e.key === 'r' || e.key === 'R') handleReplay();
         };
         window.addEventListener('keydown', onKeyDown);
         return () => window.removeEventListener('keydown', onKeyDown);
-    }, [handleEnter, handleSkip, handleReplay, isExiting]);
+    }, [finishIntro, handleSkip, handleReplay, isExiting]);
 
     const isPink = theme === 'pink';
 
@@ -397,7 +461,6 @@ export const IntroCinematic = ({ theme }) => {
             <BackgroundBlobs theme={theme} darkMode reducedMotion={reducedMotion || lightMode} staticOnMobile={lightMode} />
             <ParticleNetwork isPink={isPink} reducedMotion={reducedMotion} lightMode={lightMode} />
 
-            {/* Letterbox + vignette */}
             <div className="pointer-events-none absolute inset-0 z-[5]" aria-hidden="true">
                 <div className="absolute inset-x-0 top-0 h-16 md:h-24 bg-gradient-to-b from-black to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 h-16 md:h-24 bg-gradient-to-t from-black to-transparent" />
@@ -410,15 +473,15 @@ export const IntroCinematic = ({ theme }) => {
                 onClick={handleSkip}
                 className="absolute top-safe-or-4 right-4 sm:right-5 z-20 px-5 py-3 min-h-[44px] rounded-full text-sm font-mono uppercase tracking-widest text-white bg-white/10 border border-white/20 hover:bg-white/20 transition-colors shadow-lg backdrop-blur-sm"
             >
-                Skip →
+                {t('introCinematic.skip')}
             </button>
 
             <button
                 type="button"
                 onClick={handleSkip}
-                className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-20 px-8 py-3 min-h-[44px] rounded-full text-sm font-semibold text-gray-200 bg-black/60 border border-white/20 backdrop-blur-md hover:bg-black/80 transition-colors"
+                className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-20 px-8 py-3 min-h-[44px] rounded-full text-sm font-semibold text-white/90 bg-black/60 border border-white/20 backdrop-blur-md hover:bg-black/80 transition-colors"
             >
-                Skip intro
+                {t('introCinematic.skipMobile')}
             </button>
 
             <CinematicCard
@@ -426,7 +489,9 @@ export const IntroCinematic = ({ theme }) => {
                 theme={theme}
                 reducedMotion={reducedMotion}
                 lightMode={lightMode}
-                onEnter={handleEnter}
+                bootLines={bootLines}
+                copy={copy}
+                onNavigate={finishIntro}
                 onReplay={handleReplay}
                 isExiting={isExiting}
             />

@@ -11,6 +11,8 @@ import { LocalizedLink } from '../components/ui/LocalizedLink.jsx';
 import { useFetchWithCache } from '../utils/useFetchWithCache.js';
 import { fetchApi } from '../utils/apiClient.js';
 import { formatDate } from '../utils/formatDate.js';
+import { hasSeenIntro } from '../utils/introSeen.js';
+import { localizePath } from '../utils/i18nRouting.js';
 import ParjadM from '../Images/ParjadM.webp';
 
 const SKILLS = [
@@ -28,6 +30,15 @@ export const HomeSection = ({ theme }) => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const isPink = theme === 'pink';
+  const locale = i18n.language?.startsWith('fr') ? 'fr' : 'en';
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    if (!hasSeenIntro()) {
+      navigate(localizePath('/intro', locale), { replace: true });
+    }
+  }, [navigate, locale]);
 
   const { data: projectsData } = useFetchWithCache('/api/projects?page=1&limit=3');
   const featuredProjects = Array.isArray(projectsData?.projects) ? projectsData.projects : [];

@@ -446,6 +446,26 @@
     "followUps": "Suivis",
     "networkError": "Désolé, un problème réseau est survenu."
   },
+  "introCinematic": {
+    "kicker": "parjadm.ca",
+    "bootLines": [
+      "> montage des routes…",
+      "> chargement des projets…",
+      "> initialisation Camera FX…",
+      "> activation des portes QA…",
+      "> interface prête."
+    ],
+    "title1": "Parjad Minooei",
+    "title2": "Ingénieur logiciel",
+    "subtitle": "Je construis ce portfolio comme un produit — démos live, Camera FX avec suivi des mains, un labo QA, et du code à explorer.",
+    "decoding": "Chargement {{percent}} %",
+    "ctaProjects": "Voir les projets",
+    "ctaContact": "Me contacter",
+    "replay": "Rejouer",
+    "skip": "Passer →",
+    "skipMobile": "Passer l'intro",
+    "keyboardHints": "Entrée · projets · Échap passer · R rejouer"
+  },
   "seo": {
     "defaultTitle": "Parjad Minooei — Portfolio d'ingénieur logiciel",
     "defaultDesc": "Ingénieur logiciel créant des applications web rapides et centrées sur l'utilisateur.",
@@ -474,7 +494,7 @@
     "cliTitle": "Mode CLI — Parjad Minooei",
     "cliDesc": "Naviguez sur parjadm.ca depuis le terminal.",
     "introTitle": "Intro — Parjad Minooei",
-    "introDesc": "Une bienvenue animée sur parjadm.ca.",
+    "introDesc": "Une courte intro cinématique — puis projets, contact ou exploration du site.",
     "notFoundTitle": "Page introuvable — Parjad Minooei",
     "notFoundDesc": "La page demandée est introuvable."
   },

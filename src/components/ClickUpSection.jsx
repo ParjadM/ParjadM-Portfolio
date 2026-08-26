@@ -118,7 +118,7 @@ export const ClickUpSection = ({ theme }) => {
           <div className={`text-sm font-semibold mb-4 animate-pulse ${textClass}`}>+1!</div>
         )}
         {!justClicked && (
-          <p className="text-gray-400 text-xs mb-4">
+          <p className={`${subtle} text-xs mb-4`}>
             {t('stats.clickUpCard.remaining', { count: remaining, limit: DAILY_LIMIT })}
           </p>
         )}
@@ -143,21 +143,21 @@ export const ClickUpSection = ({ theme }) => {
 
       <div className="mt-8 pt-6 border-t border-white/10 text-left">
         <p className={`text-sm font-semibold mb-1 ${textClass}`}>{t('stats.clickUpCard.postmanTitle')}</p>
-        <p className="text-gray-400 text-xs mb-3">{t('stats.clickUpCard.postmanHint')}</p>
+        <p className={`${muted} text-xs mb-3`}>{t('stats.clickUpCard.postmanHint')}</p>
         <div className="flex items-stretch gap-2">
-          <code className="flex-1 min-w-0 truncate rounded-lg bg-black/40 border border-white/10 px-3 py-2 text-xs text-gray-200 font-mono">
+          <code className="flex-1 min-w-0 truncate rounded-lg bg-black/40 border border-white/20 px-3 py-2 text-xs text-white/90 font-mono">
             POST {CLICKUP_API_URL}
           </code>
           <button
             type="button"
             onClick={copyUrl}
-            className="shrink-0 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-gray-200 hover:bg-white/10 transition-colors"
+            className="shrink-0 rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-white/90 hover:bg-white/15 transition-colors"
             aria-label={t('stats.clickUpCard.copyUrl')}
           >
             {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
           </button>
         </div>
-        <p className="mt-2 text-gray-500 text-xs">{t('stats.clickUpCard.postmanLimit')}</p>
+        <p className={`mt-2 ${subtle} text-xs`}>{t('stats.clickUpCard.postmanLimit')}</p>
       </div>
     </GlassCard>
   );

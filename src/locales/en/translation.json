@@ -446,6 +446,26 @@
     "followUps": "Follow-ups",
     "networkError": "Sorry, something went wrong with the network."
   },
+  "introCinematic": {
+    "kicker": "parjadm.ca",
+    "bootLines": [
+      "> mounting routes…",
+      "> seeding projects…",
+      "> loading Camera FX…",
+      "> arming QA gates…",
+      "> interface ready."
+    ],
+    "title1": "Parjad Minooei",
+    "title2": "Software Engineer",
+    "subtitle": "I build this portfolio like a product — live demos, hand-tracked Camera FX, a QA engineering lab, and code you can explore.",
+    "decoding": "Loading {{percent}}%",
+    "ctaProjects": "See projects",
+    "ctaContact": "Contact me",
+    "replay": "Replay",
+    "skip": "Skip →",
+    "skipMobile": "Skip intro",
+    "keyboardHints": "Enter · projects · Esc skip · R replay"
+  },
   "seo": {
     "defaultTitle": "Parjad Minooei — Software Engineer Portfolio",
     "defaultDesc": "Software Engineer building beautiful, fast, user-centric web apps.",
@@ -474,7 +494,7 @@
     "cliTitle": "CLI Mode — Parjad Minooei",
     "cliDesc": "Navigate parjadm.ca from the terminal.",
     "introTitle": "Intro — Parjad Minooei",
-    "introDesc": "An animated welcome to parjadm.ca.",
+    "introDesc": "A quick cinematic welcome — then jump to projects, contact, or explore the site.",
     "notFoundTitle": "Page not found — Parjad Minooei",
     "notFoundDesc": "The page you requested could not be found."
   },
