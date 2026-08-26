@@ -157,7 +157,6 @@
     "footer": "Data via GitHub API & LeetCode GraphQL • Cached to improve performance",
     "sections": {
       "complexity": "Complexity Analyzer",
-      "codeReview": "AI Code Review",
       "clickUp": "ClickUp Challenge"
     },
     "clickUpCard": {
@@ -429,19 +428,6 @@
       "space": "Space Complexity",
       "copy": "Copy metrics",
       "copied": "Copied!"
-    },
-    "codeReview": {
-      "title": "AI Code Review",
-      "subtitle": "Paste a snippet for bugs, readability, and complexity hints",
-      "pasteToggle": "Paste code to review",
-      "pasteHide": "Hide code editor",
-      "reviewing": "Reviewing...",
-      "autoHint": "Auto-reviews after 1.5s pause · cached by snippet",
-      "readability": "Readability",
-      "time": "Time",
-      "space": "Space",
-      "issues": "Potential issues",
-      "suggestions": "Suggestions"
     }
   },
   "interview": {

@@ -51,5 +51,4 @@ export const CLI_AI_HELP = `AI subcommands (static — no API tokens):
   ai help                     Show this help
   ai explain <topic>          Explain a topic (e.g. lqft, react)
   ai summarize <path>         Summarize a site page (e.g. /projects)
-  ai code-review <code>       Quick API code review (uses daily limit)
   ai                          Enter interactive AI chat mode`

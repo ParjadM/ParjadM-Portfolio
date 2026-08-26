@@ -5,7 +5,6 @@ import GitHubStats from '../components/GitHubStats.tsx';
 import LeetCodeStats from '../components/LeetCodeStats.tsx';
 import { ClickUpSection } from '../components/ClickUpSection.jsx';
 import { ComplexityAnalyzer } from '../components/ComplexityAnalyzer.jsx';
-import { CodeReviewAnalyzer } from '../components/CodeReviewAnalyzer.jsx';
 import { useTranslation } from 'react-i18next';
 import { PageTransition } from '../components/ui/PageTransition.jsx';
 import { SEO } from '../components/SEO.jsx';
@@ -48,14 +47,6 @@ export const StatsPage = ({ theme }) => {
         <div className="mt-8">
           <MobileCollapsible title={t('stats.sections.complexity')} defaultOpen={false} theme={theme}>
             <ComplexityAnalyzer theme={theme} />
-          </MobileCollapsible>
-        </div>
-        </Reveal>
-
-        <Reveal>
-        <div className="mt-8">
-          <MobileCollapsible title={t('stats.sections.codeReview')} defaultOpen={false} theme={theme}>
-            <CodeReviewAnalyzer theme={theme} />
           </MobileCollapsible>
         </div>
         </Reveal>

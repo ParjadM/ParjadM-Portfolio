@@ -53,17 +53,6 @@ Respond EXCLUSIVELY in valid JSON:
   "overallSummary": "2-4 sentences"
 }`
 
-const CODE_REVIEW_PROMPT = `You are a senior code reviewer. Analyze the submitted code for bugs, readability, and complexity.
-Respond EXCLUSIVELY in valid JSON:
-{
-  "bugs": ["..."],
-  "readabilityScore": 1-10,
-  "timeComplexity": "O(...)",
-  "spaceComplexity": "O(...)",
-  "suggestions": ["..."],
-  "summary": "2-3 sentence overview"
-}`
-
 router.post('/chat', async (req, res) => {
   try {
     const { messages, context, pageContext, locale: reqLocale } = req.body
@@ -279,49 +268,6 @@ router.post('/job-fit', async (req, res) => {
   } catch (err) {
     console.error('AI Job Fit Error:', err)
     res.status(500).json({ error: err.message || 'Failed to analyze job fit' })
-  }
-})
-
-router.post('/review', async (req, res) => {
-  try {
-    const { code, language, locale: reqLocale } = req.body
-    const locale = normalizeLocale(reqLocale)
-    if (!code || typeof code !== 'string') {
-      return res.status(400).json({ error: 'Code string is required' })
-    }
-
-    const trimmed = code.trim()
-    if (trimmed.length < 10) {
-      return res.status(400).json({ error: 'Please provide more code to review.' })
-    }
-
-    const capped = trimmed.slice(0, aiConfig.codeReviewMaxChars)
-    const label = language ? `Language: ${language}\n\n` : ''
-    const payload = `${label}${capped}`
-
-    const result = await askGemini({
-      feature: 'code-review',
-      userMessage: capped,
-      messages: [{ role: 'user', parts: [{ text: payload }] }],
-      systemPromptBase: CODE_REVIEW_PROMPT,
-      responseFormat: 'json',
-      req,
-      locale,
-      skipFaq: true,
-      skipStatic: true,
-      skipKnowledge: true,
-      cacheTtl: aiConfig.cacheTtlCodeReview,
-      maxOutputTokensOverride: aiConfig.maxOutputTokensDetailed,
-    })
-
-    if (!result.ok) {
-      return res.status(result.status || 500).json({ error: result.error })
-    }
-
-    res.json({ ...result.reply, source: result.source })
-  } catch (err) {
-    console.error('AI Review Error:', err)
-    res.status(500).json({ error: err.message || 'Failed to review code' })
   }
 })
 

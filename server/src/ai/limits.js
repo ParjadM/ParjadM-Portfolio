@@ -20,7 +20,6 @@ function featureLimit(feature, customDailyLimit) {
   if (feature === 'interview') return aiConfig.interviewDailyPerIp
   if (feature === 'job-fit') return aiConfig.jobFitDailyPerIp
   if (feature === 'debrief') return aiConfig.debriefDailyPerIp
-  if (feature === 'code-review') return aiConfig.codeReviewDailyPerIp
   if (feature === 'blog-explain') return aiConfig.blogExplainDailyPerIp
   return null
 }
@@ -79,9 +78,6 @@ function limitErrorMessage(feature, limit) {
   }
   if (feature === 'debrief') {
     return `You've reached your daily limit of ${limit} interview debriefs. Please try again tomorrow.`
-  }
-  if (feature === 'code-review') {
-    return `You've reached your daily limit of ${limit} code reviews. Please try again tomorrow.`
   }
   if (feature === 'blog-explain') {
     return `You've reached your daily limit of ${limit} blog explanations. Please try again tomorrow.`

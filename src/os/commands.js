@@ -304,37 +304,6 @@ export async function executeCommand(rawCmd, ctx) {
         pushToHistory('system', summary || `No static summary for ${path}. Try /projects or /stats.`);
         break;
       }
-      if (sub === 'code-review' || sub === 'review') {
-        const code = args.slice(1).join(' ').trim();
-        if (!code || code.length < 10) {
-          pushToHistory('error', 'ai code-review: paste code after the command.');
-          break;
-        }
-        pushToHistory('system', '> Reviewing code...');
-        try {
-          const res = await fetch('/api/ai/review', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code, language: 'javascript' }),
-          });
-          const data = await res.json();
-          if (!res.ok) {
-            pushToHistory('error', data.error || 'Review failed.');
-            break;
-          }
-          const lines = [
-            `Readability: ${data.readabilityScore}/10`,
-            `Time: ${data.timeComplexity || '?'}`,
-            `Space: ${data.spaceComplexity || '?'}`,
-            data.summary || '',
-            ...(data.suggestions?.length ? ['Suggestions:', ...data.suggestions.map((s) => `  - ${s}`)] : []),
-          ].filter(Boolean);
-          pushToHistory('system', lines.join('\n'), true);
-        } catch {
-          pushToHistory('error', 'Network error during code review.');
-        }
-        break;
-      }
       setAiState?.({ active: true, messages: [] });
       pushToHistory('system', 'AI mode — type "exit" to leave. Try `ai help` for zero-cost commands.');
       break;

@@ -157,7 +157,6 @@
     "footer": "Données via l'API GitHub et LeetCode GraphQL • Mis en cache pour améliorer les performances",
     "sections": {
       "complexity": "Analyseur de complexité",
-      "codeReview": "Revue de code IA",
       "clickUp": "Défi ClickUp"
     },
     "clickUpCard": {
@@ -429,19 +428,6 @@
       "space": "Complexité spatiale",
       "copy": "Copier les métriques",
       "copied": "Copié!"
-    },
-    "codeReview": {
-      "title": "Revue de code IA",
-      "subtitle": "Collez un extrait pour détecter bogues, lisibilité et complexité",
-      "pasteToggle": "Coller du code à analyser",
-      "pasteHide": "Masquer l'éditeur",
-      "reviewing": "Analyse en cours...",
-      "autoHint": "Revue auto après 1,5 s de pause · mise en cache par extrait",
-      "readability": "Lisibilité",
-      "time": "Temps",
-      "space": "Espace",
-      "issues": "Problèmes potentiels",
-      "suggestions": "Suggestions"
     }
   },
   "interview": {
