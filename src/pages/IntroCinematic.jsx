@@ -66,10 +66,6 @@ const ParticleNetwork = ({ isPink, reducedMotion, lightMode = false }) => {
         const particles = [];
         const numParticles = lightMode ? 18 : 45;
         const connectionDistance = 180;
-        let mouse = { x: null, y: null, radius: 200 };
-
-        const onMouseMove = (e) => { mouse.x = e.clientX; mouse.y = e.clientY; };
-        const onMouseLeave = () => { mouse.x = null; mouse.y = null; };
 
         class Particle {
             constructor() {
@@ -84,16 +80,6 @@ const ParticleNetwork = ({ isPink, reducedMotion, lightMode = false }) => {
                 this.y += this.speedY;
                 if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX;
                 if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY;
-                if (mouse.x != null && mouse.y != null) {
-                    const dx = mouse.x - this.x;
-                    const dy = mouse.y - this.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    if (distance > 0 && distance < mouse.radius) {
-                        const force = (mouse.radius - distance) / mouse.radius;
-                        this.x -= (dx / distance) * force * 4;
-                        this.y -= (dy / distance) * force * 4;
-                    }
-                }
             }
             draw() {
                 ctx.fillStyle = isPink ? 'rgba(236, 72, 153, 0.45)' : 'rgba(52, 211, 153, 0.45)';
@@ -141,14 +127,10 @@ const ParticleNetwork = ({ isPink, reducedMotion, lightMode = false }) => {
             }
         };
 
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseleave', onMouseLeave);
         window.addEventListener('resize', resize);
         document.addEventListener('visibilitychange', onVisibility);
         return () => {
             running = false;
-            window.removeEventListener('mousemove', onMouseMove);
-            window.removeEventListener('mouseleave', onMouseLeave);
             window.removeEventListener('resize', resize);
             document.removeEventListener('visibilitychange', onVisibility);
             cancelAnimationFrame(animationFrameId);
@@ -169,7 +151,7 @@ const BootSequence = ({ lines, visible, accentClass }) => {
 
     if (!visible) return null;
     return (
-        <div className="mb-8 text-left max-w-md mx-auto font-mono text-sm space-y-1.5" aria-live="polite">
+        <div className="intro-layer intro-layer-boot mb-8 text-left max-w-md mx-auto font-mono text-sm space-y-1.5" aria-live="polite">
             {lines.slice(0, shown).map((line) => (
                 <p key={line} className={`${accentClass} text-white/80`}>{line}</p>
             ))}
@@ -188,13 +170,11 @@ const CinematicCard = ({
     isExiting,
 }) => {
     const { t } = useTranslation();
-    const cardRef = useRef(null);
-    const [transform, setTransform] = useState({ x: 0, y: 0 });
     const [bootDone, setBootDone] = useState(reducedMotion);
     const [showActions, setShowActions] = useState(reducedMotion);
-    const canTilt = !reducedMotion && typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches;
 
     const instant = reducedMotion || lightMode;
+    const useDepth = !reducedMotion && !lightMode;
     const { displayText: decodedTitle1, done: title1Done } = useDecoderText(copy.title1, instant ? 0 : 1400, instant);
     const { displayText: decodedTitle2, done: title2Done } = useDecoderText(copy.title2, instant ? 0 : 1900, instant);
     const { displayText: decodedSubtitle, done: subtitleDone } = useDecoderText(copy.subtitle, instant ? 0 : 2600, instant);
@@ -209,8 +189,8 @@ const CinematicCard = ({
 
     useEffect(() => {
         if (reducedMotion) return;
-        const t = setTimeout(() => setBootDone(true), 1300);
-        return () => clearTimeout(t);
+        const timer = setTimeout(() => setBootDone(true), 1300);
+        return () => clearTimeout(timer);
     }, [reducedMotion]);
 
     useEffect(() => {
@@ -221,111 +201,117 @@ const CinematicCard = ({
         ? 100
         : Math.round(((title1Done ? 1 : 0) + (title2Done ? 1 : 0) + (subtitleDone ? 1 : 0)) / 3 * 100);
 
-    const handleMouseMove = (e) => {
-        if (!canTilt || !cardRef.current || isExiting) return;
-        const { left, top, width, height } = cardRef.current.getBoundingClientRect();
-        if (!width || !height) return;
-        const x = (e.clientX - left) / width - 0.5;
-        const y = (e.clientY - top) / height - 0.5;
-        setTransform({ x: x * 12, y: y * -12 });
-    };
+    const rigClass = [
+        'intro-card-rig w-full max-w-4xl mx-auto',
+        useDepth && !isExiting ? 'intro-card-motion' : '',
+        !useDepth ? 'intro-card-flat' : '',
+    ].filter(Boolean).join(' ');
 
     return (
-        <div
-            className={`z-10 container mx-auto px-4 flex flex-col items-center justify-center min-h-screen w-full ${isExiting ? 'animate-warp-exit' : ''}`}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={() => setTransform({ x: 0, y: 0 })}
-        >
-            <div
-                ref={cardRef}
-                className="w-full max-w-4xl relative glass-3d bg-white/[0.03] border border-white/10 rounded-[2.5rem] md:rounded-[3rem] shadow-2xl"
-                style={{ transform: canTilt ? `rotateY(${transform.x}deg) rotateX(${transform.y}deg)` : undefined }}
-            >
-                <div className={`absolute inset-0 bg-gradient-to-br ${gradientClass} opacity-10 blur-3xl rounded-[2.5rem] md:rounded-[3rem]`} aria-hidden="true" />
+        <div className={`intro-stage z-10 container mx-auto px-4 flex flex-col items-center justify-center min-h-screen w-full ${isExiting ? 'animate-warp-exit' : ''}`}>
+            {useDepth && (
+                <>
+                    <div className="intro-depth-plane intro-depth-plane-2" aria-hidden="true" />
+                    <div className="intro-depth-plane intro-depth-plane-1" aria-hidden="true" />
+                </>
+            )}
 
-                {!reducedMotion && (
+            <div className={rigClass}>
+                <div className="intro-card glass-3d w-full relative bg-white/[0.03] border border-white/10 rounded-[2.5rem] md:rounded-[3rem]">
                     <div
-                        className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-current to-transparent animate-scan z-50"
-                        style={{ color: scanColor, boxShadow: `0 0 20px 2px ${scanColor}` }}
+                        className={`intro-layer intro-layer-back-glow absolute inset-0 bg-gradient-to-br ${gradientClass} opacity-10 blur-3xl rounded-[2.5rem] md:rounded-[3rem]`}
                         aria-hidden="true"
                     />
-                )}
 
-                <div className="relative p-8 md:p-16 text-center overflow-hidden card-content-3d">
-                    <p className={`text-xs font-mono uppercase tracking-[0.35em] mb-6 ${accentClass}`}>
-                        {copy.kicker}
-                    </p>
+                    <div className="intro-specular rounded-[2.5rem] md:rounded-[3rem]" aria-hidden="true" />
 
-                    <BootSequence lines={bootLines} visible={!bootDone && !reducedMotion} accentClass={accentClass} />
-
-                    <div className={`flex justify-center items-center gap-5 md:gap-6 mb-8 md:mb-10 transition-all duration-700 ${bootDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-                        <div className="p-3 md:p-4 rounded-2xl bg-white/5 border border-white/10 text-white shadow-inner intro-icon intro-icon-delay-1">
-                            <Code size={28} />
-                        </div>
-                        <div className={`p-4 md:p-5 rounded-2xl bg-gradient-to-r ${gradientClass} text-white intro-icon intro-icon-delay-2`} style={{ boxShadow: `0 0 40px ${glowColor}` }}>
-                            <BrainCircuit size={40} />
-                        </div>
-                        <div className="p-3 md:p-4 rounded-2xl bg-white/5 border border-white/10 text-white shadow-inner intro-icon intro-icon-delay-3">
-                            <Palette size={28} />
-                        </div>
-                    </div>
-
-                    <h1
-                        className={`text-4xl sm:text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-4 min-h-[3.5rem] md:min-h-[5.5rem] font-mono transition-opacity duration-500 ${bootDone ? 'opacity-100' : 'opacity-0'}`}
-                        aria-live="polite"
-                    >
-                        <span className="block sm:inline">{decodedTitle1}</span>{' '}
-                        <span className={`bg-gradient-to-r ${gradientClass} bg-clip-text text-transparent`}>{decodedTitle2}</span>
-                    </h1>
-
-                    <p className={`text-base md:text-xl ${muted} max-w-2xl mx-auto mb-6 leading-relaxed min-h-[3.5rem] md:min-h-[4rem] font-mono`}>
-                        {bootDone ? decodedSubtitle : '\u00A0'}
-                    </p>
-
-                    {!instant && bootDone && (
-                        <div className="max-w-xs mx-auto mb-8">
-                            <div className="h-1 rounded-full bg-white/10 overflow-hidden">
-                                <div
-                                    className={`h-full bg-gradient-to-r ${gradientClass} transition-all duration-300 ease-out`}
-                                    style={{ width: `${decodeProgress}%` }}
-                                />
-                            </div>
-                            <p className={`text-[10px] font-mono uppercase tracking-widest ${subtle} mt-2`}>
-                                {t('introCinematic.decoding', { percent: decodeProgress })}
-                            </p>
-                        </div>
+                    {!reducedMotion && (
+                        <div
+                            className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-current to-transparent animate-scan z-50"
+                            style={{ color: scanColor, boxShadow: `0 0 20px 2px ${scanColor}` }}
+                            aria-hidden="true"
+                        />
                     )}
 
-                    <div className={`flex flex-wrap items-center justify-center gap-3 md:gap-4 transition-all duration-700 ${showActions ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3 pointer-events-none'}`}>
-                        <RippleButton
-                            onClick={() => onNavigate('/projects')}
-                            className="px-7 md:px-8 py-3 rounded-full text-base md:text-lg font-bold min-w-[160px] md:min-w-[180px]"
-                            style={{ boxShadow: `0 0 20px ${glowColor}` }}
-                            theme={theme}
-                        >
-                            {copy.ctaProjects}
-                        </RippleButton>
-                        <button
-                            type="button"
-                            onClick={() => onNavigate('/contact')}
-                            className={`px-7 md:px-8 py-3 rounded-full text-base md:text-lg font-semibold ${muted} bg-white/10 border border-white/20 hover:bg-white/15 hover:text-white transition-all min-w-[160px] md:min-w-[180px] active:scale-95`}
-                        >
-                            {copy.ctaContact}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={onReplay}
-                            className={`px-7 md:px-8 py-3 rounded-full text-base md:text-lg font-semibold ${muted} bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all min-w-[160px] md:min-w-[180px] active:scale-95`}
-                        >
-                            {copy.replay}
-                        </button>
-                    </div>
-
-                    {!reducedMotion && showActions && (
-                        <p className={`mt-6 text-[10px] font-mono uppercase tracking-widest ${subtle}`}>
-                            {copy.keyboardHints}
+                    <div className="intro-card-inner relative p-8 md:p-16 text-center overflow-hidden">
+                        <p className={`intro-layer intro-layer-kicker text-xs font-mono uppercase tracking-[0.35em] mb-6 ${accentClass}`}>
+                            {copy.kicker}
                         </p>
-                    )}
+
+                        <BootSequence lines={bootLines} visible={!bootDone && !reducedMotion} accentClass={accentClass} />
+
+                        <div className={`intro-icons-row flex justify-center items-center gap-5 md:gap-6 mb-8 md:mb-10 transition-all duration-700 ${bootDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                            <div className="intro-layer intro-icon-left p-3 md:p-4 rounded-2xl bg-white/5 border border-white/10 text-white shadow-inner intro-icon intro-icon-delay-1">
+                                <Code size={28} />
+                            </div>
+                            <div
+                                className={`intro-layer intro-icon-center p-4 md:p-5 rounded-2xl bg-gradient-to-r ${gradientClass} text-white intro-icon intro-icon-delay-2`}
+                                style={{ boxShadow: `0 0 40px ${glowColor}` }}
+                            >
+                                <BrainCircuit size={40} />
+                            </div>
+                            <div className="intro-layer intro-icon-right p-3 md:p-4 rounded-2xl bg-white/5 border border-white/10 text-white shadow-inner intro-icon intro-icon-delay-3">
+                                <Palette size={28} />
+                            </div>
+                        </div>
+
+                        <h1
+                            className={`intro-layer intro-layer-title text-4xl sm:text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-4 min-h-[3.5rem] md:min-h-[5.5rem] font-mono transition-opacity duration-500 ${bootDone ? 'opacity-100' : 'opacity-0'}`}
+                            aria-live="polite"
+                        >
+                            <span className="block sm:inline">{decodedTitle1}</span>{' '}
+                            <span className={`bg-gradient-to-r ${gradientClass} bg-clip-text text-transparent`}>{decodedTitle2}</span>
+                        </h1>
+
+                        <p className={`intro-layer intro-layer-subtitle text-base md:text-xl ${muted} max-w-2xl mx-auto mb-6 leading-relaxed min-h-[3.5rem] md:min-h-[4rem] font-mono`}>
+                            {bootDone ? decodedSubtitle : '\u00A0'}
+                        </p>
+
+                        {!instant && bootDone && (
+                            <div className="intro-layer intro-layer-progress max-w-xs mx-auto mb-8">
+                                <div className="h-1 rounded-full bg-white/10 overflow-hidden">
+                                    <div
+                                        className={`h-full bg-gradient-to-r ${gradientClass} transition-all duration-300 ease-out`}
+                                        style={{ width: `${decodeProgress}%` }}
+                                    />
+                                </div>
+                                <p className={`text-[10px] font-mono uppercase tracking-widest ${subtle} mt-2`}>
+                                    {t('introCinematic.decoding', { percent: decodeProgress })}
+                                </p>
+                            </div>
+                        )}
+
+                        <div className={`intro-layer intro-layer-actions flex flex-wrap items-center justify-center gap-3 md:gap-4 transition-all duration-700 ${showActions ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3 pointer-events-none'}`}>
+                            <RippleButton
+                                onClick={() => onNavigate('/projects')}
+                                className="px-7 md:px-8 py-3 rounded-full text-base md:text-lg font-bold min-w-[160px] md:min-w-[180px]"
+                                style={{ boxShadow: `0 0 20px ${glowColor}` }}
+                                theme={theme}
+                            >
+                                {copy.ctaProjects}
+                            </RippleButton>
+                            <button
+                                type="button"
+                                onClick={() => onNavigate('/contact')}
+                                className={`px-7 md:px-8 py-3 rounded-full text-base md:text-lg font-semibold ${muted} bg-white/10 border border-white/20 hover:bg-white/15 hover:text-white transition-all min-w-[160px] md:min-w-[180px] active:scale-95`}
+                            >
+                                {copy.ctaContact}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={onReplay}
+                                className={`px-7 md:px-8 py-3 rounded-full text-base md:text-lg font-semibold ${muted} bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all min-w-[160px] md:min-w-[180px] active:scale-95`}
+                            >
+                                {copy.replay}
+                            </button>
+                        </div>
+
+                        {!reducedMotion && showActions && (
+                            <p className={`intro-layer intro-layer-hints mt-6 text-[10px] font-mono uppercase tracking-widest ${subtle}`}>
+                                {copy.keyboardHints}
+                            </p>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
@@ -398,18 +384,137 @@ export const IntroCinematic = ({ theme }) => {
     const isPink = theme === 'pink';
 
     return (
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black perspective-1000">
+        <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black perspective-1000 intro-scene">
             <SEO titleKey="seo.introTitle" descriptionKey="seo.introDesc" />
 
             <style>{`
+                .intro-scene { transform-style: preserve-3d; }
                 .perspective-1000 { perspective: 1200px; }
+
+                .intro-bg-depth {
+                    position: absolute;
+                    inset: 0;
+                    transform-style: preserve-3d;
+                    pointer-events: none;
+                }
+                .intro-bg-depth-far {
+                    transform: translateZ(-420px) scale(1.3);
+                    opacity: 0.75;
+                }
+                .intro-bg-depth-mid {
+                    transform: translateZ(-260px) scale(1.15);
+                    opacity: 0.85;
+                }
+                .intro-bg-depth-far canvas,
+                .intro-bg-depth-mid canvas {
+                    filter: blur(1px);
+                }
+
+                .intro-stage {
+                    perspective: 1200px;
+                    transform-style: preserve-3d;
+                    position: relative;
+                }
+
+                .intro-card-rig {
+                    transform-style: preserve-3d;
+                    position: relative;
+                    z-index: 2;
+                }
+                .intro-card-rig.intro-card-motion {
+                    animation:
+                        introFlyIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+                        introFloat 9s ease-in-out 1.2s infinite;
+                }
+                .intro-card-rig.intro-card-flat {
+                    transform: none;
+                }
+
+                .intro-card {
+                    transform-style: preserve-3d;
+                    box-shadow:
+                        0 40px 80px -20px rgba(0, 0, 0, 0.85),
+                        0 0 0 1px rgba(255, 255, 255, 0.12) inset,
+                        inset 0 1px 0 rgba(255, 255, 255, 0.18);
+                }
+                .intro-card-flat .intro-card {
+                    transform: none;
+                    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+                }
+
+                .intro-card-inner { transform-style: preserve-3d; }
+
+                .intro-layer { transform-style: preserve-3d; }
+                .intro-layer-back-glow { transform: translateZ(-60px); }
+                .intro-layer-kicker { transform: translateZ(20px); }
+                .intro-layer-boot { transform: translateZ(30px); }
+                .intro-icon-left { transform: translateZ(30px) rotateY(14deg); }
+                .intro-icon-center { transform: translateZ(90px); }
+                .intro-icon-right { transform: translateZ(30px) rotateY(-14deg); }
+                .intro-icons-row { transform-style: preserve-3d; }
+                .intro-layer-title { transform: translateZ(100px); }
+                .intro-layer-subtitle { transform: translateZ(70px); }
+                .intro-layer-progress { transform: translateZ(50px); }
+                .intro-layer-actions { transform: translateZ(40px); }
+                .intro-layer-hints { transform: translateZ(30px); }
+
+                .intro-specular {
+                    position: absolute;
+                    inset: 0;
+                    pointer-events: none;
+                    background: linear-gradient(
+                        135deg,
+                        rgba(255, 255, 255, 0.14) 0%,
+                        transparent 38%,
+                        transparent 62%,
+                        rgba(255, 255, 255, 0.05) 100%
+                    );
+                    transform: translateZ(3px);
+                    opacity: 0.75;
+                }
+
+                .intro-depth-plane {
+                    position: absolute;
+                    left: 50%;
+                    top: 50%;
+                    width: min(92vw, 56rem);
+                    height: min(52vh, 28rem);
+                    pointer-events: none;
+                    border-radius: 3rem;
+                    border: 1px solid rgba(255, 255, 255, 0.06);
+                    background: rgba(255, 255, 255, 0.02);
+                    transform-style: preserve-3d;
+                    z-index: 1;
+                }
+                .intro-depth-plane-1 {
+                    transform: translate(-50%, -50%) translateZ(-120px) scale(1.05) rotateX(10deg) rotateY(-5deg);
+                    filter: blur(1px);
+                }
+                .intro-depth-plane-2 {
+                    transform: translate(-50%, -50%) translateZ(-220px) scale(1.12) rotateX(10deg) rotateY(-5deg);
+                    filter: blur(2px);
+                    opacity: 0.55;
+                }
+
                 .glass-3d {
                     backdrop-filter: blur(25px);
-                    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.15) inset;
-                    transition: transform 0.12s ease-out;
-                    transform-style: preserve-3d;
                 }
-                .card-content-3d { transform: translateZ(50px); }
+
+                @keyframes introFlyIn {
+                    from {
+                        transform: rotateX(18deg) rotateY(-8deg) translateZ(-500px);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: rotateX(10deg) rotateY(-5deg) translateZ(0);
+                        opacity: 1;
+                    }
+                }
+
+                @keyframes introFloat {
+                    0%, 100% { transform: rotateX(10deg) rotateY(-5deg) translateZ(0); }
+                    50% { transform: rotateX(9deg) rotateY(-4deg) translateZ(12px); }
+                }
 
                 @keyframes scanLine {
                     0% { top: -10%; opacity: 0; }
@@ -431,13 +536,28 @@ export const IntroCinematic = ({ theme }) => {
                 }
 
                 @keyframes introIconIn {
-                    from { opacity: 0; transform: translateY(12px) scale(0.9); }
-                    to { opacity: 1; transform: translateY(0) scale(1); }
+                    from { opacity: 0; transform: translateY(12px) translateZ(-24px) scale(0.9); }
+                    to { opacity: 1; transform: translateY(0) translateZ(0) scale(1); }
                 }
-                .intro-icon { animation: introIconIn 0.6s ease-out forwards; opacity: 0; }
+                .intro-icon { animation: introIconIn 0.6s ease-out forwards; opacity: 0; transform-style: preserve-3d; }
                 .intro-icon-delay-1 { animation-delay: 0.1s; }
                 .intro-icon-delay-2 { animation-delay: 0.25s; }
                 .intro-icon-delay-3 { animation-delay: 0.4s; }
+                .intro-icon-left.intro-icon { animation-name: introIconInLeft; }
+                .intro-icon-center.intro-icon { animation-name: introIconInCenter; }
+                .intro-icon-right.intro-icon { animation-name: introIconInRight; }
+                @keyframes introIconInLeft {
+                    from { opacity: 0; transform: translateY(12px) translateZ(-10px) rotateY(14deg) scale(0.9); }
+                    to { opacity: 1; transform: translateY(0) translateZ(30px) rotateY(14deg) scale(1); }
+                }
+                @keyframes introIconInCenter {
+                    from { opacity: 0; transform: translateY(12px) translateZ(-30px) scale(0.9); }
+                    to { opacity: 1; transform: translateY(0) translateZ(90px) scale(1); }
+                }
+                @keyframes introIconInRight {
+                    from { opacity: 0; transform: translateY(12px) translateZ(-10px) rotateY(-14deg) scale(0.9); }
+                    to { opacity: 1; transform: translateY(0) translateZ(30px) rotateY(-14deg) scale(1); }
+                }
 
                 @keyframes flashOut {
                     0% { opacity: 0; }
@@ -454,12 +574,20 @@ export const IntroCinematic = ({ theme }) => {
                 }
 
                 @media (prefers-reduced-motion: reduce) {
-                    .animate-scan, .animate-warp-exit, .intro-icon, .intro-flash { animation: none !important; }
+                    .animate-scan, .animate-warp-exit, .intro-icon, .intro-flash,
+                    .intro-card-motion { animation: none !important; }
+                    .intro-card, .intro-card-rig { transform: none !important; }
+                    .intro-depth-plane, .intro-bg-depth-far, .intro-bg-depth-mid { transform: none !important; }
+                    .intro-layer, .intro-icon-left, .intro-icon-center, .intro-icon-right { transform: none !important; }
                 }
             `}</style>
 
-            <BackgroundBlobs theme={theme} darkMode reducedMotion={reducedMotion || lightMode} staticOnMobile={lightMode} />
-            <ParticleNetwork isPink={isPink} reducedMotion={reducedMotion} lightMode={lightMode} />
+            <div className="intro-bg-depth intro-bg-depth-far">
+                <BackgroundBlobs theme={theme} darkMode reducedMotion={reducedMotion || lightMode} staticOnMobile={lightMode} />
+            </div>
+            <div className="intro-bg-depth intro-bg-depth-mid">
+                <ParticleNetwork isPink={isPink} reducedMotion={reducedMotion} lightMode={lightMode} />
+            </div>
 
             <div className="pointer-events-none absolute inset-0 z-[5]" aria-hidden="true">
                 <div className="absolute inset-x-0 top-0 h-16 md:h-24 bg-gradient-to-b from-black to-transparent" />
