@@ -504,9 +504,18 @@
     "moreMenu": "More pages",
     "siteMenu": "Site menu",
     "themes": "Themes",
+    "cursorThemes": "Cursor theme",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "uniqueVisitors": "Unique visitors",
     "routeAnnouncement": "Navigated to {{title}}"
+  },
+  "cursorThemes": {
+    "professional": "Professional",
+    "minimal": "Minimal",
+    "classic": "Classic ring",
+    "accent": "Accent glow",
+    "crosshair": "Crosshair",
+    "native": "System default"
   }
 }

@@ -1,8 +1,15 @@
 import React, { useEffect, useRef } from 'react';
 import { getAccent } from '../utils/themeTokens.js';
+import { getCursorTheme, isCustomCursorEnabled } from '../utils/cursorThemeConfig.js';
 
-export const CustomCursor = ({ theme, darkMode = true, reducedMotion = false }) => {
+export const CustomCursor = ({
+  theme,
+  darkMode = true,
+  reducedMotion = false,
+  cursorStyle = 'professional',
+}) => {
   const accent = getAccent(theme);
+  const cursorTheme = getCursorTheme(cursorStyle);
   const rootRef = useRef(null);
   const rafRef = useRef(null);
   const positionRef = useRef({ x: 0, y: 0 });
@@ -10,8 +17,10 @@ export const CustomCursor = ({ theme, darkMode = true, reducedMotion = false }) 
   const pressingRef = useRef(false);
   const visibleRef = useRef(false);
 
+  const customEnabled = isCustomCursorEnabled(cursorStyle);
+
   useEffect(() => {
-    if (reducedMotion) return;
+    if (reducedMotion || !customEnabled) return;
 
     document.body.classList.add('custom-cursor-active');
 
@@ -84,18 +93,22 @@ export const CustomCursor = ({ theme, darkMode = true, reducedMotion = false }) 
       document.removeEventListener('mouseenter', onMouseEnter);
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
     };
-  }, [reducedMotion]);
+  }, [reducedMotion, customEnabled, cursorStyle]);
 
-  if (reducedMotion) return null;
+  if (reducedMotion || !customEnabled || cursorTheme.usesNativePointer) return null;
 
   if (typeof navigator !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     return null;
   }
 
+  const showFocusRing = cursorStyle === 'professional' || cursorStyle === 'classic' || cursorStyle === 'accent';
+  const showPointerDot = cursorStyle !== 'crosshair';
+
   return (
     <div
       ref={rootRef}
       className="custom-cursor-root fixed top-0 left-0 pointer-events-none z-[100] hidden md:block"
+      data-style={cursorStyle}
       style={{
         opacity: 0,
         '--cursor-accent': accent.hex,
@@ -103,10 +116,13 @@ export const CustomCursor = ({ theme, darkMode = true, reducedMotion = false }) 
       }}
       aria-hidden="true"
     >
-      <div className="custom-cursor-focus" />
-      <div className="custom-cursor-pointer">
-        <span className="custom-cursor-dot" />
-      </div>
+      {showFocusRing && <div className="custom-cursor-focus" />}
+      {cursorStyle === 'crosshair' && <div className="custom-cursor-crosshair" aria-hidden="true" />}
+      {showPointerDot && (
+        <div className="custom-cursor-pointer">
+          <span className="custom-cursor-dot" />
+        </div>
+      )}
     </div>
   );
 };

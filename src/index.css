@@ -31,13 +31,11 @@
   will-change: transform, opacity;
 }
 
-/* Precision dot — inverts cleanly on any background */
 .custom-cursor-pointer {
   position: absolute;
   left: 0;
   top: 0;
   transform: translate(-50%, -50%);
-  mix-blend-mode: difference;
 }
 
 .custom-cursor-dot {
@@ -46,14 +44,9 @@
   height: 5px;
   border-radius: 9999px;
   background: #fff;
-  transition: transform 0.15s ease;
+  transition: transform 0.15s ease, width 0.15s ease, height 0.15s ease;
 }
 
-.custom-cursor-root[data-press="true"] .custom-cursor-dot {
-  transform: scale(0.72);
-}
-
-/* Subtle focus ring on interactive targets */
 .custom-cursor-focus {
   position: absolute;
   left: 0;
@@ -75,7 +68,42 @@
     margin 0.22s ease;
 }
 
-.custom-cursor-root[data-hover="true"] .custom-cursor-focus {
+.custom-cursor-crosshair {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+}
+
+.custom-cursor-crosshair::before,
+.custom-cursor-crosshair::after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.45);
+}
+
+.custom-cursor-crosshair::before {
+  width: 14px;
+  height: 1px;
+  left: -7px;
+  top: -0.5px;
+}
+
+.custom-cursor-crosshair::after {
+  width: 1px;
+  height: 14px;
+  left: -0.5px;
+  top: -7px;
+}
+
+/* Professional — inverted precision dot + hover halo */
+.custom-cursor-root[data-style="professional"] .custom-cursor-pointer {
+  mix-blend-mode: difference;
+}
+
+.custom-cursor-root[data-style="professional"][data-hover="true"] .custom-cursor-focus {
   opacity: 1;
   transform: scale(1);
   width: 28px;
@@ -83,6 +111,85 @@
   margin-left: -14px;
   margin-top: -14px;
   border-color: var(--cursor-accent-soft, rgba(255, 255, 255, 0.4));
+}
+
+/* Minimal — tiny dot only */
+.custom-cursor-root[data-style="minimal"] .custom-cursor-dot {
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+.custom-cursor-root[data-style="minimal"] .custom-cursor-focus {
+  display: none;
+}
+
+/* Classic — accent dot with always-visible ring */
+.custom-cursor-root[data-style="classic"] .custom-cursor-dot {
+  width: 4px;
+  height: 4px;
+  background: var(--cursor-accent);
+}
+
+.custom-cursor-root[data-style="classic"] .custom-cursor-focus {
+  opacity: 0.75;
+  transform: scale(1);
+  width: 18px;
+  height: 18px;
+  margin-left: -9px;
+  margin-top: -9px;
+  border-color: var(--cursor-accent-soft);
+}
+
+.custom-cursor-root[data-style="classic"][data-hover="true"] .custom-cursor-focus {
+  opacity: 1;
+  width: 26px;
+  height: 26px;
+  margin-left: -13px;
+  margin-top: -13px;
+}
+
+/* Accent — branded glow */
+.custom-cursor-root[data-style="accent"] .custom-cursor-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--cursor-accent);
+  box-shadow: 0 0 10px var(--cursor-accent-soft);
+}
+
+.custom-cursor-root[data-style="accent"] .custom-cursor-focus {
+  opacity: 0.55;
+  transform: scale(1);
+  width: 22px;
+  height: 22px;
+  margin-left: -11px;
+  margin-top: -11px;
+  border-color: var(--cursor-accent);
+}
+
+.custom-cursor-root[data-style="accent"][data-hover="true"] .custom-cursor-focus {
+  opacity: 0.9;
+  width: 30px;
+  height: 30px;
+  margin-left: -15px;
+  margin-top: -15px;
+}
+
+/* Crosshair — design-tool reticle */
+.custom-cursor-root[data-style="crosshair"] .custom-cursor-crosshair::before,
+.custom-cursor-root[data-style="crosshair"] .custom-cursor-crosshair::after {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.custom-cursor-root[data-style="crosshair"][data-hover="true"] .custom-cursor-crosshair::before,
+.custom-cursor-root[data-style="crosshair"][data-hover="true"] .custom-cursor-crosshair::after {
+  background: var(--cursor-accent);
+}
+
+/* Shared press feedback */
+.custom-cursor-root[data-press="true"] .custom-cursor-dot {
+  transform: scale(0.72);
 }
 
 .custom-cursor-root[data-hover="true"][data-press="true"] .custom-cursor-focus {

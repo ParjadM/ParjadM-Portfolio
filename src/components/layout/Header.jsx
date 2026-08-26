@@ -5,6 +5,7 @@ import { Monitor, Newspaper, Film, Terminal, MessageSquare, Activity, ChevronDow
 import { GlassCard } from '../ui/GlassCard.jsx';
 import Logo from '../../Images/Logo.webp';
 import { THEMES } from '../../utils/themeConfig.js';
+import { CURSOR_THEMES } from '../../utils/cursorThemeConfig.js';
 import { getAccent } from '../../utils/themeTokens.js';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +17,7 @@ import { useSwipeDown } from '../../utils/useSwipeDown.js';
 import { useFocusTrap } from '../../utils/useFocusTrap.js';
 import { useMenuPopover } from '../../utils/useMenuPopover.js';
 
-export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isMobileMenuOpen, setIsMobileMenuOpen, onLanguageChange }) => {
+export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCursorThemeId, theme, darkMode = true, isMobileMenuOpen, setIsMobileMenuOpen, onLanguageChange }) => {
     const accent = getAccent(theme);
     const { t } = useTranslation();
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
@@ -240,7 +241,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
             id={paletteMenuId}
             role="menu"
             aria-label={t('a11y.themeMenu')}
-            className="fixed z-[9999] w-48 rounded-xl bg-gray-900 border border-gray-700 shadow-2xl overflow-hidden"
+            className="fixed z-[9999] w-52 rounded-xl bg-gray-900 border border-gray-700 shadow-2xl overflow-hidden"
             style={{ top: paletteRect.top, left: paletteRect.left }}
         >
             <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('a11y.themes')}</div>
@@ -256,6 +257,23 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                     className={`w-full text-left px-4 py-2 text-sm transition-colors ${currentThemeId === themeOption.id ? accent.menuActive : 'text-gray-300 hover:bg-gray-800'}`}
                 >
                     {themeOption.name}
+                </button>
+            ))}
+            <div className="border-t border-gray-800 mt-1 px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                {t('a11y.cursorThemes')}
+            </div>
+            {Object.values(CURSOR_THEMES).map((cursorOption) => (
+                <button
+                    key={cursorOption.id}
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                        setCursorThemeId(cursorOption.id);
+                        setIsPaletteOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 text-sm transition-colors ${currentCursorThemeId === cursorOption.id ? accent.menuActive : 'text-gray-300 hover:bg-gray-800'}`}
+                >
+                    {t(cursorOption.nameKey)}
                 </button>
             ))}
         </div>,
@@ -485,6 +503,25 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                                         className={`text-center px-4 py-3 rounded-2xl text-sm font-semibold transition-colors ${currentThemeId === themeOption.id ? accent.menuActiveBorder : 'bg-white/5 border border-white/10 text-gray-300'}`}
                                     >
                                         {themeOption.name}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <p className="mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider w-full text-center">
+                                {t('a11y.cursorThemes')}
+                            </p>
+                            <div className="grid grid-cols-2 gap-3 w-full">
+                                {Object.values(CURSOR_THEMES).map((cursorOption) => (
+                                    <button
+                                        key={cursorOption.id}
+                                        type="button"
+                                        onClick={() => {
+                                            setCursorThemeId(cursorOption.id);
+                                            handleNavClick();
+                                        }}
+                                        className={`text-center px-4 py-3 rounded-2xl text-sm font-semibold transition-colors ${currentCursorThemeId === cursorOption.id ? accent.menuActiveBorder : 'bg-white/5 border border-white/10 text-gray-300'}`}
+                                    >
+                                        {t(cursorOption.nameKey)}
                                     </button>
                                 ))}
                             </div>

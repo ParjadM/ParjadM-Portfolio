@@ -504,9 +504,18 @@
     "moreMenu": "Plus de pages",
     "siteMenu": "Menu du site",
     "themes": "Thèmes",
+    "cursorThemes": "Curseur",
     "openMenu": "Ouvrir le menu",
     "closeMenu": "Fermer le menu",
     "uniqueVisitors": "Visiteurs uniques",
     "routeAnnouncement": "Navigation vers {{title}}"
+  },
+  "cursorThemes": {
+    "professional": "Professionnel",
+    "minimal": "Minimal",
+    "classic": "Anneau classique",
+    "accent": "Lueur accent",
+    "crosshair": "Réticule",
+    "native": "Curseur système"
   }
 }

@@ -18,7 +18,7 @@ import { getThemeConfig } from '../../utils/themeConfig.js';
 import { useReducedMotion } from '../../utils/useReducedMotion.js';
 import { isFullscreenPath, stripLocalePrefix } from '../../utils/i18nRouting.js';
 
-export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
+export const Layout = ({ themeId, setThemeId, cursorThemeId, setCursorThemeId, toast, setToast }) => {
     const location = useLocation();
     const [visitorId, setVisitorId] = useState(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -128,12 +128,19 @@ export const Layout = ({ themeId, setThemeId, toast, setToast }) => {
             `}</style>
 
             <BackgroundBlobs theme={themeConfig.accentPrefix} darkMode={themeConfig.isDark} customBlobClasses={themeConfig.blobClasses} reducedMotion={reducedMotion} staticOnMobile={staticBlobs} />
-            <CustomCursor theme={themeConfig.accentPrefix} darkMode={themeConfig.isDark} reducedMotion={reducedMotion} />
+            <CustomCursor
+                theme={themeConfig.accentPrefix}
+                darkMode={themeConfig.isDark}
+                reducedMotion={reducedMotion}
+                cursorStyle={cursorThemeId}
+            />
             
             {!isFullscreenRoute && (
                 <Header 
                     setThemeId={setThemeId} 
-                    currentThemeId={themeId} 
+                    currentThemeId={themeId}
+                    setCursorThemeId={setCursorThemeId}
+                    currentCursorThemeId={cursorThemeId}
                     theme={themeConfig.accentPrefix} 
                     darkMode={themeConfig.isDark} 
                     isMobileMenuOpen={isMobileMenuOpen}
