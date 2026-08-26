@@ -133,7 +133,22 @@
     "notFound": "Article introuvable",
     "backToBlog": "← Retour au Blog",
     "seoTitle": "Blogue — Parjad Minooei",
-    "seoDesc": "Articles sur le développement web et l'apprentissage."
+    "seoDesc": "Articles sur le développement web et l'apprentissage.",
+    "aiExplain": {
+      "title": "Besoin d'une lecture plus rapide ?",
+      "subtitle": "Résumés IA — choisissez le style qui vous convient.",
+      "tldrTitle": "Trop long ? Pas le temps",
+      "tldrHint": "Un court résumé en 2–3 phrases",
+      "tldrResultLabel": "Résumé rapide",
+      "loading": {
+        "tldr": "Rédaction du résumé…",
+        "junior": "Simplification en cours…"
+      },
+      "juniorTitle": "Expliquez comme si j'étais débutant",
+      "juniorHint": "Langage simple, sans jargon",
+      "juniorResultLabel": "Version débutant",
+      "error": "Impossible de générer l'explication. Réessayez."
+    }
   },
   "stats": {
     "title": "Statistiques de développeur",
