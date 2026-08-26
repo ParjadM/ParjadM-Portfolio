@@ -5,6 +5,7 @@ import { Reveal } from '../components/Reveal.jsx';
 import { useTranslation } from 'react-i18next';
 import { PageTransition } from '../components/ui/PageTransition.jsx';
 import { SEO } from '../components/SEO.jsx';
+import { getAccent } from '../utils/themeTokens.js';
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 
 export const ContactSection = ({ theme }) => {
@@ -68,9 +69,8 @@ export const ContactSection = ({ theme }) => {
         }
     ];
 
-    const gradientClass = theme === 'pink' 
-        ? 'bg-gradient-to-r from-pink-500 to-red-500' 
-        : 'bg-gradient-to-r from-emerald-500 to-teal-500';
+    const accent = getAccent(theme);
+    const gradientClass = accent.gradientBtn;
 
     return (
         <PageTransition className="min-h-screen flex items-center justify-center py-20 px-4">
@@ -215,7 +215,7 @@ export const ContactSection = ({ theme }) => {
                                         rel={method.href.startsWith('http') ? 'noopener noreferrer' : ''}
                                         className="flex items-center p-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:border-white/20 transition-all duration-300 group"
                                     >
-                                        <div className={`p-3 rounded-lg bg-white/10 group-hover:bg-white/20 transition-all duration-300 ${theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}`}>
+                                        <div className={`p-3 rounded-lg bg-white/10 group-hover:bg-white/20 transition-all duration-300 ${accent.text}`}>
                                             {method.icon}
                                         </div>
                                         <div className="ml-4 flex-1">
@@ -225,7 +225,7 @@ export const ContactSection = ({ theme }) => {
                                             <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
                                                 {method.description}
                                             </p>
-                                            <p className={`text-xs mt-1 truncate font-medium ${theme === 'pink' ? 'text-pink-300/90' : 'text-emerald-300/90'}`}>
+                                            <p className={`text-xs mt-1 truncate font-medium ${accent.text300Soft}`}>
                                                 {method.value}
                                             </p>
                                         </div>
@@ -241,8 +241,8 @@ export const ContactSection = ({ theme }) => {
                                 <h3 className="text-2xl font-bold text-white mb-4">{t('contact.info.availability')}</h3>
                                 <div className="flex items-center space-x-4">
                                     <div className="relative">
-                                        <div className={`w-4 h-4 rounded-full ${theme === 'pink' ? 'bg-pink-500' : 'bg-emerald-500'} animate-ping absolute`}></div>
-                                        <div className={`w-4 h-4 rounded-full ${theme === 'pink' ? 'bg-pink-500' : 'bg-emerald-500'} relative`}></div>
+                                        <div className={`w-4 h-4 rounded-full ${accent.bgPing} animate-ping absolute`}></div>
+                                        <div className={`w-4 h-4 rounded-full ${accent.bgPing} relative`}></div>
                                     </div>
                                     <p className="text-gray-300">{t('contact.info.availabilityStatus')}</p>
                                 </div>

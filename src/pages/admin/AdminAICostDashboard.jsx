@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { adminJson } from '../../utils/adminApi.js';
 import { AdminPanelSkeleton } from './components/AdminSkeleton.jsx';
+import { getAccent } from '../../utils/themeTokens.js';
 
 function AiUsageChart({ data, theme }) {
+  const accentTokens = getAccent(theme);
   const width = 640;
   const height = 220;
   const padding = 32;
   const maxY = Math.max(1, ...data.map((d) => (d.gemini || 0) + (d.free || 0)));
   const barWidth = Math.max(12, (width - padding * 2) / Math.max(data.length, 1) - 8);
-  const colorGemini = theme === 'pink' ? '#f472b6' : '#34d399';
+  const colorGemini = accentTokens.hex;
   const colorFree = '#64748b';
 
   return (
@@ -55,7 +57,7 @@ export const AdminAICostDashboard = ({ theme }) => {
       .finally(() => setLoading(false));
   }, [range]);
 
-  const accent = theme === 'pink' ? 'text-pink-400' : 'text-emerald-400';
+  const accent = getAccent(theme).text;
 
   if (loading) return <AdminPanelSkeleton />;
   if (error) return <div className="text-red-300">{error}</div>;

@@ -8,6 +8,7 @@ import { SEO } from '../components/SEO.jsx';
 import { useReducedMotion } from '../utils/useReducedMotion.js';
 import { markIntroSeen } from '../utils/introSeen.js';
 import { localizePath } from '../utils/i18nRouting.js';
+import { getAccent } from '../utils/themeTokens.js';
 
 function useDecoderText(text, delay = 0, instant = false) {
     const [displayText, setDisplayText] = useState(instant ? text : '');
@@ -46,7 +47,7 @@ function useDecoderText(text, delay = 0, instant = false) {
     return { displayText, done };
 }
 
-const ParticleNetwork = ({ isPink, reducedMotion, lightMode = false }) => {
+const ParticleNetwork = ({ accent, reducedMotion, lightMode = false }) => {
     const canvasRef = useRef(null);
 
     useEffect(() => {
@@ -82,7 +83,7 @@ const ParticleNetwork = ({ isPink, reducedMotion, lightMode = false }) => {
                 if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY;
             }
             draw() {
-                ctx.fillStyle = isPink ? 'rgba(236, 72, 153, 0.45)' : 'rgba(52, 211, 153, 0.45)';
+                ctx.fillStyle = accent.canvasFill;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
@@ -103,9 +104,7 @@ const ParticleNetwork = ({ isPink, reducedMotion, lightMode = false }) => {
                     const distance = Math.sqrt(dx * dx + dy * dy);
                     if (distance < connectionDistance) {
                         ctx.beginPath();
-                        ctx.strokeStyle = isPink
-                            ? `rgba(236, 72, 153, ${1 - distance / connectionDistance})`
-                            : `rgba(52, 211, 153, ${1 - distance / connectionDistance})`;
+                        ctx.strokeStyle = `${accent.canvasStroke}${1 - distance / connectionDistance})`;
                         ctx.lineWidth = 1;
                         ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y);
@@ -135,7 +134,7 @@ const ParticleNetwork = ({ isPink, reducedMotion, lightMode = false }) => {
             document.removeEventListener('visibilitychange', onVisibility);
             cancelAnimationFrame(animationFrameId);
         };
-    }, [isPink, reducedMotion, lightMode]);
+    }, [accent, reducedMotion, lightMode]);
 
     if (reducedMotion) return null;
     return <canvas ref={canvasRef} className="absolute inset-0 z-0 opacity-35 pointer-events-none" aria-hidden="true" />;
@@ -179,11 +178,11 @@ const CinematicCard = ({
     const { displayText: decodedTitle2, done: title2Done } = useDecoderText(copy.title2, instant ? 0 : 1900, instant);
     const { displayText: decodedSubtitle, done: subtitleDone } = useDecoderText(copy.subtitle, instant ? 0 : 2600, instant);
 
-    const isPink = theme === 'pink';
-    const gradientClass = isPink ? 'from-pink-500 to-red-500' : 'from-emerald-500 to-teal-500';
-    const accentClass = isPink ? 'text-pink-300' : 'text-emerald-300';
-    const glowColor = isPink ? 'rgba(236, 72, 153, 0.35)' : 'rgba(52, 211, 153, 0.35)';
-    const scanColor = isPink ? '#ec4899' : '#34d399';
+    const accent = getAccent(theme);
+    const gradientClass = accent.gradient;
+    const accentClass = accent.text300;
+    const glowColor = accent.glow;
+    const scanColor = accent.scan;
     const muted = 'text-white/80';
     const subtle = 'text-white/55';
 
@@ -381,7 +380,7 @@ export const IntroCinematic = ({ theme }) => {
         return () => window.removeEventListener('keydown', onKeyDown);
     }, [finishIntro, handleSkip, handleReplay, isExiting]);
 
-    const isPink = theme === 'pink';
+    const accent = getAccent(theme);
 
     return (
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black perspective-1000 intro-scene">
@@ -586,7 +585,7 @@ export const IntroCinematic = ({ theme }) => {
                 <BackgroundBlobs theme={theme} darkMode reducedMotion={reducedMotion || lightMode} staticOnMobile={lightMode} />
             </div>
             <div className="intro-bg-depth intro-bg-depth-mid">
-                <ParticleNetwork isPink={isPink} reducedMotion={reducedMotion} lightMode={lightMode} />
+                <ParticleNetwork accent={accent} reducedMotion={reducedMotion} lightMode={lightMode} />
             </div>
 
             <div className="pointer-events-none absolute inset-0 z-[5]" aria-hidden="true">
@@ -626,7 +625,7 @@ export const IntroCinematic = ({ theme }) => {
 
             {flash && (
                 <div
-                    className={`fixed inset-0 z-50 pointer-events-none intro-flash ${isPink ? 'bg-pink-200' : 'bg-emerald-100'}`}
+                    className={`fixed inset-0 z-50 pointer-events-none intro-flash ${accent.flash}`}
                     aria-hidden="true"
                 />
             )}

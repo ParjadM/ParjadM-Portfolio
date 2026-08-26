@@ -6,6 +6,7 @@ import { SEO } from '../components/SEO.jsx'
 import { LocalizedLink } from '../components/ui/LocalizedLink.jsx'
 import { setActivePageContext, clearActivePageContext } from '../utils/chatbotEvents.js'
 import { CAMERA_FX_MODES, createCameraFxEngine } from '../utils/cameraFx/engine.js'
+import { getAccent } from '../utils/themeTokens.js'
 
 export const CameraFxPage = ({ theme }) => {
   const { t } = useTranslation()
@@ -30,7 +31,7 @@ export const CameraFxPage = ({ theme }) => {
   const [handStatus, setHandStatus] = useState('idle')
   const [handInfo, setHandInfo] = useState({ handCount: 0, gestures: [] })
 
-  const isPink = theme === 'pink'
+  const accent = getAccent(theme)
 
   useEffect(() => {
     setActivePageContext({
@@ -130,9 +131,9 @@ export const CameraFxPage = ({ theme }) => {
           --fx-bg: #05070d;
           --fx-panel: rgba(8, 14, 24, 0.72);
           --fx-line: rgba(140, 220, 255, 0.22);
-          --fx-glow: ${isPink ? 'rgba(244, 114, 182, 0.45)' : 'rgba(34, 211, 238, 0.4)'};
-          --fx-accent: ${isPink ? '#f472b6' : '#22d3ee'};
-          --fx-accent-2: ${isPink ? '#fb7185' : '#a3e635'};
+          --fx-glow: ${accent.glowFx};
+          --fx-accent: ${accent.fxAccent};
+          --fx-accent-2: ${accent.fxAccent2};
         }
         .camera-fx-grid {
           background-image:

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { getAccent } from '../../utils/themeTokens.js';
 
 export const RippleButton = ({ children, onClick, className = '', theme = 'green', ...props }) => {
   const [ripples, setRipples] = useState([]);
+  const accent = getAccent(theme);
 
   const handleClick = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -25,9 +27,7 @@ export const RippleButton = ({ children, onClick, className = '', theme = 'green
     if (onClick) onClick(e);
   };
 
-  const gradientClass = theme !== 'pink' 
-    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400' 
-    : 'bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-400 hover:to-red-400';
+  const gradientClass = accent.gradientBtn;
 
   return (
     <button

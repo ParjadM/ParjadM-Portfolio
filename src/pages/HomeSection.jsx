@@ -13,6 +13,7 @@ import { fetchApi } from '../utils/apiClient.js';
 import { formatDate } from '../utils/formatDate.js';
 import { hasSeenIntro } from '../utils/introSeen.js';
 import { localizePath } from '../utils/i18nRouting.js';
+import { getAccent } from '../utils/themeTokens.js';
 import ParjadM from '../Images/ParjadM.webp';
 
 const SKILLS = [
@@ -29,7 +30,7 @@ const ChevronDownIcon = (props) => (
 export const HomeSection = ({ theme }) => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
-  const isPink = theme === 'pink';
+  const accent = getAccent(theme);
   const locale = i18n.language?.startsWith('fr') ? 'fr' : 'en';
 
   useEffect(() => {
@@ -59,11 +60,11 @@ export const HomeSection = ({ theme }) => {
     };
   }, []);
 
-  const accentText = isPink ? 'text-pink-400' : 'text-emerald-400';
-  const tagClasses = isPink ? 'bg-pink-500/20 text-pink-300' : 'bg-emerald-500/20 text-emerald-300';
-  const gradientText = isPink ? 'from-pink-400 via-red-400 to-purple-400' : 'from-emerald-400 via-teal-400 to-cyan-400';
-  const borderTheme = isPink ? 'portrait-border--pink' : '';
-  const glowTheme = isPink ? 'portrait-border-glow--pink' : '';
+  const accentText = accent.text;
+  const tagClasses = accent.tag;
+  const gradientText = accent.gradientText;
+  const borderTheme = accent.portraitBorder;
+  const glowTheme = accent.portraitGlow;
 
   return (
   <PageTransition className="text-white relative overflow-hidden">

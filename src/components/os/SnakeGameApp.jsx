@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Gamepad2, RotateCcw } from 'lucide-react';
+import { getAccent } from '../../utils/themeTokens.js';
 
 const GRID_SIZE = 20;
 const CELL_SIZE = 20;
 const INITIAL_SPEED = 150;
 
 export const SnakeGameApp = ({ theme }) => {
+    const accentTokens = getAccent(theme);
     const [gameState, setGameState] = useState({
         snake: [{ x: 10, y: 10 }],
         food: { x: 15, y: 10 },
@@ -201,8 +203,8 @@ export const SnakeGameApp = ({ theme }) => {
                         
                         let bg = 'transparent';
                         if (isFood) bg = '#ef4444'; // red-500
-                        else if (isHead) bg = theme === 'pink' ? '#ec4899' : '#10b981';
-                        else if (isBody) bg = theme === 'pink' ? '#fbcfe8' : '#6ee7b7';
+                        else if (isHead) bg = accentTokens.hexHead;
+                        else if (isBody) bg = accentTokens.hexBody;
 
                         return (
                             <div 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { GlassCard } from '../../components/ui/GlassCard.jsx';
 import { SEO } from '../../components/SEO.jsx';
 import { getAdminPath } from '../../utils/i18nRouting.js';
+import { getAccent } from '../../utils/themeTokens.js';
 
 export const AdminLoginPage = ({ theme }) => {
   const navigate = useNavigate();
@@ -36,9 +37,7 @@ export const AdminLoginPage = ({ theme }) => {
     }
   };
 
-  const gradientClass = theme === 'pink'
-    ? 'bg-gradient-to-r from-pink-500 to-red-500'
-    : 'bg-gradient-to-r from-emerald-500 to-teal-500';
+  const gradientClass = getAccent(theme).gradientBtn;
 
   return (
     <section className="min-h-screen flex items-center justify-center py-20 px-4 bg-gray-950">

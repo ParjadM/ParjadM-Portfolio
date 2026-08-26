@@ -26,6 +26,15 @@ export const THEMES = {
         accentPrefix: 'pink',
         isTerminal: false,
     },
+    'ocean-dark': {
+        id: 'ocean-dark',
+        name: 'Ocean Blue',
+        isDark: true,
+        backgroundClass: 'bg-gradient-to-br from-blue-900 via-indigo-900 to-violet-900',
+        blobClasses: { blob1: 'bg-blue-500/30', blob2: 'bg-indigo-500/30', blob3: 'bg-violet-500/20' },
+        accentPrefix: 'blue',
+        isTerminal: false,
+    },
     'terminal': {
         id: 'terminal',
         name: 'Terminal Hacker',

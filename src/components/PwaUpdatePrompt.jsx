@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { RefreshCw, X } from 'lucide-react'
+import { getAccent } from '../utils/themeTokens.js'
 
 /**
  * Prompt-based PWA update UI. Uses virtual:pwa-register when available.
@@ -44,10 +45,7 @@ export function PwaUpdatePrompt({ theme = 'green' }) {
 
   if (!needRefresh && !offlineReady) return null
 
-  const accent =
-    theme === 'pink'
-      ? 'bg-pink-500/20 text-pink-200 border-pink-500/30'
-      : 'bg-emerald-500/20 text-emerald-200 border-emerald-500/30'
+  const accent = getAccent(theme).menuActiveBorder
 
   return (
     <div className="fixed left-3 right-3 bottom-24 lg:bottom-6 pb-safe z-[9997] pointer-events-none">

@@ -5,6 +5,7 @@ import { Monitor, Newspaper, Film, Terminal, MessageSquare, Activity, ChevronDow
 import { GlassCard } from '../ui/GlassCard.jsx';
 import Logo from '../../Images/Logo.webp';
 import { THEMES } from '../../utils/themeConfig.js';
+import { getAccent } from '../../utils/themeTokens.js';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../ui/LanguageSwitcher.jsx';
@@ -16,6 +17,7 @@ import { useFocusTrap } from '../../utils/useFocusTrap.js';
 import { useMenuPopover } from '../../utils/useMenuPopover.js';
 
 export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isMobileMenuOpen, setIsMobileMenuOpen, onLanguageChange }) => {
+    const accent = getAccent(theme);
     const { t } = useTranslation();
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
     const [paletteRect, setPaletteRect] = useState(null);
@@ -251,7 +253,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                         setThemeId(themeOption.id);
                         setIsPaletteOpen(false);
                     }}
-                    className={`w-full text-left px-4 py-2 text-sm transition-colors ${currentThemeId === themeOption.id ? 'bg-emerald-500/20 text-emerald-300' : 'text-gray-300 hover:bg-gray-800'}`}
+                    className={`w-full text-left px-4 py-2 text-sm transition-colors ${currentThemeId === themeOption.id ? accent.menuActive : 'text-gray-300 hover:bg-gray-800'}`}
                 >
                     {themeOption.name}
                 </button>
@@ -308,7 +310,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                             {navIndicator && (
                                 <span
                                     aria-hidden="true"
-                                    className={`absolute top-1/2 -translate-y-1/2 h-9 rounded-full transition-all duration-300 ease-out pointer-events-none ${theme === 'pink' ? 'bg-pink-500/20 border border-pink-500/20' : 'bg-emerald-500/20 border border-emerald-500/20'}`}
+                                    className={`absolute top-1/2 -translate-y-1/2 h-9 rounded-full transition-all duration-300 ease-out pointer-events-none ${accent.navIndicator}`}
                                     style={{ left: navIndicator.left, width: navIndicator.width }}
                                 />
                             )}
@@ -320,7 +322,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                                         to={item.path}
                                         className={`relative z-10 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-300 border border-transparent ${
                                             isItemActive
-                                            ? (theme === 'pink' ? 'text-pink-200' : 'text-emerald-200')
+                                            ? accent.navActiveText
                                             : 'text-gray-300 hover:text-white hover:bg-white/10'
                                         }`}
                                         aria-current={isItemActive ? 'page' : undefined}
@@ -350,7 +352,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                         <div className="flex items-center pl-4 space-x-3">
                             {visitors !== null && (
                                 <div className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 shadow-inner" title={t('a11y.uniqueVisitors')}>
-                                    <div className={`w-2 h-2 rounded-full animate-pulse ${theme === 'pink' ? 'bg-pink-400' : 'bg-emerald-400'}`}></div>
+                                    <div className={`w-2 h-2 rounded-full animate-pulse ${accent.bgDot}`}></div>
                                     <span className="text-gray-300 text-xs font-semibold tracking-wide whitespace-nowrap">
                                         {t('nav.Visitors', { count: visitors })}
                                     </span>
@@ -438,7 +440,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                                     key={item.name}
                                     to={item.path}
                                     onClick={handleNavClick}
-                                    className={`text-3xl sm:text-4xl font-extrabold tracking-tight transition-all duration-300 ${isActive(item.path) ? (theme === 'pink' ? 'text-pink-400' : 'text-emerald-400') : 'text-gray-300 hover:text-white'}`}
+                                    className={`text-3xl sm:text-4xl font-extrabold tracking-tight transition-all duration-300 ${isActive(item.path) ? accent.text : 'text-gray-300 hover:text-white'}`}
                                 >
                                     {item.name}
                                 </LocalizedLink>
@@ -447,7 +449,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                             <LocalizedLink
                                 to="/explore"
                                 onClick={handleNavClick}
-                                className={`text-2xl font-bold tracking-tight ${isActive('/explore') ? (theme === 'pink' ? 'text-pink-400' : 'text-emerald-400') : 'text-gray-300 hover:text-white'}`}
+                                className={`text-2xl font-bold tracking-tight ${isActive('/explore') ? accent.text : 'text-gray-300 hover:text-white'}`}
                             >
                                 {t('nav.Explore')}
                             </LocalizedLink>
@@ -464,7 +466,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
 
                             {visitors !== null && (
                                 <div className="mt-4 flex items-center justify-center space-x-2 px-4 py-3 rounded-full bg-white/5 border border-white/10">
-                                    <div className={`w-2.5 h-2.5 rounded-full animate-pulse ${theme === 'pink' ? 'bg-pink-400' : 'bg-emerald-400'}`}></div>
+                                    <div className={`w-2.5 h-2.5 rounded-full animate-pulse ${accent.bgDot}`}></div>
                                     <span className="text-gray-300 text-sm font-semibold tracking-wide">
                                         {t('nav.Visitors', { count: visitors })}
                                     </span>
@@ -480,7 +482,7 @@ export const Header = ({ setThemeId, currentThemeId, theme, darkMode = true, isM
                                             setThemeId(themeOption.id);
                                             handleNavClick();
                                         }}
-                                        className={`text-center px-4 py-3 rounded-2xl text-sm font-semibold transition-colors ${currentThemeId === themeOption.id ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-white/5 border border-white/10 text-gray-300'}`}
+                                        className={`text-center px-4 py-3 rounded-2xl text-sm font-semibold transition-colors ${currentThemeId === themeOption.id ? accent.menuActiveBorder : 'bg-white/5 border border-white/10 text-gray-300'}`}
                                     >
                                         {themeOption.name}
                                     </button>

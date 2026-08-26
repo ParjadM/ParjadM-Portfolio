@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { Minus, Square, X, Maximize2 } from 'lucide-react';
+import { getAccent } from '../../utils/themeTokens.js';
 
 export const Window = ({ 
     id, 
@@ -91,6 +92,8 @@ export const Window = ({
         onFocus(id);
     };
 
+    const accent = getAccent(theme);
+
     if (!isOpen) return null;
 
     const toggleMaximize = () => {
@@ -135,7 +138,7 @@ export const Window = ({
                     {/* Title Bar (Drag Handle) */}
                     <div 
                         onPointerDown={(e) => dragControls.start(e)}
-                        className={`h-10 flex items-center justify-between px-3 cursor-grab active:cursor-grabbing border-b border-white/5 bg-gray-800/50 ${isFocused ? (theme === 'pink' ? 'bg-pink-900/20' : 'bg-emerald-900/20') : ''}`}
+                        className={`h-10 flex items-center justify-between px-3 cursor-grab active:cursor-grabbing border-b border-white/5 bg-gray-800/50 ${isFocused ? accent.windowFocus : ''}`}
                     >
                         <div className="flex items-center space-x-2 text-gray-300">
                             {icon}

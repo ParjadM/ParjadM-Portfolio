@@ -105,6 +105,19 @@
     #f472b6
   );
 }
+.portrait-border--blue::before {
+  background: conic-gradient(
+    from 0deg,
+    #60a5fa,
+    #818cf8,
+    #6366f1,
+    #8b5cf6,
+    #a78bfa,
+    #818cf8,
+    #38bdf8,
+    #60a5fa
+  );
+}
 .portrait-border::after {
   content: '';
   position: absolute;
@@ -144,6 +157,16 @@
     rgba(167, 139, 250, 0.4),
     rgba(34, 211, 238, 0.3),
     rgba(244, 114, 182, 0.55)
+  );
+}
+.portrait-border-glow--blue {
+  background: conic-gradient(
+    from 90deg,
+    rgba(96, 165, 250, 0.55),
+    rgba(129, 140, 248, 0.4),
+    rgba(99, 102, 241, 0.4),
+    rgba(139, 92, 246, 0.35),
+    rgba(96, 165, 250, 0.55)
   );
 }
 @keyframes portrait-border-spin {

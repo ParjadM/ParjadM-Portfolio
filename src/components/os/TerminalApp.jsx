@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { useTerminalEngine } from '../../os/useTerminalEngine.js';
+import { getAccent } from '../../utils/themeTokens.js';
 
 export const TerminalApp = ({ theme, osState }) => {
     const { fileSystem, setFileSystem, openApp } = osState || {};
@@ -14,7 +15,7 @@ export const TerminalApp = ({ theme, osState }) => {
         promptHost: 'parjadm-os',
     });
 
-    const accent = theme === 'pink' ? 'text-pink-400' : 'text-emerald-400';
+    const accent = getAccent(theme).text;
 
     return (
         <div

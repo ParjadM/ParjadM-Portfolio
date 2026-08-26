@@ -5,6 +5,7 @@ import { Reveal } from '../components/Reveal.jsx';
 import { PageTransition } from '../components/ui/PageTransition.jsx';
 import { SEO } from '../components/SEO.jsx';
 import { LocalizedLink } from '../components/ui/LocalizedLink.jsx';
+import { getAccent } from '../utils/themeTokens.js';
 
 const EXPLORE_LINK_KEYS = [
   { path: '/cli', labelKey: 'explore.links.cli.label', descKey: 'explore.links.cli.desc' },
@@ -22,8 +23,8 @@ const EXPLORE_LINK_KEYS = [
 
 export const ExplorePage = ({ theme }) => {
   const { t } = useTranslation();
-  const accent = theme === 'pink' ? 'text-pink-400' : 'text-emerald-400';
-  const tagClass = theme === 'pink' ? 'bg-pink-500/20 text-pink-200' : 'bg-emerald-500/20 text-emerald-200';
+  const accentTokens = getAccent(theme);
+  const tagClass = accentTokens.tag200;
 
   return (
     <PageTransition className="min-h-screen py-24 px-4">
@@ -47,9 +48,9 @@ export const ExplorePage = ({ theme }) => {
             <Reveal key={item.path}>
               <LocalizedLink to={item.path} className="block h-full">
                 <GlassCard className="p-5 h-full hover:scale-[1.02] transition-transform duration-300" theme={theme}>
-                  <h2 className={`font-bold text-lg text-white group-hover:text-white ${accent}`}>{t(item.labelKey)}</h2>
+                  <h2 className={`font-bold text-lg text-white group-hover:text-white ${accentTokens.text}`}>{t(item.labelKey)}</h2>
                   <p className="text-gray-400 text-sm mt-1">{t(item.descKey)}</p>
-                  <span className={`text-xs font-medium mt-3 inline-block ${accent}`}>{t('explore.open')}</span>
+                  <span className={`text-xs font-medium mt-3 inline-block ${accentTokens.text}`}>{t('explore.open')}</span>
                 </GlassCard>
               </LocalizedLink>
             </Reveal>

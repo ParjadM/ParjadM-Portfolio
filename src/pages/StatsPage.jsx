@@ -9,9 +9,11 @@ import { useTranslation } from 'react-i18next';
 import { PageTransition } from '../components/ui/PageTransition.jsx';
 import { SEO } from '../components/SEO.jsx';
 import { MobileCollapsible } from '../components/ui/MobileCollapsible.jsx';
+import { getAccent } from '../utils/themeTokens.js';
 
 export const StatsPage = ({ theme }) => {
   const { t } = useTranslation();
+  const accent = getAccent(theme);
   return (
     <PageTransition className="min-h-screen flex items-center justify-center py-24 px-4">
       <SEO 
@@ -28,7 +30,7 @@ export const StatsPage = ({ theme }) => {
                 <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">{t('stats.title')}</h1>
                 <p className="mt-2 text-gray-300 max-w-2xl">{t('stats.subtitle')}</p>
               </div>
-              <div className={`px-4 py-2 rounded-xl text-sm font-semibold ${theme === 'pink' ? 'bg-pink-500/20 text-pink-200' : 'bg-emerald-500/20 text-emerald-200'}`}>{t('stats.autoRefreshed')}</div>
+              <div className={`px-4 py-2 rounded-xl text-sm font-semibold ${accent.tag200}`}>{t('stats.autoRefreshed')}</div>
             </div>
           </GlassCard>
         </div>

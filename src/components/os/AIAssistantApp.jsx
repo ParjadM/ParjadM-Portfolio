@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bot, Send, User, Loader2 } from 'lucide-react';
+import { getAccent } from '../../utils/themeTokens.js';
 
 export const AIAssistantApp = ({ theme }) => {
+    const accentTokens = getAccent(theme);
     const [messages, setMessages] = useState([
         { role: 'model', parts: [{ text: "Hi there! I'm Parjad's AI assistant. How can I help you today?" }] }
     ]);
@@ -76,17 +78,8 @@ export const AIAssistantApp = ({ theme }) => {
         }
     };
 
-    const getThemeColor = () => {
-        if (theme === 'pink') return 'text-pink-400 bg-pink-500/10 border-pink-500/20';
-        if (theme === 'blue') return 'text-blue-400 bg-blue-500/10 border-blue-500/20';
-        return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
-    };
-    
-    const getThemeIconColor = () => {
-        if (theme === 'pink') return 'text-pink-400';
-        if (theme === 'blue') return 'text-blue-400';
-        return 'text-emerald-400';
-    };
+    const getThemeColor = () => `${accentTokens.text} ${accentTokens.bgSoft}`;
+    const getThemeIconColor = () => accentTokens.text;
 
     return (
         <div className="flex flex-col h-full w-full bg-gray-900 text-gray-200">

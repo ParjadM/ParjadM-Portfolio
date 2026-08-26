@@ -5,6 +5,7 @@ import { openMobileMenu } from '../../utils/mobileMenuEvents.js';
 import { LocalizedLink } from '../ui/LocalizedLink.jsx';
 import { stripLocalePrefix } from '../../utils/i18nRouting.js';
 import { haptic } from '../../utils/haptics.js';
+import { getAccent } from '../../utils/themeTokens.js';
 
 export const BottomNav = React.memo(function BottomNav({ theme }) {
     const { t } = useTranslation();
@@ -28,7 +29,7 @@ export const BottomNav = React.memo(function BottomNav({ theme }) {
         { name: t('nav.Menu'), action: 'menu', icon: MenuIcon },
     ];
 
-    const activeColor = theme === 'pink' ? 'text-pink-400' : 'text-emerald-400';
+    const activeColor = getAccent(theme).text;
 
     return (
         <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-gray-900/95 backdrop-blur-md border-t border-white/10 pb-safe pt-2 px-2" aria-label="Mobile bottom navigation">

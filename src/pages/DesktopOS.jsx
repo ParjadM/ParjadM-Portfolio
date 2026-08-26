@@ -14,6 +14,7 @@ import { onLaunchApp, onOpenFile, consumePendingLaunch } from '../os/events.js';
 import { unlockAchievement } from '../os/achievements.js';
 import { pushRecentApp, getRecentApps } from '../os/session.js';
 import { haptic } from '../utils/haptics.js';
+import { getAccent } from '../utils/themeTokens.js';
 
 const Notepad = React.lazy(() => import('../components/os/Notepad.jsx').then(module => ({ default: module.Notepad })));
 const BrowserApp = React.lazy(() => import('../components/os/BrowserApp.jsx').then(module => ({ default: module.BrowserApp })));
@@ -101,6 +102,7 @@ const loadSavedWindows = () => {
 };
 
 export const DesktopOS = ({ theme }) => {
+    const accent = getAccent(theme);
     const navigate = useNavigate();
     const { t } = useTranslation();
     const [windows, setWindows] = useState(loadSavedWindows);
@@ -696,7 +698,7 @@ export const DesktopOS = ({ theme }) => {
                                     {app.icon}
                                     {isOpen && (
                                         <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-1 rounded-t-full transition-all duration-200
-                                            ${isFocused ? (theme === 'pink' ? 'bg-pink-400' : 'bg-emerald-400') : 'bg-gray-400 w-1.5'}
+                                            ${isFocused ? accent.bgDot : 'bg-gray-400 w-1.5'}
                                         `} />
                                     )}
                                 </button>

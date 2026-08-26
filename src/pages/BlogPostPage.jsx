@@ -15,6 +15,7 @@ import { BlogTableOfContents } from '../components/blog/BlogTableOfContents.jsx'
 import { BlogComments } from '../components/blog/BlogComments.jsx';
 import { SITE_URL, SITE_NAME } from '../config/site.js';
 import { fetchApi } from '../utils/apiClient.js';
+import { getAccent } from '../utils/themeTokens.js';
 
 export const BlogPostPage = ({ theme }) => {
     const { t, i18n } = useTranslation();
@@ -95,7 +96,8 @@ export const BlogPostPage = ({ theme }) => {
         );
     }
 
-    const tagColor = theme === 'pink' ? 'bg-pink-500/20 text-pink-300' : 'bg-emerald-500/20 text-emerald-300';
+    const accent = getAccent(theme);
+    const tagColor = accent.tag;
     const ogImage = `${SITE_URL}/api/og/${post.id || id}`;
     const headings = extractHeadings(post.content);
     const readMins = readingTimeMinutes(post.content);

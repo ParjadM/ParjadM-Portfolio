@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { StatsPanelSkeleton } from './ui/Skeleton.jsx'
+import { getAccent } from '../utils/themeTokens.js'
 
 type LcStats = {
   username: string
@@ -10,7 +11,7 @@ type LcStats = {
   ranking: number | null
 }
 
-export default function LeetCodeStats({ theme = 'green' as 'green' | 'pink' }) {
+export default function LeetCodeStats({ theme = 'green' as string }) {
   const [data, setData] = useState<LcStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -44,8 +45,9 @@ export default function LeetCodeStats({ theme = 'green' as 'green' | 'pink' }) {
   if (loading) return <StatsPanelSkeleton />
   if (error || !data) return <div className="text-amber-300/90 text-sm">LeetCode stats temporarily unavailable. {error ? `(${error})` : ''}</div>
 
-  const ring = theme === 'pink' ? 'ring-pink-400/40' : 'ring-emerald-400/40'
-  const accent = theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'
+  const accentTokens = getAccent(theme)
+  const ring = accentTokens.ring
+  const accent = accentTokens.text
 
   const solvedTotal = data.easySolved + data.mediumSolved + data.hardSolved
   const pct = (n: number) => (solvedTotal > 0 ? (n / solvedTotal) * 100 : 0)

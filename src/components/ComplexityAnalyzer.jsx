@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { GlassCard } from './ui/GlassCard.jsx';
 import { BrainCircuit } from './ui/Icons.jsx';
 import { useTranslation } from 'react-i18next';
+import { getAccent } from '../utils/themeTokens.js';
 
 export const ComplexityAnalyzer = ({ theme = 'emerald' }) => {
     const { t } = useTranslation();
@@ -47,9 +48,10 @@ export const ComplexityAnalyzer = ({ theme = 'emerald' }) => {
         }
     };
 
-    const gradientClass = theme === 'pink' ? 'from-pink-500 to-red-500' : 'from-emerald-500 to-teal-500';
-    const textGradientClass = theme === 'pink' ? 'text-pink-400' : 'text-emerald-400';
-    const bgOpacityClass = theme === 'pink' ? 'bg-pink-500/10 border-pink-500/20' : 'bg-emerald-500/10 border-emerald-500/20';
+    const accentTokens = getAccent(theme);
+    const gradientClass = accentTokens.gradient;
+    const textGradientClass = accentTokens.text;
+    const bgOpacityClass = accentTokens.bgSoft;
 
     return (
         <GlassCard className="p-8 relative overflow-hidden" theme={theme}>

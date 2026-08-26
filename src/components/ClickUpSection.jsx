@@ -5,6 +5,7 @@ import { Copy, Check } from 'lucide-react';
 import { GlassCard } from './ui/GlassCard.jsx';
 import { fetchApi } from '../utils/apiClient.js';
 import { SITE_URL } from '../config/site.js';
+import { getAccent } from '../utils/themeTokens.js';
 
 const CLICKUP_API_URL = `${SITE_URL.replace(/\/$/, '')}/api/clickup`;
 const DAILY_LIMIT = 5;
@@ -99,10 +100,9 @@ export const ClickUpSection = ({ theme }) => {
     } catch {}
   };
 
-  const gradientClass = theme === 'pink'
-    ? 'bg-gradient-to-r from-pink-500 to-red-500'
-    : 'bg-gradient-to-r from-emerald-500 to-teal-500';
-  const textClass = theme === 'pink' ? 'text-pink-200' : 'text-emerald-200';
+  const accentTokens = getAccent(theme);
+  const gradientClass = accentTokens.gradientBtn;
+  const textClass = accentTokens.navActiveText;
   const muted = 'text-white/75';
   const subtle = 'text-white/60';
 

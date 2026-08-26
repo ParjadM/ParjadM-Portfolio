@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { getAccent } from '../../utils/themeTokens.js';
 
 export const CalculatorApp = ({ theme }) => {
+    const accentTokens = getAccent(theme);
     const [currentValue, setCurrentValue] = useState('0');
     const [previousValue, setPreviousValue] = useState(null);
     const [operator, setOperator] = useState(null);
@@ -82,7 +84,7 @@ export const CalculatorApp = ({ theme }) => {
         const baseClass = "flex items-center justify-center text-xl font-medium rounded-full active:scale-95 transition-transform select-none cursor-pointer";
         const colorClass = {
             default: "bg-gray-700 hover:bg-gray-600 text-white",
-            primary: theme === 'pink' ? "bg-pink-500 hover:bg-pink-400 text-white" : "bg-emerald-500 hover:bg-emerald-400 text-white",
+            primary: accentTokens.btnPrimary,
             secondary: "bg-gray-300 hover:bg-gray-200 text-gray-900"
         }[color];
         

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { StatsPanelSkeleton } from './ui/Skeleton.jsx'
+import { getAccent } from '../utils/themeTokens.js'
 
 type Stats = {
   login: string
@@ -13,7 +14,7 @@ type Stats = {
   bio?: string
 }
 
-export default function GitHubStats({ theme = 'green' as 'green' | 'pink' }) {
+export default function GitHubStats({ theme = 'green' as string }) {
   const [data, setData] = useState<Stats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -35,7 +36,7 @@ export default function GitHubStats({ theme = 'green' as 'green' | 'pink' }) {
     load()
   }, [])
 
-  const tagColor = theme === 'pink' ? 'bg-pink-500/20 text-pink-300' : 'bg-emerald-500/20 text-emerald-300'
+  const tagColor = getAccent(theme).tag
 
   if (loading) return <StatsPanelSkeleton />
   if (error || !data) return <div className="text-amber-300/90 text-sm">GitHub stats temporarily unavailable. {error ? `(${error})` : ''}</div>

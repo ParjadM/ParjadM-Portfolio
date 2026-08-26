@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
+import { getAccent } from '../../utils/themeTokens.js';
 
 function isNewPost(publishAt) {
   if (!publishAt) return false;
@@ -11,6 +12,7 @@ function isNewPost(publishAt) {
 }
 
 export const NewsFeed = ({ posts, theme, onNavigate, compact, darkMode = true }) => {
+    const accentTokens = getAccent(theme);
     const [index, setIndex] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
     const [dropdownRect, setDropdownRect] = useState(null);
@@ -58,8 +60,8 @@ export const NewsFeed = ({ posts, theme, onNavigate, compact, darkMode = true })
         : 'text-gray-800 hover:bg-emerald-100/80';
     const dividerClasses = darkMode ? 'border-emerald-700/30' : 'border-emerald-200/60';
     const viewAllClasses = darkMode
-        ? `${theme === 'pink' ? 'text-pink-400 hover:bg-emerald-700/30' : 'text-emerald-300 hover:bg-emerald-700/30'}`
-        : `${theme === 'pink' ? 'text-pink-600 hover:bg-emerald-100/80' : 'text-emerald-600 hover:bg-emerald-100/80'}`;
+        ? `${accentTokens.text300} hover:bg-emerald-700/30`
+        : `${accentTokens.text} hover:bg-emerald-100/80`;
     const newBadgeClass = darkMode
         ? 'bg-emerald-400/20 text-emerald-300'
         : 'bg-emerald-600/15 text-emerald-700';
@@ -109,7 +111,7 @@ export const NewsFeed = ({ posts, theme, onNavigate, compact, darkMode = true })
                 aria-expanded={isOpen}
                 aria-haspopup="true"
             >
-                <span className={`text-xs font-semibold shrink-0 ${theme === 'pink' ? 'text-pink-400/90' : 'text-emerald-400/90'}`}>Latest:</span>
+                <span className={`text-xs font-semibold shrink-0 ${accentTokens.text300Soft}`}>Latest:</span>
                 <span className="truncate">{title}</span>
                 {showNewOnTrigger && (
                     <span className={`shrink-0 text-[9px] font-bold uppercase px-1 py-0.5 rounded ${newBadgeClass}`}>New</span>

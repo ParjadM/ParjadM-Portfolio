@@ -8,6 +8,7 @@ import { formatDate } from '../utils/formatDate.js';
 import { GRID_PAGE_SIZE, Pagination } from '../components/ui/Pagination.jsx';
 import { fetchApi } from '../utils/apiClient.js';
 import { SEO } from '../components/SEO.jsx';
+import { getAccent } from '../utils/themeTokens.js';
 
 export const BlogSection = ({ theme }) => {
     const { t, i18n } = useTranslation();
@@ -60,9 +61,10 @@ export const BlogSection = ({ theme }) => {
         setPage(1);
     };
 
-    const iconColor = theme === 'pink' ? "text-pink-400" : "text-emerald-400";
-    const categoryBgColor = theme === 'pink' ? "bg-pink-500/20" : "bg-emerald-500/20";
-    const tagColor = theme === 'pink' ? "bg-pink-500/20 text-pink-300" : "bg-emerald-500/20 text-emerald-300";
+    const accent = getAccent(theme);
+    const iconColor = accent.text;
+    const categoryBgColor = accent.bgOnly;
+    const tagColor = accent.tag;
 
     return (
         <section id="blog" className="min-h-screen flex flex-col items-center justify-center py-20 px-4">

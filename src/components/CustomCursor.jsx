@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
+import { getAccent } from '../utils/themeTokens.js';
 
 export const CustomCursor = ({ theme, darkMode = true, reducedMotion = false }) => {
+  const accent = getAccent(theme);
   const dotRef = useRef(null);
   const ringRef = useRef(null);
   const rafRef = useRef(null);
@@ -8,10 +10,8 @@ export const CustomCursor = ({ theme, darkMode = true, reducedMotion = false }) 
   const hoveringRef = useRef(false);
   const visibleRef = useRef(false);
 
-  const color = theme === 'pink' ? 'rgba(244, 114, 182, 0.5)' : 'rgba(52, 211, 153, 0.5)';
-  const ringColor = theme === 'pink'
-    ? (darkMode ? 'rgba(244, 114, 182, 1)' : 'rgba(219, 39, 119, 1)')
-    : (darkMode ? 'rgba(52, 211, 153, 1)' : 'rgba(5, 150, 105, 1)');
+  const color = accent.cursor.ring;
+  const ringColor = darkMode ? accent.cursor.dotDark : accent.cursor.dotLight;
 
   useEffect(() => {
     if (reducedMotion) return;

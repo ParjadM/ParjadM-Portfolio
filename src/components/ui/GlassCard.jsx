@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { getAccent } from '../../utils/themeTokens.js';
 
 export const GlassCard = ({ children, className = '', theme = 'green', onMouseEnter, onMouseLeave, onClick }) => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const accent = getAccent(theme);
+  const gradientClass = accent.gradientBorder;
 
   const handleMouseMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -10,10 +13,6 @@ export const GlassCard = ({ children, className = '', theme = 'green', onMouseEn
       y: e.clientY - rect.top,
     });
   };
-
-  const gradientClass = theme !== 'pink' 
-    ? 'from-emerald-400 via-teal-400 to-cyan-400' 
-    : 'from-pink-400 via-red-400 to-purple-400';
 
   return (
     <div 

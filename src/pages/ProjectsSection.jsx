@@ -11,6 +11,7 @@ import { ProjectCardSkeleton } from '../components/ui/Skeleton.jsx';
 import { BlurImage } from '../components/ui/BlurImage.jsx';
 import { LocalizedLink } from '../components/ui/LocalizedLink.jsx';
 import { GRID_PAGE_SIZE, Pagination } from '../components/ui/Pagination.jsx';
+import { getAccent } from '../utils/themeTokens.js';
 import placeholders from '../data/imagePlaceholders.json';
 import CodeQuestImage from '../Images/CodeQuest.webp';
 import BinaryGeneratorImage from '../Images/Binary 1010 Generator.webp';
@@ -44,9 +45,8 @@ export const ProjectsSection = ({ theme }) => {
         'SpaceShooter': SpaceShooterImageSm,
     };
 
-    const tagClasses = theme === 'pink'
-        ? "bg-pink-500/20 text-pink-300"
-        : "bg-emerald-500/20 text-emerald-300";
+    const accent = getAccent(theme);
+    const tagClasses = accent.tag;
 
     return (
         <PageTransition className="min-h-screen flex flex-col items-center justify-center py-20 px-4">
@@ -66,7 +66,7 @@ export const ProjectsSection = ({ theme }) => {
                     <GlassCard className="p-0 flex flex-col overflow-hidden h-full">
                         <div className="w-full aspect-video bg-gradient-to-br from-white/5 to-white/10 flex items-center justify-center overflow-hidden relative">
                             <BlurImage
-                                src={project.image || imageMap[project.title] || `https://placehold.co/600x400/${theme === 'pink' ? 'E94560' : '10B981'}/FFFFFF?text=${encodeURIComponent(project.title)}`}
+                                src={project.image || imageMap[project.title] || `https://placehold.co/600x400/${accent.hexPlaceholder}/FFFFFF?text=${encodeURIComponent(project.title)}`}
                                 srcSet={!project.image && imageMapSm[project.title]
                                     ? `${imageMapSm[project.title]} 640w, ${imageMap[project.title]} 1280w`
                                     : undefined}

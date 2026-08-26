@@ -4,10 +4,12 @@ import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { PageTransition } from '../components/ui/PageTransition.jsx';
 import { SEO } from '../components/SEO.jsx';
 import { setActivePageContext, clearActivePageContext } from '../utils/chatbotEvents.js';
+import { getAccent } from '../utils/themeTokens.js';
 
 // Note: Images imports will be broken if not fixed, but we'll assume they are handled or fix them later.
 
 export const LQFTBenchmarkPage = ({ theme }) => {
+    const accent = getAccent(theme);
     useEffect(() => {
         setActivePageContext({
             type: 'project',
@@ -70,9 +72,7 @@ export const LQFTBenchmarkPage = ({ theme }) => {
       { name: 'list_linear_map', insert: 'O(1)', search: 'O(N)', delete: 'O(N)', worstCase: 'O(N)', space: 'O(N)', perfRank: 10.25, memoryRank: 8.0, complexityRank: 10.0, supportsDelete: true },
     ];
 
-    const tagClasses = theme === 'pink'
-        ? "bg-pink-500/20 text-pink-300"
-        : "bg-emerald-500/20 text-emerald-300";
+    const tagClasses = accent.tag;
 
     const fnv1a32 = (input) => {
         let h = 0x811c9dc5;
@@ -444,7 +444,7 @@ export const LQFTBenchmarkPage = ({ theme }) => {
     const treeMemoryRows = memoryRows.filter(r => TREE_STRUCTURES.has(r.structure));
     const graphRows = complexityRows.slice().sort((a, b) => (graphMetric === 'complexityRank' ? a.complexityRank - b.complexityRank : Number(a.totalScore) - Number(b.totalScore)));
 
-    const tabButtonClass = (tab) => `px-3 py-2.5 min-h-[44px] shrink-0 rounded text-sm font-semibold whitespace-nowrap ${activeTab === tab ? (theme === 'pink' ? 'bg-pink-500/30 text-white' : 'bg-emerald-500/30 text-white') : 'bg-white/10 text-gray-300 hover:bg-white/20'}`;
+    const tabButtonClass = (tab) => `px-3 py-2.5 min-h-[44px] shrink-0 rounded text-sm font-semibold whitespace-nowrap ${activeTab === tab ? accent.tabActive : 'bg-white/10 text-gray-300 hover:bg-white/20'}`;
 
     return (
         <PageTransition className="min-h-screen flex items-center justify-center py-20 px-4">
@@ -737,7 +737,7 @@ export const LQFTBenchmarkPage = ({ theme }) => {
                                     ? 'rgba(251, 191, 36, 0.95)'
                                     : (r.name === 'adaptive_lqft_native' || r.name === 'lqft_persistent_tree'
                                       ? 'rgba(96, 165, 250, 0.95)'
-                                      : (theme === 'pink' ? 'rgba(244,114,182,0.88)' : 'rgba(52,211,153,0.88)'));
+                                      : accent.lqftDot);
                                   const labelColor = r.name === 'adaptive_lqft_light'
                                     ? 'rgba(252,211,77,0.98)'
                                     : (r.name === 'adaptive_lqft_native' || r.name === 'lqft_persistent_tree'

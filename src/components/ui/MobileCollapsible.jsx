@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { getAccent } from '../../utils/themeTokens.js';
 
 export function MobileCollapsible({ title, children, defaultOpen = false, theme = 'emerald' }) {
   const [open, setOpen] = useState(defaultOpen);
-  const accent = theme === 'pink' ? 'text-pink-400 border-pink-500/30' : 'text-emerald-400 border-emerald-500/30';
+  const accentTokens = getAccent(theme);
+  const accent = `${accentTokens.text} ${accentTokens.border}`;
 
   return (
     <>

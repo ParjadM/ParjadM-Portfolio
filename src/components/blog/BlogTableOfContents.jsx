@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { List } from 'lucide-react';
+import { getAccent } from '../../utils/themeTokens.js';
 
 export const BlogTableOfContents = ({ headings, theme = 'emerald', mode = 'both' }) => {
   const { t } = useTranslation();
@@ -8,7 +9,8 @@ export const BlogTableOfContents = ({ headings, theme = 'emerald', mode = 'both'
 
   if (!headings || headings.length < 3) return null;
 
-  const accent = theme === 'pink' ? 'text-pink-400 hover:text-pink-300' : 'text-emerald-400 hover:text-emerald-300';
+  const accentTokens = getAccent(theme);
+  const accent = accentTokens.text300;
   const showMobile = mode === 'both' || mode === 'mobile';
   const showSidebar = mode === 'both' || mode === 'sidebar';
 

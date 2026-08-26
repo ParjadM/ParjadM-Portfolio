@@ -11,7 +11,7 @@ import { sendChatStream, consumeAiChatStream } from '../utils/aiStream.js';
 import { useTranslation } from 'react-i18next';
 import { useSwipeDown } from '../utils/useSwipeDown.js';
 import { useFocusTrap } from '../utils/useFocusTrap.js';
-
+import { getAccent } from '../utils/themeTokens.js';
 
 // ... (icons remain the same) ...
 
@@ -300,9 +300,7 @@ const Chatbot = ({ theme = 'green', autoOpenDetail = null }) => {
   const chatSwipeHandlers = useSwipeDown(() => setIsOpen(false));
   const chatTrapRef = useFocusTrap(isOpen, () => setIsOpen(false));
 
-  const gradientClass = theme !== 'pink' 
-    ? 'bg-gradient-to-r from-emerald-500 to-teal-500' 
-    : 'bg-gradient-to-r from-pink-500 to-red-500';
+  const gradientClass = getAccent(theme).gradientBtn;
 
   return (
     <div className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 z-[9999] pointer-events-none">

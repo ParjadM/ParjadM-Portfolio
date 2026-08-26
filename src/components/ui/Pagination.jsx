@@ -1,4 +1,5 @@
 import React from 'react'
+import { getAccent } from '../../utils/themeTokens.js'
 
 const PAGE_SIZE = 12
 
@@ -19,15 +20,10 @@ export function Pagination({
   const totalPages = Math.max(1, Math.ceil((totalItems || 0) / pageSize))
   if (totalPages <= 1) return null
 
-  const accent =
-    theme === 'pink'
-      ? 'bg-pink-500/20 border-pink-400/40 text-pink-100 hover:bg-pink-500/30'
-      : 'bg-emerald-500/20 border-emerald-400/40 text-emerald-100 hover:bg-emerald-500/30'
+  const accentTokens = getAccent(theme)
+  const accent = accentTokens.paginationAccent
   const idle = 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white'
-  const active =
-    theme === 'pink'
-      ? 'bg-pink-500/40 border-pink-300/60 text-white'
-      : 'bg-emerald-500/40 border-emerald-300/60 text-white'
+  const active = accentTokens.paginationActive
 
   const status = pageLabel
     .replace('{{page}}', String(page))

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { CHATBOT_OPEN_EVENT } from '../utils/chatbotEvents.js';
+import { getAccent } from '../utils/themeTokens.js';
 
 const BotIcon = (props) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -17,9 +18,7 @@ export function ChatbotLauncher({ theme = 'green' }) {
   const [autoOpenDetail, setAutoOpenDetail] = useState(null);
   const loadingRef = useRef(false);
 
-  const gradientClass = theme !== 'pink'
-    ? 'bg-gradient-to-r from-emerald-500 to-teal-500'
-    : 'bg-gradient-to-r from-pink-500 to-red-500';
+  const gradientClass = getAccent(theme).gradientBtn;
 
   const loadChatbot = useCallback(async (openDetail = null) => {
     if (Chatbot || loadingRef.current) {

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SEO } from '../components/SEO.jsx';
 import { getCurrentLocale } from '../utils/chatbotEvents.js';
+import { getAccent } from '../utils/themeTokens.js';
 
 const BotIcon = (props) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -48,9 +49,8 @@ export const MockInterviewPage = ({ theme }) => {
     return () => vv.removeEventListener('resize', onResize);
   }, []);
 
-  const gradientClass = theme !== 'pink' 
-    ? 'bg-gradient-to-r from-emerald-500 to-teal-500' 
-    : 'bg-gradient-to-r from-pink-500 to-red-500';
+  const accent = getAccent(theme);
+  const gradientClass = accent.gradientBtn;
 
   useEffect(() => {
     if (roleSelected && messages.length === 0) {
@@ -136,7 +136,7 @@ export const MockInterviewPage = ({ theme }) => {
         <SEO titleKey="seo.interviewTitle" descriptionKey="seo.interviewDesc" />
         <div className="bg-gray-900/80 backdrop-blur-xl border border-white/10 p-8 rounded-3xl max-w-lg w-full text-center shadow-2xl">
           <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-white/10 flex items-center justify-center">
-            <BotIcon className={`w-8 h-8 ${theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}`} />
+            <BotIcon className={`w-8 h-8 ${accent.text}`} />
           </div>
           <h1 className="text-3xl font-bold text-white mb-4">AI Mock Interview</h1>
           <p className="text-gray-300 mb-8 leading-relaxed">

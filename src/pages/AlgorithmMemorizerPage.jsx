@@ -9,6 +9,7 @@ import { createPythonRunner } from '../utils/algorithmMemorizer/createPythonRunn
 import { formatElapsed, isNewPersonalBest, pickPersonalBest } from '../utils/algorithmMemorizer/timing.js'
 import { ensureUuidVisitorId } from '../utils/algorithmMemorizer/visitorId.js'
 import { RUNNER_LIMITS } from '../utils/algorithmMemorizer/runnerTypes.js'
+import { getAccent } from '../utils/themeTokens.js'
 
 function categoryLabel(cat, t) {
   return t(`algoMem.categories.${cat}`, { defaultValue: cat })
@@ -16,11 +17,9 @@ function categoryLabel(cat, t) {
 
 export const AlgorithmMemorizerPage = ({ theme }) => {
   const { t } = useTranslation()
-  const isPink = theme === 'pink'
-  const accent = isPink ? 'text-pink-300' : 'text-emerald-300'
-  const btn = isPink
-    ? 'bg-gradient-to-r from-pink-500 to-red-500'
-    : 'bg-gradient-to-r from-emerald-500 to-teal-500'
+  const accentTokens = getAccent(theme)
+  const accent = accentTokens.text300
+  const btn = accentTokens.gradientBtn
 
   const [list, setList] = useState([])
   const [loading, setLoading] = useState(true)
@@ -261,7 +260,7 @@ export const AlgorithmMemorizerPage = ({ theme }) => {
       <div className="container mx-auto max-w-6xl">
         <Reveal>
           <div className="text-center mb-8">
-            <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-4 ${isPink ? 'bg-pink-500/20 text-pink-200' : 'bg-emerald-500/20 text-emerald-200'}`}>
+            <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-4 ${accentTokens.tag200}`}>
               {t('algoMem.badge')}
             </span>
             <h1 className="text-4xl md:text-5xl font-extrabold text-white">{t('algoMem.title')}</h1>

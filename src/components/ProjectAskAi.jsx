@@ -1,10 +1,10 @@
 import React from 'react';
 import { openChatbot, buildProjectPageContext } from '../utils/chatbotEvents.js';
+import { getAccent } from '../utils/themeTokens.js';
 
 export function ProjectAskAi({ project, theme = 'green' }) {
-  const accent = theme === 'pink'
-    ? 'text-pink-300 hover:text-pink-200 border-pink-500/30 hover:bg-pink-500/10'
-    : 'text-emerald-300 hover:text-emerald-200 border-emerald-500/30 hover:bg-emerald-500/10';
+  const accentTokens = getAccent(theme);
+  const accent = `${accentTokens.text300} ${accentTokens.btnIdle}`;
 
   const handleClick = (e) => {
     e.preventDefault();

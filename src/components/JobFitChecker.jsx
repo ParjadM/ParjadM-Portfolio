@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { GlassCard } from './ui/GlassCard.jsx';
 import { BrainCircuit } from './ui/Icons.jsx';
+import { getAccent } from '../utils/themeTokens.js';
 
 export function JobFitChecker({ theme = 'green' }) {
   const [jobDescription, setJobDescription] = useState('');
@@ -8,12 +9,11 @@ export function JobFitChecker({ theme = 'green' }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const accent = theme === 'pink' ? 'text-pink-400' : 'text-emerald-400';
+  const accentTokens = getAccent(theme);
+  const accent = accentTokens.text;
   const muted = 'text-white/75';
   const subtle = 'text-white/60';
-  const btnClass = theme === 'pink'
-    ? 'bg-gradient-to-r from-pink-500 to-red-500'
-    : 'bg-gradient-to-r from-emerald-500 to-teal-500';
+  const btnClass = accentTokens.gradientBtn;
 
   const handleAnalyze = async (e) => {
     e.preventDefault();

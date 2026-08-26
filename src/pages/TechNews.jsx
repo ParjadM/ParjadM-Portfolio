@@ -4,8 +4,10 @@ import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { PageTransition } from '../components/ui/PageTransition.jsx';
 import { ExternalLink, Heart, Clock, User } from 'lucide-react';
 import { SEO } from '../components/SEO.jsx';
+import { getAccent } from '../utils/themeTokens.js';
 
 export const TechNews = ({ theme }) => {
+    const accent = getAccent(theme);
     const [stories, setStories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -58,7 +60,7 @@ export const TechNews = ({ theme }) => {
                         transition={{ duration: 0.5 }}
                         className="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4"
                     >
-                        Tech <span className={theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}>Hub</span>
+                        Tech <span className={accent.text}>Hub</span>
                     </motion.h1>
                     <motion.p 
                         initial={{ opacity: 0 }}
@@ -72,7 +74,7 @@ export const TechNews = ({ theme }) => {
 
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-20 space-y-4">
-                        <div className={`w-12 h-12 border-4 border-t-transparent rounded-full animate-spin ${theme === 'pink' ? 'border-pink-500' : 'border-emerald-500'}`}></div>
+                        <div className={`w-12 h-12 border-4 border-t-transparent rounded-full animate-spin ${accent.gradientSpinner}`}></div>
                         <p className="text-gray-400 font-medium animate-pulse">Pulling latest articles...</p>
                     </div>
                 ) : error ? (
@@ -106,7 +108,7 @@ export const TechNews = ({ theme }) => {
                                                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                                     />
                                                 ) : (
-                                                    <div className={`w-full h-full flex items-center justify-center bg-gradient-to-br ${theme === 'pink' ? 'from-pink-500/20 to-purple-500/20' : 'from-emerald-500/20 to-teal-500/20'}`}>
+                                                    <div className={`w-full h-full flex items-center justify-center bg-gradient-to-br ${accent.gradientCardBg}`}>
                                                         <span className="text-4xl">💻</span>
                                                     </div>
                                                 )}
@@ -120,7 +122,7 @@ export const TechNews = ({ theme }) => {
                                                 {/* Tags */}
                                                 <div className="flex flex-wrap gap-2 mb-3">
                                                     {tags.slice(0, 3).map(tag => (
-                                                        <span key={tag} className={`text-xs font-medium px-2.5 py-1 rounded-full bg-white/5 border border-white/10 ${theme === 'pink' ? 'text-pink-300' : 'text-emerald-300'}`}>
+                                                        <span key={tag} className={`text-xs font-medium px-2.5 py-1 rounded-full bg-white/5 border border-white/10 ${accent.text300}`}>
                                                             #{tag}
                                                         </span>
                                                     ))}
@@ -149,7 +151,7 @@ export const TechNews = ({ theme }) => {
                                                     
                                                     <div className="flex items-center space-x-4 text-xs font-medium text-gray-400">
                                                         <div className="flex items-center space-x-1">
-                                                            <Heart className={`w-3.5 h-3.5 ${theme === 'pink' ? 'text-pink-400' : 'text-emerald-400'}`} />
+                                                            <Heart className={`w-3.5 h-3.5 ${accent.text}`} />
                                                             <span>{story.public_reactions_count}</span>
                                                         </div>
                                                         <div className="flex items-center space-x-1">

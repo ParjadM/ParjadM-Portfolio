@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Download, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { getAccent } from '../utils/themeTokens.js';
 
 const DISMISS_KEY = 'pwa_install_dismissed';
 
@@ -50,9 +51,7 @@ export const PwaInstallPrompt = ({ theme = 'green' }) => {
 
     if (!visible || !deferredPrompt) return null;
 
-    const accent = theme === 'pink'
-        ? 'bg-pink-500/20 text-pink-300 border-pink-500/30'
-        : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
+    const accent = getAccent(theme).menuActiveBorder;
 
     return (
         <div className="lg:hidden fixed left-3 right-3 bottom-24 pb-safe z-[9998]">

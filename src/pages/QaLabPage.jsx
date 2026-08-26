@@ -5,6 +5,7 @@ import { PageTransition } from '../components/ui/PageTransition.jsx'
 import { SEO } from '../components/SEO.jsx'
 import { LocalizedLink } from '../components/ui/LocalizedLink.jsx'
 import { setActivePageContext, clearActivePageContext } from '../utils/chatbotEvents.js'
+import { getAccent } from '../utils/themeTokens.js'
 
 const PYRAMID = [
   { id: 'unit', weight: '60%', cmd: 'npm run test:unit' },
@@ -27,11 +28,9 @@ const GATES = [
 
 export const QaLabPage = ({ theme }) => {
   const { t } = useTranslation()
-  const isPink = theme === 'pink'
-  const accent = isPink ? 'text-pink-300' : 'text-teal-300'
-  const bar = isPink
-    ? 'from-pink-500/80 to-rose-400/40'
-    : 'from-teal-400/80 to-cyan-300/30'
+  const accent = getAccent(theme)
+  const accentClass = accent.text300
+  const bar = accent.gradientSoft
 
   useEffect(() => {
     setActivePageContext({
@@ -55,7 +54,7 @@ export const QaLabPage = ({ theme }) => {
           --qa-muted: rgba(232, 246, 243, 0.62);
           --qa-line: rgba(94, 234, 212, 0.22);
           --qa-panel: rgba(6, 18, 20, 0.72);
-          --qa-glow: ${isPink ? 'rgba(244,114,182,0.28)' : 'rgba(45,212,191,0.28)'};
+          --qa-glow: ${accent.glowQa};
         }
         .qa-lab-bg {
           background:
@@ -94,7 +93,7 @@ export const QaLabPage = ({ theme }) => {
           </LocalizedLink>
 
           <header className="qa-reveal mt-6 mb-12 md:mb-16 max-w-3xl">
-            <p className={`text-xs uppercase tracking-[0.28em] ${accent} mb-3`}>{t('qaLab.kicker')}</p>
+            <p className={`text-xs uppercase tracking-[0.28em] ${accentClass} mb-3`}>{t('qaLab.kicker')}</p>
             <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-[1.05]">
               {t('qaLab.title')}
             </h1>
@@ -131,7 +130,7 @@ export const QaLabPage = ({ theme }) => {
               <ul className="mt-4 space-y-2 text-sm text-white/80">
                 {['nav', 'projects', 'camera', 'locale', 'deploy'].map((key) => (
                   <li key={key} className="flex gap-2">
-                    <span className={`${accent}`}>▸</span>
+                    <span className={accentClass}>▸</span>
                     <span>{t(`qaLab.risks.${key}`)}</span>
                   </li>
                 ))}
@@ -146,7 +145,7 @@ export const QaLabPage = ({ theme }) => {
                     key={id}
                     className="inline-flex items-center gap-2 rounded-full border border-[var(--qa-line)] bg-black/30 px-3 py-1.5 text-xs"
                   >
-                    <Icon className={`h-3.5 w-3.5 ${accent}`} aria-hidden="true" />
+                    <Icon className={`h-3.5 w-3.5 ${accentClass}`} aria-hidden="true" />
                     {t(`qaLab.gates.${id}`)}
                   </span>
                 ))}
@@ -159,7 +158,7 @@ export const QaLabPage = ({ theme }) => {
             <ol className="space-y-4 text-sm md:text-base text-[var(--qa-muted)] max-w-3xl">
               {['one', 'two', 'three', 'four'].map((key, i) => (
                 <li key={key} className="flex gap-3">
-                  <span className={`font-mono text-xs mt-1 ${accent}`}>{String(i + 1).padStart(2, '0')}</span>
+                  <span className={`font-mono text-xs mt-1 ${accentClass}`}>{String(i + 1).padStart(2, '0')}</span>
                   <span>{t(`qaLab.improve.${key}`)}</span>
                 </li>
               ))}
@@ -172,7 +171,7 @@ export const QaLabPage = ({ theme }) => {
             <ul className="space-y-3 text-sm md:text-base text-[var(--qa-muted)] max-w-3xl">
               {FUTURE_KEYS.map((key) => (
                 <li key={key} className="flex gap-3">
-                  <span className={`mt-1 shrink-0 ${accent}`} aria-hidden="true">→</span>
+                  <span className={`mt-1 shrink-0 ${accentClass}`} aria-hidden="true">→</span>
                   <span>{t(`qaLab.future.${key}`)}</span>
                 </li>
               ))}

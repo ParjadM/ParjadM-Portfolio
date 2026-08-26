@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Sparkles, Zap, GraduationCap } from 'lucide-react';
+import { getAccent } from '../utils/themeTokens.js';
 
 export function BlogAiExplain({ postId, theme = 'green' }) {
   const { t } = useTranslation();
@@ -9,19 +10,13 @@ export function BlogAiExplain({ postId, theme = 'green' }) {
   const [loadingMode, setLoadingMode] = useState(null);
   const [error, setError] = useState('');
 
-  const isPink = theme === 'pink';
-  const accent = isPink ? 'text-pink-300' : 'text-emerald-300';
-  const accentBg = isPink ? 'from-pink-500/20 to-rose-500/10' : 'from-emerald-500/20 to-teal-500/10';
-  const border = isPink ? 'border-pink-400/25' : 'border-emerald-400/25';
-  const btnActive = isPink
-    ? 'border-pink-400/40 bg-pink-500/15 shadow-[0_0_24px_rgba(244,114,182,0.12)]'
-    : 'border-emerald-400/40 bg-emerald-500/15 shadow-[0_0_24px_rgba(52,211,153,0.12)]';
-  const btnIdle = isPink
-    ? 'border-white/10 bg-white/[0.04] hover:border-pink-400/30 hover:bg-pink-500/10'
-    : 'border-white/10 bg-white/[0.04] hover:border-emerald-400/30 hover:bg-emerald-500/10';
-  const resultPanel = isPink
-    ? 'border-pink-400/20 bg-pink-500/[0.08]'
-    : 'border-emerald-400/20 bg-emerald-500/[0.08]';
+  const accentTokens = getAccent(theme);
+  const accent = accentTokens.text300;
+  const accentBg = accentTokens.gradientBg;
+  const border = accentTokens.border;
+  const btnActive = accentTokens.btnActive;
+  const btnIdle = accentTokens.btnIdle;
+  const resultPanel = accentTokens.resultPanel;
 
   const fetchExplain = async (mode) => {
     setLoadingMode(mode);

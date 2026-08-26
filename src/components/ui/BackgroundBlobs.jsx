@@ -4,10 +4,16 @@ export const BackgroundBlobs = ({ theme, darkMode = true, customBlobClasses, red
     const pinkThemeClasses = darkMode
         ? { blob1: "bg-pink-500/30", blob2: "bg-red-500/30", blob3: "bg-purple-500/20" }
         : { blob1: "bg-pink-400/20", blob2: "bg-red-400/20", blob3: "bg-purple-400/15" };
+    const blueThemeClasses = darkMode
+        ? { blob1: "bg-blue-500/30", blob2: "bg-indigo-500/30", blob3: "bg-violet-500/20" }
+        : { blob1: "bg-blue-400/25", blob2: "bg-indigo-400/25", blob3: "bg-violet-400/20" };
     const greenThemeClasses = darkMode
         ? { blob1: "bg-emerald-500/30", blob2: "bg-teal-500/30", blob3: "bg-cyan-500/20" }
         : { blob1: "bg-emerald-400/25", blob2: "bg-teal-400/25", blob3: "bg-cyan-400/20" };
-    const themeClasses = customBlobClasses || (theme === 'green' || theme === 'emerald' ? greenThemeClasses : pinkThemeClasses);
+    const themeClasses = customBlobClasses || (
+        theme === 'blue' ? blueThemeClasses
+        : (theme === 'green' || theme === 'emerald' ? greenThemeClasses : pinkThemeClasses)
+    );
     const animClass = reducedMotion || staticOnMobile ? '' : 'animate-blob';
 
     return (

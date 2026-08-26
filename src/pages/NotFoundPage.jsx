@@ -4,13 +4,13 @@ import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { useTranslation } from 'react-i18next';
 import { Reveal } from '../components/Reveal.jsx';
 import { SEO } from '../components/SEO.jsx';
+import { getAccent } from '../utils/themeTokens.js';
 
 export const NotFoundPage = ({ theme }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const gradientClass = theme === 'pink'
-        ? 'bg-gradient-to-r from-pink-500 to-red-500'
-        : 'bg-gradient-to-r from-emerald-500 to-teal-500';
+    const accent = getAccent(theme);
+    const gradientClass = accent.gradientBtn;
 
     return (
         <section className="min-h-screen flex items-center justify-center py-20 px-4">
@@ -18,7 +18,7 @@ export const NotFoundPage = ({ theme }) => {
             <div className="container mx-auto max-w-2xl text-center">
                 <Reveal>
                 <GlassCard className="p-12 md:p-16" theme={theme}>
-                    <div className={`text-8xl md:text-9xl font-extrabold ${theme === 'pink' ? 'text-pink-400/30' : 'text-emerald-400/30'}`}>404</div>
+                    <div className={`text-8xl md:text-9xl font-extrabold ${accent.textMuted}`}>404</div>
                     <h1 className="text-2xl md:text-3xl font-bold text-white mt-4">{t('notFound.title')}</h1>
                     <p className="text-gray-300 mt-2 max-w-md mx-auto">
                         {t('notFound.desc')}
