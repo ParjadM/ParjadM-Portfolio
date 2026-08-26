@@ -3,37 +3,30 @@ import { getAccent } from '../utils/themeTokens.js';
 
 export const CustomCursor = ({ theme, darkMode = true, reducedMotion = false }) => {
   const accent = getAccent(theme);
-  const dotRef = useRef(null);
-  const ringRef = useRef(null);
+  const rootRef = useRef(null);
   const rafRef = useRef(null);
   const positionRef = useRef({ x: 0, y: 0 });
   const hoveringRef = useRef(false);
   const visibleRef = useRef(false);
 
-  const color = accent.cursor.ring;
-  const ringColor = darkMode ? accent.cursor.dotDark : accent.cursor.dotLight;
+  const dotColor = darkMode ? accent.cursor.dotDark : accent.cursor.dotLight;
+  const ringColor = accent.cursor.ring;
 
   useEffect(() => {
     if (reducedMotion) return;
 
+    document.body.classList.add('custom-cursor-active');
+
     const applyPosition = () => {
       rafRef.current = null;
       const { x, y } = positionRef.current;
-      const scale = hoveringRef.current ? 1.5 : 1;
-      const ringScale = hoveringRef.current ? 2 : 1;
-      const opacity = visibleRef.current ? '1' : '0';
+      const hovering = hoveringRef.current;
+      const opacity = visibleRef.current ? 1 : 0;
 
-      if (dotRef.current) {
-        dotRef.current.style.left = `${x}px`;
-        dotRef.current.style.top = `${y}px`;
-        dotRef.current.style.opacity = opacity;
-        dotRef.current.style.transform = `translate(-50%, -50%) scale(${scale})`;
-      }
-      if (ringRef.current) {
-        ringRef.current.style.left = `${x}px`;
-        ringRef.current.style.top = `${y}px`;
-        ringRef.current.style.opacity = opacity;
-        ringRef.current.style.transform = `translate(-50%, -50%) scale(${ringScale})`;
+      if (rootRef.current) {
+        rootRef.current.style.opacity = String(opacity);
+        rootRef.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+        rootRef.current.dataset.hover = hovering ? 'true' : 'false';
       }
     };
 
@@ -73,6 +66,7 @@ export const CustomCursor = ({ theme, darkMode = true, reducedMotion = false }) 
     document.addEventListener('mouseenter', onMouseEnter);
 
     return () => {
+      document.body.classList.remove('custom-cursor-active');
       window.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseleave', onMouseLeave);
       document.removeEventListener('mouseenter', onMouseEnter);
@@ -87,27 +81,22 @@ export const CustomCursor = ({ theme, darkMode = true, reducedMotion = false }) 
   }
 
   return (
-    <>
-      <div
-        ref={dotRef}
-        className="fixed pointer-events-none z-[100] transition-opacity duration-300 hidden md:block"
-        style={{ opacity: 0 }}
-      >
+    <div
+      ref={rootRef}
+      className="custom-cursor-root fixed top-0 left-0 pointer-events-none z-[100] hidden md:block"
+      style={{ opacity: 0 }}
+      aria-hidden="true"
+    >
+      <div className="custom-cursor-body">
         <div
-          className="w-4 h-4 rounded-full transition-transform duration-200"
-          style={{ backgroundColor: ringColor }}
+          className="custom-cursor-ring"
+          style={{ borderColor: ringColor }}
+        />
+        <div
+          className="custom-cursor-dot"
+          style={{ backgroundColor: dotColor, boxShadow: `0 0 8px ${ringColor}` }}
         />
       </div>
-      <div
-        ref={ringRef}
-        className="fixed pointer-events-none z-[99] transition-all duration-500 ease-out hidden md:block"
-        style={{ opacity: 0 }}
-      >
-        <div
-          className="w-8 h-8 rounded-full border transition-all duration-300"
-          style={{ borderColor: color, borderWidth: '1px' }}
-        />
-      </div>
-    </>
+    </div>
   );
 };

@@ -9,6 +9,83 @@
   outline-offset: 2px;
 }
 
+/* Custom cursor — hide native pointer on desktop when active */
+@media (min-width: 768px) {
+  body.custom-cursor-active,
+  body.custom-cursor-active a,
+  body.custom-cursor-active button,
+  body.custom-cursor-active [role="button"],
+  body.custom-cursor-active label,
+  body.custom-cursor-active summary {
+    cursor: none !important;
+  }
+  body.custom-cursor-active input,
+  body.custom-cursor-active textarea,
+  body.custom-cursor-active select,
+  body.custom-cursor-active [contenteditable="true"] {
+    cursor: text !important;
+  }
+}
+
+.custom-cursor-root {
+  will-change: transform, opacity;
+}
+
+.custom-cursor-body {
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+.custom-cursor-ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 18px;
+  height: 18px;
+  margin-left: -9px;
+  margin-top: -9px;
+  border-radius: 9999px;
+  border: 1.5px solid;
+  opacity: 0.85;
+  transition: width 0.2s ease, height 0.2s ease, margin 0.2s ease, opacity 0.2s ease;
+}
+
+.custom-cursor-dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  margin-top: -2.5px;
+  border-radius: 9999px;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.15);
+  transition: width 0.2s ease, height 0.2s ease, margin 0.2s ease;
+}
+
+.custom-cursor-root[data-hover="true"] .custom-cursor-ring {
+  width: 26px;
+  height: 26px;
+  margin-left: -13px;
+  margin-top: -13px;
+  opacity: 1;
+}
+
+.custom-cursor-root[data-hover="true"] .custom-cursor-dot {
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  margin-top: -3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .custom-cursor-ring,
+  .custom-cursor-dot {
+    transition: none !important;
+  }
+}
+
 /* Scroll reveal (CSS replacement for framer-motion Reveal) */
 .reveal {
   opacity: 0;
