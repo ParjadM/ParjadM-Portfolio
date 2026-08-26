@@ -103,6 +103,8 @@ export const ClickUpSection = ({ theme }) => {
     ? 'bg-gradient-to-r from-pink-500 to-red-500'
     : 'bg-gradient-to-r from-emerald-500 to-teal-500';
   const textClass = theme === 'pink' ? 'text-pink-200' : 'text-emerald-200';
+  const muted = 'text-white/75';
+  const subtle = 'text-white/60';
 
   return (
     <GlassCard className="p-8 md:p-10" theme={theme}>
