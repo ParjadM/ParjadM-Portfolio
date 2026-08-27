@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { getAccent } from '../utils/themeTokens.js';
 import { getCursorTheme, isCustomCursorEnabled } from '../utils/cursorThemeConfig.js';
 
@@ -125,10 +126,12 @@ export const CustomCursor = ({
   const showFocusRing = cursorStyle === 'professional' || cursorStyle === 'classic' || cursorStyle === 'accent';
   const showPointerDot = cursorStyle !== 'crosshair';
 
-  return (
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <div
       ref={rootRef}
-      className="custom-cursor-root fixed top-0 left-0 pointer-events-none z-[100] hidden md:block"
+      className="custom-cursor-root fixed top-0 left-0 pointer-events-none hidden md:block"
       data-style={cursorStyle}
       style={{
         '--cursor-accent': accent.hex,
@@ -143,6 +146,7 @@ export const CustomCursor = ({
           <span className="custom-cursor-dot" />
         </div>
       )}
-    </div>
+    </div>,
+    document.body,
   );
 };

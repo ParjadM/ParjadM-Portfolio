@@ -28,6 +28,7 @@
 }
 
 .custom-cursor-root {
+  z-index: 100000;
   will-change: transform, opacity;
 }
 
