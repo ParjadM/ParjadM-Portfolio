@@ -43,9 +43,6 @@ try {
   await waitForServer();
   const browser = await chromium.launch();
   const page = await browser.newPage();
-  await page.addInitScript(() => {
-    localStorage.setItem('parjadm_intro_seen', '1');
-  });
 
   const pageErrors = [];
   page.on('pageerror', (err) => pageErrors.push(err.message));
@@ -74,11 +71,7 @@ try {
   // Mobile menu opens and closes
   const mobile = await browser.newContext({ ...devices['iPhone 13'] });
   const mobilePage = await mobile.newPage();
-  await mobilePage.addInitScript(() => {
-    localStorage.setItem('parjadm_intro_seen', '1');
-  });
   await mobilePage.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
-  await mobilePage.waitForURL((url) => !new URL(url).pathname.includes('/intro'), { timeout: 10_000 });
   const menuBtn = mobilePage.getByRole('button', { name: /open menu|ouvrir le menu|menu/i }).first();
   const menuVisible = await menuBtn.isVisible({ timeout: 3_000 }).catch(() => false);
   if (menuVisible) {

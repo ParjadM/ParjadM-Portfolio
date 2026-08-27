@@ -7,30 +7,23 @@ import { test, expect } from '@playwright/test'
  */
 
 test.describe('Intro cinematic', () => {
-  test('first visit redirects home to intro', async ({ page }) => {
+  test('home stays on home and does not force intro', async ({ page }) => {
     await page.goto('/')
-    await expect(page).toHaveURL(/\/intro\/?$/)
-    await expect(page.getByRole('button', { name: /skip/i }).first()).toBeVisible()
+    await expect(page).toHaveURL(/\/(\?|$)/)
+    await expect(page.locator('#main-content')).toBeVisible()
+    await expect(page).not.toHaveURL(/\/intro\/?$/)
   })
 
-  test('skip navigates to home and marks intro seen', async ({ page }) => {
+  test('intro remains reachable from its route and skip returns home', async ({ page }) => {
     await page.goto('/intro')
+    await expect(page.getByRole('button', { name: /skip/i }).first()).toBeVisible()
     await page.getByRole('button', { name: /skip/i }).first().click()
     await expect(page).toHaveURL(/\/(\?|$)/)
     await expect(page.locator('#main-content')).toBeVisible()
-
-    const seen = await page.evaluate(() => localStorage.getItem('parjadm_intro_seen'))
-    expect(seen).toBe('1')
   })
 })
 
 test.describe('Critical journeys', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
-      localStorage.setItem('parjadm_intro_seen', '1')
-    })
-  })
-
   test('home renders brand and primary navigation', async ({ page }) => {
     await page.goto('/')
     await expect(page.locator('header').first()).toBeVisible()
@@ -93,12 +86,6 @@ test.describe('Critical journeys', () => {
 })
 
 test.describe('Accessibility smoke', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
-      localStorage.setItem('parjadm_intro_seen', '1')
-    })
-  })
-
   test('skip link is present and can receive focus', async ({ page }) => {
     await page.goto('/')
     const skip = page.locator('a[href="#main-content"]').first()
