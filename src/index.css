@@ -109,72 +109,76 @@
   display: none;
 }
 
-.custom-cursor-root[data-style="minimal"] .custom-cursor-focus {
+.custom-cursor-root[data-style="minimal"] .custom-cursor-focus,
+.custom-cursor-root[data-style="accent"] .custom-cursor-focus {
   display: none;
 }
 
-/* Professional — square inverted dot, halo only on hover */
+/* Professional — bold inverted square, square dashed halo on hover */
 .custom-cursor-root[data-style="professional"] .custom-cursor-pointer {
   mix-blend-mode: difference;
 }
 
 .custom-cursor-root[data-style="professional"] .custom-cursor-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 0;
   background: #fff;
   box-shadow: none;
 }
 
 .custom-cursor-root[data-style="professional"] .custom-cursor-focus {
+  border-radius: 2px;
   border-style: dashed;
-  border-width: 1px;
+  border-width: 1.5px;
+  opacity: 0;
 }
 
 .custom-cursor-root[data-style="professional"][data-hover="true"] .custom-cursor-focus {
   opacity: 1;
   transform: scale(1);
-  width: 40px;
-  height: 40px;
-  margin-left: -20px;
-  margin-top: -20px;
-  border-color: rgba(255, 255, 255, 0.55);
+  width: 44px;
+  height: 44px;
+  margin-left: -22px;
+  margin-top: -22px;
+  border-color: rgba(255, 255, 255, 0.7);
   border-style: dashed;
+  border-radius: 4px;
 }
 
-/* Minimal — tiny round pin, no ring ever */
+/* Minimal — single-pixel pin, no halo */
 .custom-cursor-root[data-style="minimal"] .custom-cursor-pointer {
   mix-blend-mode: normal;
 }
 
 .custom-cursor-root[data-style="minimal"] .custom-cursor-dot {
-  width: 4px;
-  height: 4px;
+  width: 3px;
+  height: 3px;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.55);
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: none;
 }
 
-/* Classic — small accent dot inside a sharp hollow ring */
+/* Classic — white center + sharp hollow accent stroke ring (always visible) */
 .custom-cursor-root[data-style="classic"] .custom-cursor-pointer {
   mix-blend-mode: normal;
 }
 
 .custom-cursor-root[data-style="classic"] .custom-cursor-dot {
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
   border-radius: 9999px;
-  background: var(--cursor-accent);
-  box-shadow: none;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
 }
 
 .custom-cursor-root[data-style="classic"] .custom-cursor-focus {
   opacity: 1;
   transform: scale(1);
-  width: 32px;
-  height: 32px;
-  margin-left: -16px;
-  margin-top: -16px;
+  width: 38px;
+  height: 38px;
+  margin-left: -19px;
+  margin-top: -19px;
   background: transparent;
   border: 2px solid var(--cursor-accent);
   box-shadow: none;
@@ -182,48 +186,38 @@
 }
 
 .custom-cursor-root[data-style="classic"][data-hover="true"] .custom-cursor-focus {
-  width: 42px;
-  height: 42px;
-  margin-left: -21px;
-  margin-top: -21px;
+  width: 48px;
+  height: 48px;
+  margin-left: -24px;
+  margin-top: -24px;
   border-width: 2px;
 }
 
-/* Accent — large neon bloom, soft radial glow (no sharp ring) */
+/* Accent — large neon dot + outer bloom only (no ring stroke) */
 .custom-cursor-root[data-style="accent"] .custom-cursor-pointer {
   mix-blend-mode: normal;
 }
 
 .custom-cursor-root[data-style="accent"] .custom-cursor-dot {
-  width: 12px;
-  height: 12px;
+  width: 16px;
+  height: 16px;
   border-radius: 9999px;
   background: var(--cursor-accent);
-  box-shadow:
-    0 0 6px var(--cursor-accent),
-    0 0 18px var(--cursor-accent-soft),
-    0 0 32px var(--cursor-accent-soft);
-}
-
-.custom-cursor-root[data-style="accent"] .custom-cursor-focus {
-  opacity: 0.5;
-  transform: scale(1);
-  width: 52px;
-  height: 52px;
-  margin-left: -26px;
-  margin-top: -26px;
   border: none;
-  background: radial-gradient(circle, var(--cursor-accent-soft) 0%, transparent 70%);
-  filter: blur(8px);
+  box-shadow:
+    0 0 8px var(--cursor-accent),
+    0 0 22px var(--cursor-accent),
+    0 0 44px var(--cursor-accent-soft),
+    0 0 72px var(--cursor-accent-soft);
 }
 
-.custom-cursor-root[data-style="accent"][data-hover="true"] .custom-cursor-focus {
-  opacity: 0.85;
-  width: 68px;
-  height: 68px;
-  margin-left: -34px;
-  margin-top: -34px;
-  background: radial-gradient(circle, var(--cursor-accent) 0%, transparent 68%);
+.custom-cursor-root[data-style="accent"][data-hover="true"] .custom-cursor-dot {
+  transform: scale(1.12);
+  box-shadow:
+    0 0 10px var(--cursor-accent),
+    0 0 28px var(--cursor-accent),
+    0 0 56px var(--cursor-accent-soft),
+    0 0 96px var(--cursor-accent-soft);
 }
 
 /* Crosshair — design-tool reticle */

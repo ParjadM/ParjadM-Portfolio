@@ -134,8 +134,9 @@ export const CustomCursor = ({
 
   return createPortal(
     <div
+      key={cursorStyle}
       ref={rootRef}
-      className="custom-cursor-root fixed top-0 left-0 pointer-events-none hidden md:block"
+      className={`custom-cursor-root custom-cursor-root--${cursorStyle} fixed top-0 left-0 pointer-events-none hidden md:block`}
       data-style={cursorStyle}
       style={{
         '--cursor-accent': accent.hex,
