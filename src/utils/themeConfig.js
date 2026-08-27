@@ -49,16 +49,65 @@ export const THEMES = {
 export const THEME_IDS = Object.keys(THEMES);
 export const DEFAULT_THEME_ID = 'emerald-dark';
 export const USER_THEME_STORAGE_KEY = 'portfolio_theme_id';
+/** Eastern Time calendar used for the daily default theme rotation. */
+export const THEME_TIME_ZONE = 'America/New_York';
+/** Display label for the rotation clock (Eastern Time). */
+export const THEME_TIME_ZONE_LABEL = 'EST';
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
-function localCalendarDayNumber(date) {
-    return Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / MS_PER_DAY);
+function getTimeZoneParts(date, timeZone = THEME_TIME_ZONE) {
+    const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hourCycle: 'h23',
+    }).formatToParts(date);
+
+    const values = Object.fromEntries(
+        parts.filter((part) => part.type !== 'literal').map((part) => [part.type, part.value]),
+    );
+
+    return {
+        year: Number(values.year),
+        month: Number(values.month),
+        day: Number(values.day),
+        hour: Number(values.hour),
+        minute: Number(values.minute),
+        second: Number(values.second),
+    };
+}
+
+/** Convert an Eastern Time wall-clock stamp to a UTC Date. */
+export function zonedTimeToUtc(
+    { year, month, day, hour = 0, minute = 0, second = 0 },
+    timeZone = THEME_TIME_ZONE,
+) {
+    const utcGuess = Date.UTC(year, month - 1, day, hour, minute, second);
+    const asZone = getTimeZoneParts(new Date(utcGuess), timeZone);
+    const asUtc = Date.UTC(
+        asZone.year,
+        asZone.month - 1,
+        asZone.day,
+        asZone.hour,
+        asZone.minute,
+        asZone.second,
+    );
+    return new Date(utcGuess - (asUtc - utcGuess));
+}
+
+function estCalendarDayNumber(date) {
+    const { year, month, day } = getTimeZoneParts(date, THEME_TIME_ZONE);
+    return Math.floor(Date.UTC(year, month - 1, day) / MS_PER_DAY);
 }
 
 export function getDailyDefaultThemeId(now = new Date()) {
     const count = THEME_IDS.length;
-    const index = ((localCalendarDayNumber(now) % count) + count) % count;
+    const index = ((estCalendarDayNumber(now) % count) + count) % count;
     return THEME_IDS[index];
 }
 
@@ -68,12 +117,21 @@ export function getNextDailyDefaultThemeId(now = new Date()) {
     return THEME_IDS[(currentIndex + 1) % THEME_IDS.length];
 }
 
-export function getNextLocalMidnight(now = new Date()) {
-    return new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+export function getNextEstMidnight(now = new Date()) {
+    const { year, month, day } = getTimeZoneParts(now, THEME_TIME_ZONE);
+    const nextCivilDay = new Date(Date.UTC(year, month - 1, day + 1));
+    return zonedTimeToUtc({
+        year: nextCivilDay.getUTCFullYear(),
+        month: nextCivilDay.getUTCMonth() + 1,
+        day: nextCivilDay.getUTCDate(),
+        hour: 0,
+        minute: 0,
+        second: 0,
+    }, THEME_TIME_ZONE);
 }
 
-export function msUntilNextLocalMidnight(now = new Date()) {
-    return Math.max(1, getNextLocalMidnight(now).getTime() - now.getTime());
+export function msUntilNextEstMidnight(now = new Date()) {
+    return Math.max(1, getNextEstMidnight(now).getTime() - now.getTime());
 }
 
 /** Formats a duration as HH:MM (hours can exceed 24 if needed). */

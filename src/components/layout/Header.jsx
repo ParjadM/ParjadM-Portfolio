@@ -6,9 +6,10 @@ import { GlassCard } from '../ui/GlassCard.jsx';
 import Logo from '../../Images/Logo.webp';
 import {
     THEMES,
+    THEME_TIME_ZONE_LABEL,
     formatDurationHoursMinutes,
     getNextDailyDefaultThemeId,
-    msUntilNextLocalMidnight,
+    msUntilNextEstMidnight,
 } from '../../utils/themeConfig.js';
 import { CURSOR_THEMES } from '../../utils/cursorThemeConfig.js';
 import { getAccent } from '../../utils/themeTokens.js';
@@ -25,7 +26,7 @@ import { useMenuPopover } from '../../utils/useMenuPopover.js';
 export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCursorThemeId, theme, darkMode = true, isMobileMenuOpen, setIsMobileMenuOpen, onLanguageChange }) => {
     const accent = getAccent(theme);
     const { t } = useTranslation();
-    const [themeCountdown, setThemeCountdown] = useState(() => formatDurationHoursMinutes(msUntilNextLocalMidnight()));
+    const [themeCountdown, setThemeCountdown] = useState(() => formatDurationHoursMinutes(msUntilNextEstMidnight()));
     const [nextDailyThemeId, setNextDailyThemeId] = useState(() => getNextDailyDefaultThemeId());
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
     const [paletteRect, setPaletteRect] = useState(null);
@@ -76,7 +77,7 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
 
     useEffect(() => {
         const syncDailyThemeMeta = () => {
-            setThemeCountdown(formatDurationHoursMinutes(msUntilNextLocalMidnight()));
+            setThemeCountdown(formatDurationHoursMinutes(msUntilNextEstMidnight()));
             setNextDailyThemeId(getNextDailyDefaultThemeId());
         };
 
@@ -274,7 +275,7 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
         >
             <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('a11y.themes')}</div>
             <div className="px-3 pb-2 text-[11px] text-gray-400 tabular-nums">
-                {t('a11y.themeDefaultCountdown', { time: themeCountdown })}
+                {t('a11y.themeDefaultCountdown', { time: themeCountdown, tz: THEME_TIME_ZONE_LABEL })}
             </div>
             {Object.values(THEMES).map((themeOption) => {
                 const isSelected = currentThemeId === themeOption.id;
@@ -542,7 +543,7 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
                                     {t('a11y.themes')}
                                 </p>
                                 <p className="mb-3 text-[11px] text-gray-400 tabular-nums text-center">
-                                    {t('a11y.themeDefaultCountdown', { time: themeCountdown })}
+                                    {t('a11y.themeDefaultCountdown', { time: themeCountdown, tz: THEME_TIME_ZONE_LABEL })}
                                 </p>
                                 <div className="grid grid-cols-2 gap-3 w-full">
                                     {Object.values(THEMES).map((themeOption) => {

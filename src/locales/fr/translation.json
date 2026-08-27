@@ -504,7 +504,7 @@
     "moreMenu": "Plus de pages",
     "siteMenu": "Menu du site",
     "themes": "Thèmes",
-    "themeDefaultCountdown": "Par défaut encore {{time}}",
+    "themeDefaultCountdown": "Par défaut encore {{time}} {{tz}}",
     "themeNextBadge": "Suivant",
     "cursorThemes": "Curseur",
     "openMenu": "Ouvrir le menu",

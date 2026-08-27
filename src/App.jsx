@@ -6,7 +6,7 @@ import { DEFAULT_CURSOR_THEME_ID } from './utils/cursorThemeConfig.js';
 import {
     USER_THEME_STORAGE_KEY,
     getDailyDefaultThemeId,
-    msUntilNextLocalMidnight,
+    msUntilNextEstMidnight,
     readSavedThemeId,
     resolveThemeId,
 } from './utils/themeConfig.js';
@@ -34,7 +34,7 @@ function App() {
         }
     }, []);
 
-    // Rotate the default theme at local midnight unless the user picked one
+    // Rotate the default theme at midnight EST unless the user picked one
     useEffect(() => {
         if (!followsDailyDefault) return undefined;
 
@@ -49,7 +49,7 @@ function App() {
             timeoutId = window.setTimeout(() => {
                 applyDailyDefault();
                 scheduleNextSwitch();
-            }, msUntilNextLocalMidnight());
+            }, msUntilNextEstMidnight());
         };
 
         scheduleNextSwitch();
