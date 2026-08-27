@@ -7,7 +7,7 @@ export const CustomCursor = ({
   theme,
   darkMode = true,
   reducedMotion = false,
-  cursorStyle = 'professional',
+  cursorStyle = 'accent',
 }) => {
   const accent = getAccent(theme);
   const cursorTheme = getCursorTheme(cursorStyle);

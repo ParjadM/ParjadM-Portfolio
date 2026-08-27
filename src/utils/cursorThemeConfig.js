@@ -26,7 +26,7 @@ export const CURSOR_THEMES = {
   },
 };
 
-export const DEFAULT_CURSOR_THEME_ID = 'professional';
+export const DEFAULT_CURSOR_THEME_ID = 'accent';
 
 export function getCursorTheme(id) {
   return CURSOR_THEMES[id] ?? CURSOR_THEMES[DEFAULT_CURSOR_THEME_ID];

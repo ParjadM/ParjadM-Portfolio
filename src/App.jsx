@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { Layout } from './components/layout/Layout.jsx';
+import { DEFAULT_CURSOR_THEME_ID } from './utils/cursorThemeConfig.js';
 
 // --- Main App Component ---
 function App() {
     const [currentThemeId, setCurrentThemeId] = useState('emerald-dark');
-    const [cursorThemeId, setCursorThemeId] = useState('professional');
+    const [cursorThemeId, setCursorThemeId] = useState(DEFAULT_CURSOR_THEME_ID);
     const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
 
     // Load theme preference on mount

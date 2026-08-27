@@ -13,6 +13,7 @@ describe('cursorThemeConfig', () => {
   });
 
   it('falls back to default for unknown ids', () => {
+    expect(DEFAULT_CURSOR_THEME_ID).toBe('accent');
     expect(getCursorTheme('unknown').id).toBe(DEFAULT_CURSOR_THEME_ID);
   });
 
