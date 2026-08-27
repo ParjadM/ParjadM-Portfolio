@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { getAccent } from '../utils/themeTokens.js';
 import { getCursorTheme, isCustomCursorEnabled } from '../utils/cursorThemeConfig.js';
@@ -21,26 +21,34 @@ export const CustomCursor = ({
   const hoveringRef = useRef(false);
   const pressingRef = useRef(false);
   const visibleRef = useRef(true);
+  const cursorStyleRef = useRef(cursorStyle);
+  cursorStyleRef.current = cursorStyle;
 
   const customEnabled = isCustomCursorEnabled(cursorStyle);
 
   const applyPosition = useCallback(() => {
     rafRef.current = null;
-    const { x, y } = positionRef.current;
-    const opacity = visibleRef.current ? 1 : 0;
+    const node = rootRef.current;
+    if (!node) return;
 
-    if (rootRef.current) {
-      rootRef.current.style.opacity = String(opacity);
-      rootRef.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-      rootRef.current.dataset.hover = hoveringRef.current ? 'true' : 'false';
-      rootRef.current.dataset.press = pressingRef.current ? 'true' : 'false';
-    }
+    const { x, y } = positionRef.current;
+    node.style.opacity = visibleRef.current ? '1' : '0';
+    node.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    node.dataset.style = cursorStyleRef.current;
+    node.dataset.hover = hoveringRef.current ? 'true' : 'false';
+    node.dataset.press = pressingRef.current ? 'true' : 'false';
   }, []);
 
   const scheduleUpdate = useCallback(() => {
     if (rafRef.current != null) return;
     rafRef.current = requestAnimationFrame(applyPosition);
   }, [applyPosition]);
+
+  const syncCursor = useCallback(() => {
+    visibleRef.current = true;
+    pressingRef.current = false;
+    scheduleUpdate();
+  }, [scheduleUpdate]);
 
   useEffect(() => {
     if (reducedMotion || !customEnabled) {
@@ -55,76 +63,72 @@ export const CustomCursor = ({
   useEffect(() => {
     if (reducedMotion || !customEnabled) return undefined;
 
-    const onMouseMove = (e) => {
-      positionRef.current = { x: e.clientX, y: e.clientY };
-      visibleRef.current = true;
-
-      const target = e.target;
-      const isClickable =
+    const isClickableTarget = (target) => {
+      if (!(target instanceof Element)) return false;
+      return (
         target.tagName === 'BUTTON' ||
         target.tagName === 'A' ||
-        target.closest('button') ||
-        target.closest('a') ||
-        target.classList.contains('cursor-pointer');
+        !!target.closest('button') ||
+        !!target.closest('a') ||
+        target.classList.contains('cursor-pointer')
+      );
+    };
 
-      hoveringRef.current = !!isClickable;
+    const onPointerMove = (e) => {
+      positionRef.current = { x: e.clientX, y: e.clientY };
+      visibleRef.current = e.clientX >= 0 && e.clientY >= 0
+        && e.clientX <= window.innerWidth
+        && e.clientY <= window.innerHeight;
+      hoveringRef.current = isClickableTarget(e.target);
       scheduleUpdate();
     };
 
-    const onMouseDown = () => {
+    const onPointerDown = () => {
       pressingRef.current = true;
+      visibleRef.current = true;
       scheduleUpdate();
     };
 
-    const onMouseUp = () => {
+    const onPointerUp = () => {
+      pressingRef.current = false;
+      visibleRef.current = true;
+      scheduleUpdate();
+    };
+
+    const onWindowBlur = () => {
       pressingRef.current = false;
       scheduleUpdate();
     };
 
-    const onMouseLeave = () => {
-      visibleRef.current = false;
-      scheduleUpdate();
-    };
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('pointerdown', onPointerDown, true);
+    window.addEventListener('pointerup', onPointerUp, true);
+    window.addEventListener('pointercancel', onPointerUp, true);
+    window.addEventListener('blur', onWindowBlur);
 
-    const onMouseEnter = () => {
-      visibleRef.current = true;
-      scheduleUpdate();
-    };
-
-    window.addEventListener('mousemove', onMouseMove, { passive: true });
-    window.addEventListener('mousedown', onMouseDown);
-    window.addEventListener('mouseup', onMouseUp);
-    document.addEventListener('mouseleave', onMouseLeave);
-    document.addEventListener('mouseenter', onMouseEnter);
-
-    visibleRef.current = true;
-    scheduleUpdate();
+    syncCursor();
 
     return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mousedown', onMouseDown);
-      window.removeEventListener('mouseup', onMouseUp);
-      document.removeEventListener('mouseleave', onMouseLeave);
-      document.removeEventListener('mouseenter', onMouseEnter);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerdown', onPointerDown, true);
+      window.removeEventListener('pointerup', onPointerUp, true);
+      window.removeEventListener('pointercancel', onPointerUp, true);
+      window.removeEventListener('blur', onWindowBlur);
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
     };
-  }, [reducedMotion, customEnabled, scheduleUpdate]);
+  }, [reducedMotion, customEnabled, scheduleUpdate, syncCursor]);
 
-  // Re-sync DOM after style/markup changes (React must not control opacity/transform)
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (reducedMotion || !customEnabled) return;
-    visibleRef.current = true;
-    scheduleUpdate();
-  }, [cursorStyle, theme, darkMode, reducedMotion, customEnabled, scheduleUpdate]);
+    syncCursor();
+    applyPosition();
+  }, [cursorStyle, theme, darkMode, reducedMotion, customEnabled, syncCursor, applyPosition]);
 
   if (reducedMotion || !customEnabled || cursorTheme.usesNativePointer) return null;
 
   if (typeof navigator !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     return null;
   }
-
-  const showFocusRing = cursorStyle === 'professional' || cursorStyle === 'classic' || cursorStyle === 'accent';
-  const showPointerDot = cursorStyle !== 'crosshair';
 
   if (typeof document === 'undefined') return null;
 
@@ -135,17 +139,15 @@ export const CustomCursor = ({
       data-style={cursorStyle}
       style={{
         '--cursor-accent': accent.hex,
-        '--cursor-accent-soft': darkMode ? `${accent.hex}66` : `${accent.hex}88`,
+        '--cursor-accent-soft': darkMode ? `${accent.hex}88` : `${accent.hex}aa`,
       }}
       aria-hidden="true"
     >
-      {showFocusRing && <div className="custom-cursor-focus" />}
-      {cursorStyle === 'crosshair' && <div className="custom-cursor-crosshair" aria-hidden="true" />}
-      {showPointerDot && (
-        <div className="custom-cursor-pointer">
-          <span className="custom-cursor-dot" />
-        </div>
-      )}
+      <div className="custom-cursor-focus" />
+      <div className="custom-cursor-crosshair" aria-hidden="true" />
+      <div className="custom-cursor-pointer">
+        <span className="custom-cursor-dot" />
+      </div>
     </div>,
     document.body,
   );

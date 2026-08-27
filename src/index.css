@@ -99,6 +99,20 @@
   top: -11px;
 }
 
+/* Hide layers per style — stable DOM, CSS-only switching */
+.custom-cursor-root:not([data-style="crosshair"]) .custom-cursor-crosshair {
+  display: none;
+}
+
+.custom-cursor-root[data-style="crosshair"] .custom-cursor-pointer,
+.custom-cursor-root[data-style="crosshair"] .custom-cursor-focus {
+  display: none;
+}
+
+.custom-cursor-root[data-style="minimal"] .custom-cursor-focus {
+  display: none;
+}
+
 /* Professional — inverted precision dot + hover halo */
 .custom-cursor-root[data-style="professional"] .custom-cursor-pointer {
   mix-blend-mode: difference;
@@ -118,7 +132,11 @@
   border-color: var(--cursor-accent-soft, rgba(255, 255, 255, 0.4));
 }
 
-/* Minimal — dot only */
+/* Minimal — dot only, no blend */
+.custom-cursor-root[data-style="minimal"] .custom-cursor-pointer {
+  mix-blend-mode: normal;
+}
+
 .custom-cursor-root[data-style="minimal"] .custom-cursor-dot {
   width: 7px;
   height: 7px;
@@ -126,11 +144,10 @@
   box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.35);
 }
 
-.custom-cursor-root[data-style="minimal"] .custom-cursor-focus {
-  display: none;
-}
-
 /* Classic — accent dot with always-visible ring */
+.custom-cursor-root[data-style="classic"] .custom-cursor-pointer {
+  mix-blend-mode: normal;
+}
 .custom-cursor-root[data-style="classic"] .custom-cursor-dot {
   width: 7px;
   height: 7px;
@@ -156,6 +173,10 @@
 }
 
 /* Accent — branded glow */
+.custom-cursor-root[data-style="accent"] .custom-cursor-pointer {
+  mix-blend-mode: normal;
+}
+
 .custom-cursor-root[data-style="accent"] .custom-cursor-dot {
   width: 10px;
   height: 10px;
@@ -194,7 +215,7 @@
 
 /* Shared press feedback */
 .custom-cursor-root[data-press="true"] .custom-cursor-dot {
-  transform: scale(0.72);
+  transform: scale(0.88);
 }
 
 .custom-cursor-root[data-hover="true"][data-press="true"] .custom-cursor-focus {
