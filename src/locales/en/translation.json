@@ -511,8 +511,8 @@
     "routeAnnouncement": "Navigated to {{title}}"
   },
   "cursorThemes": {
-    "professional": "Professional",
-    "minimal": "Minimal",
+    "professional": "Professional (square)",
+    "minimal": "Minimal (tiny dot)",
     "classic": "Classic ring",
     "accent": "Accent glow",
     "crosshair": "Crosshair",

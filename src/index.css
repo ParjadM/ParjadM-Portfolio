@@ -113,93 +113,117 @@
   display: none;
 }
 
-/* Professional — inverted precision dot + hover halo */
+/* Professional — square inverted dot, halo only on hover */
 .custom-cursor-root[data-style="professional"] .custom-cursor-pointer {
   mix-blend-mode: difference;
 }
 
 .custom-cursor-root[data-style="professional"] .custom-cursor-dot {
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: #fff;
+  box-shadow: none;
+}
+
+.custom-cursor-root[data-style="professional"] .custom-cursor-focus {
+  border-style: dashed;
+  border-width: 1px;
 }
 
 .custom-cursor-root[data-style="professional"][data-hover="true"] .custom-cursor-focus {
   opacity: 1;
   transform: scale(1);
-  width: 42px;
-  height: 42px;
-  margin-left: -21px;
-  margin-top: -21px;
-  border-color: var(--cursor-accent-soft, rgba(255, 255, 255, 0.4));
+  width: 40px;
+  height: 40px;
+  margin-left: -20px;
+  margin-top: -20px;
+  border-color: rgba(255, 255, 255, 0.55);
+  border-style: dashed;
 }
 
-/* Minimal — dot only, no blend */
+/* Minimal — tiny round pin, no ring ever */
 .custom-cursor-root[data-style="minimal"] .custom-cursor-pointer {
   mix-blend-mode: normal;
 }
 
 .custom-cursor-root[data-style="minimal"] .custom-cursor-dot {
-  width: 7px;
-  height: 7px;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.35);
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.55);
 }
 
-/* Classic — accent dot with always-visible ring */
+/* Classic — small accent dot inside a sharp hollow ring */
 .custom-cursor-root[data-style="classic"] .custom-cursor-pointer {
   mix-blend-mode: normal;
 }
+
 .custom-cursor-root[data-style="classic"] .custom-cursor-dot {
-  width: 7px;
-  height: 7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 9999px;
   background: var(--cursor-accent);
+  box-shadow: none;
 }
 
 .custom-cursor-root[data-style="classic"] .custom-cursor-focus {
-  opacity: 0.75;
-  transform: scale(1);
-  width: 28px;
-  height: 28px;
-  margin-left: -14px;
-  margin-top: -14px;
-  border-color: var(--cursor-accent-soft);
-}
-
-.custom-cursor-root[data-style="classic"][data-hover="true"] .custom-cursor-focus {
   opacity: 1;
-  width: 40px;
-  height: 40px;
-  margin-left: -20px;
-  margin-top: -20px;
-}
-
-/* Accent — branded glow */
-.custom-cursor-root[data-style="accent"] .custom-cursor-pointer {
-  mix-blend-mode: normal;
-}
-
-.custom-cursor-root[data-style="accent"] .custom-cursor-dot {
-  width: 10px;
-  height: 10px;
-  background: var(--cursor-accent);
-  box-shadow: 0 0 14px var(--cursor-accent-soft);
-}
-
-.custom-cursor-root[data-style="accent"] .custom-cursor-focus {
-  opacity: 0.55;
   transform: scale(1);
   width: 32px;
   height: 32px;
   margin-left: -16px;
   margin-top: -16px;
-  border-color: var(--cursor-accent);
+  background: transparent;
+  border: 2px solid var(--cursor-accent);
+  box-shadow: none;
+  filter: none;
+}
+
+.custom-cursor-root[data-style="classic"][data-hover="true"] .custom-cursor-focus {
+  width: 42px;
+  height: 42px;
+  margin-left: -21px;
+  margin-top: -21px;
+  border-width: 2px;
+}
+
+/* Accent — large neon bloom, soft radial glow (no sharp ring) */
+.custom-cursor-root[data-style="accent"] .custom-cursor-pointer {
+  mix-blend-mode: normal;
+}
+
+.custom-cursor-root[data-style="accent"] .custom-cursor-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  background: var(--cursor-accent);
+  box-shadow:
+    0 0 6px var(--cursor-accent),
+    0 0 18px var(--cursor-accent-soft),
+    0 0 32px var(--cursor-accent-soft);
+}
+
+.custom-cursor-root[data-style="accent"] .custom-cursor-focus {
+  opacity: 0.5;
+  transform: scale(1);
+  width: 52px;
+  height: 52px;
+  margin-left: -26px;
+  margin-top: -26px;
+  border: none;
+  background: radial-gradient(circle, var(--cursor-accent-soft) 0%, transparent 70%);
+  filter: blur(8px);
 }
 
 .custom-cursor-root[data-style="accent"][data-hover="true"] .custom-cursor-focus {
-  opacity: 0.9;
-  width: 44px;
-  height: 44px;
-  margin-left: -22px;
-  margin-top: -22px;
+  opacity: 0.85;
+  width: 68px;
+  height: 68px;
+  margin-left: -34px;
+  margin-top: -34px;
+  background: radial-gradient(circle, var(--cursor-accent) 0%, transparent 68%);
 }
 
 /* Crosshair — design-tool reticle */
