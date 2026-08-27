@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { getAccent } from '../utils/themeTokens.js';
 import { getCursorTheme, isCustomCursorEnabled } from '../utils/cursorThemeConfig.js';
 
@@ -12,35 +12,47 @@ export const CustomCursor = ({
   const cursorTheme = getCursorTheme(cursorStyle);
   const rootRef = useRef(null);
   const rafRef = useRef(null);
-  const positionRef = useRef({ x: 0, y: 0 });
+  const positionRef = useRef(
+    typeof window !== 'undefined'
+      ? { x: window.innerWidth / 2, y: window.innerHeight / 2 }
+      : { x: 0, y: 0 },
+  );
   const hoveringRef = useRef(false);
   const pressingRef = useRef(false);
-  const visibleRef = useRef(false);
+  const visibleRef = useRef(true);
 
   const customEnabled = isCustomCursorEnabled(cursorStyle);
 
+  const applyPosition = useCallback(() => {
+    rafRef.current = null;
+    const { x, y } = positionRef.current;
+    const opacity = visibleRef.current ? 1 : 0;
+
+    if (rootRef.current) {
+      rootRef.current.style.opacity = String(opacity);
+      rootRef.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      rootRef.current.dataset.hover = hoveringRef.current ? 'true' : 'false';
+      rootRef.current.dataset.press = pressingRef.current ? 'true' : 'false';
+    }
+  }, []);
+
+  const scheduleUpdate = useCallback(() => {
+    if (rafRef.current != null) return;
+    rafRef.current = requestAnimationFrame(applyPosition);
+  }, [applyPosition]);
+
   useEffect(() => {
-    if (reducedMotion || !customEnabled) return;
+    if (reducedMotion || !customEnabled) {
+      document.body.classList.remove('custom-cursor-active');
+      return undefined;
+    }
 
     document.body.classList.add('custom-cursor-active');
+    return () => document.body.classList.remove('custom-cursor-active');
+  }, [reducedMotion, customEnabled]);
 
-    const applyPosition = () => {
-      rafRef.current = null;
-      const { x, y } = positionRef.current;
-      const opacity = visibleRef.current ? 1 : 0;
-
-      if (rootRef.current) {
-        rootRef.current.style.opacity = String(opacity);
-        rootRef.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-        rootRef.current.dataset.hover = hoveringRef.current ? 'true' : 'false';
-        rootRef.current.dataset.press = pressingRef.current ? 'true' : 'false';
-      }
-    };
-
-    const scheduleUpdate = () => {
-      if (rafRef.current != null) return;
-      rafRef.current = requestAnimationFrame(applyPosition);
-    };
+  useEffect(() => {
+    if (reducedMotion || !customEnabled) return undefined;
 
     const onMouseMove = (e) => {
       positionRef.current = { x: e.clientX, y: e.clientY };
@@ -84,8 +96,10 @@ export const CustomCursor = ({
     document.addEventListener('mouseleave', onMouseLeave);
     document.addEventListener('mouseenter', onMouseEnter);
 
+    visibleRef.current = true;
+    scheduleUpdate();
+
     return () => {
-      document.body.classList.remove('custom-cursor-active');
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mousedown', onMouseDown);
       window.removeEventListener('mouseup', onMouseUp);
@@ -93,7 +107,14 @@ export const CustomCursor = ({
       document.removeEventListener('mouseenter', onMouseEnter);
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
     };
-  }, [reducedMotion, customEnabled, cursorStyle]);
+  }, [reducedMotion, customEnabled, scheduleUpdate]);
+
+  // Re-sync DOM after style/markup changes (React must not control opacity/transform)
+  useEffect(() => {
+    if (reducedMotion || !customEnabled) return;
+    visibleRef.current = true;
+    scheduleUpdate();
+  }, [cursorStyle, theme, darkMode, reducedMotion, customEnabled, scheduleUpdate]);
 
   if (reducedMotion || !customEnabled || cursorTheme.usesNativePointer) return null;
 
@@ -110,7 +131,6 @@ export const CustomCursor = ({
       className="custom-cursor-root fixed top-0 left-0 pointer-events-none z-[100] hidden md:block"
       data-style={cursorStyle}
       style={{
-        opacity: 0,
         '--cursor-accent': accent.hex,
         '--cursor-accent-soft': darkMode ? `${accent.hex}66` : `${accent.hex}88`,
       }}
