@@ -3,7 +3,9 @@ import {
   DEFAULT_THEME_ID,
   THEME_IDS,
   THEMES,
+  formatDurationHoursMinutes,
   getDailyDefaultThemeId,
+  getNextDailyDefaultThemeId,
   getNextLocalMidnight,
   getThemeConfig,
   msUntilNextLocalMidnight,
@@ -27,6 +29,7 @@ describe('themeConfig', () => {
     const todayId = getDailyDefaultThemeId(today);
     const expected = THEME_IDS[(THEME_IDS.indexOf(todayId) + 1) % THEME_IDS.length];
     expect(getDailyDefaultThemeId(tomorrow)).toBe(expected);
+    expect(getNextDailyDefaultThemeId(today)).toBe(expected);
   });
 
   it('cycles through every selectable theme', () => {
@@ -53,5 +56,12 @@ describe('themeConfig', () => {
     expect(nextMidnight.getHours()).toBe(0);
     expect(nextMidnight.getDate()).toBe(28);
     expect(msUntilNextLocalMidnight(now)).toBe(nextMidnight.getTime() - now.getTime());
+  });
+
+  it('formats remaining time as HH:MM', () => {
+    expect(formatDurationHoursMinutes(0)).toBe('00:00');
+    expect(formatDurationHoursMinutes(59_000)).toBe('00:01');
+    expect(formatDurationHoursMinutes((11 * 60 + 42) * 60_000)).toBe('11:42');
+    expect(formatDurationHoursMinutes((23 * 60 + 5) * 60_000 + 1)).toBe('23:06');
   });
 });

@@ -504,6 +504,8 @@
     "moreMenu": "More pages",
     "siteMenu": "Site menu",
     "themes": "Themes",
+    "themeDefaultCountdown": "Default for {{time}}",
+    "themeNextBadge": "Next",
     "cursorThemes": "Cursor theme",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",

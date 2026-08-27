@@ -62,12 +62,26 @@ export function getDailyDefaultThemeId(now = new Date()) {
     return THEME_IDS[index];
 }
 
+export function getNextDailyDefaultThemeId(now = new Date()) {
+    const currentId = getDailyDefaultThemeId(now);
+    const currentIndex = THEME_IDS.indexOf(currentId);
+    return THEME_IDS[(currentIndex + 1) % THEME_IDS.length];
+}
+
 export function getNextLocalMidnight(now = new Date()) {
     return new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
 }
 
 export function msUntilNextLocalMidnight(now = new Date()) {
     return Math.max(1, getNextLocalMidnight(now).getTime() - now.getTime());
+}
+
+/** Formats a duration as HH:MM (hours can exceed 24 if needed). */
+export function formatDurationHoursMinutes(ms) {
+    const totalMinutes = Math.max(0, Math.ceil(ms / 60000));
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 }
 
 export function readSavedThemeId() {

@@ -4,7 +4,12 @@ import { Palette, Menu } from '../ui/Icons.jsx';
 import { Monitor, Newspaper, Film, Terminal, MessageSquare, Activity, ChevronDown } from 'lucide-react';
 import { GlassCard } from '../ui/GlassCard.jsx';
 import Logo from '../../Images/Logo.webp';
-import { THEMES } from '../../utils/themeConfig.js';
+import {
+    THEMES,
+    formatDurationHoursMinutes,
+    getNextDailyDefaultThemeId,
+    msUntilNextLocalMidnight,
+} from '../../utils/themeConfig.js';
 import { CURSOR_THEMES } from '../../utils/cursorThemeConfig.js';
 import { getAccent } from '../../utils/themeTokens.js';
 import { createPortal } from 'react-dom';
@@ -20,6 +25,8 @@ import { useMenuPopover } from '../../utils/useMenuPopover.js';
 export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCursorThemeId, theme, darkMode = true, isMobileMenuOpen, setIsMobileMenuOpen, onLanguageChange }) => {
     const accent = getAccent(theme);
     const { t } = useTranslation();
+    const [themeCountdown, setThemeCountdown] = useState(() => formatDurationHoursMinutes(msUntilNextLocalMidnight()));
+    const [nextDailyThemeId, setNextDailyThemeId] = useState(() => getNextDailyDefaultThemeId());
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
     const [paletteRect, setPaletteRect] = useState(null);
     const paletteTriggerRef = useRef(null);
@@ -67,6 +74,27 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
         { name: t('nav.Stats'), path: '/stats', icon: <Activity className="w-4 h-4" />, description: t('more.statsDesc') }
     ];
 
+    useEffect(() => {
+        const syncDailyThemeMeta = () => {
+            setThemeCountdown(formatDurationHoursMinutes(msUntilNextLocalMidnight()));
+            setNextDailyThemeId(getNextDailyDefaultThemeId());
+        };
+
+        syncDailyThemeMeta();
+        const intervalId = window.setInterval(syncDailyThemeMeta, 1000);
+        const onVisible = () => {
+            if (document.visibilityState === 'visible') syncDailyThemeMeta();
+        };
+        document.addEventListener('visibilitychange', onVisible);
+        window.addEventListener('focus', syncDailyThemeMeta);
+
+        return () => {
+            clearInterval(intervalId);
+            document.removeEventListener('visibilitychange', onVisible);
+            window.removeEventListener('focus', syncDailyThemeMeta);
+        };
+    }, []);
+
     const paletteTriggers = useMemo(
         () => [paletteTriggerRef, mobilePaletteTriggerRef],
         [],
@@ -109,7 +137,7 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
         const trigger = getPaletteTriggerEl();
         if (!trigger) return;
         const rect = trigger.getBoundingClientRect();
-        const w = 192;
+        const w = 240;
         const margin = 8;
         const left = Math.max(margin, Math.min(rect.right - w, window.innerWidth - w - margin));
         setPaletteRect({ top: rect.bottom + margin, left });
@@ -132,7 +160,7 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
                 const trigger = triggerRef?.current || getPaletteTriggerEl();
                 if (trigger) {
                     const rect = trigger.getBoundingClientRect();
-                    const w = 192;
+                    const w = 240;
                     const margin = 8;
                     const left = Math.max(margin, Math.min(rect.right - w, window.innerWidth - w - margin));
                     setPaletteRect({ top: rect.bottom + margin, left });
@@ -241,11 +269,17 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
             id={paletteMenuId}
             role="menu"
             aria-label={t('a11y.themeMenu')}
-            className="fixed z-[9999] w-52 rounded-xl bg-gray-900 border border-gray-700 shadow-2xl overflow-hidden"
+            className="fixed z-[9999] w-60 rounded-xl bg-gray-900 border border-gray-700 shadow-2xl overflow-hidden"
             style={{ top: paletteRect.top, left: paletteRect.left }}
         >
             <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('a11y.themes')}</div>
-            {Object.values(THEMES).map((themeOption) => (
+            <div className="px-3 pb-2 text-[11px] text-gray-400 tabular-nums">
+                {t('a11y.themeDefaultCountdown', { time: themeCountdown })}
+            </div>
+            {Object.values(THEMES).map((themeOption) => {
+                const isSelected = currentThemeId === themeOption.id;
+                const isNext = themeOption.id === nextDailyThemeId;
+                return (
                 <button
                     key={themeOption.id}
                     type="button"
@@ -254,11 +288,23 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
                         setThemeId(themeOption.id);
                         setIsPaletteOpen(false);
                     }}
-                    className={`w-full text-left px-4 py-2 text-sm transition-colors ${currentThemeId === themeOption.id ? accent.menuActive : 'text-gray-300 hover:bg-gray-800'}`}
+                    className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center justify-between gap-2 ${
+                        isSelected
+                            ? accent.menuActive
+                            : isNext
+                              ? `text-gray-100 bg-white/5 border-l-2 ${accent.borderSolid}`
+                              : 'text-gray-300 hover:bg-gray-800'
+                    }`}
                 >
-                    {themeOption.name}
+                    <span className="min-w-0 truncate">{themeOption.name}</span>
+                    {isNext ? (
+                        <span className={`shrink-0 text-[10px] font-bold uppercase tracking-wider ${accent.text}`}>
+                            {t('a11y.themeNextBadge')}
+                        </span>
+                    ) : null}
                 </button>
-            ))}
+                );
+            })}
             <div className="border-t border-gray-800 mt-1 px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                 {t('a11y.cursorThemes')}
             </div>
@@ -491,20 +537,43 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
                                 </div>
                             )}
 
-                            <div className="grid grid-cols-2 gap-3 w-full mt-6">
-                                {Object.values(THEMES).map((themeOption) => (
-                                    <button
-                                        key={themeOption.id}
-                                        type="button"
-                                        onClick={() => {
-                                            setThemeId(themeOption.id);
-                                            handleNavClick();
-                                        }}
-                                        className={`text-center px-4 py-3 rounded-2xl text-sm font-semibold transition-colors ${currentThemeId === themeOption.id ? accent.menuActiveBorder : 'bg-white/5 border border-white/10 text-gray-300'}`}
-                                    >
-                                        {themeOption.name}
-                                    </button>
-                                ))}
+                            <div className="w-full mt-6">
+                                <p className="mb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center">
+                                    {t('a11y.themes')}
+                                </p>
+                                <p className="mb-3 text-[11px] text-gray-400 tabular-nums text-center">
+                                    {t('a11y.themeDefaultCountdown', { time: themeCountdown })}
+                                </p>
+                                <div className="grid grid-cols-2 gap-3 w-full">
+                                    {Object.values(THEMES).map((themeOption) => {
+                                        const isSelected = currentThemeId === themeOption.id;
+                                        const isNext = themeOption.id === nextDailyThemeId;
+                                        return (
+                                            <button
+                                                key={themeOption.id}
+                                                type="button"
+                                                onClick={() => {
+                                                    setThemeId(themeOption.id);
+                                                    handleNavClick();
+                                                }}
+                                                className={`relative text-center px-4 py-3 rounded-2xl text-sm font-semibold transition-colors ${
+                                                    isSelected
+                                                        ? accent.menuActiveBorder
+                                                        : isNext
+                                                          ? `bg-white/5 border ${accent.borderSolid} text-gray-100`
+                                                          : 'bg-white/5 border border-white/10 text-gray-300'
+                                                }`}
+                                            >
+                                                {isNext ? (
+                                                    <span className={`absolute -top-2 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-gray-900 border ${accent.borderSolid} ${accent.text}`}>
+                                                        {t('a11y.themeNextBadge')}
+                                                    </span>
+                                                ) : null}
+                                                {themeOption.name}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
                             </div>
 
                             <p className="mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider w-full text-center">
