@@ -505,6 +505,7 @@
     "siteMenu": "Menu du site",
     "themes": "Thèmes",
     "themeDefaultCountdown": "Par défaut encore {{time}} {{tz}}",
+    "themeTodayBadge": "Aujourd'hui",
     "themeNextBadge": "Suivant",
     "cursorThemes": "Curseur",
     "openMenu": "Ouvrir le menu",

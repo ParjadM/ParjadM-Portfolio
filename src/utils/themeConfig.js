@@ -49,6 +49,8 @@ export const THEMES = {
 export const THEME_IDS = Object.keys(THEMES);
 export const DEFAULT_THEME_ID = 'emerald-dark';
 export const USER_THEME_STORAGE_KEY = 'portfolio_theme_id';
+/** Only set when the visitor explicitly picks a theme in the palette. */
+export const USER_THEME_MANUAL_STORAGE_KEY = 'portfolio_theme_manual';
 /** Eastern Time calendar used for the daily default theme rotation. */
 export const THEME_TIME_ZONE = 'America/New_York';
 /** Display label for the rotation clock (Eastern Time). */
@@ -142,13 +144,44 @@ export function formatDurationHoursMinutes(ms) {
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 }
 
+export function hasManualThemePreference() {
+    if (typeof localStorage === 'undefined') return false;
+    try {
+        return localStorage.getItem(USER_THEME_MANUAL_STORAGE_KEY) === '1';
+    } catch {
+        return false;
+    }
+}
+
 export function readSavedThemeId() {
     if (typeof localStorage === 'undefined') return null;
     try {
+        // Ignore leftover theme ids that were never an explicit palette choice.
+        if (!hasManualThemePreference()) return null;
         const saved = localStorage.getItem(USER_THEME_STORAGE_KEY);
         return THEMES[saved] ? saved : null;
     } catch {
         return null;
+    }
+}
+
+export function saveManualThemeId(themeId) {
+    if (typeof localStorage === 'undefined' || !THEMES[themeId]) return;
+    try {
+        localStorage.setItem(USER_THEME_STORAGE_KEY, themeId);
+        localStorage.setItem(USER_THEME_MANUAL_STORAGE_KEY, '1');
+    } catch {
+        // Ignore quota / private-mode failures; in-memory choice still applies.
+    }
+}
+
+export function clearManualThemePreference() {
+    if (typeof localStorage === 'undefined') return;
+    try {
+        localStorage.removeItem(USER_THEME_STORAGE_KEY);
+        localStorage.removeItem(USER_THEME_MANUAL_STORAGE_KEY);
+    } catch {
+        // Ignore storage failures.
     }
 }
 

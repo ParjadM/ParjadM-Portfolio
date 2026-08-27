@@ -4,11 +4,11 @@ import { HelmetProvider } from 'react-helmet-async';
 import { Layout } from './components/layout/Layout.jsx';
 import { DEFAULT_CURSOR_THEME_ID } from './utils/cursorThemeConfig.js';
 import {
-    USER_THEME_STORAGE_KEY,
     getDailyDefaultThemeId,
     msUntilNextEstMidnight,
     readSavedThemeId,
     resolveThemeId,
+    saveManualThemeId,
 } from './utils/themeConfig.js';
 
 // --- Main App Component ---
@@ -18,7 +18,7 @@ function App() {
     const [cursorThemeId, setCursorThemeId] = useState(DEFAULT_CURSOR_THEME_ID);
     const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
 
-    // Load saved preferences on mount
+    // Load preferences on mount — daily EST default unless user explicitly picked
     useEffect(() => {
         const savedTheme = readSavedThemeId();
         if (savedTheme) {
@@ -34,7 +34,7 @@ function App() {
         }
     }, []);
 
-    // Rotate the default theme at midnight EST unless the user picked one
+    // Keep applying today's EST default until midnight unless the user picked one
     useEffect(() => {
         if (!followsDailyDefault) return undefined;
 
@@ -71,7 +71,7 @@ function App() {
     const updateTheme = (newThemeId) => {
         setCurrentThemeId(newThemeId);
         setFollowsDailyDefault(false);
-        localStorage.setItem(USER_THEME_STORAGE_KEY, newThemeId);
+        saveManualThemeId(newThemeId);
     };
 
     const updateCursorTheme = (newCursorThemeId) => {

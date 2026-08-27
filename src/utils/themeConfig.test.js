@@ -1,33 +1,40 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import {
   DEFAULT_THEME_ID,
   THEME_IDS,
   THEME_TIME_ZONE_LABEL,
   THEMES,
+  USER_THEME_MANUAL_STORAGE_KEY,
+  USER_THEME_STORAGE_KEY,
+  clearManualThemePreference,
   formatDurationHoursMinutes,
   getDailyDefaultThemeId,
   getNextDailyDefaultThemeId,
   getNextEstMidnight,
   getThemeConfig,
   msUntilNextEstMidnight,
+  readSavedThemeId,
   resolveThemeId,
+  saveManualThemeId,
   zonedTimeToUtc,
 } from './themeConfig.js';
 
 describe('themeConfig', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it('falls back to the default theme for unknown ids', () => {
     expect(getThemeConfig('unknown').id).toBe(DEFAULT_THEME_ID);
   });
 
   it('uses the same default theme for an entire EST calendar day', () => {
-    // 2026-08-27 08:00 EDT and 23:00 EDT
     const morning = new Date('2026-08-27T12:00:00.000Z');
     const night = new Date('2026-08-28T03:00:00.000Z');
     expect(getDailyDefaultThemeId(morning)).toBe(getDailyDefaultThemeId(night));
   });
 
   it('advances to the next theme at midnight EST', () => {
-    // Just before / after 2026-08-28 00:00 EDT (UTC-4)
     const beforeMidnight = new Date('2026-08-28T03:59:00.000Z');
     const afterMidnight = new Date('2026-08-28T04:00:00.000Z');
     const todayId = getDailyDefaultThemeId(beforeMidnight);
@@ -53,8 +60,20 @@ describe('themeConfig', () => {
     expect(resolveThemeId('not-a-theme', now)).toBe(getDailyDefaultThemeId(now));
   });
 
+  it('ignores leftover theme ids unless the visitor explicitly picked one', () => {
+    localStorage.setItem(USER_THEME_STORAGE_KEY, 'emerald-dark');
+    expect(readSavedThemeId()).toBeNull();
+
+    saveManualThemeId('ocean-dark');
+    expect(localStorage.getItem(USER_THEME_MANUAL_STORAGE_KEY)).toBe('1');
+    expect(readSavedThemeId()).toBe('ocean-dark');
+
+    clearManualThemePreference();
+    expect(readSavedThemeId()).toBeNull();
+  });
+
   it('schedules the next switch for midnight EST', () => {
-    const now = new Date('2026-08-27T22:30:00.000Z'); // 18:30 EDT
+    const now = new Date('2026-08-27T22:30:00.000Z');
     const nextMidnight = getNextEstMidnight(now);
     expect(nextMidnight.toISOString()).toBe('2026-08-28T04:00:00.000Z');
     expect(msUntilNextEstMidnight(now)).toBe(nextMidnight.getTime() - now.getTime());

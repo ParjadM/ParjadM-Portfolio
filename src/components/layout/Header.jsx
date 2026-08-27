@@ -8,6 +8,7 @@ import {
     THEMES,
     THEME_TIME_ZONE_LABEL,
     formatDurationHoursMinutes,
+    getDailyDefaultThemeId,
     getNextDailyDefaultThemeId,
     msUntilNextEstMidnight,
 } from '../../utils/themeConfig.js';
@@ -27,6 +28,7 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
     const accent = getAccent(theme);
     const { t } = useTranslation();
     const [themeCountdown, setThemeCountdown] = useState(() => formatDurationHoursMinutes(msUntilNextEstMidnight()));
+    const [dailyDefaultThemeId, setDailyDefaultThemeId] = useState(() => getDailyDefaultThemeId());
     const [nextDailyThemeId, setNextDailyThemeId] = useState(() => getNextDailyDefaultThemeId());
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
     const [paletteRect, setPaletteRect] = useState(null);
@@ -78,6 +80,7 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
     useEffect(() => {
         const syncDailyThemeMeta = () => {
             setThemeCountdown(formatDurationHoursMinutes(msUntilNextEstMidnight()));
+            setDailyDefaultThemeId(getDailyDefaultThemeId());
             setNextDailyThemeId(getNextDailyDefaultThemeId());
         };
 
@@ -279,6 +282,7 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
             </div>
             {Object.values(THEMES).map((themeOption) => {
                 const isSelected = currentThemeId === themeOption.id;
+                const isToday = themeOption.id === dailyDefaultThemeId;
                 const isNext = themeOption.id === nextDailyThemeId;
                 return (
                 <button
@@ -301,6 +305,10 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
                     {isNext ? (
                         <span className={`shrink-0 text-[10px] font-bold uppercase tracking-wider ${accent.text}`}>
                             {t('a11y.themeNextBadge')}
+                        </span>
+                    ) : isToday ? (
+                        <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                            {t('a11y.themeTodayBadge')}
                         </span>
                     ) : null}
                 </button>
@@ -548,6 +556,7 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
                                 <div className="grid grid-cols-2 gap-3 w-full">
                                     {Object.values(THEMES).map((themeOption) => {
                                         const isSelected = currentThemeId === themeOption.id;
+                                        const isToday = themeOption.id === dailyDefaultThemeId;
                                         const isNext = themeOption.id === nextDailyThemeId;
                                         return (
                                             <button
@@ -568,6 +577,10 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
                                                 {isNext ? (
                                                     <span className={`absolute -top-2 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-gray-900 border ${accent.borderSolid} ${accent.text}`}>
                                                         {t('a11y.themeNextBadge')}
+                                                    </span>
+                                                ) : isToday ? (
+                                                    <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-gray-900 border border-white/20 text-gray-300">
+                                                        {t('a11y.themeTodayBadge')}
                                                     </span>
                                                 ) : null}
                                                 {themeOption.name}
