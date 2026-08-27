@@ -46,4 +46,43 @@ export const THEMES = {
     }
 };
 
-export const getThemeConfig = (themeId) => THEMES[themeId] || THEMES['emerald-dark'];
+export const THEME_IDS = Object.keys(THEMES);
+export const DEFAULT_THEME_ID = 'emerald-dark';
+export const USER_THEME_STORAGE_KEY = 'portfolio_theme_id';
+
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+function localCalendarDayNumber(date) {
+    return Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / MS_PER_DAY);
+}
+
+export function getDailyDefaultThemeId(now = new Date()) {
+    const count = THEME_IDS.length;
+    const index = ((localCalendarDayNumber(now) % count) + count) % count;
+    return THEME_IDS[index];
+}
+
+export function getNextLocalMidnight(now = new Date()) {
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+}
+
+export function msUntilNextLocalMidnight(now = new Date()) {
+    return Math.max(1, getNextLocalMidnight(now).getTime() - now.getTime());
+}
+
+export function readSavedThemeId() {
+    if (typeof localStorage === 'undefined') return null;
+    try {
+        const saved = localStorage.getItem(USER_THEME_STORAGE_KEY);
+        return THEMES[saved] ? saved : null;
+    } catch {
+        return null;
+    }
+}
+
+export function resolveThemeId(savedThemeId, now = new Date()) {
+    if (savedThemeId && THEMES[savedThemeId]) return savedThemeId;
+    return getDailyDefaultThemeId(now);
+}
+
+export const getThemeConfig = (themeId) => THEMES[themeId] || THEMES[DEFAULT_THEME_ID];
