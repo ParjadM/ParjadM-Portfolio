@@ -40,8 +40,8 @@
 
 .custom-cursor-dot {
   display: block;
-  width: 5px;
-  height: 5px;
+  width: 8px;
+  height: 8px;
   border-radius: 9999px;
   background: #fff;
   transition: transform 0.15s ease, width 0.15s ease, height 0.15s ease;
@@ -51,12 +51,12 @@
   position: absolute;
   left: 0;
   top: 0;
-  width: 22px;
-  height: 22px;
-  margin-left: -11px;
-  margin-top: -11px;
+  width: 32px;
+  height: 32px;
+  margin-left: -16px;
+  margin-top: -16px;
   border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
   opacity: 0;
   transform: scale(0.88);
   transition:
@@ -85,17 +85,17 @@
 }
 
 .custom-cursor-crosshair::before {
-  width: 14px;
-  height: 1px;
-  left: -7px;
-  top: -0.5px;
+  width: 22px;
+  height: 1.5px;
+  left: -11px;
+  top: -0.75px;
 }
 
 .custom-cursor-crosshair::after {
-  width: 1px;
-  height: 14px;
-  left: -0.5px;
-  top: -7px;
+  width: 1.5px;
+  height: 22px;
+  left: -0.75px;
+  top: -11px;
 }
 
 /* Professional — inverted precision dot + hover halo */
@@ -106,19 +106,19 @@
 .custom-cursor-root[data-style="professional"][data-hover="true"] .custom-cursor-focus {
   opacity: 1;
   transform: scale(1);
-  width: 28px;
-  height: 28px;
-  margin-left: -14px;
-  margin-top: -14px;
+  width: 42px;
+  height: 42px;
+  margin-left: -21px;
+  margin-top: -21px;
   border-color: var(--cursor-accent-soft, rgba(255, 255, 255, 0.4));
 }
 
-/* Minimal — tiny dot only */
+/* Minimal — dot only */
 .custom-cursor-root[data-style="minimal"] .custom-cursor-dot {
-  width: 4px;
-  height: 4px;
+  width: 7px;
+  height: 7px;
   background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.35);
 }
 
 .custom-cursor-root[data-style="minimal"] .custom-cursor-focus {
@@ -127,53 +127,53 @@
 
 /* Classic — accent dot with always-visible ring */
 .custom-cursor-root[data-style="classic"] .custom-cursor-dot {
-  width: 4px;
-  height: 4px;
+  width: 7px;
+  height: 7px;
   background: var(--cursor-accent);
 }
 
 .custom-cursor-root[data-style="classic"] .custom-cursor-focus {
   opacity: 0.75;
   transform: scale(1);
-  width: 18px;
-  height: 18px;
-  margin-left: -9px;
-  margin-top: -9px;
+  width: 28px;
+  height: 28px;
+  margin-left: -14px;
+  margin-top: -14px;
   border-color: var(--cursor-accent-soft);
 }
 
 .custom-cursor-root[data-style="classic"][data-hover="true"] .custom-cursor-focus {
   opacity: 1;
-  width: 26px;
-  height: 26px;
-  margin-left: -13px;
-  margin-top: -13px;
+  width: 40px;
+  height: 40px;
+  margin-left: -20px;
+  margin-top: -20px;
 }
 
 /* Accent — branded glow */
 .custom-cursor-root[data-style="accent"] .custom-cursor-dot {
-  width: 6px;
-  height: 6px;
+  width: 10px;
+  height: 10px;
   background: var(--cursor-accent);
-  box-shadow: 0 0 10px var(--cursor-accent-soft);
+  box-shadow: 0 0 14px var(--cursor-accent-soft);
 }
 
 .custom-cursor-root[data-style="accent"] .custom-cursor-focus {
   opacity: 0.55;
   transform: scale(1);
-  width: 22px;
-  height: 22px;
-  margin-left: -11px;
-  margin-top: -11px;
+  width: 32px;
+  height: 32px;
+  margin-left: -16px;
+  margin-top: -16px;
   border-color: var(--cursor-accent);
 }
 
 .custom-cursor-root[data-style="accent"][data-hover="true"] .custom-cursor-focus {
   opacity: 0.9;
-  width: 30px;
-  height: 30px;
-  margin-left: -15px;
-  margin-top: -15px;
+  width: 44px;
+  height: 44px;
+  margin-left: -22px;
+  margin-top: -22px;
 }
 
 /* Crosshair — design-tool reticle */
