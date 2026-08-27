@@ -55,9 +55,13 @@ try {
 
     const headerVisible = await page.locator('header').first().isVisible().catch(() => false);
     const bodyText = (await page.textContent('body'))?.trim() ?? '';
-    const formVisible = check === 'form'
-      ? await page.locator('form').first().isVisible().catch(() => false)
-      : true;
+    let formVisible = true;
+    if (check === 'form') {
+      const form = page.locator('#main-content form, main form').first();
+      formVisible = await form.waitFor({ state: 'visible', timeout: 10_000 })
+        .then(() => true)
+        .catch(() => false);
+    }
 
     if (!headerVisible || bodyText.length < 20 || !formVisible) {
       console.error(`FAIL ${path}: header=${headerVisible}, form=${formVisible}, bodyLen=${bodyText.length}`);
