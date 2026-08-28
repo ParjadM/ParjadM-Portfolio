@@ -495,25 +495,26 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
                         role="dialog"
                         aria-modal="true"
                         aria-label={t('a11y.siteMenu')}
-                        className="fixed inset-0 z-[99999] bg-gray-900/90 backdrop-blur-3xl flex flex-col items-center justify-center p-6 transition-all duration-300 overflow-y-auto"
+                        className="fixed inset-0 z-[99999] flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-gray-900/90 backdrop-blur-3xl transition-all duration-300"
                         {...menuSwipeHandlers}
                     >
                         <button
                             type="button"
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="absolute top-6 right-6 p-4 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all"
+                            className="absolute top-safe-or-4 right-4 z-10 p-3 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-all"
                             aria-label={t('a11y.closeMenu')}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
 
-                        <div className="flex flex-col items-center space-y-6 w-full max-w-sm mt-10">
+                        <div className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain px-4 pt-[calc(4.5rem+env(safe-area-inset-top))] pb-safe-or-3">
+                            <div className="flex flex-col items-center space-y-4 w-full max-w-sm mx-auto">
                             {navItems.map(item => (
                                 <LocalizedLink
                                     key={item.name}
                                     to={item.path}
                                     onClick={handleNavClick}
-                                    className={`text-3xl sm:text-4xl font-extrabold tracking-tight transition-all duration-300 ${isActive(item.path) ? accent.text : 'text-gray-300 hover:text-white'}`}
+                                    className={`text-2xl sm:text-3xl font-extrabold tracking-tight transition-all duration-300 ${isActive(item.path) ? accent.text : 'text-gray-300 hover:text-white'}`}
                                 >
                                     {item.name}
                                 </LocalizedLink>
@@ -522,23 +523,23 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
                             <LocalizedLink
                                 to="/explore"
                                 onClick={handleNavClick}
-                                className={`text-2xl font-bold tracking-tight ${isActive('/explore') ? accent.text : 'text-gray-300 hover:text-white'}`}
+                                className={`text-xl sm:text-2xl font-bold tracking-tight ${isActive('/explore') ? accent.text : 'text-gray-300 hover:text-white'}`}
                             >
                                 {t('nav.Explore')}
                             </LocalizedLink>
 
-                            <div className="w-full h-px bg-white/10 my-4" />
+                            <div className="w-full h-px bg-white/10 my-2" />
 
-                            <div className="flex flex-wrap justify-center gap-4 w-full">
+                            <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 w-full">
                                 {MORE_ITEMS.map((item) => (
-                                    <LocalizedLink key={item.path} to={item.path} onClick={handleNavClick} className="text-gray-400 hover:text-white font-medium">
+                                    <LocalizedLink key={item.path} to={item.path} onClick={handleNavClick} className="text-sm text-gray-400 hover:text-white font-medium">
                                         {item.name}
                                     </LocalizedLink>
                                 ))}
                             </div>
 
                             {visitors !== null && (
-                                <div className="mt-4 flex items-center justify-center space-x-2 px-4 py-3 rounded-full bg-white/5 border border-white/10">
+                                <div className="mt-2 flex items-center justify-center space-x-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
                                     <div className={`w-2.5 h-2.5 rounded-full animate-pulse ${accent.bgDot}`}></div>
                                     <span className="text-gray-300 text-sm font-semibold tracking-wide">
                                         {t('nav.Visitors', { count: visitors })}
@@ -546,14 +547,14 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
                                 </div>
                             )}
 
-                            <div className="w-full mt-6">
+                            <div className="w-full mt-4">
                                 <p className="mb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center">
                                     {t('a11y.themes')}
                                 </p>
-                                <p className="mb-3 text-[11px] text-gray-400 tabular-nums text-center">
+                                <p className="mb-2 text-[11px] text-gray-400 tabular-nums text-center">
                                     {t('a11y.themeDefaultCountdown', { time: themeCountdown, tz: THEME_TIME_ZONE_LABEL })}
                                 </p>
-                                <div className="grid grid-cols-2 gap-3 w-full">
+                                <div className="grid grid-cols-2 gap-2 w-full">
                                     {Object.values(THEMES).map((themeOption) => {
                                         const isSelected = currentThemeId === themeOption.id;
                                         const isToday = themeOption.id === dailyDefaultThemeId;
@@ -566,7 +567,7 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
                                                     setThemeId(themeOption.id);
                                                     handleNavClick();
                                                 }}
-                                                className={`relative text-center px-4 py-3 rounded-2xl text-sm font-semibold transition-colors ${
+                                                className={`relative text-center px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-colors ${
                                                     isSelected
                                                         ? accent.menuActiveBorder
                                                         : isNext
@@ -590,10 +591,10 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
                                 </div>
                             </div>
 
-                            <p className="mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider w-full text-center">
+                            <p className="mt-4 mb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider w-full text-center">
                                 {t('a11y.cursorThemes')}
                             </p>
-                            <div className="grid grid-cols-2 gap-3 w-full">
+                            <div className="grid grid-cols-2 gap-2 w-full pb-2">
                                 {Object.values(CURSOR_THEMES).map((cursorOption) => (
                                     <button
                                         key={cursorOption.id}
@@ -602,11 +603,12 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
                                             setCursorThemeId(cursorOption.id);
                                             handleNavClick();
                                         }}
-                                        className={`text-center px-4 py-3 rounded-2xl text-sm font-semibold transition-colors ${currentCursorThemeId === cursorOption.id ? accent.menuActiveBorder : 'bg-white/5 border border-white/10 text-gray-300'}`}
+                                        className={`text-center px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-colors ${currentCursorThemeId === cursorOption.id ? accent.menuActiveBorder : 'bg-white/5 border border-white/10 text-gray-300'}`}
                                     >
                                         {t(cursorOption.nameKey)}
                                     </button>
                                 ))}
+                            </div>
                             </div>
                         </div>
                     </div>,
