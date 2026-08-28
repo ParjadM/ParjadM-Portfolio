@@ -453,8 +453,8 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
                 </GlassCard>
             </nav>
 
-            {/* Mobile & Tablet Navigation */}
-            <nav className="lg:hidden px-4 pt-safe-or-4 pb-3" role="navigation" aria-label="Mobile Primary">
+            {/* Mobile & Tablet Navigation (< lg) */}
+            <nav className="lg:hidden px-4 md:px-6 pt-safe-or-4 pb-3" role="navigation" aria-label="Mobile Primary">
                 <GlassCard className="!rounded-2xl border border-white/10 shadow-lg backdrop-blur-md px-4 py-2" theme={theme}>
                     <div className="flex justify-between items-center gap-2">
                         <LocalizedLink to="/" className="inline-flex items-center shrink-0">
@@ -507,39 +507,41 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
 
-                        <div className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain px-4 pt-[calc(4.5rem+env(safe-area-inset-top))] pb-safe-or-3">
-                            <div className="flex flex-col items-center space-y-4 w-full max-w-sm mx-auto">
+                        <div className="mobile-menu-scroll flex-1 min-h-0 overflow-y-auto overscroll-y-contain px-4 md:px-8 pt-[calc(4.5rem+env(safe-area-inset-top))] pb-safe-or-6">
+                            <div className="flex flex-col items-center space-y-4 md:space-y-5 w-full max-w-sm md:max-w-2xl mx-auto">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 md:gap-y-4 w-full md:justify-items-center">
                             {navItems.map(item => (
                                 <LocalizedLink
                                     key={item.name}
                                     to={item.path}
                                     onClick={handleNavClick}
-                                    className={`text-2xl sm:text-3xl font-extrabold tracking-tight transition-all duration-300 ${isActive(item.path) ? accent.text : 'text-gray-300 hover:text-white'}`}
+                                    className={`text-2xl md:text-2xl font-extrabold tracking-tight transition-all duration-300 text-center ${isActive(item.path) ? accent.text : 'text-gray-300 hover:text-white'}`}
                                 >
                                     {item.name}
                                 </LocalizedLink>
                             ))}
+                            </div>
 
                             <LocalizedLink
                                 to="/explore"
                                 onClick={handleNavClick}
-                                className={`text-xl sm:text-2xl font-bold tracking-tight ${isActive('/explore') ? accent.text : 'text-gray-300 hover:text-white'}`}
+                                className={`text-xl font-bold tracking-tight ${isActive('/explore') ? accent.text : 'text-gray-300 hover:text-white'}`}
                             >
                                 {t('nav.Explore')}
                             </LocalizedLink>
 
-                            <div className="w-full h-px bg-white/10 my-2" />
+                            <div className="w-full h-px bg-white/10 my-1 md:my-2" />
 
-                            <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 w-full">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-x-3 gap-y-2 w-full md:max-w-xl">
                                 {MORE_ITEMS.map((item) => (
-                                    <LocalizedLink key={item.path} to={item.path} onClick={handleNavClick} className="text-sm text-gray-400 hover:text-white font-medium">
+                                    <LocalizedLink key={item.path} to={item.path} onClick={handleNavClick} className="text-sm text-gray-400 hover:text-white font-medium text-center">
                                         {item.name}
                                     </LocalizedLink>
                                 ))}
                             </div>
 
                             {visitors !== null && (
-                                <div className="mt-2 flex items-center justify-center space-x-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
+                                <div className="mt-1 md:mt-2 flex items-center justify-center space-x-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
                                     <div className={`w-2.5 h-2.5 rounded-full animate-pulse ${accent.bgDot}`}></div>
                                     <span className="text-gray-300 text-sm font-semibold tracking-wide">
                                         {t('nav.Visitors', { count: visitors })}
@@ -547,14 +549,14 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
                                 </div>
                             )}
 
-                            <div className="w-full mt-4">
+                            <div className="w-full mt-3 md:mt-4">
                                 <p className="mb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center">
                                     {t('a11y.themes')}
                                 </p>
                                 <p className="mb-2 text-[11px] text-gray-400 tabular-nums text-center">
                                     {t('a11y.themeDefaultCountdown', { time: themeCountdown, tz: THEME_TIME_ZONE_LABEL })}
                                 </p>
-                                <div className="grid grid-cols-2 gap-2 w-full">
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 w-full">
                                     {Object.values(THEMES).map((themeOption) => {
                                         const isSelected = currentThemeId === themeOption.id;
                                         const isToday = themeOption.id === dailyDefaultThemeId;
@@ -591,10 +593,10 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
                                 </div>
                             </div>
 
-                            <p className="mt-4 mb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider w-full text-center">
+                            <p className="mt-3 md:mt-4 mb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider w-full text-center">
                                 {t('a11y.cursorThemes')}
                             </p>
-                            <div className="grid grid-cols-2 gap-2 w-full pb-2">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 w-full pb-4 md:pb-6">
                                 {Object.values(CURSOR_THEMES).map((cursorOption) => (
                                     <button
                                         key={cursorOption.id}

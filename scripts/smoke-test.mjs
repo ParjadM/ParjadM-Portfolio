@@ -96,6 +96,33 @@ try {
   }
   await mobile.close();
 
+  // Tablet menu: scroll panel reaches cursor themes
+  const tablet = await browser.newContext({ ...devices['iPad Mini'] });
+  const tabletPage = await tablet.newPage();
+  await tabletPage.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  const tabletMenuBtn = tabletPage.locator('nav[aria-label="Mobile Primary"]').getByRole('button', { name: /open menu|ouvrir le menu/i });
+  const tabletMenuVisible = await tabletMenuBtn.isVisible({ timeout: 3_000 }).catch(() => false);
+  if (tabletMenuVisible) {
+    await tabletMenuBtn.click({ timeout: 10_000 });
+    const tabletDialog = tabletPage.getByRole('dialog', { name: /site menu/i });
+    await tabletDialog.waitFor({ state: 'visible', timeout: 5_000 });
+    const scrollPanel = tabletDialog.locator('.mobile-menu-scroll');
+    await scrollPanel.waitFor({ state: 'visible', timeout: 5_000 });
+    await scrollPanel.evaluate((el) => { el.scrollTop = el.scrollHeight; });
+    const cursorOption = tabletPage.getByRole('button', { name: /accent glow|lueur accent/i });
+    await cursorOption.scrollIntoViewIfNeeded();
+    const cursorVisible = await cursorOption.isVisible().catch(() => false);
+    if (!cursorVisible) {
+      console.error('FAIL tablet menu: cursor themes not visible after scroll');
+      failed = true;
+    } else {
+      console.log('PASS tablet menu scroll + cursor themes');
+    }
+  } else {
+    console.log('SKIP tablet menu (button not visible)');
+  }
+  await tablet.close();
+
   if (pageErrors.length > 0) {
     console.error('Uncaught page errors:');
     for (const e of pageErrors) console.error(`  - ${e}`);
