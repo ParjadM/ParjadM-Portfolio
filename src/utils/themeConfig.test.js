@@ -4,6 +4,7 @@ import {
   THEME_IDS,
   THEME_TIME_ZONE_LABEL,
   THEMES,
+  USER_THEME_MANUAL_DAY_KEY,
   USER_THEME_MANUAL_STORAGE_KEY,
   USER_THEME_STORAGE_KEY,
   clearManualThemePreference,
@@ -13,7 +14,8 @@ import {
   getNextEstMidnight,
   getThemeConfig,
   msUntilNextEstMidnight,
-  readSavedThemeId,
+  readManualThemeIdForToday,
+  resolveActiveThemeId,
   resolveThemeId,
   saveManualThemeId,
   zonedTimeToUtc,
@@ -60,16 +62,35 @@ describe('themeConfig', () => {
     expect(resolveThemeId('not-a-theme', now)).toBe(getDailyDefaultThemeId(now));
   });
 
-  it('ignores leftover theme ids unless the visitor explicitly picked one', () => {
+  it('ignores leftover theme ids unless the visitor explicitly picked one today', () => {
     localStorage.setItem(USER_THEME_STORAGE_KEY, 'emerald-dark');
-    expect(readSavedThemeId()).toBeNull();
+    expect(readManualThemeIdForToday()).toBeNull();
 
-    saveManualThemeId('ocean-dark');
+    const now = new Date('2026-08-28T12:00:00.000Z');
+    saveManualThemeId('ocean-dark', now);
     expect(localStorage.getItem(USER_THEME_MANUAL_STORAGE_KEY)).toBe('1');
-    expect(readSavedThemeId()).toBe('ocean-dark');
+    expect(localStorage.getItem(USER_THEME_MANUAL_DAY_KEY)).toBeTruthy();
+    expect(readManualThemeIdForToday(now)).toBe('ocean-dark');
+    expect(resolveActiveThemeId(now)).toBe('ocean-dark');
 
     clearManualThemePreference();
-    expect(readSavedThemeId()).toBeNull();
+    expect(readManualThemeIdForToday(now)).toBeNull();
+  });
+
+  it('expires manual picks from a previous EST day and applies the new default', () => {
+    const yesterday = new Date('2026-08-27T16:00:00.000Z');
+    const today = new Date('2026-08-28T12:00:00.000Z');
+    saveManualThemeId('ocean-dark', yesterday);
+    expect(readManualThemeIdForToday(today)).toBeNull();
+    expect(resolveActiveThemeId(today)).toBe(getDailyDefaultThemeId(today));
+    expect(localStorage.getItem(USER_THEME_STORAGE_KEY)).toBeNull();
+  });
+
+  it('clears legacy manual flags that have no EST day stamp', () => {
+    localStorage.setItem(USER_THEME_STORAGE_KEY, 'crimson-dark');
+    localStorage.setItem(USER_THEME_MANUAL_STORAGE_KEY, '1');
+    expect(readManualThemeIdForToday()).toBeNull();
+    expect(localStorage.getItem(USER_THEME_STORAGE_KEY)).toBeNull();
   });
 
   it('schedules the next switch for midnight EST', () => {

@@ -1,45 +1,45 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { Layout } from './components/layout/Layout.jsx';
 import { DEFAULT_CURSOR_THEME_ID } from './utils/cursorThemeConfig.js';
 import {
+    clearManualThemePreference,
     getDailyDefaultThemeId,
     msUntilNextEstMidnight,
-    readSavedThemeId,
-    resolveThemeId,
+    readManualThemeIdForToday,
+    resolveActiveThemeId,
     saveManualThemeId,
 } from './utils/themeConfig.js';
 
 // --- Main App Component ---
 function App() {
-    const [currentThemeId, setCurrentThemeId] = useState(() => resolveThemeId(readSavedThemeId()));
-    const [followsDailyDefault, setFollowsDailyDefault] = useState(() => !readSavedThemeId());
+    const [currentThemeId, setCurrentThemeId] = useState(() => resolveActiveThemeId());
     const [cursorThemeId, setCursorThemeId] = useState(DEFAULT_CURSOR_THEME_ID);
     const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
 
-    // Load preferences on mount — daily EST default unless user explicitly picked
-    useEffect(() => {
-        const savedTheme = readSavedThemeId();
-        if (savedTheme) {
-            setCurrentThemeId(savedTheme);
-            setFollowsDailyDefault(false);
-        } else {
-            setCurrentThemeId(getDailyDefaultThemeId());
-            setFollowsDailyDefault(true);
+    const syncThemeForToday = useCallback(() => {
+        const manualTheme = readManualThemeIdForToday();
+        if (manualTheme) {
+            setCurrentThemeId(manualTheme);
+            return;
         }
+        setCurrentThemeId(getDailyDefaultThemeId());
+    }, []);
+
+    // Load preferences on mount — apply today's EST default unless user picked today
+    useEffect(() => {
+        syncThemeForToday();
         const savedCursorTheme = localStorage.getItem('portfolio_cursor_theme_id');
         if (savedCursorTheme) {
             setCursorThemeId(savedCursorTheme);
         }
-    }, []);
+    }, [syncThemeForToday]);
 
-    // Keep applying today's EST default until midnight unless the user picked one
+    // Force the new daily default at EST midnight and when the tab returns on a new day
     useEffect(() => {
-        if (!followsDailyDefault) return undefined;
-
         const applyDailyDefault = () => {
-            if (readSavedThemeId()) return;
+            clearManualThemePreference();
             setCurrentThemeId(getDailyDefaultThemeId());
         };
 
@@ -53,24 +53,24 @@ function App() {
         };
 
         scheduleNextSwitch();
-        applyDailyDefault();
 
         const onVisible = () => {
-            if (document.visibilityState === 'visible') applyDailyDefault();
+            if (document.visibilityState !== 'visible') return;
+            syncThemeForToday();
         };
+
         document.addEventListener('visibilitychange', onVisible);
-        window.addEventListener('focus', applyDailyDefault);
+        window.addEventListener('focus', syncThemeForToday);
 
         return () => {
             clearTimeout(timeoutId);
             document.removeEventListener('visibilitychange', onVisible);
-            window.removeEventListener('focus', applyDailyDefault);
+            window.removeEventListener('focus', syncThemeForToday);
         };
-    }, [followsDailyDefault]);
+    }, [syncThemeForToday]);
 
     const updateTheme = (newThemeId) => {
         setCurrentThemeId(newThemeId);
-        setFollowsDailyDefault(false);
         saveManualThemeId(newThemeId);
     };
 

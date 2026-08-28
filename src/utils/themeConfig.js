@@ -51,6 +51,8 @@ export const DEFAULT_THEME_ID = 'emerald-dark';
 export const USER_THEME_STORAGE_KEY = 'portfolio_theme_id';
 /** Only set when the visitor explicitly picks a theme in the palette. */
 export const USER_THEME_MANUAL_STORAGE_KEY = 'portfolio_theme_manual';
+/** EST calendar day stamp for the manual pick (expires at the next EST midnight). */
+export const USER_THEME_MANUAL_DAY_KEY = 'portfolio_theme_manual_est_day';
 /** Eastern Time calendar used for the daily default theme rotation. */
 export const THEME_TIME_ZONE = 'America/New_York';
 /** Display label for the rotation clock (Eastern Time). */
@@ -153,11 +155,21 @@ export function hasManualThemePreference() {
     }
 }
 
-export function readSavedThemeId() {
+/** Returns the EST calendar day index used for daily theme rotation. */
+export function getEstCalendarDayNumber(now = new Date()) {
+    return estCalendarDayNumber(now);
+}
+
+export function readManualThemeIdForToday(now = new Date()) {
     if (typeof localStorage === 'undefined') return null;
     try {
-        // Ignore leftover theme ids that were never an explicit palette choice.
         if (!hasManualThemePreference()) return null;
+        const savedDay = localStorage.getItem(USER_THEME_MANUAL_DAY_KEY);
+        const today = String(estCalendarDayNumber(now));
+        if (!savedDay || savedDay !== today) {
+            clearManualThemePreference();
+            return null;
+        }
         const saved = localStorage.getItem(USER_THEME_STORAGE_KEY);
         return THEMES[saved] ? saved : null;
     } catch {
@@ -165,11 +177,17 @@ export function readSavedThemeId() {
     }
 }
 
-export function saveManualThemeId(themeId) {
+/** @deprecated Use readManualThemeIdForToday */
+export function readSavedThemeId(now = new Date()) {
+    return readManualThemeIdForToday(now);
+}
+
+export function saveManualThemeId(themeId, now = new Date()) {
     if (typeof localStorage === 'undefined' || !THEMES[themeId]) return;
     try {
         localStorage.setItem(USER_THEME_STORAGE_KEY, themeId);
         localStorage.setItem(USER_THEME_MANUAL_STORAGE_KEY, '1');
+        localStorage.setItem(USER_THEME_MANUAL_DAY_KEY, String(estCalendarDayNumber(now)));
     } catch {
         // Ignore quota / private-mode failures; in-memory choice still applies.
     }
@@ -180,9 +198,16 @@ export function clearManualThemePreference() {
     try {
         localStorage.removeItem(USER_THEME_STORAGE_KEY);
         localStorage.removeItem(USER_THEME_MANUAL_STORAGE_KEY);
+        localStorage.removeItem(USER_THEME_MANUAL_DAY_KEY);
     } catch {
         // Ignore storage failures.
     }
+}
+
+export function resolveActiveThemeId(now = new Date()) {
+    const manual = readManualThemeIdForToday(now);
+    if (manual) return manual;
+    return getDailyDefaultThemeId(now);
 }
 
 export function resolveThemeId(savedThemeId, now = new Date()) {
