@@ -17,18 +17,6 @@ You answer questions about Parjad based on the following information:`
 const INTERVIEW_PROMPT = `You are Parjad Minooei, a talented Software Engineer. You are currently in a technical job interview with a recruiter or hiring manager.
 Answer their questions confidently, accurately, and professionally, but let your personality shine through. Use the following facts about your background:`
 
-const COMPLEXITY_PROMPT = `You are an expert static analyzer for code complexity.
-Analyze the following source code and determine its Time Complexity and Space (Memory) Complexity.
-Provide the complexity BOTH with constants (exact operations/space count, e.g., O(3N + 2)) and without constants (Big-O notation, e.g., O(N)).
-Respond EXCLUSIVELY in valid JSON format using the following schema:
-{
-  "timeWithConstant": "...",
-  "timeWithoutConstant": "...",
-  "memoryWithConstant": "...",
-  "memoryWithoutConstant": "...",
-  "explanation": "A concise explanation."
-}`
-
 const JOB_FIT_PROMPT = `You are a hiring analyst comparing a job description to Parjad Minooei's background.
 Use the candidate knowledge below. Be honest, constructive, and recruiter-friendly.
 Respond EXCLUSIVELY in valid JSON:
@@ -284,37 +272,6 @@ router.post('/blog/explain', async (req, res) => {
   } catch (err) {
     console.error('AI Blog Explain Error:', err)
     res.status(500).json({ error: err.message || 'Failed to explain blog post' })
-  }
-})
-
-router.post('/complexity', async (req, res) => {
-  try {
-    const { code } = req.body
-
-    if (!code || typeof code !== 'string') {
-      return res.status(400).json({ error: 'Code string is required' })
-    }
-
-    const result = await askGemini({
-      feature: 'complexity',
-      userMessage: code.trim(),
-      systemPromptBase: COMPLEXITY_PROMPT,
-      responseFormat: 'json',
-      req,
-      skipFaq: true,
-      skipStatic: true,
-      skipKnowledge: true,
-      cacheTtl: aiConfig.cacheTtlComplexity,
-    })
-
-    if (!result.ok) {
-      return res.status(result.status || 500).json({ error: result.error })
-    }
-
-    res.json(result.reply)
-  } catch (err) {
-    console.error('AI Complexity Error:', err)
-    res.status(500).json({ error: err.message || 'Failed to analyze code complexity' })
   }
 })
 

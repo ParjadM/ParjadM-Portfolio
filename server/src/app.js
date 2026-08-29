@@ -3,7 +3,6 @@ import cors from 'cors'
 import morgan from 'morgan'
 import adminRouter from './routes/admin.js'
 import authRouter, { requireAuth } from './auth.js'
-import itemsRouter from './routes/items.js'
 import blogRouter from './routes/blog.js'
 import { currentEngine, initDatabase } from './db/index.js'
 import projectsRouter from './routes/projects.js'
@@ -59,7 +58,6 @@ export async function createApp() {
 
   // API routes
   app.use('/api/auth', authRouter)
-  app.use('/api/items', itemsRouter)
   app.use('/api/blog', blogRouter)
   app.use('/api/projects', projectsRouter)
   app.use('/api/admin', requireAuth, adminRouter)

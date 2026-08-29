@@ -7,7 +7,6 @@ export const aiConfig = {
   knowledgeMaxChars: Number(process.env.AI_KNOWLEDGE_MAX_CHARS || 800),
   cacheTtlChat: Number(process.env.AI_CACHE_TTL_CHAT || 2592000),
   cacheTtlInterview: Number(process.env.AI_CACHE_TTL_INTERVIEW || 2592000),
-  cacheTtlComplexity: Number(process.env.AI_CACHE_TTL_COMPLEXITY || 604800),
   cacheTtlJobFit: Number(process.env.AI_CACHE_TTL_JOB_FIT || 86400),
   cacheTtlDebrief: Number(process.env.AI_CACHE_TTL_DEBRIEF || 604800),
   jobFitDailyPerIp: Number(process.env.AI_JOB_FIT_DAILY_PER_IP || 3),

@@ -255,9 +255,6 @@
   will-change: opacity, transform;
 }
 .reveal-up { transform: translateY(40px) scale(0.95); }
-.reveal-down { transform: translateY(-40px) scale(0.95); }
-.reveal-left { transform: translateX(-40px) scale(0.95); }
-.reveal-right { transform: translateX(40px) scale(0.95); }
 .reveal-visible {
   opacity: 1;
   transform: none;

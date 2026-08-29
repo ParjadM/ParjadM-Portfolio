@@ -177,11 +177,6 @@ export function readManualThemeIdForToday(now = new Date()) {
     }
 }
 
-/** @deprecated Use readManualThemeIdForToday */
-export function readSavedThemeId(now = new Date()) {
-    return readManualThemeIdForToday(now);
-}
-
 export function saveManualThemeId(themeId, now = new Date()) {
     if (typeof localStorage === 'undefined' || !THEMES[themeId]) return;
     try {

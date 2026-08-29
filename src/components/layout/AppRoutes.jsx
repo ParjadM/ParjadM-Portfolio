@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { Route, useRoutes } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import { RequireAuth } from '../../utils/auth.jsx';
 import { lazyWithRetry } from '../../utils/lazyWithRetry.js';
 
@@ -126,22 +126,5 @@ export function buildAppRouteElements(theme) {
     <Route key="fr-admin-login" path="/fr/admin/login" element={themed(AdminLoginPage)} />,
     <Route key="fr-admin" path="/fr/admin" element={<RequireAuth>{themed(AdminDashboard)}</RequireAuth>} />,
     <Route key="not-found" path="*" element={themed(NotFoundPage)} />,
-  ]);
-}
-
-/** Hook-based routing for use outside a <Routes> wrapper. */
-export function AppRoutes({ theme }) {
-  const themed = (Component) => lazyThemed(Component, theme);
-
-  return useRoutes([
-    ...PUBLIC_ROUTES.flatMap(({ path, Component }) => [
-      { path: routePath('', path), element: themed(Component) },
-      { path: routePath('/fr', path), element: themed(Component) },
-    ]),
-    { path: '/admin/login', element: themed(AdminLoginPage) },
-    { path: '/admin', element: <RequireAuth>{themed(AdminDashboard)}</RequireAuth> },
-    { path: '/fr/admin/login', element: themed(AdminLoginPage) },
-    { path: '/fr/admin', element: <RequireAuth>{themed(AdminDashboard)}</RequireAuth> },
-    { path: '*', element: themed(NotFoundPage) },
   ]);
 }
