@@ -46,9 +46,23 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 1 * 1024 * 1024,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
-        navigateFallback: '/index.html',
+        navigateFallback: null,
         navigateFallbackDenylist: [/^\/api\//, /^\/assets\//],
         runtimeCaching: [
+          {
+            // Never pin online visitors to the HTML from an older precache.
+            urlPattern: ({ request, url }) => request.mode === 'navigate'
+              && url.origin === self.location.origin
+              && !url.pathname.startsWith('/api/')
+              && !url.pathname.startsWith('/assets/'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'page-navigations',
+              networkTimeoutSeconds: 5,
+              cacheableResponse: { statuses: [200] },
+              expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 7 },
+            },
+          },
           {
             urlPattern: /^\/api\//,
             handler: 'NetworkOnly',

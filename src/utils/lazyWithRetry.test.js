@@ -29,9 +29,9 @@ describe('recoverFromStaleChunk', () => {
   });
 
   it('returns false on the second attempt in the same tab session', async () => {
-    sessionStorage.setItem('chunk-load-reload', '1');
+    sessionStorage.setItem('chunk-load-reload', String(Date.now()));
     await expect(recoverFromStaleChunk()).resolves.toBe(false);
-    expect(sessionStorage.getItem('chunk-load-reload')).toBe('1');
+    expect(Number(sessionStorage.getItem('chunk-load-reload'))).toBeGreaterThan(1);
     await expect(recoverFromStaleChunk()).resolves.toBe(false);
   });
 });
@@ -42,7 +42,7 @@ describe('recovery coordination', () => {
     vi.resetModules();
     sessionStorage.clear();
     const update = vi.fn(() => new Promise(() => {}));
-    vi.stubGlobal('navigator', { onLine: true, serviceWorker: { getRegistration: async () => ({ update }) } });
+    vi.stubGlobal('navigator', { onLine: true, serviceWorker: { getRegistrations: update } });
     try {
       const { recoverFromStaleChunk: recover } = await import('./lazyWithRetry.js');
       const first = recover();

@@ -3,6 +3,14 @@ import React from 'react';
 const RELOAD_KEY = 'chunk-load-reload';
 let recoveryPromise;
 let attemptedRecovery = false;
+const RECOVERY_COOLDOWN_MS = 60_000;
+
+function recentlyRecovered() {
+  const stored = Number(safeSessionGet(RELOAD_KEY));
+  const query = Number(new URL(window.location.href).searchParams.get('_chunkfix'));
+  const last = Math.max(stored || 0, query || 0);
+  return last > 1 && Date.now() - last < RECOVERY_COOLDOWN_MS;
+}
 
 function isChunkLoadError(err) {
   const msg = String(err?.message || err || '');
@@ -92,28 +100,25 @@ async function unregisterServiceWorkers() {
 
 /**
  * Recover from a deploy mismatch: old shell/SW referencing deleted hashed chunks.
- * One reload only per tab session to avoid loops.
+ * One automatic reload per minute, shared across handlers, to avoid loops.
  */
 function recoverFromStaleChunk() {
   if (recoveryPromise) return recoveryPromise;
-  if (navigator.onLine === false || attemptedRecovery || safeSessionGet(RELOAD_KEY)
-      || new URL(window.location.href).searchParams.has('_chunkfix')) {
+  if (navigator.onLine === false || attemptedRecovery || recentlyRecovered()) {
     return Promise.resolve(false);
   }
   attemptedRecovery = true;
-  safeSessionSet(RELOAD_KEY, '1');
+  safeSessionSet(RELOAD_KEY, String(Date.now()));
   recoveryPromise = performRecovery();
   return recoveryPromise;
 }
 
 async function performRecovery() {
 
-  const activated = await activateWaitingWorker();
-  if (!activated) {
-    // No waiting worker — clear caches + unregister so the next load is network-fresh.
-    await clearAssetCaches();
-    await unregisterServiceWorkers();
-  }
+  // A waiting worker can still contain a stale shell. Remove its registration
+  // and asset caches before navigating instead of trusting activation timing.
+  await unregisterServiceWorkers();
+  await clearAssetCaches();
 
   // Cache-bust the navigation in case a CDN/edge still has a stale HTML shell.
   try {
@@ -159,8 +164,7 @@ export function installChunkLoadRecovery() {
   const onRejection = (event) => {
     if (!isChunkLoadError(event.reason)) return;
     if (navigator.onLine === false) return;
-    if (recoveryPromise || (!attemptedRecovery && !safeSessionGet(RELOAD_KEY)
-        && !new URL(window.location.href).searchParams.has('_chunkfix'))) {
+    if (recoveryPromise || (!attemptedRecovery && !recentlyRecovered())) {
       event.preventDefault();
       void recoverFromStaleChunk();
     }
