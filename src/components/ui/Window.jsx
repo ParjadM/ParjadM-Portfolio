@@ -1,207 +1,81 @@
-import React, { useRef, useState } from 'react';
-import { motion, AnimatePresence, useDragControls } from 'framer-motion';
-import { Minus, Square, X, Maximize2 } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Minus, Square, X, Columns2 } from 'lucide-react';
 import { getAccent } from '../../utils/themeTokens.js';
 
-export const Window = ({ 
-    id, 
-    title, 
-    icon, 
-    isOpen, 
-    isMinimized, 
-    isFocused, 
-    zIndex, 
-    onClose, 
-    onMinimize, 
-    onFocus,
-    children,
-    theme = 'emerald',
-    defaultSize = { width: 600, height: 400 },
-    defaultPosition = { x: 50, y: 50 }
-}) => {
-    // Small screens (including landscape phones with limited height) get full-screen windows
-    const [isMaximized, setIsMaximized] = useState(() => window.innerWidth < 768 || window.innerHeight < 500);
-    const [size, setSize] = useState(() => {
-        const isMobile = window.innerWidth < 768 || window.innerHeight < 500;
-        if (isMobile) {
-            return { width: window.innerWidth, height: window.innerHeight - 48 };
-        }
-        return {
-            width: Math.min(defaultSize.width, window.innerWidth - 40),
-            height: Math.min(defaultSize.height, window.innerHeight - 100)
-        };
-    });
-    const windowRef = useRef(null);
-    const dragControls = useDragControls();
-    // Position set by edge snapping (drag to left/right edge = half screen, top = maximize)
-    const [snapPos, setSnapPos] = useState(null);
-
-    const handleDragStart = () => setSnapPos(null);
-
-    const handleDragEnd = (e, info) => {
-        const px = info.point.x;
-        const py = info.point.y;
-        const vw = window.innerWidth;
-        const vh = window.innerHeight;
-        if (py <= 8) {
-            setIsMaximized(true);
-            return;
-        }
-        const half = { width: Math.floor(vw / 2), height: vh - 48 };
-        if (px <= 12) {
-            setSize(half);
-            setSnapPos({ x: 0, y: 0 });
-        } else if (px >= vw - 12) {
-            setSize(half);
-            setSnapPos({ x: vw - half.width, y: 0 });
-        }
-    };
-
-    const handleResize = (e, direction) => {
-        e.stopPropagation();
-        onFocus(id);
-        const startX = e.clientX;
-        const startY = e.clientY;
-        const startWidth = size.width;
-        const startHeight = size.height;
-
-        const handlePointerMove = (eMove) => {
-            let newWidth = startWidth;
-            let newHeight = startHeight;
-            
-            if (direction === 'right' || direction === 'both') {
-                newWidth = Math.max(300, startWidth + (eMove.clientX - startX));
-            }
-            if (direction === 'bottom' || direction === 'both') {
-                newHeight = Math.max(200, startHeight + (eMove.clientY - startY));
-            }
-            setSize({ width: newWidth, height: newHeight });
-        };
-
-        const handlePointerUp = () => {
-            document.removeEventListener('pointermove', handlePointerMove);
-            document.removeEventListener('pointerup', handlePointerUp);
-        };
-
-        document.addEventListener('pointermove', handlePointerMove);
-        document.addEventListener('pointerup', handlePointerUp);
-    };
-
-    // Bring to front on click
-    const handlePointerDown = () => {
-        onFocus(id);
-    };
-
+const viewport = () => ({ width: window.innerWidth, height: window.innerHeight });
+export const Window = ({ id, title, icon, isOpen, isMinimized, isFocused, zIndex, onClose, onMinimize, onFocus, children, theme = 'emerald', defaultSize = { width: 600, height: 400 }, defaultPosition = { x: 50, y: 50 } }) => {
+    const [screen, setScreen] = useState(viewport);
+    const [mode, setMode] = useState('floating');
+    const [bounds, setBounds] = useState({ ...defaultPosition, ...defaultSize });
+    const cleanup = useRef(() => {});
+    const mobile = screen.width < 768 || screen.height < 500;
     const accent = getAccent(theme);
-
-    if (!isOpen) return null;
-
-    const toggleMaximize = () => {
-        setIsMaximized((prev) => {
-            if (prev) setSnapPos(null);
-            return !prev;
-        });
+    useEffect(() => {
+        const resize = () => setScreen(viewport());
+        window.addEventListener('resize', resize);
+        return () => { window.removeEventListener('resize', resize); cleanup.current(); };
+    }, []);
+    useEffect(() => { if (isMinimized) cleanup.current(); }, [isMinimized]);
+    const availableHeight = Math.max(120, screen.height - 80);
+    const width = Math.min(bounds.width, screen.width);
+    const height = Math.min(bounds.height, availableHeight);
+    const rect = {
+        width, height,
+        x: Math.max(0, Math.min(bounds.x, screen.width - width)),
+        y: Math.max(0, Math.min(bounds.y, availableHeight - height)),
     };
-
+    const startGesture = (event, resize = false) => {
+        if (mobile || mode !== 'floating' || event.button !== 0) return;
+        event.preventDefault();
+        onFocus(id);
+        cleanup.current();
+        const start = { x: event.clientX, y: event.clientY, ...{ rect } };
+        const target = event.currentTarget;
+        target.setPointerCapture(event.pointerId);
+        const move = (e) => {
+            const dx = e.clientX - start.x, dy = e.clientY - start.y;
+            setBounds(resize ? {
+                ...rect,
+                width: Math.min(screen.width - rect.x, Math.max(280, rect.width + dx)),
+                height: Math.min(availableHeight - rect.y, Math.max(180, rect.height + dy)),
+            } : { ...rect, x: Math.max(0, Math.min(screen.width - rect.width, rect.x + dx)), y: Math.max(0, Math.min(availableHeight - rect.height, rect.y + dy)) });
+        };
+        const stop = (e) => {
+            cleanup.current();
+            if (!resize && e.type === 'pointerup') {
+                if (e.clientY < 12) setMode('maximized');
+                else if (e.clientX < 16) setMode('left');
+                else if (e.clientX > screen.width - 16) setMode('right');
+            }
+        };
+        cleanup.current = () => {
+            target.removeEventListener('pointermove', move);
+            target.removeEventListener('pointerup', stop);
+            target.removeEventListener('pointercancel', stop);
+            if (target.hasPointerCapture(event.pointerId)) target.releasePointerCapture(event.pointerId);
+        };
+        target.addEventListener('pointermove', move);
+        target.addEventListener('pointerup', stop);
+        target.addEventListener('pointercancel', stop);
+    };
+    if (!isOpen) return null;
+    const full = mobile || mode === 'maximized';
+    const snapped = mode === 'left' || mode === 'right';
+    const toggleMaximize = () => setMode(mode === 'floating' ? 'maximized' : 'floating');
     return (
-        <AnimatePresence>
-            {!isMinimized && (
-                <motion.div
-                    ref={windowRef}
-                    drag={!isMaximized}
-                    dragListener={false}
-                    dragControls={dragControls}
-                    dragMomentum={false}
-                    dragConstraints={{ left: 0, top: 0, right: window.innerWidth - 100, bottom: window.innerHeight - 100 }}
-                    onDragStart={handleDragStart}
-                    onDragEnd={handleDragEnd}
-                    initial={{ opacity: 0, scale: 0.95, ...defaultPosition }}
-                    animate={{ 
-                        opacity: isFocused ? 1 : 0.88, 
-                        scale: 1,
-                        x: isMaximized ? 0 : (snapPos ? snapPos.x : undefined),
-                        y: isMaximized ? 0 : (snapPos ? snapPos.y : undefined),
-                        width: isMaximized ? '100vw' : size.width,
-                        height: isMaximized ? 'calc(100vh - 48px)' : size.height, // 48px for taskbar
-                        zIndex: zIndex
-                    }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ 
-                        default: { type: "spring", bounce: 0, duration: 0.3 },
-                        width: { type: "tween", duration: 0 },
-                        height: { type: "tween", duration: 0 }
-                    }}
-                    onPointerDown={handlePointerDown}
-                    className="absolute shadow-2xl flex flex-col rounded-xl overflow-hidden bg-gray-900/80 backdrop-blur-xl border border-white/10"
-                    style={{ position: 'absolute' }}
-                >
-                    {/* Title Bar (Drag Handle) */}
-                    <div 
-                        onPointerDown={(e) => dragControls.start(e)}
-                        className={`h-10 flex items-center justify-between px-3 cursor-grab active:cursor-grabbing border-b border-white/5 bg-gray-800/50 ${isFocused ? accent.windowFocus : ''}`}
-                    >
-                        <div className="flex items-center space-x-2 text-gray-300">
-                            {icon}
-                            <span className="text-sm font-semibold select-none">{title}</span>
-                        </div>
-                        
-                        <div className="flex items-center space-x-1.5" onPointerDown={(e) => e.stopPropagation()}>
-                            <button 
-                                onClick={(e) => { e.stopPropagation(); onMinimize(id); }}
-                                className="w-9 h-9 md:w-7 md:h-7 flex items-center justify-center rounded hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
-                                aria-label="Minimize"
-                            >
-                                <Minus className="w-4 h-4 md:w-3.5 md:h-3.5" />
-                            </button>
-                            <button 
-                                onClick={(e) => { e.stopPropagation(); toggleMaximize(); }}
-                                className="w-9 h-9 md:w-7 md:h-7 flex items-center justify-center rounded hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
-                                aria-label={isMaximized ? 'Restore' : 'Maximize'}
-                            >
-                                {isMaximized ? <Maximize2 className="w-4 h-4 md:w-3.5 md:h-3.5" /> : <Square className="w-4 h-4 md:w-3.5 md:h-3.5" />}
-                            </button>
-                            <button 
-                                onClick={(e) => { e.stopPropagation(); onClose(id); }}
-                                className="w-9 h-9 md:w-7 md:h-7 flex items-center justify-center rounded hover:bg-red-500 text-gray-400 hover:text-white transition-colors"
-                                aria-label="Close"
-                            >
-                                <X className="w-4 h-4" />
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Window Content */}
-                    <div className="flex-1 overflow-auto bg-gray-900/40 relative">
-                        {isFocused && <div className="absolute inset-0 pointer-events-none border border-transparent shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]" />}
-                        {children}
-                    </div>
-
-                    {/* Edge Resize Handles */}
-                    {!isMaximized && (
-                        <>
-                            {/* Right Edge */}
-                            <div 
-                                onPointerDown={(e) => handleResize(e, 'right')}
-                                className="absolute top-0 right-0 w-2 h-full cursor-e-resize z-50 hover:bg-white/10 transition-colors"
-                            />
-                            {/* Bottom Edge */}
-                            <div 
-                                onPointerDown={(e) => handleResize(e, 'bottom')}
-                                className="absolute bottom-0 left-0 w-full h-2 cursor-s-resize z-50 hover:bg-white/10 transition-colors"
-                            />
-                            {/* Custom Bottom-Right Corner Resize Handle */}
-                            <div 
-                                onPointerDown={(e) => handleResize(e, 'both')}
-                                className="absolute bottom-0 right-0 w-6 h-6 cursor-se-resize z-50 flex items-end justify-end p-1.5 opacity-50 hover:opacity-100 transition-opacity bg-transparent"
-                            >
-                                <svg viewBox="0 0 10 10" width="10" height="10" className="text-gray-400">
-                                    <path d="M 8 10 L 10 8 M 5 10 L 10 5 M 2 10 L 10 2" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
-                                </svg>
-                            </div>
-                        </>
-                    )}
-                </motion.div>
-            )}
-        </AnimatePresence>
+        <section aria-label={title} data-os-window={id} onPointerDown={() => onFocus(id)} onFocusCapture={() => { if (!isFocused) onFocus(id); }}
+            className={`os-window absolute flex flex-col overflow-hidden border rounded-xl shadow-2xl ${isFocused ? 'border-white/30' : 'border-white/10'} bg-gray-900`}
+            style={{ display: isMinimized ? 'none' : undefined, zIndex, left: full ? 0 : snapped ? (mode === 'right' ? '50%' : 0) : rect.x, top: full || snapped ? 0 : rect.y, width: full ? '100%' : snapped ? '50%' : rect.width, height: full || snapped ? 'calc(100dvh - 64px - env(safe-area-inset-bottom, 0px))' : rect.height, borderRadius: full ? 0 : undefined }}>
+            <div onPointerDown={startGesture} onDoubleClick={() => { if (!mobile) toggleMaximize(); }} className={`flex shrink-0 h-12 items-center justify-between pl-3 border-b border-white/10 select-none ${isFocused ? accent.windowFocus : 'bg-gray-800'} ${!mobile && mode === 'floating' ? 'cursor-grab' : ''}`} style={{ touchAction: 'none' }}>
+                <div className="flex items-center gap-2 min-w-0 text-gray-200"><span className="shrink-0">{icon}</span><span className="text-sm font-semibold truncate">{title}</span></div>
+                <div className="flex shrink-0" onPointerDown={e => e.stopPropagation()} onDoubleClick={e => e.stopPropagation()}>
+                    <button className="os-window-control" aria-label={`Minimize ${title}`} onClick={() => onMinimize(id)}><Minus size={17} /></button>
+                    {!mobile && <><button className="os-window-control" aria-label={`Snap ${title} ${mode === 'left' ? 'right' : 'left'}`} onClick={() => setMode(mode === 'left' ? 'right' : 'left')}><Columns2 size={17} /></button><button className="os-window-control" aria-label={`${mode === 'floating' ? 'Maximize' : 'Restore'} ${title}`} onClick={toggleMaximize}><Square size={15} /></button></>}
+                    <button className="os-window-control hover:!bg-red-600" aria-label={`Close ${title}`} onClick={() => onClose(id)}><X size={18} /></button>
+                </div>
+            </div>
+            <div className="flex-1 min-h-0 overflow-auto overscroll-contain relative">{children}</div>
+            {!mobile && mode === 'floating' && <div onPointerDown={e => startGesture(e, true)} aria-hidden="true" className="absolute bottom-0 right-0 w-7 h-7 cursor-se-resize touch-none text-gray-400 flex items-center justify-center">◢</div>}
+        </section>
     );
 };

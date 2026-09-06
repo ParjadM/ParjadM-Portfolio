@@ -35,12 +35,12 @@ const NativeBlog = React.lazy(() => import('../components/os/NativeSiteApps.jsx'
 const NativeStats = React.lazy(() => import('../components/os/NativeSiteApps.jsx').then(m => ({ default: m.StatsApp })));
 const NativeTechNews = React.lazy(() => import('../components/os/NativeSiteApps.jsx').then(m => ({ default: m.TechNewsApp })));
 const AppStoreApp = React.lazy(() => import('../components/os/AppStoreApp.jsx').then(m => ({ default: m.AppStoreApp })));
-import { 
-    Terminal, 
-    Globe, 
-    Newspaper, 
-    Folder, 
-    Activity, 
+import {
+    Terminal,
+    Globe,
+    Newspaper,
+    Folder,
+    Activity,
     Monitor,
     ChevronUp,
     Wifi,
@@ -116,7 +116,7 @@ export const DesktopOS = ({ theme }) => {
     const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
     const [startMenuSearch, setStartMenuSearch] = useState('');
     const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 });
-    const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+    const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768 || window.innerHeight < 500);
     const [isOsBooted, setIsOsBooted] = useState(() => sessionStorage.getItem('os_booted') === '1');
     const [altTabOpen, setAltTabOpen] = useState(false);
     const [altTabIndex, setAltTabIndex] = useState(0);
@@ -129,10 +129,18 @@ export const DesktopOS = ({ theme }) => {
     }, []);
 
     useEffect(() => {
-        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        const handleResize = () => setIsMobile(window.innerWidth < 768 || window.innerHeight < 500);
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    useEffect(() => {
+        if (!isMobile) return;
+        setWindows(prev => {
+            const top = Math.max(...prev.filter(w => !w.isMinimized).map(w => w.zIndex));
+            return prev.map(w => w.zIndex === top ? w : { ...w, isMinimized: true });
+        });
+    }, [isMobile]);
 
     // Prevent accidental pull-to-refresh from killing the OS session on mobile
     useEffect(() => {
@@ -140,7 +148,7 @@ export const DesktopOS = ({ theme }) => {
         document.documentElement.style.overscrollBehaviorY = 'contain';
         return () => { document.documentElement.style.overscrollBehaviorY = prev; };
     }, []);
-    
+
     // Global OS State
     const [photos, setPhotos] = useState([]);
     const [fileSystem, setFileSystem] = useState(loadFileSystem);
@@ -254,15 +262,15 @@ export const DesktopOS = ({ theme }) => {
     }), [openApp]);
 
     const closeApp = (appId) => {
-        setWindows(windows.filter(w => w.id !== appId));
+        setWindows(prev => prev.filter(w => w.id !== appId));
     };
 
     const minimizeApp = (appId) => {
-        setWindows(windows.map(w => w.id === appId ? { ...w, isMinimized: true } : w));
+        setWindows(prev => prev.map(w => w.id === appId ? { ...w, isMinimized: true } : w));
     };
 
     const focusApp = (appId) => {
-        setWindows(windows.map(w => w.id === appId ? { ...w, zIndex: topZIndex + 1 } : w));
+        setWindows(prev => prev.map(w => w.id === appId ? { ...w, isMinimized: false, zIndex: topZIndex + 1 } : isMobile ? { ...w, isMinimized: true } : w));
         setTopZIndex(topZIndex + 1);
     };
 
@@ -272,7 +280,7 @@ export const DesktopOS = ({ theme }) => {
             if (existing.isMinimized) {
                 focusApp(appId);
                 setWindows(prev => prev.map(w => w.id === appId ? { ...w, isMinimized: false } : w));
-            } else if (existing.zIndex < topZIndex) {
+            } else if (existing.zIndex < Math.max(...windows.filter(w => !w.isMinimized).map(w => w.zIndex))) {
                 focusApp(appId);
             } else {
                 minimizeApp(appId);
@@ -366,16 +374,16 @@ export const DesktopOS = ({ theme }) => {
 
     const crtVariants = {
         initial: { scaleY: 0.8, scaleX: 1, opacity: 0.5 },
-        exit: { 
-            scaleY: [0.8, 0.005, 0.005], 
-            scaleX: [1, 1, 0], 
+        exit: {
+            scaleY: [0.8, 0.005, 0.005],
+            scaleX: [1, 1, 0],
             opacity: [0.8, 1, 0],
-            transition: { duration: 0.5, ease: "easeOut", times: [0, 0.4, 1] } 
+            transition: { duration: 0.5, ease: "easeOut", times: [0, 0.4, 1] }
         }
     };
 
     return (
-        <div 
+        <div
             className="fixed inset-0 w-full h-full overflow-hidden bg-black text-white font-sans select-none flex items-center justify-center"
             onClick={closeContextMenu}
             onContextMenu={handleContextMenu}
@@ -413,39 +421,39 @@ export const DesktopOS = ({ theme }) => {
                             style={{ top: contextMenu.y, left: contextMenu.x }}
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <button 
+                            <button
                                 onClick={() => createFileSystemItem('folder')}
                                 className="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-white/10 hover:text-white transition-colors"
                             >
                                 {t('os.newFolder')}
                             </button>
-                            <button 
+                            <button
                                 onClick={() => createFileSystemItem('file')}
                                 className="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-white/10 hover:text-white transition-colors"
                             >
                                 {t('os.newDocument')}
                             </button>
                             <div className="h-px bg-white/10 my-1 mx-2" />
-                            <button 
+                            <button
                                 onClick={() => { openApp('terminal'); closeContextMenu(); }}
                                 className="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-white/10 hover:text-white transition-colors"
                             >
                                 {t('os.openTerminal')}
                             </button>
-                            <button 
+                            <button
                                 onClick={() => { navigate('/cli'); closeContextMenu(); }}
                                 className="w-full text-left px-4 py-2 text-sm text-emerald-300 hover:bg-white/10 transition-colors"
                             >
                                 {t('os.openCli')}
                             </button>
                             <div className="h-px bg-white/10 my-1 mx-2" />
-                            <button 
+                            <button
                                 onClick={toggleWallpaper}
                                 className="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-white/10 hover:text-white transition-colors"
                             >
                                 {t('os.changeWallpaper')}
                             </button>
-                            <button 
+                            <button
                                 onClick={() => {
                                     setWindows([]);
                                     closeContextMenu();
@@ -462,7 +470,7 @@ export const DesktopOS = ({ theme }) => {
                 {isMobile ? (
                     <div className="absolute inset-0 z-10 p-6 pt-12 grid grid-cols-4 gap-x-4 gap-y-8 content-start">
                         {APPS.map((app) => (
-                            <div 
+                            <div
                                 key={app.id}
                                 onClick={(e) => { e.stopPropagation(); openApp(app.id); }}
                                 className="flex flex-col items-center justify-start cursor-pointer group active:scale-95 transition-transform"
@@ -487,8 +495,8 @@ export const DesktopOS = ({ theme }) => {
                                     drag
                                     dragMomentum={false}
                                     onDragEnd={(e, info) => {
-                                        setDesktopIcons(prev => prev.map(icon => 
-                                            icon.id === iconConfig.id 
+                                        setDesktopIcons(prev => prev.map(icon =>
+                                            icon.id === iconConfig.id
                                                 ? { ...icon, x: icon.x + info.offset.x, y: icon.y + info.offset.y }
                                                 : icon
                                         ));
@@ -514,8 +522,8 @@ export const DesktopOS = ({ theme }) => {
                     {windows.map(win => {
                         const appDef = APPS.find(a => a.id === win.id);
                         if (!appDef) return null;
-                        const isFocused = win.zIndex === Math.max(...windows.map(w => w.zIndex));
-                        
+                        const isFocused = win.zIndex === Math.max(...windows.filter(w => !w.isMinimized).map(w => w.zIndex));
+
                         return (
                             <div key={win.id} className="pointer-events-auto">
                                 <Window
@@ -533,8 +541,8 @@ export const DesktopOS = ({ theme }) => {
                                     defaultSize={appDef.defaultSize}
                                 >
                                     {appDef.type === 'iframe' ? (
-                                        <iframe 
-                                            src={appDef.url} 
+                                        <iframe
+                                            src={appDef.url}
                                             className="w-full h-full border-0 bg-gray-900"
                                             title={appDef.title}
                                             sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
@@ -563,15 +571,15 @@ export const DesktopOS = ({ theme }) => {
                         >
                             <div className="relative mb-4 sm:mb-6 shrink-0">
                                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                <input 
-                                    type="text" 
-                                    placeholder="Type here to search apps..." 
+                                <input
+                                    type="text"
+                                    placeholder="Type here to search apps..."
                                     value={startMenuSearch}
                                     onChange={(e) => setStartMenuSearch(e.target.value)}
                                     className="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-12 pr-4 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500/50 focus:bg-white/10 transition-all"
                                 />
                             </div>
-                            
+
                             <div className="min-h-0 flex-1 overflow-y-auto">
                                 <div className="flex justify-between items-center mb-4 px-2">
                                     <span className="font-semibold text-white">Pinned apps</span>
@@ -596,7 +604,7 @@ export const DesktopOS = ({ theme }) => {
 
                                 <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-4 mb-2">
                                     {APPS.filter(a => a.title.toLowerCase().includes(startMenuSearch.toLowerCase())).map(app => (
-                                        <button 
+                                        <button
                                             key={app.id}
                                             onClick={() => { openApp(app.id); setIsStartMenuOpen(false); }}
                                             className="flex flex-col items-center justify-center p-3 rounded-xl hover:bg-white/10 transition-colors group"
@@ -617,7 +625,7 @@ export const DesktopOS = ({ theme }) => {
                                     </div>
                                     <span className="text-sm text-gray-200 font-medium">Guest User</span>
                                 </div>
-                                <button 
+                                <button
                                     onClick={handleExit}
                                     className="p-2 rounded-lg hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors group"
                                     title={t('os.shutDown')}
@@ -665,32 +673,35 @@ export const DesktopOS = ({ theme }) => {
                 </AnimatePresence>
 
                 {/* Taskbar / Dock */}
-                <div className={`absolute bottom-0 left-0 w-full z-40 transition-all duration-300 ${isMobile ? 'h-14' : 'h-12'}`}>
+                <div className={`absolute bottom-0 left-0 w-full z-40 transition-all duration-300 os-taskbar`}>
                     <div className="absolute inset-0 bg-gray-900/70 backdrop-blur-2xl border-t border-emerald-500/20 shadow-[0_-4px_30px_rgba(16,185,129,0.08)]" />
                     <div className="relative h-full flex items-center justify-between px-2 sm:px-4">
                     {/* Start Button & Centered Apps */}
-                    <div className="flex-1 flex items-center justify-start sm:justify-center space-x-2 overflow-x-auto overflow-y-hidden scrollbar-hide pr-2">
-                        <button 
+                    <div className="min-w-0 flex-1 flex items-center justify-start space-x-2 overflow-x-auto overflow-y-hidden scrollbar-hide pr-2">
+                        <button
                             onClick={(e) => { e.stopPropagation(); haptic(); setIsStartMenuOpen(!isStartMenuOpen); closeContextMenu(); }}
                             className={`w-12 h-12 md:w-10 md:h-10 flex items-center justify-center rounded transition-all group ${isStartMenuOpen ? 'bg-white/20 shadow-inner' : 'hover:bg-white/10'}`}
+                            aria-label={t('os.start')}
                             title={t('os.start')}
                         >
                             <LayoutGrid className={`w-5 h-5 text-blue-400 transition-transform group-hover:scale-110`} />
                         </button>
-                        
+
                         <div className="w-px h-6 bg-white/20 mx-2" />
 
                         {APPS.map((app) => {
                             const win = windows.find(w => w.id === app.id);
                             if (!win) return null;
                             const isOpen = !!win;
-                            const isFocused = isOpen && win.zIndex === Math.max(...windows.map(w => w.zIndex)) && !win.isMinimized;
-                            
+                            const isFocused = isOpen && win.zIndex === Math.max(...windows.filter(w => !w.isMinimized).map(w => w.zIndex)) && !win.isMinimized;
+
                             return (
                                 <button
                                     key={app.id}
                                     onClick={(e) => { e.stopPropagation(); haptic(); toggleAppFromTaskbar(app.id); }}
-                                    className={`relative w-12 h-12 md:w-10 md:h-10 flex items-center justify-center rounded transition-all duration-200 
+                                    aria-label={app.title}
+                                    aria-pressed={isFocused}
+                                    className={`shrink-0 relative w-12 h-12 md:w-11 md:h-11 flex items-center justify-center rounded transition-all duration-200
                                         ${isFocused ? 'bg-white/15 shadow-inner' : 'hover:bg-white/10'}
                                     `}
                                     title={app.title}
@@ -708,7 +719,7 @@ export const DesktopOS = ({ theme }) => {
 
                     {/* System Tray */}
                     <div className="flex-shrink-0 flex items-center space-x-2 sm:space-x-4 pl-2 border-l border-white/10 sm:border-0 ml-auto relative">
-                        <div 
+                        <div
                             onClick={(e) => { e.stopPropagation(); setIsTrayExpanded(!isTrayExpanded); setIsClockExpanded(false); }}
                             className="hidden sm:flex items-center space-x-2 text-gray-400 hover:bg-white/10 px-2 py-1 rounded cursor-pointer transition-colors"
                         >
@@ -717,8 +728,8 @@ export const DesktopOS = ({ theme }) => {
                             <Volume2 className="w-4 h-4" />
                             <Battery className="w-4 h-4" />
                         </div>
-                        
-                        <div 
+
+                        <div
                             onClick={(e) => { e.stopPropagation(); setIsClockExpanded(!isClockExpanded); setIsTrayExpanded(false); }}
                             className="flex flex-col items-end text-[10px] sm:text-xs text-gray-300 hover:bg-white/10 px-2 py-1 rounded cursor-pointer transition-colors whitespace-nowrap"
                         >
@@ -729,7 +740,7 @@ export const DesktopOS = ({ theme }) => {
                         {/* Tray Popover */}
                         <AnimatePresence>
                             {isTrayExpanded && (
-                                <motion.div 
+                                <motion.div
                                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -755,7 +766,7 @@ export const DesktopOS = ({ theme }) => {
                         {/* Clock Popover */}
                         <AnimatePresence>
                             {isClockExpanded && (
-                                <motion.div 
+                                <motion.div
                                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -767,7 +778,7 @@ export const DesktopOS = ({ theme }) => {
                                     <div className="text-emerald-400 text-sm font-medium mb-6">
                                         {time.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}
                                     </div>
-                                    
+
                                     {/* Mini Calendar Grid (Visual Only) */}
                                     <div className="w-full grid grid-cols-7 gap-1 text-center text-xs text-gray-400 mb-2">
                                         {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => <div key={d}>{d}</div>)}

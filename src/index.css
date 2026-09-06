@@ -563,3 +563,23 @@ html, #root {
   .responsive-content { padding-bottom: 2rem; }
   .responsive-content > .page-transition, .responsive-content section.py-20 { padding-inline: var(--page-gutter); }
 }
+
+.os-taskbar { height: calc(64px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.os-taskbar button { flex-shrink: 0; min-width: 44px; min-height: 44px; border-radius: 12px; }
+.os-window-control { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; color: #cbd5e1; border-radius: 8px; }
+.os-window-control:hover { background: #ffffff15; color: white; }
+.os-window:focus-within { border-color: #ffffff50; }
+@media (max-width: 767px), (max-height: 499px) {
+  .os-window input, .os-window textarea, .os-window select { font-size: 16px; }
+  .os-taskbar { padding-inline: 4px; }
+}
+.os-window { animation: os-window-appear .16s ease-out; }
+@keyframes os-window-appear { from { opacity: .5; } to { opacity: 1; } }
+@media (max-width: 767px) {
+  .os-settings { flex-direction: column; }
+  .os-settings > div:first-child { width: 100%; max-width: none; display: flex; gap: 4px; padding: 8px; border-right: 0; border-bottom: 1px solid #ffffff15; overflow-x: auto; flex-shrink: 0; }
+  .os-settings > div:first-child h2 { display: none; }
+  .os-settings > div:first-child button { width: auto; flex-shrink: 0; min-height: 44px; margin: 0; padding-inline: 10px; }
+  .os-settings > div:nth-child(2) { min-height: 0; min-width: 0; padding: 20px; }
+}
+@media (prefers-reduced-motion: reduce) { .os-window { animation: none; } }

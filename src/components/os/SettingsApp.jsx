@@ -8,7 +8,7 @@ export const SettingsApp = ({ theme, osState }) => {
     const [customUrl, setCustomUrl] = useState(wallpaper && wallpaper.startsWith('http') ? wallpaper : '');
 
     return (
-        <div className="flex h-full w-full bg-gray-900 text-gray-200">
+        <div className="os-settings flex h-full w-full bg-gray-900 text-gray-200">
             {/* Sidebar */}
             <div className="w-1/3 max-w-[200px] border-r border-white/10 bg-gray-800/50 p-4 space-y-2">
                 <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 px-2">Settings</h2>
