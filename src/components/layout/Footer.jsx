@@ -26,7 +26,7 @@ export const Footer = React.memo(function Footer({ theme }) {
     ];
 
     return (
-        <footer className="relative mt-20">
+        <footer className="site-footer relative mt-20">
             {/* Decorative Top Border */}
             <div className="w-full h-px bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             

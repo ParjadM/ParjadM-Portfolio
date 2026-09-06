@@ -7,6 +7,7 @@ export const GlassCard = ({ children, className = '', theme = 'green', onMouseEn
   const gradientClass = accent.gradientBorder;
 
   const handleMouseMove = (e) => {
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     const rect = e.currentTarget.getBoundingClientRect();
     setMousePosition({
       x: e.clientX - rect.left,
@@ -16,7 +17,7 @@ export const GlassCard = ({ children, className = '', theme = 'green', onMouseEn
 
   return (
     <div 
-      className={`relative bg-white/[0.04] backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] transition-all duration-500 hover:border-white/20 hover:bg-white/[0.08] hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] group overflow-hidden ${className}`}
+      className={`glass-card relative bg-white/[0.04] backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] transition-all duration-500 hover:border-white/20 hover:bg-white/[0.08] hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] group overflow-hidden ${className}`}
       onMouseMove={handleMouseMove}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}

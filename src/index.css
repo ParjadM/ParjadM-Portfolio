@@ -507,3 +507,59 @@ html, #root {
   -webkit-overflow-scrolling: touch;
   max-width: 100%;
 }
+/* Shared phone and tablet rhythm, scoped away from fullscreen experiences. */
+@media (max-width: 1023px) {
+  .responsive-content { --page-gutter: clamp(1.125rem, 4vw, 2.5rem); padding-top: calc(5.5rem + env(safe-area-inset-top, 0px)); }
+  .responsive-content > .page-transition,
+  .responsive-content section.py-20 { padding-top: 2.5rem; padding-bottom: 3.5rem; }
+  .responsive-content .container { min-width: 0; }
+  .responsive-content .grid > * { min-width: 0; }
+  .responsive-content h1, .responsive-content h2, .responsive-content h3 { text-wrap: balance; overflow-wrap: break-word; }
+  .responsive-content p { line-height: 1.7; }
+  .responsive-content .glass-card { border-color: rgb(255 255 255 / .14); background-color: rgb(255 255 255 / .055); box-shadow: 0 12px 32px rgb(0 0 0 / .18); }
+  .responsive-content input:not([type=checkbox]):not([type=radio]), .responsive-content select, .responsive-content textarea { font-size: 16px; border-radius: 12px; }
+  .responsive-content input:not([type=checkbox]):not([type=radio]), .responsive-content select { min-height: 48px; }
+  .responsive-content textarea { min-height: 150px; }
+  .project-actions a { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; border-radius: 12px; background: rgb(255 255 255 / .05); }
+  .mobile-header { padding-inline: 12px; padding-top: calc(10px + env(safe-area-inset-top, 0px)); }
+  .mobile-header > .glass-card { background: rgb(15 23 42 / .92); box-shadow: 0 8px 28px #0003; }
+  .mobile-dock { left: 10px; right: 10px; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); max-width: 560px; margin-inline: auto; padding: 5px; border: 1px solid rgb(255 255 255 / .15); border-radius: 24px; box-shadow: 0 12px 36px #0006; background: rgb(15 23 42 / .96); }
+  .mobile-dock > div { height: 58px; }
+  .mobile-dock a, .mobile-dock button { border-radius: 18px; gap: 3px; min-width: 0; }
+  .mobile-dock a[aria-current=page] { background: rgb(255 255 255 / .09); box-shadow: inset 0 1px 0 #ffffff12; }
+  .mobile-dock svg { width: 21px; height: 21px; fill: none; }
+  .mobile-dock span { font-size: 10px; letter-spacing: .015em; }
+  .site-menu { background: radial-gradient(ellipse at top left, #213347, #0b1220 65%); }
+  .site-menu .menu-primary-link { display: flex; align-items: center; min-height: 52px; padding: 12px 18px; width: 100%; border-radius: 16px; border: 1px solid #ffffff12; background: #ffffff05; text-align: left; font-size: 1.25rem; font-weight: 600; }
+  .site-menu .menu-primary-link[aria-current=page] { background: #ffffff10; border-color: currentColor; }
+  .site-menu .menu-secondary-link { display: flex; align-items: center; justify-content: center; min-height: 48px; padding: 8px; border-radius: 12px; background: #ffffff06; color: #cbd5e1; }
+  .site-menu button { min-height: 44px; }
+  .site-footer { margin-top: 2rem; padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px)); }
+  .site-footer > .container { padding: 2.5rem 1.5rem; }
+  .site-footer nav a { display: inline-flex; align-items: center; min-height: 44px; padding-inline: 8px; }
+  .site-footer nav ul { gap: 4px 16px; }
+  .home-hero { padding: 2rem 0 3rem; min-height: auto; }
+  .home-hero > .container { padding-inline: var(--page-gutter); gap: 2.5rem; }
+  .home-hero h1 { font-size: clamp(2.75rem, 6.8vw, 4.5rem); line-height: 1.08; letter-spacing: -.045em; }
+  .home-hero .portrait-border img { width: clamp(220px, 30vw, 300px); }
+  .home-hero > .absolute { display: none; }
+}
+@media (max-width: 639px) {
+  .responsive-content > .page-transition, .responsive-content section.py-20 { padding-inline: var(--page-gutter); }
+  .responsive-content h2.text-4xl { font-size: 2rem; line-height: 1.15; letter-spacing: -.025em; }
+  .responsive-content .glass-card.p-6 { padding: 1.25rem; }
+  .responsive-content .grid.gap-8 { gap: 1.25rem; }
+  .home-hero h1 { font-size: clamp(2.65rem, 11vw, 4rem); }
+  .home-hero p { font-size: 1.125rem; }
+  .home-hero .mt-10 { margin-top: 1.75rem; }
+  .home-hero .portrait-border img { width: min(68vw, 280px); }
+  .site-footer .mb-12, .site-footer .mb-10 { margin-bottom: 1.5rem; }
+}
+@media (hover: none) and (pointer: coarse) {
+  .glass-card { backdrop-filter: blur(10px); }
+  .glass-card > .pointer-events-none { display: none; }
+}
+@media (max-width: 1023px) {
+  .responsive-content { padding-bottom: 2rem; }
+  .responsive-content > .page-transition, .responsive-content section.py-20 { padding-inline: var(--page-gutter); }
+}

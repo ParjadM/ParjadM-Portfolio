@@ -87,7 +87,7 @@ export const ProjectsSection = ({ theme }) => {
                             {(project.tags || []).map(tag => <span key={tag} className={`${tagClasses} text-xs font-semibold px-2.5 py-1 rounded-full`}>{tag}</span>)}
                         </div>
                         <p className="text-gray-300 mb-6 flex-grow line-clamp-4" title={project.description}>{project.description}</p>
-                        <div className="flex items-center justify-between mt-auto gap-3">
+                        <div className="project-actions flex flex-wrap items-center justify-between mt-auto gap-3">
                           <ProjectAskAi project={project} theme={theme} />
                           <div className="flex space-x-4">
                            {project.githubUrl && <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110" aria-label={`${project.title} on GitHub`}><Github size={24} /></a>}

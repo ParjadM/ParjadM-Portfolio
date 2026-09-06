@@ -70,7 +70,7 @@ export const HomeSection = ({ theme }) => {
     />
 
     {/* Hero */}
-    <section className="relative py-10 md:py-0 md:min-h-[calc(100vh-6rem)] flex items-center">
+    <section className="home-hero relative py-10 md:py-0 md:min-h-[calc(100vh-6rem)] flex items-center">
       <div className="z-10 container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-10 items-center">
         {/* Left: Text content */}
         <div className="text-left">
@@ -136,7 +136,7 @@ export const HomeSection = ({ theme }) => {
             </LocalizedLink>
           </div>
           </Reveal>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             {featuredProjects.map((project) => {
               const href = typeof project.liveUrl === 'string' && project.liveUrl.startsWith('/') && !project.liveUrl.startsWith('//')
                 ? project.liveUrl

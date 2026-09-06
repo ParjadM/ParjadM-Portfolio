@@ -454,7 +454,7 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
             </nav>
 
             {/* Mobile & Tablet Navigation (< lg) */}
-            <nav className="lg:hidden px-4 md:px-6 pt-safe-or-4 pb-3" role="navigation" aria-label="Mobile Primary">
+            <nav className="mobile-header lg:hidden px-4 md:px-6 pt-safe-or-4 pb-3" role="navigation" aria-label="Mobile Primary">
                 <GlassCard className="!rounded-2xl border border-white/10 shadow-lg backdrop-blur-md px-4 py-2" theme={theme}>
                     <div className="flex justify-between items-center gap-2">
                         <LocalizedLink to="/" className="inline-flex items-center shrink-0">
@@ -495,7 +495,7 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
                         role="dialog"
                         aria-modal="true"
                         aria-label={t('a11y.siteMenu')}
-                        className="fixed inset-0 z-[99999] flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-gray-900/90 backdrop-blur-3xl transition-all duration-300"
+                        className="site-menu fixed inset-0 z-[99999] flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-gray-900/90 backdrop-blur-3xl transition-all duration-300"
                         {...menuSwipeHandlers}
                     >
                         <button
@@ -515,7 +515,8 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
                                     key={item.name}
                                     to={item.path}
                                     onClick={handleNavClick}
-                                    className={`text-2xl md:text-2xl font-extrabold tracking-tight transition-all duration-300 text-center ${isActive(item.path) ? accent.text : 'text-gray-300 hover:text-white'}`}
+                                    aria-current={isActive(item.path) ? 'page' : undefined}
+                                    className={`menu-primary-link text-2xl md:text-2xl font-extrabold tracking-tight transition-all duration-300 text-center ${isActive(item.path) ? accent.text : 'text-gray-300 hover:text-white'}`}
                                 >
                                     {item.name}
                                 </LocalizedLink>
@@ -534,7 +535,7 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
 
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-x-3 gap-y-2 w-full md:max-w-xl">
                                 {MORE_ITEMS.map((item) => (
-                                    <LocalizedLink key={item.path} to={item.path} onClick={handleNavClick} className="text-sm text-gray-400 hover:text-white font-medium text-center">
+                                    <LocalizedLink key={item.path} to={item.path} onClick={handleNavClick} className="menu-secondary-link text-sm text-gray-400 hover:text-white font-medium text-center">
                                         {item.name}
                                     </LocalizedLink>
                                 ))}

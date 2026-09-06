@@ -149,7 +149,7 @@ export const Layout = ({ themeId, setThemeId, cursorThemeId, setCursorThemeId, t
                 />
             )}
             
-            <main id="main-content" role="main" tabIndex={-1} className={`relative z-10 transition-all duration-500 ${!isFullscreenRoute ? 'pt-[4.75rem] sm:pt-20 md:pt-24 pb-28 lg:pb-0' : ''}`}>
+            <main id="main-content" role="main" tabIndex={-1} className={`relative z-10 transition-all duration-500 ${!isFullscreenRoute ? 'responsive-content pt-[4.75rem] sm:pt-20 md:pt-24 pb-28 lg:pb-0' : ''}`}>
                 <Routes location={location} key={location.pathname}>
                     {buildAppRouteElements(themeConfig.accentPrefix)}
                 </Routes>

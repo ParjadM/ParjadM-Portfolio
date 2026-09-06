@@ -32,7 +32,7 @@ export const BottomNav = React.memo(function BottomNav({ theme }) {
     const activeColor = getAccent(theme).text;
 
     return (
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-gray-900/95 backdrop-blur-md border-t border-white/10 pb-safe pt-2 px-2" aria-label="Mobile bottom navigation">
+        <nav className="mobile-dock lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-gray-900/95 backdrop-blur-md border-t border-white/10 pb-safe pt-2 px-2" aria-label="Mobile bottom navigation">
             <div className="flex justify-around items-center h-16 max-w-lg mx-auto">
                 {navItems.map((item) => {
                     const active = item.action === 'menu' ? false : isActive(item.path);
@@ -56,6 +56,7 @@ export const BottomNav = React.memo(function BottomNav({ theme }) {
                         <LocalizedLink
                             key={item.path}
                             to={item.path}
+                            aria-current={active ? 'page' : undefined}
                             onClick={() => haptic()}
                             className={`flex flex-col items-center justify-center flex-1 h-full min-h-[44px] transition-colors ${active ? activeColor : 'text-gray-400 hover:text-white'}`}
                         >

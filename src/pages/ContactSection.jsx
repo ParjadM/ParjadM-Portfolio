@@ -218,7 +218,7 @@ export const ContactSection = ({ theme }) => {
                                         <div className={`p-3 rounded-lg bg-white/10 group-hover:bg-white/20 transition-all duration-300 ${accent.text}`}>
                                             {method.icon}
                                         </div>
-                                        <div className="ml-4 flex-1">
+                                        <div className="ml-4 flex-1 min-w-0">
                                             <h4 className="font-semibold text-white group-hover:text-white transition-colors duration-300">
                                                 {method.title}
                                             </h4>
