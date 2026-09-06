@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { isChunkLoadError, recoverFromStaleChunk } from './lazyWithRetry.js';
 
 describe('isChunkLoadError', () => {
@@ -31,6 +31,34 @@ describe('recoverFromStaleChunk', () => {
   it('returns false on the second attempt in the same tab session', async () => {
     sessionStorage.setItem('chunk-load-reload', '1');
     await expect(recoverFromStaleChunk()).resolves.toBe(false);
-    expect(sessionStorage.getItem('chunk-load-reload')).toBeNull();
+    expect(sessionStorage.getItem('chunk-load-reload')).toBe('1');
+    await expect(recoverFromStaleChunk()).resolves.toBe(false);
+  });
+});
+
+
+describe('recovery coordination', () => {
+  it('shares one recovery between simultaneous failures', async () => {
+    vi.resetModules();
+    sessionStorage.clear();
+    const update = vi.fn(() => new Promise(() => {}));
+    vi.stubGlobal('navigator', { onLine: true, serviceWorker: { getRegistration: async () => ({ update }) } });
+    try {
+      const { recoverFromStaleChunk: recover } = await import('./lazyWithRetry.js');
+      const first = recover();
+      expect(recover()).toBe(first);
+      await Promise.resolve();
+      expect(update).toHaveBeenCalledTimes(1);
+    } finally { vi.unstubAllGlobals(); }
+  });
+  it('does not reload or consume recovery while offline', async () => {
+    vi.resetModules();
+    sessionStorage.clear();
+    vi.stubGlobal('navigator', { onLine: false });
+    try {
+      const { recoverFromStaleChunk: recover } = await import('./lazyWithRetry.js');
+      await expect(recover()).resolves.toBe(false);
+      expect(sessionStorage.getItem('chunk-load-reload')).toBeNull();
+    } finally { vi.unstubAllGlobals(); }
   });
 });

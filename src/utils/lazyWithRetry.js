@@ -1,6 +1,8 @@
 import React from 'react';
 
 const RELOAD_KEY = 'chunk-load-reload';
+let recoveryPromise;
+let attemptedRecovery = false;
 
 function isChunkLoadError(err) {
   const msg = String(err?.message || err || '');
@@ -27,12 +29,6 @@ function safeSessionGet(key) {
 function safeSessionSet(key, value) {
   try {
     sessionStorage.setItem(key, value);
-  } catch {}
-}
-
-function safeSessionRemove(key) {
-  try {
-    sessionStorage.removeItem(key);
   } catch {}
 }
 
@@ -98,12 +94,19 @@ async function unregisterServiceWorkers() {
  * Recover from a deploy mismatch: old shell/SW referencing deleted hashed chunks.
  * One reload only per tab session to avoid loops.
  */
-async function recoverFromStaleChunk() {
-  if (safeSessionGet(RELOAD_KEY)) {
-    safeSessionRemove(RELOAD_KEY);
-    return false;
+function recoverFromStaleChunk() {
+  if (recoveryPromise) return recoveryPromise;
+  if (navigator.onLine === false || attemptedRecovery || safeSessionGet(RELOAD_KEY)
+      || new URL(window.location.href).searchParams.has('_chunkfix')) {
+    return Promise.resolve(false);
   }
+  attemptedRecovery = true;
   safeSessionSet(RELOAD_KEY, '1');
+  recoveryPromise = performRecovery();
+  return recoveryPromise;
+}
+
+async function performRecovery() {
 
   const activated = await activateWaitingWorker();
   if (!activated) {
@@ -134,7 +137,6 @@ export function lazyWithRetry(factory) {
           err.name = 'ChunkLoadError';
           throw err;
         }
-        safeSessionRemove(RELOAD_KEY);
         return mod;
       })
       .catch(async (err) => {
@@ -142,28 +144,33 @@ export function lazyWithRetry(factory) {
           const recovering = await recoverFromStaleChunk();
           if (recovering) return new Promise(() => {});
         }
-        safeSessionRemove(RELOAD_KEY);
         throw err;
       }),
   );
 }
 
 export function installChunkLoadRecovery() {
-  window.addEventListener('vite:preloadError', async (event) => {
-    // Only swallow the error when we actually reload. Preventing the event
-    // without reloading makes the dynamic import resolve with `undefined`.
-    const recovering = await recoverFromStaleChunk();
-    if (recovering) {
-      event.preventDefault();
-    }
-  });
-
-  // Catch dynamic-import rejections that bypass React.lazy in some browsers.
-  window.addEventListener('unhandledrejection', (event) => {
+  const onPreloadError = (event) => {
+    if (!isChunkLoadError(event.payload)) return;
+    // Keep the rejection intact so lazyWithRetry can await the shared recovery.
+    // Preventing Vite's event would turn the import into an empty module.
+    void recoverFromStaleChunk();
+  };
+  const onRejection = (event) => {
     if (!isChunkLoadError(event.reason)) return;
-    event.preventDefault();
-    recoverFromStaleChunk();
-  });
+    if (navigator.onLine === false) return;
+    if (recoveryPromise || (!attemptedRecovery && !safeSessionGet(RELOAD_KEY)
+        && !new URL(window.location.href).searchParams.has('_chunkfix'))) {
+      event.preventDefault();
+      void recoverFromStaleChunk();
+    }
+  };
+  window.addEventListener('vite:preloadError', onPreloadError);
+  window.addEventListener('unhandledrejection', onRejection);
+  return () => {
+    window.removeEventListener('vite:preloadError', onPreloadError);
+    window.removeEventListener('unhandledrejection', onRejection);
+  };
 }
 
 export { isChunkLoadError, recoverFromStaleChunk, activateWaitingWorker, clearAssetCaches };
