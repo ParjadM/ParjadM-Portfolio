@@ -33,10 +33,9 @@ function isUsable(entry, ttlMs, swrMs) {
  * Fetch JSON from a same-origin API URL with caching.
  * @returns {Promise<any>}
  */
-export async function fetchApi(url, {
+async function fetchShared(url, {
   ttlMs = DEFAULT_TTL_MS,
   swrMs = DEFAULT_SWR_MS,
-  signal,
   force = false,
 } = {}) {
   const key = canonicalizeUrl(url)
@@ -49,7 +48,7 @@ export async function fetchApi(url, {
   const shouldRevalidate = !force && isUsable(existing, ttlMs, swrMs)
 
   const promise = (async () => {
-    const res = await fetch(key, { signal })
+    const res = await fetch(key)
     if (!res.ok) throw new Error(`Error: ${res.status} ${res.statusText}`)
     const data = await res.json()
     store.set(key, { data, fetchedAt: Date.now() })
@@ -77,6 +76,22 @@ export async function fetchApi(url, {
       store.set(key, { data: cur.data, fetchedAt: cur.fetchedAt })
     }
   }
+}
+
+/** Cancellation belongs to the caller, never to a shared network request. */
+export function fetchApi(url, options = {}) {
+  const { signal, ...sharedOptions } = options
+  if (signal?.aborted) return Promise.reject(new DOMException('Request aborted', 'AbortError'))
+  const request = fetchShared(url, sharedOptions)
+  if (!signal) return request
+  return new Promise((resolve, reject) => {
+    const abort = () => reject(new DOMException('Request aborted', 'AbortError'))
+    signal.addEventListener('abort', abort, { once: true })
+    request.then(
+      data => { signal.removeEventListener('abort', abort); resolve(data) },
+      error => { signal.removeEventListener('abort', abort); reject(error) },
+    )
+  })
 }
 
 /** Read cached data without fetching (may be stale). */

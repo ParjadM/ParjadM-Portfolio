@@ -40,16 +40,17 @@ export const BlogSection = ({ theme }) => {
                 });
                 if (selectedCategory !== 'all') params.set('category', selectedCategory);
                 const data = await fetchApi(`/api/blog?${params}`, { signal: controller.signal });
+                if (controller.signal.aborted) return;
                 setPosts(Array.isArray(data.posts) ? data.posts : []);
                 setTotalItems(data.pagination?.totalItems ?? (data.posts?.length || 0));
                 setFeaturedPost(selectedCategory === 'all' ? (data.featuredPost || null) : null);
             } catch (e) {
-                if (e?.name === 'AbortError') return;
+                if (controller.signal.aborted || e?.name === 'AbortError') return;
                 setError(t('blog.error'));
                 setPosts([]);
                 setTotalItems(0);
             } finally {
-                setLoading(false);
+                if (!controller.signal.aborted) setLoading(false);
             }
         };
         fetchPosts();

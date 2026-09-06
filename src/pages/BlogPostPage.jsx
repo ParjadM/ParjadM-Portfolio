@@ -34,13 +34,14 @@ export const BlogPostPage = ({ theme }) => {
             setError('');
             try {
                 const data = await fetchApi(`/api/blog/${id}`, { signal: controller.signal, ttlMs: 30_000 });
+                if (controller.signal.aborted) return;
                 setPost(data.post);
             } catch (err) {
-                if (err?.name === 'AbortError') return;
+                if (controller.signal.aborted || err?.name === 'AbortError') return;
                 setError('Post not found');
                 setPost(null);
             } finally {
-                setLoading(false);
+                if (!controller.signal.aborted) setLoading(false);
             }
         };
         fetchPost();

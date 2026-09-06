@@ -63,3 +63,29 @@ describe('apiClient', () => {
     expect(peekApi('/api/blog?page=1')).toBeUndefined()
   })
 })
+
+describe('caller cancellation', () => {
+  beforeEach(() => { __resetApiClient(); vi.restoreAllMocks() })
+  it('lets a remounted blog finish after the previous caller aborts', async () => {
+    let finish
+    const fetchMock = vi.fn(() => new Promise(resolve => { finish = resolve }))
+    vi.stubGlobal('fetch', fetchMock)
+    const controller = new AbortController()
+    const first = fetchApi('/api/blog', { signal: controller.signal })
+    const rejected = expect(first).rejects.toMatchObject({ name: 'AbortError' })
+    controller.abort()
+    const second = fetchApi('/api/blog')
+    finish({ ok: true, json: async () => ({ posts: [{ id: 'post' }] }) })
+    await rejected
+    await expect(second).resolves.toEqual({ posts: [{ id: 'post' }] })
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+  it('does not fetch for an already cancelled caller', async () => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    const controller = new AbortController()
+    controller.abort()
+    await expect(fetchApi('/api/blog', { signal: controller.signal })).rejects.toMatchObject({ name: 'AbortError' })
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+})
