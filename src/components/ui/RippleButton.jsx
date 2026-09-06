@@ -31,7 +31,7 @@ export const RippleButton = ({ children, onClick, className = '', theme = 'green
 
   return (
     <button
-      className={`relative overflow-hidden transform transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-lg active:scale-95 ${gradientClass} ${className}`}
+      className={`primary-button relative overflow-hidden transform transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-lg active:scale-95 ${gradientClass} ${className}`}
       onClick={handleClick}
       {...props}
     >

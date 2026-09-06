@@ -38,15 +38,14 @@ export const MarkdownContent = ({ content, className = '', withHeadingIds = fals
     pre: ({ children, ...props }) => (
       <pre className="markdown-pre mb-4 rounded-lg border border-white/10 bg-black/50" {...props}>{children}</pre>
     ),
-    code: ({ inline, children, ...props }) =>
-      inline ?
-      <code className="bg-white/10 px-1.5 py-0.5 rounded text-sm font-mono text-emerald-300" {...props}>{children}</code> :
-      <code className="block p-4 text-sm font-mono text-gray-300 whitespace-pre" {...props}>{children}</code>,
+    code: ({ children, className, ...props }) =>
+      <code className={`markdown-code ${className || ''}`} {...props}>{children}</code>,
+    table: ({ children }) => <div className="markdown-table"><table>{children}</table></div>,
     blockquote: ({ ...props }) => <blockquote className="border-l-4 border-emerald-500 pl-4 italic text-gray-400 mb-4" {...props} />
   };
 
   return (
-    <div className={`text-gray-300 leading-7 ${className}`}>
+    <div className={`reading-content text-gray-300 leading-7 ${className}`}>
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
         {content || ''}
       </ReactMarkdown>

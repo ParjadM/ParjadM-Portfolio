@@ -69,6 +69,8 @@
     "storyText3": "Quand je ne conçois pas de systèmes, vous me trouverez généralement en train de repousser mes limites à la salle de sport, de plonger dans des casse-têtes mathématiques complexes ou d'aiguiser mes compétences algorithmiques sur LeetCode. Je suis animé par une optimisation incessante—tant dans l'IDE que dans mon développement personnel."
   },
   "projects": {
+    "liveDemo": "Démo",
+    "sourceCode": "Code",
     "title": "Mes Projets",
     "loading": "Chargement...",
     "error": "Échec du chargement des projets",

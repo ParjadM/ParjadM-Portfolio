@@ -68,7 +68,7 @@ export const BlogSection = ({ theme }) => {
     const tagColor = accent.tag;
 
     return (
-        <section id="blog" className="min-h-screen flex flex-col items-center justify-center py-20 px-4">
+        <section id="blog" className="blog-page min-h-screen flex flex-col items-center justify-center py-20 px-4">
             <SEO titleKey="blog.seoTitle" descriptionKey="blog.seoDesc" />
             <div className="container mx-auto max-w-7xl">
                 <Reveal>
@@ -110,9 +110,9 @@ export const BlogSection = ({ theme }) => {
                     <Reveal className="mb-12">
                         <h3 className="text-2xl font-bold text-white mb-6 text-center">{t('blog.featured')}</h3>
                         <Link to={`/blog/${featuredPost.id}`} className="block">
-                            <GlassCard className="p-0 md:p-0 group cursor-pointer hover:scale-[1.01] transition-transform duration-300 overflow-hidden">
+                            <GlassCard theme={theme} className="p-0 md:p-0 group cursor-pointer hover:scale-[1.01] transition-transform duration-300 overflow-hidden">
                                 {featuredPost.image && (
-                                  <div className="w-full h-48 md:h-60 overflow-hidden bg-black/20 flex items-center justify-center">
+                                  <div className="w-full aspect-[21/9] overflow-hidden bg-black/20 flex items-center justify-center">
                                     <img src={featuredPost.image} alt="" className="w-full h-full object-contain" loading="lazy" decoding="async" />
                                   </div>
                                 )}
@@ -154,9 +154,9 @@ export const BlogSection = ({ theme }) => {
                         {!loading && posts.map(post => (
                             <Reveal key={post.id}>
                             <Link to={`/blog/${post.id}`} className="block">
-                            <GlassCard className="p-0 group cursor-pointer hover:scale-105 transition-transform duration-300 overflow-hidden">
+                            <GlassCard theme={theme} className="p-0 group cursor-pointer hover:-translate-y-1 transition-transform duration-300 overflow-hidden">
                                 {post.image && (
-                                  <div className="w-full h-40 overflow-hidden bg-black/20 flex items-center justify-center">
+                                  <div className="w-full aspect-video overflow-hidden bg-black/20 flex items-center justify-center">
                                     <img src={post.image} alt="" className="w-full h-full object-contain" loading="lazy" decoding="async" />
                                   </div>
                                 )}

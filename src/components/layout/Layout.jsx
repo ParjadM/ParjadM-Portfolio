@@ -14,6 +14,7 @@ import { PwaInstallPrompt } from '../PwaInstallPrompt.jsx';
 import { PwaUpdatePrompt } from '../PwaUpdatePrompt.jsx';
 import { NavigationEffects } from './NavigationEffects.jsx';
 
+import { getAccent } from '../../utils/themeTokens.js';
 import { getThemeConfig } from '../../utils/themeConfig.js';
 import { useReducedMotion } from '../../utils/useReducedMotion.js';
 import { isFullscreenPath, stripLocalePrefix } from '../../utils/i18nRouting.js';
@@ -74,7 +75,7 @@ export const Layout = ({ themeId, setThemeId, cursorThemeId, setCursorThemeId, t
     // Manual SEO moved to SEO.jsx component on individual pages
 
     return (
-        <div className={`relative min-h-screen overflow-x-hidden font-sans transition-colors duration-500 ${
+        <div style={{ '--site-accent': getAccent(themeConfig.accentPrefix).hex }} className={`site-shell relative min-h-screen overflow-x-hidden font-sans transition-colors duration-500 ${
             themeConfig.backgroundClass
         } ${!themeConfig.isDark ? 'light-mode text-gray-900' : 'text-white'} ${themeConfig.isTerminal ? 'terminal-mode' : ''}`}>
             <LocaleSync />

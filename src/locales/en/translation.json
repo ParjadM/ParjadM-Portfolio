@@ -69,6 +69,8 @@
     "storyText3": "When I'm not designing systems, you'll usually find me pushing limits at the gym, diving into complex math puzzles, or sharpening my algorithmic skills on LeetCode. I am driven by relentless optimization—both in the IDE and in personal growth."
   },
   "projects": {
+    "liveDemo": "Live demo",
+    "sourceCode": "Code",
     "title": "My Projects",
     "loading": "Loading...",
     "error": "Failed to load projects",

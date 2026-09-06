@@ -49,7 +49,7 @@ export const ProjectsSection = ({ theme }) => {
     const tagClasses = accent.tag;
 
     return (
-        <PageTransition className="min-h-screen flex flex-col items-center justify-center py-20 px-4">
+        <PageTransition className="projects-page min-h-screen flex flex-col items-center justify-center py-20 px-4">
             <SEO 
                 titleKey="seo.projectsTitle"
                 descriptionKey="seo.projectsDesc"
@@ -63,7 +63,7 @@ export const ProjectsSection = ({ theme }) => {
                 {loading && Array.from({ length: 6 }, (_, i) => <ProjectCardSkeleton key={`skeleton-${i}`} />)}
                 {pageProjects.map((project) => (
                     <Reveal key={project.id || project.title} className="h-full">
-                    <GlassCard className="p-0 flex flex-col overflow-hidden h-full">
+                    <GlassCard theme={theme} className="project-card p-0 flex flex-col overflow-hidden h-full">
                         <div className="w-full aspect-video bg-gradient-to-br from-white/5 to-white/10 flex items-center justify-center overflow-hidden relative">
                             <BlurImage
                                 src={project.image || imageMap[project.title] || `https://placehold.co/600x400/${accent.hexPlaceholder}/FFFFFF?text=${encodeURIComponent(project.title)}`}
@@ -76,7 +76,7 @@ export const ProjectsSection = ({ theme }) => {
                                 alt={project.title}
                                 placeholder={placeholders[project.title]}
                                 wrapperClassName="w-full h-full"
-                                className="opacity-100 md:opacity-80 md:hover:opacity-100 hover:scale-105 transition-all duration-300"
+                                className="project-cover opacity-100 transition-transform duration-300"
                             />
                             <div aria-hidden="true" className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/10 bg-gradient-to-t from-black/20 to-transparent" />
                         </div>
@@ -84,25 +84,25 @@ export const ProjectsSection = ({ theme }) => {
                         <div className="p-6 flex flex-col flex-grow">
                         <h3 className="text-2xl font-bold text-white mb-2">{project.title}</h3>
                         <div className="flex flex-wrap gap-2 mb-4 min-h-[1.75rem]">
-                            {(project.tags || []).map(tag => <span key={tag} className={`${tagClasses} text-xs font-semibold px-2.5 py-1 rounded-full`}>{tag}</span>)}
+                            {(project.tags || []).slice(0, 3).map(tag => <span key={tag} className={`${tagClasses} text-xs font-semibold px-2.5 py-1 rounded-full`}>{tag}</span>)}
                         </div>
                         <p className="text-gray-300 mb-6 flex-grow line-clamp-4" title={project.description}>{project.description}</p>
                         <div className="project-actions flex flex-wrap items-center justify-between mt-auto gap-3">
                           <ProjectAskAi project={project} theme={theme} />
-                          <div className="flex space-x-4">
-                           {project.githubUrl && <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110" aria-label={`${project.title} on GitHub`}><Github size={24} /></a>}
+                          <div className="flex flex-wrap gap-2">
+                           {project.githubUrl && <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="project-link" aria-label={`${project.title} on GitHub`}><Github size={18} /><span>{t('projects.sourceCode')}</span></a>}
                            {project.liveUrl && (
                              isInternalAppPath(project.liveUrl) ? (
                                <LocalizedLink
                                  to={project.liveUrl}
-                                 className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110"
+                                 className="project-link"
                                  aria-label={`Open ${project.title}`}
                                >
-                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg><span>{t('projects.liveDemo')}</span>
                                </LocalizedLink>
                              ) : (
-                               <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-transform duration-300 hover:scale-110" aria-label={`${project.title} live demo`}>
-                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                               <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="project-link" aria-label={`${project.title} live demo`}>
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg><span>{t('projects.liveDemo')}</span>
                                </a>
                              )
                            )}

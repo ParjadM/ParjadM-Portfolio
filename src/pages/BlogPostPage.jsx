@@ -85,7 +85,7 @@ export const BlogPostPage = ({ theme }) => {
 
     if (error || !post) {
         return (
-            <section className="min-h-screen flex items-center justify-center py-20 px-4">
+            <section className="article-page min-h-screen flex items-center justify-center py-20 px-4">
                 <SEO titleKey="seo.notFoundTitle" descriptionKey="seo.notFoundDesc" noindex canonicalPath={`/blog/${id}`} englishOnly />
                 <div className="container mx-auto max-w-3xl text-center">
                     <GlassCard className="p-8">
@@ -129,7 +129,7 @@ export const BlogPostPage = ({ theme }) => {
     ];
 
     return (
-        <section className="min-h-screen flex items-center justify-center py-20 px-4">
+        <section className="article-page min-h-screen flex items-center justify-center py-20 px-4">
             <SEO
                 title={`${post.title} — Parjad Minooei`}
                 description={post.excerpt || post.content?.substring(0, 150)}
@@ -150,7 +150,7 @@ export const BlogPostPage = ({ theme }) => {
                     </aside>
 
                     <div>
-                        <GlassCard className="p-8">
+                        <article className="article-surface">
                             <div className="flex items-center justify-between mb-4">
                                 <span className={`px-2 py-1 rounded-full text-xs font-semibold ${tagColor}`}>{post.category || 'personal'}</span>
                                 <span className="text-gray-400 text-xs">{post.readTime || t('blog.minRead', { count: readMins })} • {formatDate(post.date, i18n.language)}</span>
@@ -168,7 +168,7 @@ export const BlogPostPage = ({ theme }) => {
                             <BlogTableOfContents headings={headings} theme={theme} mode="mobile" />
                             <BlogAiExplain postId={post.id || id} theme={theme} />
                             <MarkdownContent content={post.content} withHeadingIds />
-                        </GlassCard>
+                        </article>
 
                         <BlogComments postId={post.id || id} />
 
