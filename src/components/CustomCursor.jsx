@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { getAccent } from '../utils/themeTokens.js';
 import { getCursorTheme, isCustomCursorEnabled } from '../utils/cursorThemeConfig.js';
@@ -24,7 +24,16 @@ export const CustomCursor = ({
   const cursorStyleRef = useRef(cursorStyle);
   cursorStyleRef.current = cursorStyle;
 
-  const customEnabled = isCustomCursorEnabled(cursorStyle);
+  const [finePointer, setFinePointer] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)').matches,
+  );
+  useEffect(() => {
+    const media = window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)');
+    const change = () => setFinePointer(media.matches);
+    media.addEventListener('change', change);
+    return () => media.removeEventListener('change', change);
+  }, []);
+  const customEnabled = finePointer && isCustomCursorEnabled(cursorStyle);
 
   const applyPosition = useCallback(() => {
     rafRef.current = null;

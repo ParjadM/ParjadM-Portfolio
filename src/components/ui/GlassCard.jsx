@@ -1,22 +1,32 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { getAccent } from '../../utils/themeTokens.js';
 
 export const GlassCard = ({ children, className = '', theme = 'green', onMouseEnter, onMouseLeave, onClick }) => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const frame = useRef(null);
+  const pointer = useRef(null);
+  const card = useRef(null);
+  useEffect(() => () => {
+    if (frame.current !== null) cancelAnimationFrame(frame.current);
+  }, []);
   const accent = getAccent(theme);
   const gradientClass = accent.gradientBorder;
 
   const handleMouseMove = (e) => {
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    setMousePosition({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+    pointer.current = { x: e.clientX, y: e.clientY };
+    if (frame.current !== null) return;
+    frame.current = requestAnimationFrame(() => {
+      frame.current = null;
+      const node = card.current;
+      if (!node || !pointer.current) return;
+      const rect = node.getBoundingClientRect();
+      node.style.setProperty('--glow-x', `${pointer.current.x - rect.left}px`);
+      node.style.setProperty('--glow-y', `${pointer.current.y - rect.top}px`);
     });
   };
 
   return (
-    <div 
+    <div ref={card}
       className={`glass-card relative bg-white/[0.04] backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] transition-all duration-500 hover:border-white/20 hover:bg-white/[0.08] hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] group overflow-hidden ${className}`}
       onMouseMove={handleMouseMove}
       onMouseEnter={onMouseEnter}
@@ -27,7 +37,7 @@ export const GlassCard = ({ children, className = '', theme = 'green', onMouseEn
       <div 
         className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition duration-500 group-hover:opacity-100"
         style={{
-          background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.06), transparent 40%)`,
+          background: `radial-gradient(600px circle at var(--glow-x, 0px) var(--glow-y, 0px), rgba(255,255,255,0.06), transparent 40%)`,
         }}
       />
 

@@ -74,7 +74,7 @@ export const HomeSection = ({ theme }) => {
       <div className="z-10 container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-10 items-center">
         {/* Left: Text content */}
         <div className="text-left">
-          <Reveal>
+          <Reveal eager>
           <h1 className={`text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-tight bg-gradient-to-r ${gradientText} bg-clip-text text-transparent`}>
             {t('home.title')}
           </h1>
@@ -97,7 +97,7 @@ export const HomeSection = ({ theme }) => {
 
         {/* Right: Portrait image */}
         <div className="flex justify-center md:justify-end mt-4 md:mt-0">
-          <Reveal>
+          <Reveal eager>
           <div className="relative inline-block">
             <div aria-hidden="true" className={`portrait-border-glow ${glowTheme}`} />
             <div className={`portrait-border ${borderTheme}`}>

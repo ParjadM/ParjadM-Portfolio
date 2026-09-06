@@ -85,7 +85,9 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
         };
 
         syncDailyThemeMeta();
-        const intervalId = window.setInterval(syncDailyThemeMeta, 1000);
+        const intervalId = window.setInterval(() => {
+            if (document.visibilityState === 'visible') syncDailyThemeMeta();
+        }, 60_000);
         const onVisible = () => {
             if (document.visibilityState === 'visible') syncDailyThemeMeta();
         };
