@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import './IntroCinematic.css';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { BackgroundBlobs } from '../components/ui/BackgroundBlobs.jsx';
@@ -35,7 +36,7 @@ function useDecoderText(text, delay = 0, instant = false) {
                     clearInterval(interval);
                     setDone(true);
                 }
-                iteration += 1 / 3;
+                iteration += Math.max(0.6, text.length / 45);
             }, 16);
         }, delay);
         return () => {
@@ -55,6 +56,7 @@ const ParticleNetwork = ({ accent, reducedMotion, lightMode = false }) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
+        if (!ctx) return;
         let animationFrameId;
         let running = true;
 
@@ -169,8 +171,8 @@ const CinematicCard = ({
     isExiting,
 }) => {
     const { t } = useTranslation();
-    const [bootDone, setBootDone] = useState(reducedMotion);
-    const [showActions, setShowActions] = useState(reducedMotion);
+    const [bootDone, setBootDone] = useState(reducedMotion || lightMode);
+    const [showActions, setShowActions] = useState(reducedMotion || lightMode);
 
     const instant = reducedMotion || lightMode;
     const useDepth = !reducedMotion && !lightMode;
@@ -187,10 +189,10 @@ const CinematicCard = ({
     const subtle = 'text-white/55';
 
     useEffect(() => {
-        if (reducedMotion) return;
+        if (reducedMotion || lightMode) return;
         const timer = setTimeout(() => setBootDone(true), 1300);
         return () => clearTimeout(timer);
-    }, [reducedMotion]);
+    }, [reducedMotion, lightMode]);
 
     useEffect(() => {
         if (subtitleDone || reducedMotion) setShowActions(true);
@@ -216,7 +218,7 @@ const CinematicCard = ({
             )}
 
             <div className={rigClass}>
-                <div className="intro-card glass-3d w-full relative bg-white/[0.03] border border-white/10 rounded-[2.5rem] md:rounded-[3rem]">
+                <div className="cinema-panel intro-card glass-3d w-full relative bg-white/[0.03] border border-white/10 rounded-[2.5rem] md:rounded-[3rem]">
                     <div
                         className={`intro-layer intro-layer-back-glow absolute inset-0 bg-gradient-to-br ${gradientClass} opacity-10 blur-3xl rounded-[2.5rem] md:rounded-[3rem]`}
                         aria-hidden="true"
@@ -254,12 +256,12 @@ const CinematicCard = ({
                             </div>
                         </div>
 
-                        <h1
-                            className={`intro-layer intro-layer-title text-4xl sm:text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-4 min-h-[3.5rem] md:min-h-[5.5rem] font-mono transition-opacity duration-500 ${bootDone ? 'opacity-100' : 'opacity-0'}`}
+                        <h1 aria-label={`${copy.title1} ${copy.title2}`}
+                            className={`cinema-title intro-layer intro-layer-title text-4xl sm:text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-4 min-h-[3.5rem] md:min-h-[5.5rem] font-mono transition-opacity duration-500 ${bootDone ? 'opacity-100' : 'opacity-0'}`}
                             aria-live="polite"
                         >
-                            <span className="block sm:inline">{decodedTitle1}</span>{' '}
-                            <span className={`bg-gradient-to-r ${gradientClass} bg-clip-text text-transparent`}>{decodedTitle2}</span>
+                            <span aria-hidden="true" className="block">{decodedTitle1}</span>{' '}
+                            <span aria-hidden="true" className={`cinema-title-accent bg-gradient-to-r ${gradientClass} bg-clip-text text-transparent`}>{decodedTitle2}</span>
                         </h1>
 
                         <p className={`intro-layer intro-layer-subtitle text-base md:text-xl ${muted} max-w-2xl mx-auto mb-6 leading-relaxed min-h-[3.5rem] md:min-h-[4rem] font-mono`}>
@@ -331,6 +333,8 @@ export const IntroCinematic = ({ theme }) => {
     const [sequenceKey, setSequenceKey] = useState(0);
     const [isExiting, setIsExiting] = useState(false);
     const [flash, setFlash] = useState(false);
+    const exitTimer = useRef(null);
+    useEffect(() => () => clearTimeout(exitTimer.current), []);
 
     const locale = i18n.language?.startsWith('fr') ? 'fr' : 'en';
 
@@ -354,8 +358,8 @@ export const IntroCinematic = ({ theme }) => {
         markIntroSeen();
         setIsExiting(true);
         setFlash(true);
-        const delay = reducedMotion ? 300 : 900;
-        setTimeout(() => navigate(localizePath(path, locale)), delay);
+        clearTimeout(exitTimer.current);
+        exitTimer.current = setTimeout(() => navigate(localizePath(path, locale)), reducedMotion ? 0 : 900);
     }, [navigate, locale, reducedMotion]);
 
     const handleSkip = useCallback(() => {
@@ -364,6 +368,7 @@ export const IntroCinematic = ({ theme }) => {
     }, [navigate, locale]);
 
     const handleReplay = useCallback(() => {
+        clearTimeout(exitTimer.current);
         setIsExiting(false);
         setFlash(false);
         setSequenceKey((k) => k + 1);
@@ -372,6 +377,7 @@ export const IntroCinematic = ({ theme }) => {
     useEffect(() => {
         const onKeyDown = (e) => {
             if (isExiting) return;
+            if (e.target instanceof HTMLElement && e.target.closest('button, a, input, textarea, select')) return;
             if (e.key === 'Enter') finishIntro('/projects');
             if (e.key === 'Escape') handleSkip();
             if (e.key === 'r' || e.key === 'R') handleReplay();
@@ -383,7 +389,7 @@ export const IntroCinematic = ({ theme }) => {
     const accent = getAccent(theme);
 
     return (
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black perspective-1000 intro-scene">
+        <section style={{ '--cinema-accent': theme === 'pink' ? '244, 114, 182' : '52, 211, 153' }} className={`cinema-stage ${reducedMotion ? 'cinema-still' : ''} relative min-h-screen flex items-center justify-center overflow-hidden bg-black perspective-1000 intro-scene`}>
             <SEO titleKey="seo.introTitle" descriptionKey="seo.introDesc" />
 
             <style>{`
@@ -581,6 +587,14 @@ export const IntroCinematic = ({ theme }) => {
                 }
             `}</style>
 
+            <div className="cinema-atmosphere" aria-hidden="true">
+                <div className="cinema-aura" />
+                <div className="cinema-orbit cinema-orbit-one" />
+                <div className="cinema-orbit cinema-orbit-two" />
+                <div className="cinema-orbit cinema-orbit-three" />
+                <div className="cinema-grid" />
+                <div className="cinema-horizon" />
+            </div>
             <div className="intro-bg-depth intro-bg-depth-far">
                 <BackgroundBlobs theme={theme} darkMode reducedMotion={reducedMotion || lightMode} staticOnMobile={lightMode} />
             </div>
@@ -625,7 +639,7 @@ export const IntroCinematic = ({ theme }) => {
 
             {flash && (
                 <div
-                    className={`fixed inset-0 z-50 pointer-events-none intro-flash ${accent.flash}`}
+                    className={`fixed inset-0 z-50 pointer-events-none intro-flash bg-black`}
                     aria-hidden="true"
                 />
             )}

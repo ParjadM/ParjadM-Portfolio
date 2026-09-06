@@ -1,0 +1,26 @@
+.cinema-stage { isolation: isolate; min-height: 100svh; background: #030807; }
+.cinema-atmosphere { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.cinema-aura { position: absolute; width: 90vw; height: 75vh; left: 5%; top: 0; background: radial-gradient(ellipse, rgba(var(--cinema-accent), .16), transparent 65%); animation: cinema-breathe 9s ease-in-out infinite alternate; }
+.cinema-orbit { position: absolute; left: 50%; top: 45%; width: min(85vw, 1100px); aspect-ratio: 1; border: 1px solid rgba(var(--cinema-accent), .2); border-radius: 50%; box-shadow: inset 0 0 35px rgba(var(--cinema-accent), .035), 0 0 35px rgba(var(--cinema-accent), .035); }
+.cinema-orbit::after { content: ''; position: absolute; top: 15%; left: 14%; width: 6px; height: 6px; border-radius: 50%; background: rgb(var(--cinema-accent)); box-shadow: 0 0 20px 4px rgba(var(--cinema-accent), .5); }
+.cinema-orbit-one { animation: cinema-orbit 48s linear infinite; }
+.cinema-orbit-two { width: min(105vw, 1380px); opacity: .45; animation: cinema-orbit 65s linear infinite reverse; }
+.cinema-orbit-three { width: min(65vw, 840px); border-style: dashed; opacity: .25; animation: cinema-orbit 80s linear infinite; }
+.cinema-grid { position: absolute; inset: 58% -50% -50%; background-image: linear-gradient(rgba(var(--cinema-accent), .12) 1px, transparent 1px), linear-gradient(90deg, rgba(var(--cinema-accent), .12) 1px, transparent 1px); background-size: 70px 70px; transform: perspective(450px) rotateX(62deg); transform-origin: top; mask-image: linear-gradient(transparent, black 40%, transparent 85%); }
+.cinema-horizon { position: absolute; top: 70%; left: 10%; width: 80%; height: 1px; background: linear-gradient(90deg, transparent, rgba(var(--cinema-accent), .55), transparent); box-shadow: 0 0 45px 8px rgba(var(--cinema-accent), .12); }
+.cinema-stage .cinema-panel { background: linear-gradient(135deg, rgba(13, 23, 23, .75), rgba(3, 8, 8, .45)); border-color: rgba(var(--cinema-accent), .16); backdrop-filter: blur(12px); box-shadow: 0 40px 100px #0008, inset 0 1px 0 #ffffff12; border-radius: 12px; margin: 100px 0 70px; }
+.cinema-panel::before, .cinema-panel::after { content: ''; position: absolute; width: 30px; height: 30px; border-color: rgba(var(--cinema-accent), .7); pointer-events: none; }
+.cinema-panel::before { top: -1px; left: -1px; border-top: 1px solid; border-left: 1px solid; border-top-left-radius: 12px; }
+.cinema-panel::after { bottom: -1px; right: -1px; border-bottom: 1px solid; border-right: 1px solid; border-bottom-right-radius: 12px; }
+.cinema-stage .cinema-title { font-family: 'Outfit Variable', 'Outfit', sans-serif; font-size: clamp(2.35rem, 7.3vw, 6.3rem); line-height: 1.02; letter-spacing: -.055em; font-weight: 700; min-height: 2.1em; }
+.cinema-title-accent { display: block; padding-bottom: .12em; filter: drop-shadow(0 0 24px rgba(var(--cinema-accent), .22)); }
+.cinema-stage .cinema-subtitle { font-family: inherit; max-width: 510px; color: #a6b7b4; min-height: 4.5em; }
+.cinema-signature { position: absolute; left: 32px; top: 30px; right: 180px; z-index: 10; display: flex; justify-content: space-between; gap: 20px; color: #92aba3; font: 10px monospace; letter-spacing: .2em; }
+.cinema-stage button:focus-visible { outline: 2px solid rgb(var(--cinema-accent)); outline-offset: 5px; }
+@keyframes cinema-orbit { from { transform: translate(-50%, -50%) rotate(-25deg) rotateX(55deg) rotateZ(0deg); } to { transform: translate(-50%, -50%) rotate(-25deg) rotateX(55deg) rotateZ(360deg); } }
+@keyframes cinema-breathe { from { transform: scale(.85); opacity: .5; } to { transform: scale(1.15); opacity: 1; } }
+@media (max-width: 767px) { .cinema-signature { left: 20px; top: 28px; } .cinema-signature span:last-child { display: none; } .cinema-stage .cinema-panel { margin: 90px 0 110px; } .cinema-orbit { animation-duration: 90s; } .cinema-grid { background-size: 45px 45px; } }
+.cinema-still *, .cinema-still *::before, .cinema-still *::after { animation: none !important; transition: none !important; }
+.cinema-still .intro-icon { opacity: 1; }
+.cinema-still .cinema-orbit { transform: translate(-50%, -50%) rotate(-25deg) rotateX(55deg); }
+@media (prefers-reduced-motion: reduce) { .cinema-stage *, .cinema-stage *::before, .cinema-stage *::after { animation: none !important; transition: none !important; } .cinema-stage .intro-icon { opacity: 1; } }
