@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Text } from '@react-three/drei';
+import { Text, Billboard } from '@react-three/drei';
 import { RigidBody, CuboidCollider } from '@react-three/rapier';
 import { useTranslation } from 'react-i18next';
 
@@ -33,18 +33,19 @@ export function Building({ location }) {
         <meshStandardMaterial color="#0f172a" roughness={0.7} metalness={0.05} />
       </mesh>
 
-      <Text
-        position={[0, h + 1.1, 0]}
-        fontSize={0.55}
-        color="#f8fafc"
-        anchorX="center"
-        anchorY="middle"
-        outlineWidth={0.03}
-        outlineColor="#020617"
-        maxWidth={6}
-      >
-        {label}
-      </Text>
+      <Billboard position={[0, h + 1.1, 0]}>
+        <Text
+          fontSize={0.55}
+          color="#f8fafc"
+          anchorX="center"
+          anchorY="middle"
+          outlineWidth={0.03}
+          outlineColor="#020617"
+          maxWidth={6}
+        >
+          {label}
+        </Text>
+      </Billboard>
     </group>
   );
 }
