@@ -7,7 +7,7 @@ import { PLAYER_SPAWN } from '../../data/worldLocations.js';
 const MOVE_SPEED = 5.5;
 const RUN_SPEED = 9;
 const TURN_SPEED = 2.4;
-const VISUAL_TURN_LERP = 12;
+const VISUAL_TURN_LERP = 14;
 
 /**
  * Capsule player with keyboard movement (WASD / arrows + Shift run).
@@ -155,20 +155,30 @@ export function Player({ onPositionChange, inputLocked = false }) {
           <capsuleGeometry args={[0.35, 0.9, 6, 12]} />
           <meshStandardMaterial color="#e2e8f0" roughness={0.45} metalness={0.1} />
         </mesh>
-        {/* Head — slight forward bias so facing reads clearly */}
+        {/* Head — slight forward bias */}
         <mesh position={[0, 1.48, 0.08]} castShadow>
           <sphereGeometry args={[0.24, 12, 12]} />
           <meshStandardMaterial color="#f1f5f9" roughness={0.4} />
         </mesh>
         {/* Chest plate facing cue */}
-        <mesh position={[0, 1.05, 0.32]} castShadow>
-          <boxGeometry args={[0.42, 0.35, 0.12]} />
+        <mesh position={[0, 1.05, 0.34]} castShadow>
+          <boxGeometry args={[0.44, 0.38, 0.14]} />
           <meshStandardMaterial color="#38bdf8" roughness={0.35} metalness={0.15} />
         </mesh>
         {/* Nose / forward cue — local +Z is forward */}
-        <mesh position={[0, 1.42, 0.38]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-          <coneGeometry args={[0.12, 0.36, 8]} />
+        <mesh position={[0, 1.42, 0.42]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+          <coneGeometry args={[0.13, 0.4, 8]} />
           <meshStandardMaterial color="#0ea5e9" roughness={0.4} />
+        </mesh>
+        {/* Overhead arrow — visible while follow-camera yaw is catching up */}
+        <mesh position={[0, 1.95, 0.15]} rotation={[Math.PI / 2, 0, Math.PI]} castShadow>
+          <coneGeometry args={[0.2, 0.48, 3]} />
+          <meshStandardMaterial
+            color="#38bdf8"
+            emissive="#0284c7"
+            emissiveIntensity={0.4}
+            roughness={0.35}
+          />
         </mesh>
       </group>
     </RigidBody>
