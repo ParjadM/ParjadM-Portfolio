@@ -39,6 +39,8 @@ export default defineConfig({
           '**/MockInterview*',
           '**/CameraFx*',
           '**/QaLab*',
+          '**/ExploreWorld*',
+          '**/explore-world*',
           '**/garden/**',
           '**/icons/icon-512.png',
           '**/icons/icon-maskable-512.png',

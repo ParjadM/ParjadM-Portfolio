@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Palette, Menu } from '../ui/Icons.jsx';
-import { Monitor, Newspaper, Film, Terminal, MessageSquare, Activity, ChevronDown } from 'lucide-react';
+import { Monitor, Newspaper, Film, Terminal, MessageSquare, Activity, ChevronDown, Globe } from 'lucide-react';
 import { GlassCard } from '../ui/GlassCard.jsx';
 import Logo from '../../Images/Logo.webp';
 import {
@@ -69,6 +69,7 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
     const isActive = (path) => stripLocalePrefix(location.pathname) === path;
 
     const MORE_ITEMS = [
+        { name: t('more.exploreWorld'), path: '/explore-world', icon: <Globe className="w-4 h-4" />, description: t('more.exploreWorldDesc') },
         { name: t('more.os'), path: '/os', icon: <Monitor className="w-4 h-4" />, description: t('more.osDesc') },
         { name: t('more.techNews'), path: '/tech-news', icon: <Newspaper className="w-4 h-4" />, description: t('more.techNewsDesc') },
         { name: t('more.intro'), path: '/intro', icon: <Film className="w-4 h-4" />, description: t('more.introDesc') },
