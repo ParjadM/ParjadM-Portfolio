@@ -155,15 +155,20 @@ export function Player({ onPositionChange, inputLocked = false }) {
           <capsuleGeometry args={[0.35, 0.9, 6, 12]} />
           <meshStandardMaterial color="#e2e8f0" roughness={0.45} metalness={0.1} />
         </mesh>
-        {/* Head */}
-        <mesh position={[0, 1.45, 0]} castShadow>
-          <sphereGeometry args={[0.22, 12, 12]} />
-          <meshStandardMaterial color="#cbd5e1" roughness={0.4} />
+        {/* Head — slight forward bias so facing reads clearly */}
+        <mesh position={[0, 1.48, 0.08]} castShadow>
+          <sphereGeometry args={[0.24, 12, 12]} />
+          <meshStandardMaterial color="#f1f5f9" roughness={0.4} />
         </mesh>
-        {/* Nose / facing cue — local +Z is forward */}
-        <mesh position={[0, 1.35, 0.28]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-          <coneGeometry args={[0.1, 0.28, 8]} />
-          <meshStandardMaterial color="#64748b" roughness={0.5} />
+        {/* Chest plate facing cue */}
+        <mesh position={[0, 1.05, 0.32]} castShadow>
+          <boxGeometry args={[0.42, 0.35, 0.12]} />
+          <meshStandardMaterial color="#38bdf8" roughness={0.35} metalness={0.15} />
+        </mesh>
+        {/* Nose / forward cue — local +Z is forward */}
+        <mesh position={[0, 1.42, 0.38]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+          <coneGeometry args={[0.12, 0.36, 8]} />
+          <meshStandardMaterial color="#0ea5e9" roughness={0.4} />
         </mesh>
       </group>
     </RigidBody>
