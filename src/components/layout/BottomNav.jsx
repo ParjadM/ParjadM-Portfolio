@@ -14,7 +14,7 @@ export const BottomNav = React.memo(function BottomNav({ theme }) {
 
     const isActive = (itemPath) => {
         if (itemPath === '/explore') {
-            return ['/explore', '/cli', '/os', '/algorithm-memorizer', '/intro', '/interview', '/tech-news'].some(
+            return ['/explore', '/explore-world', '/cli', '/os', '/algorithm-memorizer', '/intro', '/interview', '/tech-news'].some(
                 (p) => path === p || path.startsWith(p + '/')
             );
         }

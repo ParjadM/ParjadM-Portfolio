@@ -65,6 +65,7 @@ const MockInterviewPage = lazyNamed(() => import('../../pages/MockInterviewPage.
 const TechNews = lazyNamed(() => import('../../pages/TechNews.jsx'), 'TechNews');
 const DesktopOS = lazyNamed(() => import('../../pages/DesktopOS.jsx'), 'DesktopOS');
 const ExplorePage = lazyNamed(() => import('../../pages/ExplorePage.jsx'), 'ExplorePage');
+const ExploreWorldPage = lazyNamed(() => import('../../pages/ExploreWorldPage.jsx'), 'ExploreWorldPage');
 const AlgorithmMemorizerPage = lazyNamed(() => import('../../pages/AlgorithmMemorizerPage.jsx'), 'AlgorithmMemorizerPage');
 
 const ROUTE_COMPONENTS = {
@@ -78,6 +79,7 @@ const ROUTE_COMPONENTS = {
   contact: ContactSection,
   stats: StatsPage,
   explore: ExplorePage,
+  exploreWorld: ExploreWorldPage,
   algoMem: AlgorithmMemorizerPage,
   techNews: TechNews,
   interview: MockInterviewPage,
