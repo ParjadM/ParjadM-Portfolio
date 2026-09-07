@@ -59,10 +59,13 @@ describe('isFullscreenPath', () => {
         expect(isFullscreenPath('/fr/os')).toBe(true);
         expect(isFullscreenPath('/cli')).toBe(true);
         expect(isFullscreenPath('/intro')).toBe(true);
+        expect(isFullscreenPath('/explore-world')).toBe(true);
+        expect(isFullscreenPath('/fr/explore-world')).toBe(true);
     });
 
     it('returns false for regular routes', () => {
         expect(isFullscreenPath('/')).toBe(false);
         expect(isFullscreenPath('/projects')).toBe(false);
+        expect(isFullscreenPath('/explore')).toBe(false);
     });
 });
