@@ -9,19 +9,19 @@ export const CAMERA_PRESETS = {
     offset: [0, 5.5, 10],
     lookOffset: [0, 0.95, 0],
   },
-  // Keep camera inside the lab: lower than ceiling (~4.2) and short enough
-  // to stay in front of the entrance wall when facing into the room.
+  // Interior third-person: wider than Phase 4B close-up, still shorter than outdoor.
+  // Boom length stays inside entrance wall (~z+6) for spawn near z≈0.8 facing −Z.
   interior: {
-    offset: [0, 2.35, 3.6],
-    lookOffset: [0, 0.95, 0],
+    offset: [0, 2.9, 4.6],
+    lookOffset: [0, 1.0, 0],
   },
 };
 
 /**
- * Spawn inside the room with open space ahead (−Z) and enough room behind
- * for the interior camera (+Z) before the entrance wall at z≈+6.
+ * Spawn facing project displays (−Z) with open floor ahead and camera clearance
+ * behind before the entrance wall at z≈+6.
  */
-export const PROJECTS_INTERIOR_SPAWN = { x: 0, y: 1.2, z: 1.8, yaw: Math.PI };
+export const PROJECTS_INTERIOR_SPAWN = { x: 0, y: 1.2, z: 0.8, yaw: Math.PI };
 
 /** Spawn outside Projects Lab door after exiting. */
 export function getProjectsExteriorSpawn() {

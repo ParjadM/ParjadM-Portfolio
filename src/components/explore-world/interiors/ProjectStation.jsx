@@ -30,37 +30,37 @@ export function ProjectStation({
       </RigidBody>
 
       <mesh position={[0, 0.35, 0]} castShadow receiveShadow>
-        <boxGeometry args={[1.2, 0.7, 0.9]} />
-        <meshStandardMaterial color="#3d4654" roughness={0.55} metalness={0.25} />
+        <boxGeometry args={[1.25, 0.7, 0.95]} />
+        <meshStandardMaterial color="#1f2937" roughness={0.5} metalness={0.28} />
       </mesh>
       <mesh position={[0, 1.35, -0.1]} castShadow>
-        <boxGeometry args={[1.35, 0.95, 0.12]} />
-        <meshStandardMaterial color="#1e293b" roughness={0.45} metalness={0.35} />
+        <boxGeometry args={[1.4, 0.98, 0.14]} />
+        <meshStandardMaterial color="#0f172a" roughness={0.4} metalness={0.4} />
       </mesh>
       <mesh position={[0, 1.35, -0.02]}>
-        <boxGeometry args={[1.15, 0.75, 0.05]} />
+        <boxGeometry args={[1.18, 0.78, 0.05]} />
         <meshStandardMaterial
-          color="#7dd3fc"
+          color="#bae6fd"
           emissive="#38bdf8"
-          emissiveIntensity={0.35}
-          roughness={0.25}
-          metalness={0.4}
+          emissiveIntensity={0.55}
+          roughness={0.22}
+          metalness={0.35}
         />
       </mesh>
       <mesh position={[0, 2.05, 0]} castShadow rotation={[0.4, 0.6, 0.2]}>
-        <octahedronGeometry args={[0.28, 0]} />
-        <meshStandardMaterial color="#94a3b8" roughness={0.3} metalness={0.55} transparent opacity={0.85} />
+        <octahedronGeometry args={[0.3, 0]} />
+        <meshStandardMaterial color="#e2e8f0" roughness={0.28} metalness={0.6} transparent opacity={0.9} />
       </mesh>
 
-      <Billboard position={[0, 2.4, 0]}>
+      <Billboard position={[0, 2.45, 0]}>
         <Text
-          fontSize={0.14}
-          color="#f8fafc"
+          fontSize={0.2}
+          color="#ffffff"
           anchorX="center"
           anchorY="bottom"
-          maxWidth={2.2}
-          outlineWidth={0.01}
-          outlineColor="#0f172a"
+          maxWidth={2.6}
+          outlineWidth={0.02}
+          outlineColor="#020617"
         >
           {title}
         </Text>

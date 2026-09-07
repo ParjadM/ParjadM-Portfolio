@@ -94,11 +94,13 @@ export function ProjectsInterior({
   onInteract,
   inputLocked = false,
 }) {
+  // 2×2 grid facing the entrance so at least the front row reads immediately.
+  // Room playable area ≈ x±8, z±6; keep clear aisle on centerline for spawn/walk.
   const stations = [
-    { project: projects[0], position: [-4.5, 0, -3.2], rotationY: 0.25 },
-    { project: projects[1], position: [4.5, 0, -3.2], rotationY: -0.25 },
-    { project: projects[2], position: [-4.2, 0, 1.5], rotationY: Math.PI / 2 },
-    { project: projects[3], position: [4.2, 0, 1.5], rotationY: -Math.PI / 2 },
+    { project: projects[0], position: [-3.6, 0, -3.5], rotationY: 0 },
+    { project: projects[1], position: [3.6, 0, -3.5], rotationY: 0 },
+    { project: projects[2], position: [-3.6, 0, -0.55], rotationY: 0 },
+    { project: projects[3], position: [3.6, 0, -0.55], rotationY: 0 },
   ].filter((s) => s.project);
 
   return (
