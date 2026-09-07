@@ -26,7 +26,6 @@ export function Player({ onPositionChange, inputLocked = false }) {
   const yawRef = useRef(0);
   const visualYawRef = useRef(0);
   const tmpVec = useRef(new THREE.Vector3());
-  const lastReport = useRef(0);
 
   useEffect(() => {
     const setKey = (code, pressed) => {
@@ -129,9 +128,7 @@ export function Player({ onPositionChange, inputLocked = false }) {
       visualRef.current.rotation.y = visualYawRef.current;
     }
 
-    const t = performance.now();
-    if (onPositionChange && t - lastReport.current > 80) {
-      lastReport.current = t;
+    if (onPositionChange) {
       const p = body.translation();
       onPositionChange({ x: p.x, y: p.y, z: p.z, yaw: yawRef.current });
     }

@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { getLocationById } from '../../data/worldLocations.js';
 
-const INTERACT_RADIUS = 4.5;
+const INTERACT_RADIUS = 5.5;
 
 /**
  * Detects proximity to a landmark and reports prompt / interact events.
