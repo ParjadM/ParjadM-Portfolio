@@ -31,6 +31,8 @@
     "interviewDesc": "S'entraîner avec une IA",
     "algoMem": "Mémoriseur d'algorithmes",
     "algoMemDesc": "Tapez des algorithmes de mémoire contre la montre",
+    "exploreWorld": "Monde à explorer",
+    "exploreWorldDesc": "Parcourir une ville 3D du portfolio",
     "statsDesc": "Statistiques et métriques du site"
   },
   "home": {
@@ -242,7 +244,34 @@
       "lqft": { "label": "Benchmark LQFT", "desc": "Terrain de jeu performance" },
       "cameraFx": { "label": "Camera FX", "desc": "Gestes des mains et lumières néon" },
       "qaLab": { "label": "Labo QA ingénierie", "desc": "Comment je teste ce site — pyramide, risques, CI" },
-      "algoMem": { "label": "Mémoriseur d'algorithmes", "desc": "S'entraîner à taper des algorithmes contre la montre" }
+      "algoMem": { "label": "Mémoriseur d'algorithmes", "desc": "S'entraîner à taper des algorithmes contre la montre" },
+      "exploreWorld": { "label": "Monde à explorer", "desc": "Parcourir une ville 3D de repères du portfolio" }
+    }
+  },
+  "exploreWorld": {
+    "title": "Monde à explorer",
+    "controls": "WASD / flèches pour bouger · Maj pour courir · E pour interagir",
+    "exit": "Quitter",
+    "loading": "Chargement du monde…",
+    "promptProjects": "Appuyez sur E pour explorer Projets",
+    "mobileTitle": "Expérience bureau",
+    "mobileBody": "La phase 1 du Monde à explorer est conçue pour clavier et souris sur un grand écran. Ouvrez-la dans un navigateur de bureau pour parcourir la ville.",
+    "backToExplore": "Retour à Explorer",
+    "seoTitle": "Monde à explorer — Parjad Minooei",
+    "seoDesc": "Parcourez une ville 3D du portfolio et découvrez des repères comme Projets.",
+    "overlay": {
+      "projectsTitle": "Quartier Projets",
+      "projectsBody": "Ce repère ouvre la galerie de projets — réalisations sélectionnées, notes de cas et démos du portfolio.",
+      "close": "Rester dans le monde",
+      "viewProjects": "Voir les projets →"
+    },
+    "locations": {
+      "projects": "Projets",
+      "blog": "Blog",
+      "experience": "Expérience",
+      "education": "Éducation",
+      "skills": "Compétences",
+      "about": "À propos"
     }
   },
   "cameraFx": {
