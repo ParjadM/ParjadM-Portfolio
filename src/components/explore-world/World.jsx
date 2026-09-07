@@ -6,7 +6,7 @@ import { FollowCamera } from './FollowCamera.jsx';
 import { InteractionZone } from './InteractionZone.jsx';
 
 /**
- * Full scene graph for Explore World Phase 1.
+ * Full scene graph for Explore World.
  */
 export function World({
   playerPoseRef,
@@ -21,23 +21,23 @@ export function World({
 
   return (
     <>
-      <color attach="background" args={['#87b5d9']} />
-      <fog attach="fog" args={['#9ec5e0', 28, 55]} />
-      <ambientLight intensity={0.55} />
+      <color attach="background" args={['#b7d4ea']} />
+      <fog attach="fog" args={['#c5dceb', 32, 62]} />
+      <ambientLight intensity={0.48} />
       <directionalLight
         castShadow
-        position={[12, 18, 8]}
-        intensity={1.05}
+        position={[14, 20, 10]}
+        intensity={1.15}
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
         shadow-camera-far={60}
-        shadow-camera-left={-20}
-        shadow-camera-right={20}
-        shadow-camera-top={20}
-        shadow-camera-bottom={-20}
+        shadow-camera-left={-22}
+        shadow-camera-right={22}
+        shadow-camera-top={22}
+        shadow-camera-bottom={-22}
       />
-      <hemisphereLight args={['#bfdbfe', '#1a3a2f', 0.35]} />
-      <Sky sunPosition={[40, 20, 30]} turbidity={6} rayleigh={1.2} mieCoefficient={0.01} />
+      <hemisphereLight args={['#dceeff', '#4a6b52', 0.42]} />
+      <Sky sunPosition={[45, 24, 28]} turbidity={5} rayleigh={1.05} mieCoefficient={0.008} />
 
       <Town />
       <Player onPositionChange={handlePositionChange} inputLocked={inputLocked} />

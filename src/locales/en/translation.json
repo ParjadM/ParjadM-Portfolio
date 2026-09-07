@@ -266,11 +266,11 @@
       "viewProjects": "View projects →"
     },
     "locations": {
-      "projects": "Projects",
-      "blog": "Blog",
-      "experience": "Experience",
-      "education": "Education",
-      "skills": "Skills",
+      "projects": "Projects Lab",
+      "blog": "Blog Library",
+      "experience": "Experience Office",
+      "education": "Education Campus",
+      "skills": "Skills Workshop",
       "about": "About"
     }
   },

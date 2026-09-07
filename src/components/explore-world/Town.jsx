@@ -2,6 +2,10 @@ import React, { useMemo } from 'react';
 import { RigidBody, CuboidCollider } from '@react-three/rapier';
 import { WORLD_BOUNDS, WORLD_LOCATIONS } from '../../data/worldLocations.js';
 import { Building } from './Building.jsx';
+import { Paths } from './town/Paths.jsx';
+import { TownSquare } from './town/TownSquare.jsx';
+import { Rock, Shrub, StreetLamp, Tree } from './town/props.jsx';
+import { TOWN_COLORS, TOWN_MAT } from './town/townPalette.js';
 
 function BoundaryWalls() {
   const { halfSize, wallHeight, wallThickness } = WORLD_BOUNDS;
@@ -21,34 +25,43 @@ function BoundaryWalls() {
       <CuboidCollider args={[wall.args[0] / 2, wall.args[1] / 2, wall.args[2] / 2]} />
       <mesh>
         <boxGeometry args={wall.args} />
-        <meshStandardMaterial color="#1e293b" transparent opacity={0.25} />
+        <meshStandardMaterial color={TOWN_COLORS.fence} transparent opacity={0.18} />
       </mesh>
     </RigidBody>
   ));
 }
 
-function Paths() {
-  // Cross roads through town square — simple flat planes, no colliders.
+function EnvironmentProps() {
   return (
     <group>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]} receiveShadow>
-        <planeGeometry args={[4.5, 30]} />
-        <meshStandardMaterial color="#475569" roughness={0.9} />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.025, 0]} receiveShadow>
-        <planeGeometry args={[30, 4.5]} />
-        <meshStandardMaterial color="#475569" roughness={0.9} />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]} receiveShadow>
-        <circleGeometry args={[3.2, 24]} />
-        <meshStandardMaterial color="#64748b" roughness={0.85} />
-      </mesh>
+      <Tree position={[16, 0, 6]} scale={1.1} />
+      <Tree position={[15, 0, -8]} scale={0.95} />
+      <Tree position={[-16, 0, 4]} scale={1.05} />
+      <Tree position={[-14, 0, -9]} scale={0.9} />
+      <Tree position={[7, 0, 16]} scale={1} />
+      <Tree position={[-8, 0, 16]} scale={1.05} />
+      <Tree position={[8, 0, -16]} scale={0.95} />
+      <Tree position={[-7, 0, -16]} scale={1} />
+
+      <Shrub position={[9, 0.2, -5]} />
+      <Shrub position={[-9, 0.2, -6]} scale={1.1} />
+      <Shrub position={[4, 0.2, 11]} />
+      <Shrub position={[-3, 0.2, -11]} scale={0.9} />
+
+      <StreetLamp position={[8, 0, 0.5]} />
+      <StreetLamp position={[-8, 0, 0.5]} />
+      <StreetLamp position={[0.5, 0, 8]} />
+      <StreetLamp position={[0.5, 0, -8]} />
+
+      <Rock position={[18, 0.1, -3]} scale={1.2} />
+      <Rock position={[-17, 0.1, 8]} scale={0.9} />
+      <Rock position={[3, 0.1, 18]} />
     </group>
   );
 }
 
 /**
- * Ground, paths, buildings, and world bounds.
+ * Stylized RPG portfolio town: ground, paths, square, landmarks, light props.
  */
 export function Town() {
   const groundSize = WORLD_BOUNDS.halfSize * 2;
@@ -59,11 +72,23 @@ export function Town() {
         <CuboidCollider args={[groundSize / 2, 0.25, groundSize / 2]} />
         <mesh receiveShadow>
           <boxGeometry args={[groundSize, 0.5, groundSize]} />
-          <meshStandardMaterial color="#1a3a2f" roughness={0.95} />
+          <meshStandardMaterial {...TOWN_MAT.grass} />
         </mesh>
       </RigidBody>
 
+      {/* Soft grass variation patches (visual only) */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[10, 0.01, 16]} receiveShadow>
+        <circleGeometry args={[4, 16]} />
+        <meshStandardMaterial color={TOWN_COLORS.grassDeep} roughness={0.96} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-12, 0.01, -14]} receiveShadow>
+        <circleGeometry args={[5, 16]} />
+        <meshStandardMaterial color={TOWN_COLORS.grassDeep} roughness={0.96} />
+      </mesh>
+
       <Paths />
+      <TownSquare />
+      <EnvironmentProps />
       <BoundaryWalls />
 
       {WORLD_LOCATIONS.map((location) => (
