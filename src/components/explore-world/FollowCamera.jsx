@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const OFFSET = new THREE.Vector3(0, 4.2, 7.5);
+const OFFSET = new THREE.Vector3(0, 5.2, 8.5);
 const LOOK_OFFSET = new THREE.Vector3(0, 1.1, 0);
 const LERP = 6;
 
