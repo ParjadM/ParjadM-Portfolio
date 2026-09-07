@@ -2,9 +2,11 @@ import { useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const OFFSET = new THREE.Vector3(0, 5.2, 8.5);
-const LOOK_OFFSET = new THREE.Vector3(0, 1.1, 0);
-const LERP = 6;
+/** Behind + above the player; pulled back so the character has breathing room. */
+const OFFSET = new THREE.Vector3(0, 6.4, 12);
+/** Look near chest height so the player sits mid-lower frame, not glued to the bottom edge. */
+const LOOK_OFFSET = new THREE.Vector3(0, 0.85, 0);
+const LERP = 5.2;
 
 /**
  * Smooth third-person camera behind and above the player.

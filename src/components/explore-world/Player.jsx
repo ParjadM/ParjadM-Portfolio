@@ -7,13 +7,15 @@ import { PLAYER_SPAWN } from '../../data/worldLocations.js';
 const MOVE_SPEED = 5.5;
 const RUN_SPEED = 9;
 const TURN_SPEED = 2.4;
+const VISUAL_TURN_LERP = 12;
 
 /**
  * Capsule player with keyboard movement (WASD / arrows + Shift run).
- * Rotation is yaw-only; physics body stays upright.
+ * Physics body stays upright; a visible mesh yaw-smoothes to face movement.
  */
 export function Player({ onPositionChange, inputLocked = false }) {
   const bodyRef = useRef(null);
+  const visualRef = useRef(null);
   const keysRef = useRef({
     forward: false,
     back: false,
@@ -22,6 +24,7 @@ export function Player({ onPositionChange, inputLocked = false }) {
     run: false,
   });
   const yawRef = useRef(0);
+  const visualYawRef = useRef(0);
   const tmpVec = useRef(new THREE.Vector3());
   const lastReport = useRef(0);
 
@@ -107,8 +110,24 @@ export function Player({ onPositionChange, inputLocked = false }) {
     }
 
     body.setLinvel({ x: move.x, y: linvel.y, z: move.z }, true);
-    body.setRotation({ x: 0, y: Math.sin(yawRef.current / 2), z: 0, w: Math.cos(yawRef.current / 2) }, true);
+    // Keep the rigid body upright; facing is applied on the visual mesh.
+    body.setRotation({ x: 0, y: 0, z: 0, w: 1 }, true);
     body.setAngvel({ x: 0, y: 0, z: 0 }, true);
+
+    // Smooth visual yaw so left/right turns and direction changes read clearly.
+    let targetVisualYaw = yawRef.current;
+    if (!inputLocked && keys.back && !keys.forward) {
+      // Walking backward: face the reverse heading so the "nose" still leads the motion.
+      targetVisualYaw = yawRef.current + Math.PI;
+    }
+    const turnT = 1 - Math.exp(-VISUAL_TURN_LERP * delta);
+    let deltaYaw = targetVisualYaw - visualYawRef.current;
+    deltaYaw = ((deltaYaw + Math.PI) % (Math.PI * 2)) - Math.PI;
+    visualYawRef.current += deltaYaw * turnT;
+
+    if (visualRef.current) {
+      visualRef.current.rotation.y = visualYawRef.current;
+    }
 
     const t = performance.now();
     if (onPositionChange && t - lastReport.current > 80) {
@@ -123,20 +142,28 @@ export function Player({ onPositionChange, inputLocked = false }) {
       ref={bodyRef}
       position={PLAYER_SPAWN}
       colliders={false}
-      enabledRotations={[false, true, false]}
+      enabledRotations={[false, false, false]}
       linearDamping={0.6}
       angularDamping={1}
       canSleep={false}
+      lockRotations
     >
       <CapsuleCollider args={[0.45, 0.35]} position={[0, 0.8, 0]} />
-      <group>
+      <group ref={visualRef}>
+        {/* Body */}
         <mesh position={[0, 0.8, 0]} castShadow>
           <capsuleGeometry args={[0.35, 0.9, 6, 12]} />
           <meshStandardMaterial color="#e2e8f0" roughness={0.45} metalness={0.1} />
         </mesh>
-        <mesh position={[0, 1.45, 0.22]} castShadow>
+        {/* Head */}
+        <mesh position={[0, 1.45, 0]} castShadow>
           <sphereGeometry args={[0.22, 12, 12]} />
           <meshStandardMaterial color="#cbd5e1" roughness={0.4} />
+        </mesh>
+        {/* Nose / facing cue — local +Z is forward */}
+        <mesh position={[0, 1.35, 0.28]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+          <coneGeometry args={[0.1, 0.28, 8]} />
+          <meshStandardMaterial color="#64748b" roughness={0.5} />
         </mesh>
       </group>
     </RigidBody>

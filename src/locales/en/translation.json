@@ -253,7 +253,7 @@
     "controls": "WASD / arrows to move · Shift to run · E to interact",
     "exit": "Exit",
     "loading": "Loading world…",
-    "promptProjects": "Press E — Projects",
+    "promptProjects": "Press E to explore Projects",
     "mobileTitle": "Desktop experience",
     "mobileBody": "Explore World Phase 1 is built for keyboard and mouse on a larger screen. Open it on a desktop browser to walk the town.",
     "backToExplore": "Back to Explore",

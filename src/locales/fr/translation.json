@@ -253,7 +253,7 @@
     "controls": "WASD / flèches pour bouger · Maj pour courir · E pour interagir",
     "exit": "Quitter",
     "loading": "Chargement du monde…",
-    "promptProjects": "Appuyez sur E — Projets",
+    "promptProjects": "Appuyez sur E pour explorer Projets",
     "mobileTitle": "Expérience bureau",
     "mobileBody": "La phase 1 du Monde à explorer est conçue pour clavier et souris sur un grand écran. Ouvrez-la dans un navigateur de bureau pour parcourir la ville.",
     "backToExplore": "Retour à Explorer",
