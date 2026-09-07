@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 /**
  * Minimal non-gamey HUD for Explore World.
  */
-export function WorldHud({ showPrompt, onExit }) {
+export function WorldHud({ promptText, onExit }) {
   const { t } = useTranslation();
 
   return (
@@ -25,9 +25,9 @@ export function WorldHud({ showPrompt, onExit }) {
         </button>
       </div>
 
-      {showPrompt ? (
+      {promptText ? (
         <div className="mx-auto mb-10 rounded-full border border-emerald-400/30 bg-black/55 px-5 py-2.5 text-sm font-medium text-emerald-200 backdrop-blur-md">
-          {t('exploreWorld.promptProjects')}
+          {promptText}
         </div>
       ) : (
         <div />

@@ -20,7 +20,7 @@ const VISUAL_TURN_LERP = 14;
  *   └── visual yaw group
  *        └── AnimatedPlayer (model + Idle/Walk/Run)
  */
-export function Player({ onPositionChange, inputLocked = false }) {
+export function Player({ onPositionChange, inputLocked = false, teleportRequestRef }) {
   const bodyRef = useRef(null);
   const visualRef = useRef(null);
   const keysRef = useRef({
@@ -95,6 +95,26 @@ export function Player({ onPositionChange, inputLocked = false }) {
   useFrame((_, delta) => {
     const body = bodyRef.current;
     if (!body) return;
+
+    const teleport = teleportRequestRef?.current;
+    if (teleport) {
+      body.setTranslation({ x: teleport.x, y: teleport.y, z: teleport.z }, true);
+      body.setLinvel({ x: 0, y: 0, z: 0 }, true);
+      body.setAngvel({ x: 0, y: 0, z: 0 }, true);
+      yawRef.current = teleport.yaw ?? 0;
+      visualYawRef.current = yawRef.current;
+      if (visualRef.current) visualRef.current.rotation.y = visualYawRef.current;
+      teleportRequestRef.current = null;
+      if (onPositionChange) {
+        onPositionChange({
+          x: teleport.x,
+          y: teleport.y,
+          z: teleport.z,
+          yaw: yawRef.current,
+        });
+      }
+      return;
+    }
 
     const keys = keysRef.current;
     const linvel = body.linvel();

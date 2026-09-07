@@ -254,6 +254,8 @@
     "exit": "Quitter",
     "loading": "Chargement du monde…",
     "promptProjects": "Appuyez sur E pour explorer Projets",
+    "promptExitLab": "Appuyez sur E pour retourner en ville",
+    "promptViewProject": "Appuyez sur E pour voir {{name}}",
     "mobileTitle": "Expérience bureau",
     "mobileBody": "La phase 1 du Monde à explorer est conçue pour clavier et souris sur un grand écran. Ouvrez-la dans un navigateur de bureau pour parcourir la ville.",
     "backToExplore": "Retour à Explorer",
@@ -264,6 +266,11 @@
       "projectsBody": "Ce repère ouvre la galerie de projets — réalisations sélectionnées, notes de cas et démos du portfolio.",
       "close": "Rester dans le monde",
       "viewProjects": "Voir les projets →"
+    },
+    "projectOverlay": {
+      "close": "Fermer",
+      "viewProject": "Voir le projet",
+      "github": "GitHub"
     },
     "locations": {
       "projects": "Labo Projets",

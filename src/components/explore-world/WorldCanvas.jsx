@@ -2,6 +2,7 @@ import React, { Suspense, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Physics } from '@react-three/rapier';
 import { World } from './World.jsx';
+import { AREA_TOWN } from './exploreWorldScene.js';
 
 function LoadingFallback({ label }) {
   return (
@@ -19,11 +20,15 @@ function LoadingFallback({ label }) {
  */
 export function WorldCanvas({
   loadingLabel,
+  area = AREA_TOWN,
+  projects = [],
   playerPoseRef,
+  teleportRequestRef,
   onPromptChange,
   interactRequestedRef,
   onInteract,
   inputLocked = false,
+  cameraPreset = 'outdoor',
 }) {
   const [ready, setReady] = useState(false);
 
@@ -44,17 +49,18 @@ export function WorldCanvas({
           dpr={[1, 1.5]}
           camera={{ fov: 50, near: 0.1, far: 120, position: [0, 6, 12] }}
           gl={{ antialias: true, powerPreference: 'high-performance' }}
-          onCreated={({ gl }) => {
-            gl.setClearColor('#87b5d9');
-          }}
         >
           <Physics gravity={[0, -18, 0]} timeStep="vary">
             <World
+              area={area}
+              projects={projects}
               playerPoseRef={playerPoseRef}
+              teleportRequestRef={teleportRequestRef}
               onPromptChange={onPromptChange}
               interactRequestedRef={interactRequestedRef}
               onInteract={onInteract}
               inputLocked={inputLocked}
+              cameraPreset={cameraPreset}
             />
           </Physics>
         </Canvas>

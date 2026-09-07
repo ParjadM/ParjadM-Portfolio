@@ -5,14 +5,20 @@ import { SEO } from '../components/SEO.jsx';
 import { localizePath } from '../utils/i18nRouting.js';
 import { WorldCanvas } from '../components/explore-world/WorldCanvas.jsx';
 import { WorldHud } from '../components/explore-world/WorldHud.jsx';
-import { WorldOverlay } from '../components/explore-world/WorldOverlay.jsx';
 import { MobileGate } from '../components/explore-world/MobileGate.jsx';
+import { FadeOverlay } from '../components/explore-world/FadeOverlay.jsx';
+import { ProjectDetailOverlay } from '../components/explore-world/overlays/ProjectDetailOverlay.jsx';
+import {
+  AREA_PROJECTS,
+  AREA_TOWN,
+  getProjectsExteriorSpawn,
+  PROJECTS_API,
+  PROJECTS_INTERIOR_SPAWN,
+} from '../components/explore-world/exploreWorldScene.js';
 
 function useIsDesktopExplore() {
   const [ok, setOk] = useState(() => {
     if (typeof window === 'undefined') return true;
-    // Phase 1: keyboard/mouse experience — gate narrow viewports only.
-    // Avoid hover/pointer media queries; they fail in VMs and some desktops.
     return window.matchMedia('(min-width: 768px)').matches;
   });
 
@@ -27,36 +33,112 @@ function useIsDesktopExplore() {
   return ok;
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
+}
+
 /**
- * Explore World Phase 1 page shell: HUD + overlay + lazy 3D canvas.
+ * Explore World page shell: town ↔ Projects Lab, HUD, overlays, fade transitions.
  */
 export function ExploreWorldPage({ theme }) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const isDesktop = useIsDesktopExplore();
   const playerPoseRef = useRef({ x: 0, y: 1.2, z: 4, yaw: 0 });
+  const teleportRequestRef = useRef(null);
   const interactRequestedRef = useRef(false);
-  const [showPrompt, setShowPrompt] = useState(false);
-  const [overlayOpen, setOverlayOpen] = useState(false);
+  const transitionLockRef = useRef(false);
+
+  const [area, setArea] = useState(AREA_TOWN);
+  const [projects, setProjects] = useState([]);
+  const [promptText, setPromptText] = useState('');
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [fading, setFading] = useState(false);
 
   const locale = i18n.language?.startsWith('fr') ? 'fr' : 'en';
+  const overlayOpen = Boolean(selectedProject);
+  const inputLocked = overlayOpen || fading;
 
-  const handleExit = useCallback(() => {
+  const handleExitWorld = useCallback(() => {
     navigate(localizePath('/explore', locale));
   }, [navigate, locale]);
 
-  const handleInteract = useCallback(() => {
-    setOverlayOpen(true);
+  useEffect(() => {
+    let cancelled = false;
+    fetch(PROJECTS_API)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled) return;
+        const list = Array.isArray(data?.projects) ? data.projects.slice(0, 4) : [];
+        setProjects(list);
+      })
+      .catch(() => {
+        if (!cancelled) setProjects([]);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  const handlePromptChange = useCallback((visible, payload) => {
+    if (!visible || !payload) {
+      setPromptText('');
+      return;
+    }
+    if (payload.type === 'enter-projects') {
+      setPromptText(t('exploreWorld.promptProjects'));
+    } else if (payload.type === 'exit-projects') {
+      setPromptText(t('exploreWorld.promptExitLab'));
+    } else if (payload.type === 'project' && payload.project?.title) {
+      setPromptText(t('exploreWorld.promptViewProject', { name: payload.project.title }));
+    } else {
+      setPromptText('');
+    }
+  }, [t]);
+
+  const runTransition = useCallback(async (nextArea, spawn) => {
+    if (transitionLockRef.current) return;
+    transitionLockRef.current = true;
+    setFading(true);
+    setPromptText('');
+    setSelectedProject(null);
+    await sleep(320);
+    setArea(nextArea);
+    teleportRequestRef.current = spawn;
+    playerPoseRef.current = { ...spawn };
+    await sleep(80);
+    setFading(false);
+    await sleep(320);
+    transitionLockRef.current = false;
+  }, []);
+
+  const handleInteract = useCallback((payload) => {
+    if (!payload || transitionLockRef.current || overlayOpen) return;
+
+    if (payload.type === 'enter-projects') {
+      runTransition(AREA_PROJECTS, PROJECTS_INTERIOR_SPAWN);
+      return;
+    }
+    if (payload.type === 'exit-projects') {
+      runTransition(AREA_TOWN, getProjectsExteriorSpawn());
+      return;
+    }
+    if (payload.type === 'project' && payload.project) {
+      setSelectedProject(payload.project);
+    }
+  }, [overlayOpen, runTransition]);
 
   useEffect(() => {
     if (!isDesktop) return undefined;
 
     const onKeyDown = (e) => {
       if (overlayOpen) {
-        if (e.code === 'Escape') setOverlayOpen(false);
+        if (e.code === 'Escape') setSelectedProject(null);
         return;
       }
+      if (fading || transitionLockRef.current) return;
       if (e.code === 'KeyE' && !e.repeat) {
         interactRequestedRef.current = true;
       }
@@ -64,7 +146,7 @@ export function ExploreWorldPage({ theme }) {
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isDesktop, overlayOpen]);
+  }, [isDesktop, overlayOpen, fading]);
 
   if (!isDesktop) {
     return (
@@ -80,16 +162,25 @@ export function ExploreWorldPage({ theme }) {
       <SEO titleKey="exploreWorld.seoTitle" descriptionKey="exploreWorld.seoDesc" />
       <WorldCanvas
         loadingLabel={t('exploreWorld.loading')}
+        area={area}
+        projects={projects}
         playerPoseRef={playerPoseRef}
-        onPromptChange={setShowPrompt}
+        teleportRequestRef={teleportRequestRef}
+        onPromptChange={handlePromptChange}
         interactRequestedRef={interactRequestedRef}
         onInteract={handleInteract}
-        inputLocked={overlayOpen}
+        inputLocked={inputLocked}
+        cameraPreset={area === AREA_PROJECTS ? 'interior' : 'outdoor'}
       />
-      <WorldHud showPrompt={showPrompt && !overlayOpen} onExit={handleExit} />
-      {overlayOpen ? (
-        <WorldOverlay theme={theme} onClose={() => setOverlayOpen(false)} />
+      <WorldHud promptText={!overlayOpen && !fading ? promptText : ''} onExit={handleExitWorld} />
+      {selectedProject ? (
+        <ProjectDetailOverlay
+          theme={theme}
+          project={selectedProject}
+          onClose={() => setSelectedProject(null)}
+        />
       ) : null}
+      <FadeOverlay visible={fading} />
     </div>
   );
 }

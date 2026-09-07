@@ -254,6 +254,8 @@
     "exit": "Exit",
     "loading": "Loading world…",
     "promptProjects": "Press E to explore Projects",
+    "promptExitLab": "Press E to return to town",
+    "promptViewProject": "Press E to view {{name}}",
     "mobileTitle": "Desktop experience",
     "mobileBody": "Explore World Phase 1 is built for keyboard and mouse on a larger screen. Open it on a desktop browser to walk the town.",
     "backToExplore": "Back to Explore",
@@ -264,6 +266,11 @@
       "projectsBody": "This landmark opens the project gallery — selected builds, case notes, and demos from across the portfolio.",
       "close": "Stay in world",
       "viewProjects": "View projects →"
+    },
+    "projectOverlay": {
+      "close": "Close",
+      "viewProject": "View Project",
+      "github": "GitHub"
     },
     "locations": {
       "projects": "Projects Lab",
