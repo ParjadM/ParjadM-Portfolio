@@ -11,11 +11,13 @@ import { MobileGate } from '../components/explore-world/MobileGate.jsx';
 function useIsDesktopExplore() {
   const [ok, setOk] = useState(() => {
     if (typeof window === 'undefined') return true;
-    return window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)').matches;
+    // Phase 1: keyboard/mouse experience — gate narrow viewports only.
+    // Avoid hover/pointer media queries; they fail in VMs and some desktops.
+    return window.matchMedia('(min-width: 768px)').matches;
   });
 
   useEffect(() => {
-    const mq = window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)');
+    const mq = window.matchMedia('(min-width: 768px)');
     const onChange = () => setOk(mq.matches);
     onChange();
     mq.addEventListener('change', onChange);
