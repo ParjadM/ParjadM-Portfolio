@@ -9,14 +9,19 @@ export const CAMERA_PRESETS = {
     offset: [0, 5.5, 10],
     lookOffset: [0, 0.95, 0],
   },
+  // Keep camera inside the lab: lower than ceiling (~4.2) and short enough
+  // to stay in front of the entrance wall when facing into the room.
   interior: {
-    offset: [0, 3.6, 6.2],
-    lookOffset: [0, 0.9, 0],
+    offset: [0, 2.35, 3.6],
+    lookOffset: [0, 0.95, 0],
   },
 };
 
-/** Spawn just inside the Projects Lab entrance (facing into the room, −Z). */
-export const PROJECTS_INTERIOR_SPAWN = { x: 0, y: 1.2, z: 5.2, yaw: Math.PI };
+/**
+ * Spawn inside the room with open space ahead (−Z) and enough room behind
+ * for the interior camera (+Z) before the entrance wall at z≈+6.
+ */
+export const PROJECTS_INTERIOR_SPAWN = { x: 0, y: 1.2, z: 1.8, yaw: Math.PI };
 
 /** Spawn outside Projects Lab door after exiting. */
 export function getProjectsExteriorSpawn() {
