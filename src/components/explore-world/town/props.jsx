@@ -30,43 +30,54 @@ export function Shrub({ position = [0, 0, 0], scale = 1 }) {
   );
 }
 
+/** Bench sized for an adult RPG character (~seat height 0.45). */
 export function Bench({ position = [0, 0, 0], rotation = [0, 0, 0] }) {
   return (
     <group position={position} rotation={rotation}>
-      <mesh position={[0, 0.28, 0]} castShadow receiveShadow>
-        <boxGeometry args={[1.2, 0.08, 0.4]} />
+      <mesh position={[0, 0.45, 0]} castShadow receiveShadow>
+        <boxGeometry args={[1.35, 0.1, 0.42]} />
         <meshStandardMaterial {...TOWN_MAT.wood} />
       </mesh>
-      <mesh position={[0, 0.45, -0.16]} castShadow>
-        <boxGeometry args={[1.2, 0.28, 0.08]} />
+      <mesh position={[0, 0.68, -0.16]} castShadow>
+        <boxGeometry args={[1.35, 0.32, 0.09]} />
         <meshStandardMaterial color={TOWN_COLORS.woodLight} roughness={0.85} />
       </mesh>
-      <mesh position={[-0.45, 0.14, 0]} castShadow>
-        <boxGeometry args={[0.08, 0.28, 0.36]} />
+      <mesh position={[-0.5, 0.22, 0]} castShadow>
+        <boxGeometry args={[0.1, 0.44, 0.38]} />
         <meshStandardMaterial color={TOWN_COLORS.stoneDark} roughness={0.8} />
       </mesh>
-      <mesh position={[0.45, 0.14, 0]} castShadow>
-        <boxGeometry args={[0.08, 0.28, 0.36]} />
+      <mesh position={[0.5, 0.22, 0]} castShadow>
+        <boxGeometry args={[0.1, 0.44, 0.38]} />
         <meshStandardMaterial color={TOWN_COLORS.stoneDark} roughness={0.8} />
       </mesh>
     </group>
   );
 }
 
+/** Shorter, heavier lamp post — supports the scene without towering over it. */
 export function StreetLamp({ position = [0, 0, 0] }) {
   return (
     <group position={position}>
-      <mesh position={[0, 1.1, 0]} castShadow>
-        <cylinderGeometry args={[0.05, 0.07, 2.2, 6]} />
-        <meshStandardMaterial color={TOWN_COLORS.charcoal} roughness={0.6} metalness={0.35} />
+      <mesh position={[0, 0.12, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.18, 0.22, 0.16, 8]} />
+        <meshStandardMaterial color={TOWN_COLORS.stoneDark} roughness={0.75} />
       </mesh>
-      <mesh position={[0, 2.25, 0]} castShadow>
-        <boxGeometry args={[0.35, 0.12, 0.35]} />
-        <meshStandardMaterial color={TOWN_COLORS.stoneDark} roughness={0.55} metalness={0.2} />
+      <mesh position={[0, 0.85, 0]} castShadow>
+        <cylinderGeometry args={[0.08, 0.1, 1.4, 8]} />
+        <meshStandardMaterial color={TOWN_COLORS.charcoal} roughness={0.55} metalness={0.4} />
       </mesh>
-      <mesh position={[0, 2.12, 0]}>
-        <boxGeometry args={[0.28, 0.16, 0.28]} />
-        <meshStandardMaterial color={TOWN_COLORS.lamp} emissive={TOWN_COLORS.lamp} emissiveIntensity={0.35} roughness={0.4} />
+      <mesh position={[0, 1.6, 0]} castShadow>
+        <boxGeometry args={[0.42, 0.14, 0.42]} />
+        <meshStandardMaterial color={TOWN_COLORS.stoneDark} roughness={0.5} metalness={0.25} />
+      </mesh>
+      <mesh position={[0, 1.48, 0]}>
+        <boxGeometry args={[0.32, 0.18, 0.32]} />
+        <meshStandardMaterial
+          color={TOWN_COLORS.lamp}
+          emissive={TOWN_COLORS.lamp}
+          emissiveIntensity={0.28}
+          roughness={0.4}
+        />
       </mesh>
     </group>
   );
@@ -75,12 +86,12 @@ export function StreetLamp({ position = [0, 0, 0] }) {
 export function Planter({ position = [0, 0, 0], scale = 1 }) {
   return (
     <group position={position} scale={scale}>
-      <mesh position={[0, 0.22, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.7, 0.44, 0.7]} />
+      <mesh position={[0, 0.28, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.75, 0.5, 0.75]} />
         <meshStandardMaterial {...TOWN_MAT.stone} />
       </mesh>
-      <mesh position={[0, 0.5, 0]} castShadow>
-        <icosahedronGeometry args={[0.28, 0]} />
+      <mesh position={[0, 0.58, 0]} castShadow>
+        <icosahedronGeometry args={[0.3, 0]} />
         <meshStandardMaterial {...TOWN_MAT.leaf} />
       </mesh>
     </group>

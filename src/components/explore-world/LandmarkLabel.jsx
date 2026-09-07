@@ -3,25 +3,28 @@ import { Billboard, Text } from '@react-three/drei';
 
 /**
  * Landmark nameplate that always faces the camera (never mirrored).
+ * Kept small so it identifies buildings without dominating the view.
  */
 export function LandmarkLabel({
   children,
   position = [0, 0, 0],
-  fontSize = 0.55,
-  color = '#f8fafc',
-  maxWidth = 6,
+  fontSize = 0.28,
+  color = '#f1f5f9',
+  maxWidth = 3.2,
 }) {
   return (
-    <Billboard position={position}>
+    <Billboard position={position} follow lockX={false} lockY={false} lockZ={false}>
       <Text
         fontSize={fontSize}
         color={color}
         anchorX="center"
-        anchorY="middle"
-        outlineWidth={0.035}
-        outlineColor="#020617"
+        anchorY="bottom"
+        outlineWidth={0.018}
+        outlineColor="#0f172a"
         maxWidth={maxWidth}
         textAlign="center"
+        overflowWrap="break-word"
+        depthOffset={-2}
       >
         {children}
       </Text>
