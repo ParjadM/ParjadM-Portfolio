@@ -2,10 +2,10 @@ import { useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
-/** Behind + above the player; pulled back so the character has breathing room. */
-const OFFSET = new THREE.Vector3(0, 6.4, 12);
+/** Behind + above the player; slightly closer/lower so the character fills more of the frame. */
+const OFFSET = new THREE.Vector3(0, 5.5, 10);
 /** Look near chest height so the player sits mid-lower frame, not glued to the bottom edge. */
-const LOOK_OFFSET = new THREE.Vector3(0, 0.85, 0);
+const LOOK_OFFSET = new THREE.Vector3(0, 0.95, 0);
 const POSITION_LERP = 5.2;
 /** Slower than player turn so the mesh rotates on-screen before the camera catches up. */
 const YAW_LERP = 3.4;
