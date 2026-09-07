@@ -35,8 +35,14 @@ export function LandmarkLabel({
 
   return (
     <group position={position} rotation={[0, yaw, 0]}>
-      <Text {...textProps}>{children}</Text>
-      <Text {...textProps} rotation={[0, Math.PI, 0]}>{children}</Text>
+      {/* Front toward lookAt (+Z). Slight offset avoids z-fighting with the back copy. */}
+      <Text {...textProps} position={[0, 0, 0.04]}>
+        {children}
+      </Text>
+      {/* Back face: readable when approaching from outside the town. */}
+      <Text {...textProps} position={[0, 0, -0.04]} rotation={[0, Math.PI, 0]}>
+        {children}
+      </Text>
     </group>
   );
 }
