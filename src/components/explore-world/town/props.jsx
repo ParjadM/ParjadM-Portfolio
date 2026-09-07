@@ -54,24 +54,24 @@ export function Bench({ position = [0, 0, 0], rotation = [0, 0, 0] }) {
   );
 }
 
-/** Shorter, heavier lamp post — supports the scene without towering over it. */
+/** Shorter (~18%), thicker lamp post. */
 export function StreetLamp({ position = [0, 0, 0] }) {
   return (
     <group position={position}>
-      <mesh position={[0, 0.12, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.18, 0.22, 0.16, 8]} />
+      <mesh position={[0, 0.1, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.22, 0.26, 0.16, 8]} />
         <meshStandardMaterial color={TOWN_COLORS.stoneDark} roughness={0.75} />
       </mesh>
-      <mesh position={[0, 0.85, 0]} castShadow>
-        <cylinderGeometry args={[0.08, 0.1, 1.4, 8]} />
+      <mesh position={[0, 0.7, 0]} castShadow>
+        <cylinderGeometry args={[0.1, 0.12, 1.15, 8]} />
         <meshStandardMaterial color={TOWN_COLORS.charcoal} roughness={0.55} metalness={0.4} />
       </mesh>
-      <mesh position={[0, 1.6, 0]} castShadow>
-        <boxGeometry args={[0.42, 0.14, 0.42]} />
+      <mesh position={[0, 1.32, 0]} castShadow>
+        <boxGeometry args={[0.46, 0.14, 0.46]} />
         <meshStandardMaterial color={TOWN_COLORS.stoneDark} roughness={0.5} metalness={0.25} />
       </mesh>
-      <mesh position={[0, 1.48, 0]}>
-        <boxGeometry args={[0.32, 0.18, 0.32]} />
+      <mesh position={[0, 1.2, 0]}>
+        <boxGeometry args={[0.34, 0.16, 0.34]} />
         <meshStandardMaterial
           color={TOWN_COLORS.lamp}
           emissive={TOWN_COLORS.lamp}

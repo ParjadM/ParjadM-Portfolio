@@ -41,7 +41,7 @@ export function Building({ location }) {
 
       <Visual size={location.size} />
 
-      <LandmarkLabel position={[0, Math.max(h, colliderH) + 0.55, 0]}>
+      <LandmarkLabel position={[0, Math.max(h, colliderH) + 0.28, 0]}>
         {label}
       </LandmarkLabel>
     </group>

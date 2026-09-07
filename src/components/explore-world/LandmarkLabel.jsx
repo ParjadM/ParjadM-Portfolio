@@ -8,9 +8,9 @@ import { Billboard, Text } from '@react-three/drei';
 export function LandmarkLabel({
   children,
   position = [0, 0, 0],
-  fontSize = 0.28,
+  fontSize = 0.16,
   color = '#f1f5f9',
-  maxWidth = 3.2,
+  maxWidth = 1.9,
 }) {
   return (
     <Billboard position={position} follow lockX={false} lockY={false} lockZ={false}>
@@ -19,7 +19,7 @@ export function LandmarkLabel({
         color={color}
         anchorX="center"
         anchorY="bottom"
-        outlineWidth={0.018}
+        outlineWidth={0.012}
         outlineColor="#0f172a"
         maxWidth={maxWidth}
         textAlign="center"
