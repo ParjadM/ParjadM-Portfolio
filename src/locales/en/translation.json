@@ -31,6 +31,8 @@
     "interviewDesc": "Practice with an AI",
     "algoMem": "Algorithm Memorizer",
     "algoMemDesc": "Type algorithms from memory against the clock",
+    "exploreWorld": "Explore World",
+    "exploreWorldDesc": "Walk a 3D portfolio town",
     "statsDesc": "Site statistics and metrics"
   },
   "home": {
@@ -242,7 +244,34 @@
       "lqft": { "label": "LQFT Benchmark", "desc": "Performance playground" },
       "cameraFx": { "label": "Camera FX", "desc": "Hand gestures with neon finger lights" },
       "qaLab": { "label": "QA Engineering Lab", "desc": "How I test this site — pyramid, risks, CI gates" },
-      "algoMem": { "label": "Algorithm Memorizer", "desc": "Practice typing algorithms against the clock" }
+      "algoMem": { "label": "Algorithm Memorizer", "desc": "Practice typing algorithms against the clock" },
+      "exploreWorld": { "label": "Explore World", "desc": "Walk a 3D town of portfolio landmarks" }
+    }
+  },
+  "exploreWorld": {
+    "title": "Explore World",
+    "controls": "WASD / arrows to move · Shift to run · E to interact",
+    "exit": "Exit",
+    "loading": "Loading world…",
+    "promptProjects": "Press E — Projects",
+    "mobileTitle": "Desktop experience",
+    "mobileBody": "Explore World Phase 1 is built for keyboard and mouse on a larger screen. Open it on a desktop browser to walk the town.",
+    "backToExplore": "Back to Explore",
+    "seoTitle": "Explore World — Parjad Minooei",
+    "seoDesc": "Walk a 3D portfolio town and discover landmarks like Projects.",
+    "overlay": {
+      "projectsTitle": "Projects District",
+      "projectsBody": "This landmark opens the project gallery — selected builds, case notes, and demos from across the portfolio.",
+      "close": "Stay in world",
+      "viewProjects": "View projects →"
+    },
+    "locations": {
+      "projects": "Projects",
+      "blog": "Blog",
+      "experience": "Experience",
+      "education": "Education",
+      "skills": "Skills",
+      "about": "About"
     }
   },
   "cameraFx": {
