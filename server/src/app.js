@@ -36,7 +36,7 @@ export async function createApp() {
       console.error('Database unavailable:', err.message)
       res.setHeader('Cache-Control', 'no-store')
       res.setHeader('Retry-After', '10')
-      res.status(503).json({ error: 'Data temporarily unavailable. Please retry.' })
+      res.status(503).json({ code: 'DATABASE_UNAVAILABLE', error: 'Data temporarily unavailable. Please retry.' })
     }
   })
 

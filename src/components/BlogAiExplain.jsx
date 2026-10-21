@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Sparkles, Zap, GraduationCap } from 'lucide-react';
+import { requestBlogExplanation } from '../utils/blogExplanation.js';
 import { getAccent } from '../utils/themeTokens.js';
 
 export function BlogAiExplain({ postId, theme = 'green' }) {
@@ -9,6 +10,12 @@ export function BlogAiExplain({ postId, theme = 'green' }) {
   const [junior, setJunior] = useState('');
   const [loadingMode, setLoadingMode] = useState(null);
   const [error, setError] = useState('');
+  const [retrying, setRetrying] = useState(false);
+  const requestRef = useRef(null);
+  useEffect(() => {
+    setTldr(''); setJunior(''); setError(''); setRetrying(false); setLoadingMode(null);
+    return () => { requestRef.current?.abort(); requestRef.current = null; };
+  }, [postId]);
 
   const accentTokens = getAccent(theme);
   const accent = accentTokens.text300;
@@ -19,22 +26,26 @@ export function BlogAiExplain({ postId, theme = 'green' }) {
   const resultPanel = accentTokens.resultPanel;
 
   const fetchExplain = async (mode) => {
+    if (requestRef.current || (mode === 'tldr' ? tldr : junior)) return;
+    const controller = new AbortController();
+    requestRef.current = controller;
     setLoadingMode(mode);
     setError('');
+    setRetrying(false);
     try {
-      const res = await fetch('/api/ai/blog/explain', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ postId, mode }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed');
+      const data = await requestBlogExplanation({ postId, mode, signal: controller.signal, onRetry: () => setRetrying(true) });
+      if (controller.signal.aborted) return;
       if (mode === 'tldr') setTldr(data.reply);
       else setJunior(data.reply);
     } catch (err) {
-      setError(err.message || t('blog.aiExplain.error'));
+      if (controller.signal.aborted) return;
+      setError(t(err.code === 'DATABASE_UNAVAILABLE' ? 'blog.aiExplain.unavailable' : 'blog.aiExplain.error'));
     } finally {
-      setLoadingMode(null);
+      if (requestRef.current === controller) {
+        requestRef.current = null;
+        setLoadingMode(null);
+        setRetrying(false);
+      }
     }
   };
 
@@ -92,6 +103,7 @@ export function BlogAiExplain({ postId, theme = 'green' }) {
           />
         </div>
 
+        {retrying && <p role="status" className="text-sm text-gray-300">{t('blog.aiExplain.retrying')}</p>}
         {error && (
           <p className="text-sm text-red-200 bg-red-950/30 border border-red-400/25 rounded-xl px-4 py-3" role="alert">
             {error}

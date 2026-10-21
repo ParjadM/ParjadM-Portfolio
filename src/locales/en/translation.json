@@ -149,7 +149,9 @@
       "juniorTitle": "Explain like I'm junior",
       "juniorHint": "Plain language, no jargon",
       "juniorResultLabel": "Beginner-friendly version",
-      "error": "Could not generate an explanation. Please try again."
+      "error": "Could not generate an explanation. Please try again.",
+        "retrying": "The article service is reconnecting. Retrying once…",
+        "unavailable": "The article database is temporarily unavailable. Please try again shortly."
     }
   },
   "stats": {

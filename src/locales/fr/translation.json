@@ -149,7 +149,9 @@
       "juniorTitle": "Expliquez comme si j'étais débutant",
       "juniorHint": "Langage simple, sans jargon",
       "juniorResultLabel": "Version débutant",
-      "error": "Impossible de générer l'explication. Réessayez."
+      "error": "Impossible de générer l'explication. Réessayez.",
+        "retrying": "Le service des articles se reconnecte. Nouvelle tentative…",
+        "unavailable": "La base de données des articles est temporairement indisponible. Réessayez dans un instant."
     }
   },
   "stats": {
