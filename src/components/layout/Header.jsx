@@ -359,7 +359,7 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
                     </div>
                     <div className="flex flex-col">
                         <span className="text-sm font-semibold text-gray-200 group-hover:text-white transition-colors">{item.name}</span>
-                        <span className="text-[10px] text-gray-500 group-hover:text-gray-400 transition-colors">{item.description}</span>
+                        <span className="text-[10px] text-gray-300 group-hover:text-white transition-colors">{item.description}</span>
                     </div>
                 </LocalizedLink>
             ))}
@@ -518,7 +518,7 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
                                     to={item.path}
                                     onClick={handleNavClick}
                                     aria-current={isActive(item.path) ? 'page' : undefined}
-                                    className={`menu-primary-link text-2xl md:text-2xl font-extrabold tracking-tight transition-all duration-300 text-center ${isActive(item.path) ? accent.text : 'text-gray-300 hover:text-white'}`}
+                                    className={`menu-primary-link text-2xl md:text-2xl font-extrabold tracking-tight transition-all duration-300 text-center ${isActive(item.path) ? accent.text300 : 'text-gray-300 hover:text-white'}`}
                                 >
                                     {item.name}
                                 </LocalizedLink>

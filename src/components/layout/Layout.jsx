@@ -75,7 +75,7 @@ export const Layout = ({ themeId, setThemeId, cursorThemeId, setCursorThemeId, t
     // Manual SEO moved to SEO.jsx component on individual pages
 
     return (
-        <div style={{ '--site-accent': getAccent(themeConfig.accentPrefix).hex }} className={`site-shell relative min-h-screen overflow-x-hidden font-sans transition-colors duration-500 ${
+        <div data-theme={themeId} style={{ '--site-accent': getAccent(themeConfig.accentPrefix).hex }} className={`site-shell relative min-h-screen overflow-x-hidden font-sans transition-colors duration-500 ${
             themeConfig.backgroundClass
         } ${!themeConfig.isDark ? 'light-mode text-gray-900' : 'text-white'} ${themeConfig.isTerminal ? 'terminal-mode' : ''}`}>
             <LocaleSync />
@@ -99,33 +99,6 @@ export const Layout = ({ themeId, setThemeId, cursorThemeId, setCursorThemeId, t
                         transition-duration: 0.01ms !important;
                     }
                 }
-                .light-mode .text-white { color: rgb(17 24 39) !important; }
-                .light-mode .text-gray-300 { color: rgb(75 85 99) !important; }
-                .light-mode .text-gray-400 { color: rgb(107 114 128) !important; }
-                .light-mode .text-gray-500 { color: rgb(107 114 128) !important; }
-                .light-mode [class*="bg-white/"] { --tw-bg-opacity: 0.06; background-color: rgb(0 0 0 / var(--tw-bg-opacity)) !important; }
-                .light-mode [class*="border-white/"] { border-color: rgb(229 231 235 / 0.8) !important; }
-                .light-mode .border-white\\/10 { border-color: rgb(229 231 235) !important; }
-                .light-mode .hover\\:border-white\\/20:hover { border-color: rgb(156 163 175) !important; }
-                .light-mode .hover\\:border-white\\/40:focus { border-color: rgb(107 114 128) !important; }
-                .light-mode .focus\\:border-white\\/40:focus { border-color: rgb(107 114 128) !important; }
-                .light-mode .placeholder-gray-400::placeholder { color: rgb(156 163 175); }
-                .light-mode header a, .light-mode header button { color: rgb(17 24 39) !important; }
-                .light-mode header nav a:hover { color: rgb(17 24 39) !important; }
-                .light-mode header nav a[aria-current="page"] { background-color: rgba(16 185 129 / 0.2) !important; color: rgb(5 150 105) !important; }
-                .light-mode header img[alt="Logo"] { filter: brightness(0); }
-                .light-mode .text-gray-200 { color: rgb(55 65 81) !important; }
-                .light-mode footer .text-gray-300 { color: rgb(75 85 99) !important; }
-                .light-mode footer .text-gray-500 { color: rgb(107 114 128) !important; }
-                .light-mode footer a { color: rgb(75 85 99) !important; }
-                .light-mode footer a:hover { color: rgb(34 197 94) !important; }
-                .light-mode ::placeholder { color: rgb(156 163 175); opacity: 1; }
-
-                .terminal-mode { color: #4ade80 !important; }
-                .terminal-mode .text-white, .terminal-mode .text-gray-300, .terminal-mode .text-gray-400, .terminal-mode .text-gray-500 { color: #4ade80 !important; }
-                .terminal-mode [class*="bg-white/"] { background-color: rgba(74, 222, 128, 0.05) !important; }
-                .terminal-mode [class*="border-white/"] { border-color: rgba(74, 222, 128, 0.3) !important; }
-                .terminal-mode header img[alt="Logo"] { filter: sepia(100%) hue-rotate(80deg) saturate(400%) brightness(1.2); }
             `}</style>
 
             <BackgroundBlobs theme={themeConfig.accentPrefix} darkMode={themeConfig.isDark} customBlobClasses={themeConfig.blobClasses} reducedMotion={reducedMotion} staticOnMobile={staticBlobs} />

@@ -3,7 +3,19 @@ import { EditorState, Compartment } from '@codemirror/state'
 import { EditorView, keymap, lineNumbers, highlightActiveLine, placeholder as cmPlaceholder } from '@codemirror/view'
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands'
 import { python } from '@codemirror/lang-python'
-import { syntaxHighlighting, defaultHighlightStyle, bracketMatching, foldGutter } from '@codemirror/language'
+import { syntaxHighlighting, HighlightStyle, bracketMatching, foldGutter } from '@codemirror/language'
+
+import { tags } from '@lezer/highlight'
+
+// Stable semantic classes let syntax colors follow the active site theme.
+const contrastHighlightStyle = HighlightStyle.define([
+  { tag: tags.keyword, class: 'syntax-keyword' },
+  { tag: [tags.name, tags.propertyName], class: 'syntax-name' },
+  { tag: [tags.string, tags.regexp], class: 'syntax-string' },
+  { tag: [tags.number, tags.bool, tags.null], class: 'syntax-literal' },
+  { tag: tags.comment, class: 'syntax-comment' },
+  { tag: tags.invalid, class: 'syntax-invalid' },
+])
 
 const EDITOR_FONT =
   'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace'
@@ -112,7 +124,7 @@ export function PythonCodeEditor({
       history(),
       bracketMatching(),
       python(),
-      syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+      syntaxHighlighting(contrastHighlightStyle),
       keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
       EditorState.tabSize.of(TAB_SIZE),
       editableComp.current.of(EditorView.editable.of(!readOnly)),

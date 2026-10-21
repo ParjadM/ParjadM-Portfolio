@@ -1,0 +1,1439 @@
+{
+  "branch": "main",
+  "baseCommit": "726790a",
+  "date": "2026-10-20",
+  "audits": [
+    {
+      "name": "final-desktop",
+      "checks": 75,
+      "axeViolations": 0,
+      "sampledViolations": 0,
+      "results": [
+        {
+          "theme": "emerald-dark",
+          "route": "/",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 38
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/projects",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 15
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/about",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 27
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/contact",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 32
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/blog",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 21
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/blog/contrast-fixture",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 26
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/explore",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 43
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/projects/qaLab",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 66
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/projects/lqftBenchmark",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 49
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/projects/cameraFx",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 26
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/algorithm-memorizer",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 24
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/stats",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 33
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/interview",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 12
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/admin/login",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 6
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/404",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 12
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 24
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/projects",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 8
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/about",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 10
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/contact",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 10
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/blog",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 11
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/blog/contrast-fixture",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 19
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/explore",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 10
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/projects/qaLab",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 66
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/projects/lqftBenchmark",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 8
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/projects/cameraFx",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 26
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/algorithm-memorizer",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 10
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/stats",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 10
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/interview",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 12
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/admin/login",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 1
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/404",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 9
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 38
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/projects",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 15
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/about",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 27
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/contact",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 32
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/blog",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 21
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/blog/contrast-fixture",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 26
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/explore",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 43
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/projects/qaLab",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 66
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/projects/lqftBenchmark",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 49
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/projects/cameraFx",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 26
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/algorithm-memorizer",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 24
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/stats",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 33
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/interview",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 12
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/admin/login",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 6
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/404",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 12
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 38
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/projects",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 15
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/about",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 27
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/contact",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 32
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/blog",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 21
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/blog/contrast-fixture",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 26
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/explore",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 43
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/projects/qaLab",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 66
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/projects/lqftBenchmark",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 49
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/projects/cameraFx",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 26
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/algorithm-memorizer",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 24
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/stats",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 33
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/interview",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 12
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/admin/login",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 6
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/404",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 12
+        },
+        {
+          "theme": "terminal",
+          "route": "/",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 25
+        },
+        {
+          "theme": "terminal",
+          "route": "/projects",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 7
+        },
+        {
+          "theme": "terminal",
+          "route": "/about",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 18
+        },
+        {
+          "theme": "terminal",
+          "route": "/contact",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 22
+        },
+        {
+          "theme": "terminal",
+          "route": "/blog",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 7
+        },
+        {
+          "theme": "terminal",
+          "route": "/blog/contrast-fixture",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 9
+        },
+        {
+          "theme": "terminal",
+          "route": "/explore",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 33
+        },
+        {
+          "theme": "terminal",
+          "route": "/projects/qaLab",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 59
+        },
+        {
+          "theme": "terminal",
+          "route": "/projects/lqftBenchmark",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 41
+        },
+        {
+          "theme": "terminal",
+          "route": "/projects/cameraFx",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 19
+        },
+        {
+          "theme": "terminal",
+          "route": "/algorithm-memorizer",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 14
+        },
+        {
+          "theme": "terminal",
+          "route": "/stats",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 23
+        },
+        {
+          "theme": "terminal",
+          "route": "/interview",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 0
+        },
+        {
+          "theme": "terminal",
+          "route": "/admin/login",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 5
+        },
+        {
+          "theme": "terminal",
+          "route": "/404",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 4
+        }
+      ]
+    },
+    {
+      "name": "final-mobile",
+      "checks": 65,
+      "axeViolations": 0,
+      "sampledViolations": 0,
+      "results": [
+        {
+          "theme": "emerald-dark",
+          "route": "/",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 42
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/projects",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 20
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/about",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 32
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/contact",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 37
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/blog",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 26
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/blog/contrast-fixture",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 31
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/projects/qaLab",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 71
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/projects/cameraFx",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 31
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/algorithm-memorizer",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 29
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/stats",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 20
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/interview",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 17
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/admin/login",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 6
+        },
+        {
+          "theme": "emerald-dark",
+          "route": "/404",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 17
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 28
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/projects",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 13
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/about",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 11
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/contact",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 15
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/blog",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 16
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/blog/contrast-fixture",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 19
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/projects/qaLab",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 71
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/projects/cameraFx",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 31
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/algorithm-memorizer",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 10
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/stats",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 15
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/interview",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 17
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/admin/login",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 6
+        },
+        {
+          "theme": "emerald-light",
+          "route": "/404",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 13
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 42
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/projects",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 20
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/about",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 32
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/contact",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 37
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/blog",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 26
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/blog/contrast-fixture",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 31
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/projects/qaLab",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 71
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/projects/cameraFx",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 31
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/algorithm-memorizer",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 29
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/stats",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 20
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/interview",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 17
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/admin/login",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 6
+        },
+        {
+          "theme": "crimson-dark",
+          "route": "/404",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 17
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 42
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/projects",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 20
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/about",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 32
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/contact",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 37
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/blog",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 26
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/blog/contrast-fixture",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 31
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/projects/qaLab",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 71
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/projects/cameraFx",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 31
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/algorithm-memorizer",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 29
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/stats",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 20
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/interview",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 17
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/admin/login",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 6
+        },
+        {
+          "theme": "ocean-dark",
+          "route": "/404",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 17
+        },
+        {
+          "theme": "terminal",
+          "route": "/",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 25
+        },
+        {
+          "theme": "terminal",
+          "route": "/projects",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 22
+        },
+        {
+          "theme": "terminal",
+          "route": "/about",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 23
+        },
+        {
+          "theme": "terminal",
+          "route": "/contact",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 25
+        },
+        {
+          "theme": "terminal",
+          "route": "/blog",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 7
+        },
+        {
+          "theme": "terminal",
+          "route": "/blog/contrast-fixture",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 14
+        },
+        {
+          "theme": "terminal",
+          "route": "/projects/qaLab",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 64
+        },
+        {
+          "theme": "terminal",
+          "route": "/projects/cameraFx",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 24
+        },
+        {
+          "theme": "terminal",
+          "route": "/algorithm-memorizer",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 31
+        },
+        {
+          "theme": "terminal",
+          "route": "/stats",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 4
+        },
+        {
+          "theme": "terminal",
+          "route": "/interview",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 0
+        },
+        {
+          "theme": "terminal",
+          "route": "/admin/login",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 6
+        },
+        {
+          "theme": "terminal",
+          "route": "/404",
+          "axeViolations": 0,
+          "sampledViolations": 0,
+          "axeIncomplete": 4
+        }
+      ]
+    },
+    {
+      "name": "interactions",
+      "checks": 50,
+      "axeViolations": 0,
+      "sampledViolations": 0,
+      "results": [
+        {
+          "theme": "emerald-dark",
+          "state": "palette",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-dark",
+          "state": "navigation",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-dark",
+          "state": "chat",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-dark",
+          "state": "hover",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-dark",
+          "state": "editor",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-light",
+          "state": "palette",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-light",
+          "state": "navigation",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-light",
+          "state": "chat",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-light",
+          "state": "hover",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-light",
+          "state": "editor",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "crimson-dark",
+          "state": "palette",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "crimson-dark",
+          "state": "navigation",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "crimson-dark",
+          "state": "chat",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "crimson-dark",
+          "state": "hover",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "crimson-dark",
+          "state": "editor",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "ocean-dark",
+          "state": "palette",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "ocean-dark",
+          "state": "navigation",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "ocean-dark",
+          "state": "chat",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "ocean-dark",
+          "state": "hover",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "ocean-dark",
+          "state": "editor",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "terminal",
+          "state": "palette",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "terminal",
+          "state": "navigation",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "terminal",
+          "state": "chat",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "terminal",
+          "state": "hover",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "terminal",
+          "state": "editor",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-dark",
+          "state": "palette",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-dark",
+          "state": "navigation",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-dark",
+          "state": "chat",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-dark",
+          "state": "hover",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-dark",
+          "state": "editor",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-light",
+          "state": "palette",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-light",
+          "state": "navigation",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-light",
+          "state": "chat",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-light",
+          "state": "hover",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-light",
+          "state": "editor",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "crimson-dark",
+          "state": "palette",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "crimson-dark",
+          "state": "navigation",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "crimson-dark",
+          "state": "chat",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "crimson-dark",
+          "state": "hover",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "crimson-dark",
+          "state": "editor",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "ocean-dark",
+          "state": "palette",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "ocean-dark",
+          "state": "navigation",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "ocean-dark",
+          "state": "chat",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "ocean-dark",
+          "state": "hover",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "ocean-dark",
+          "state": "editor",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "terminal",
+          "state": "palette",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "terminal",
+          "state": "navigation",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "terminal",
+          "state": "chat",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "terminal",
+          "state": "hover",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "terminal",
+          "state": "editor",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        }
+      ]
+    },
+    {
+      "name": "focus-normal-motion",
+      "checks": 10,
+      "axeViolations": 0,
+      "sampledViolations": 0,
+      "results": [
+        {
+          "theme": "emerald-dark",
+          "state": "focus",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-light",
+          "state": "focus",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "crimson-dark",
+          "state": "focus",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "ocean-dark",
+          "state": "focus",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "terminal",
+          "state": "focus",
+          "width": 1440,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-dark",
+          "state": "focus",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "emerald-light",
+          "state": "focus",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "crimson-dark",
+          "state": "focus",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "ocean-dark",
+          "state": "focus",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        },
+        {
+          "theme": "terminal",
+          "state": "focus",
+          "width": 390,
+          "axeViolations": 0,
+          "sampledViolations": 0
+        }
+      ]
+    }
+  ]
+}

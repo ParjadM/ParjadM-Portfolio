@@ -1,0 +1,308 @@
+/* Contrast tokens apply to public pages and inherited controls, not only body copy.
+   Explicit dark surfaces (camera, terminal, admin, popovers) keep their own pair. */
+.site-shell {
+  --contrast-text: #f1f5f9;
+  --contrast-muted: #b6c2d2;
+  --contrast-accent: #6ee7b7;
+  --contrast-surface: #111c29;
+  --contrast-field: #172334;
+  --contrast-border: #7c8a9c;
+  --contrast-on-action: #ffffff;
+  color: var(--contrast-text);
+}
+.site-shell[data-theme="crimson-dark"] {
+  --contrast-accent: #f9a8d4;
+}
+.site-shell[data-theme="ocean-dark"] {
+  --contrast-accent: #93c5fd;
+}
+.site-shell.light-mode {
+  --contrast-text: #172033;
+  --contrast-muted: #475569;
+  --contrast-accent: #065f46;
+  --contrast-surface: #f8fafc;
+  --contrast-field: #ffffff;
+  --contrast-border: #64748b;
+  color: var(--contrast-text);
+}
+.site-shell.terminal-mode {
+  --contrast-text: #86efac;
+  --contrast-muted: #86c99b;
+  --contrast-accent: #86efac;
+  --contrast-surface: #07170d;
+  --contrast-field: #0a2013;
+}
+.site-shell :is(.text-white, .text-gray-100, .text-gray-200) {
+  color: var(--contrast-text);
+}
+.site-shell
+  :is(.text-gray-300, .text-gray-400, .text-gray-500, .text-gray-600) {
+  color: var(--contrast-muted);
+}
+.site-shell :is(input, textarea, select)::placeholder {
+  color: var(--contrast-muted);
+  opacity: 1;
+}
+.site-shell
+  :is(
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    textarea,
+    select
+  ) {
+  color: var(--contrast-text);
+  border-color: var(--contrast-border);
+}
+.site-shell select option {
+  background: var(--contrast-field);
+  color: var(--contrast-text);
+}
+.site-shell :is(a, button, input, textarea, select, summary):focus-visible {
+  outline: 2px solid var(--contrast-accent);
+  outline-offset: 3px;
+}
+.site-shell :is(.theme-action, .primary-button),
+.site-shell .theme-action .text-white {
+  color: var(--contrast-on-action);
+}
+.site-shell.terminal-mode .theme-action {
+  background: #14532d;
+  color: #ffffff;
+}
+.site-shell.terminal-mode .theme-action:hover {
+  background: #166534;
+}
+/* The light theme previously inverted text but left dark panels untouched. */
+.site-shell.light-mode .glass-card {
+  background-color: var(--contrast-surface);
+  border-color: #94a3b8;
+}
+.site-shell.light-mode .glass-card > div:not(:last-child) {
+  opacity: 0;
+}
+.site-shell.light-mode [class*="bg-white/"] {
+  background-color: #e2e8f0;
+}
+.site-shell.light-mode [class*="border-white/"] {
+  border-color: #94a3b8;
+}
+.site-shell.light-mode
+  :is(
+    [class*="text-emerald-"],
+    [class*="text-green-"],
+    [class*="text-teal-"],
+    [class*="text-cyan-"]
+  ) {
+  color: var(--contrast-accent);
+}
+.site-shell.light-mode
+  :is([class*="text-blue-"], [class*="text-indigo-"], [class*="text-violet-"]) {
+  color: #1e40af;
+}
+.site-shell.light-mode
+  :is([class*="text-pink-"], [class*="text-rose-"], [class*="text-red-"]) {
+  color: #9f1239;
+}
+.site-shell.light-mode :is([class*="text-amber-"], [class*="text-yellow-"]) {
+  color: #854d0e;
+}
+.site-shell.light-mode .bg-clip-text {
+  background-image: linear-gradient(100deg, #065f46, #115e59);
+}
+.site-shell.light-mode header nav a[aria-current="page"] {
+  color: #065f46;
+  background-color: #c3e8da;
+}
+.site-shell.light-mode header img[alt="Logo"] {
+  filter: brightness(0);
+}
+.site-shell.light-mode .portrait-border {
+  background-color: #111827;
+}
+/* Restore semantic dark pairs inside intentionally dark tools and dialogs. */
+.site-shell.light-mode
+  :is(
+    .camera-fx-shell,
+    .qa-lab,
+    [data-contrast-surface="dark"],
+    [class*="bg-gray-9"],
+    .bg-black
+  ) {
+  --contrast-text: #f1f5f9;
+  --contrast-muted: #b6c2d2;
+  --contrast-accent: #6ee7b7;
+  --contrast-surface: #111c29;
+  --contrast-field: #172334;
+  color: var(--contrast-text);
+}
+.site-shell.light-mode
+  :is(
+    .camera-fx-shell,
+    .qa-lab,
+    [data-contrast-surface="dark"],
+    [class*="bg-gray-9"],
+    .bg-black
+  )
+  [class*="bg-white/"] {
+  background-color: #ffffff12;
+}
+.site-shell.light-mode
+  :is(
+    .camera-fx-shell,
+    .qa-lab,
+    [data-contrast-surface="dark"],
+    [class*="bg-gray-9"],
+    .bg-black
+  )
+  :is([class*="text-blue-"], [class*="text-indigo-"]) {
+  color: #93c5fd;
+}
+.site-shell.light-mode
+  :is(
+    .camera-fx-shell,
+    .qa-lab,
+    [data-contrast-surface="dark"],
+    [class*="bg-gray-9"],
+    .bg-black
+  )
+  :is([class*="text-amber-"], [class*="text-yellow-"]) {
+  color: #fde68a;
+}
+.site-shell.light-mode
+  :is(
+    .camera-fx-shell,
+    .qa-lab,
+    [data-contrast-surface="dark"],
+    [class*="bg-gray-9"],
+    .bg-black
+  )
+  :is([class*="text-red-"], [class*="text-pink-"]) {
+  color: #fda4af;
+}
+.site-shell
+  .theme-action
+  :is([class*="text-emerald-"], [class*="text-blue-"], .text-white) {
+  color: #fff;
+}
+.site-shell .camera-fx-shell [class*="text-white/"] {
+  color: #bac7d8;
+}
+.site-shell.light-mode pre:not(.algo-mem-ghost) {
+  color: #172033;
+  background: #e9eef2;
+}
+.site-shell.light-mode .cm-content {
+  color: #172033;
+}
+.site-shell.light-mode .algo-mem-ghost {
+  color: #526078 !important;
+  background: transparent;
+}
+.site-shell.terminal-mode header img[alt="Logo"] {
+  filter: sepia(100%) hue-rotate(80deg) saturate(400%) brightness(1.2);
+}
+/* Muted text must remain readable even when legacy utilities specify alpha. */
+.site-shell [class*="text-white/"] {
+  color: var(--contrast-muted);
+}
+.site-shell .glass-card {
+  background-color: var(--contrast-surface);
+}
+.site-shell.light-mode [class*="bg-black/"] {
+  background-color: #e2e8f0;
+}
+.site-shell.light-mode
+  :is(
+    .camera-fx-shell,
+    .qa-lab,
+    [data-contrast-surface="dark"],
+    [class*="bg-gray-9"],
+    .bg-black
+  )
+  [class*="bg-black/"] {
+  background-color: #00000050;
+}
+.site-shell .camera-fx-mode[aria-pressed="true"] {
+  color: #ffffff;
+}
+.site-shell .theme-action [class*="text-white/"] {
+  color: #ffffff;
+}
+.site-shell .cm-placeholder,
+.site-shell .cm-gutters {
+  color: var(--contrast-muted);
+}
+.site-shell.light-mode .cm-gutters {
+  background: #dbe3ec;
+}
+.site-shell.light-mode .qa-lab pre {
+  color: var(--contrast-text);
+  background: var(--contrast-field);
+}
+.site-shell.light-mode
+  :is(
+    input:not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+    textarea,
+    select
+  ) {
+  border-color: var(--contrast-border);
+}
+/* Gradient headings must remain clipped, including footer rules that reset background. */
+.site-shell .bg-clip-text {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+.site-shell .site-footer h2 {
+  background-image: none;
+  color: var(--contrast-accent);
+  -webkit-text-fill-color: currentColor;
+}
+/* Keep header hover decoration from washing out small language labels. */
+.site-shell header .glass-card > div:not(:last-child) {
+  opacity: 0;
+}
+/* Python syntax needs a dark-surface palette; CodeMirror defaults target white. */
+.site-shell .cm-editor {
+  color: var(--contrast-text);
+}
+.site-shell .cm-content {
+  caret-color: var(--contrast-accent);
+}
+.site-shell .syntax-keyword {
+  color: #d8b4fe;
+}
+.site-shell .syntax-name {
+  color: var(--contrast-text);
+}
+.site-shell .syntax-string {
+  color: #86efac;
+}
+.site-shell .syntax-literal {
+  color: #93c5fd;
+}
+.site-shell .syntax-comment {
+  color: var(--contrast-muted);
+}
+.site-shell .syntax-invalid {
+  color: #fda4af;
+  text-decoration: underline wavy;
+}
+.site-shell .algo-mem-ghost {
+  color: var(--contrast-muted) !important;
+}
+.site-shell.light-mode .syntax-keyword {
+  color: #6b21a8;
+}
+.site-shell.light-mode .syntax-string {
+  color: #166534;
+}
+.site-shell.light-mode .syntax-literal {
+  color: #1e40af;
+}
+.site-shell.light-mode .syntax-invalid {
+  color: #9f1239;
+}
+.site-shell .cm-editor.cm-focused {
+  outline: 2px solid var(--contrast-accent);
+}
