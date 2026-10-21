@@ -26,8 +26,19 @@ export async function createApp() {
   app.use(express.json())
   app.use(morgan('dev'))
 
-  // Initialize DB (no-op for memory)
-  await initDatabase()
+  // Check connectivity on each request, including warm serverless instances.
+  // connectMongo is a no-op while connected; failures must never activate empty storage.
+  app.use(async (_req, res, next) => {
+    try {
+      await initDatabase()
+      next()
+    } catch (err) {
+      console.error('Database unavailable:', err.message)
+      res.setHeader('Cache-Control', 'no-store')
+      res.setHeader('Retry-After', '10')
+      res.status(503).json({ error: 'Data temporarily unavailable. Please retry.' })
+    }
+  })
 
   // Health check
   app.get('/api/health', (req, res) => {

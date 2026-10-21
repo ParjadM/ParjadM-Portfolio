@@ -113,7 +113,8 @@ router.get('/rss', async (_req, res) => {
     res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=600')
     res.send(await buildRssFeed())
   } catch (err) {
-    res.status(500).json({ error: err.message })
+    res.setHeader('Cache-Control', 'no-store')
+    res.status(503).json({ error: 'Content temporarily unavailable. Please retry.' })
   }
 })
 
@@ -209,7 +210,7 @@ router.get('/', async (req, res) => {
     res.json(payload)
   } catch (err) {
     res.setHeader('Cache-Control', 'no-store')
-    res.json({ posts: [] })
+    res.status(503).json({ error: 'Content temporarily unavailable. Please retry.' })
   }
 })
 
@@ -264,7 +265,8 @@ router.get('/:id/related', async (req, res) => {
     res.setHeader('Cache-Control', 'public, max-age=30, stale-while-revalidate=300')
     res.json(payload)
   } catch (err) {
-    res.status(500).json({ error: err.message })
+    res.setHeader('Cache-Control', 'no-store')
+    res.status(503).json({ error: 'Content temporarily unavailable. Please retry.' })
   }
 })
 
@@ -292,7 +294,8 @@ router.get('/:id', async (req, res) => {
     cacheSet(cacheKey, payload, POST_TTL_MS)
     res.json(payload)
   } catch (err) {
-    res.status(500).json({ error: err.message })
+    res.setHeader('Cache-Control', 'no-store')
+    res.status(503).json({ error: 'Content temporarily unavailable. Please retry.' })
   }
 })
 

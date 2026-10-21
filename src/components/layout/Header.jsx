@@ -22,6 +22,7 @@ import { MOBILE_MENU_OPEN } from '../../utils/mobileMenuEvents.js';
 import { stripLocalePrefix } from '../../utils/i18nRouting.js';
 import { useSwipeDown } from '../../utils/useSwipeDown.js';
 import { useFocusTrap } from '../../utils/useFocusTrap.js';
+import { useVisitorCount } from '../../utils/useVisitorCount.js';
 import { useMenuPopover } from '../../utils/useMenuPopover.js';
 
 export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCursorThemeId, theme, darkMode = true, isMobileMenuOpen, setIsMobileMenuOpen, onLanguageChange }) => {
@@ -40,16 +41,7 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
     const moreTriggerRef = useRef(null);
     const navLinksRef = useRef(null);
     const [navIndicator, setNavIndicator] = useState(null);
-    const [visitors, setVisitors] = useState(() => {
-        try {
-            const cached = localStorage.getItem('cachedVisitors');
-            if (!cached) return null;
-            const parsed = Number(cached);
-            return Number.isFinite(parsed) ? parsed : null;
-        } catch {
-            return null;
-        }
-    });
+    const visitors = useVisitorCount();
     const location = useLocation();
     const navItems = [
         { name: t('nav.Home'), path: '/' },
@@ -187,22 +179,6 @@ export const Header = ({ setThemeId, currentThemeId, setCursorThemeId, currentCu
             return next;
         });
     };
-
-    useEffect(() => {
-        const controller = new AbortController();
-        fetch('/api/metrics', { signal: controller.signal })
-          .then(res => res.ok ? res.json() : null)
-          .then(d => {
-            if (!d || typeof d.uniqueVisitors !== 'number') return;
-            setVisitors(d.uniqueVisitors);
-            try { localStorage.setItem('cachedVisitors', String(d.uniqueVisitors)); } catch {}
-          })
-          .catch(() => {
-            // Keep cached value on network/server errors to avoid flashing/reset.
-          });
-
-        return () => controller.abort();
-    }, []);
 
     useLayoutEffect(() => {
         if (!isPaletteOpen || typeof window === 'undefined') {

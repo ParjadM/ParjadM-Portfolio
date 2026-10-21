@@ -8,15 +8,17 @@ let appPromise
 // Vercel serverless function handler (memoized app to reduce cold starts)
 export default async function handler(req, res) {
   try {
-    appPromise ||= createApp()
+    appPromise ||= createApp().catch(err => { appPromise = undefined; throw err })
     const app = await appPromise
     return app(req, res)
   } catch (err) {
     // Surface the error as JSON instead of a generic crash page
     console.error('API handler error:', err)
-    res.statusCode = 500
+    res.statusCode = 503
+    res.setHeader('Cache-Control', 'no-store')
+    res.setHeader('Retry-After', '10')
     res.setHeader('Content-Type', 'application/json')
-    res.end(JSON.stringify({ error: 'Serverless handler error', message: err?.message || String(err) }))
+    res.end(JSON.stringify({ error: 'Service temporarily unavailable. Please retry.' }))
   }
 }
 

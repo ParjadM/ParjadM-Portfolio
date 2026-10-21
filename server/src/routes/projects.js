@@ -183,7 +183,7 @@ router.get('/', async (req, res) => {
     res.json(payload)
   } catch (err) {
     res.setHeader('Cache-Control', 'no-store')
-    res.json({ projects: [] })
+    res.status(503).json({ error: 'Content temporarily unavailable. Please retry.' })
   }
 })
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { Reveal } from '../components/Reveal.jsx';
@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { BlogCardSkeleton } from '../components/ui/Skeleton.jsx';
 import { formatDate } from '../utils/formatDate.js';
 import { GRID_PAGE_SIZE, Pagination } from '../components/ui/Pagination.jsx';
-import { fetchApi } from '../utils/apiClient.js';
+import { useFetchWithCache } from '../utils/useFetchWithCache.js';
 import { SEO } from '../components/SEO.jsx';
 import { getAccent } from '../utils/themeTokens.js';
 
@@ -14,11 +14,13 @@ export const BlogSection = ({ theme }) => {
     const { t, i18n } = useTranslation();
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [page, setPage] = useState(1);
-    const [posts, setPosts] = useState([]);
-    const [featuredPost, setFeaturedPost] = useState(null);
-    const [totalItems, setTotalItems] = useState(0);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+    const params = new URLSearchParams({ page: String(page), limit: String(GRID_PAGE_SIZE), includeFeatured: selectedCategory === 'all' ? 'true' : 'false' });
+    if (selectedCategory !== 'all') params.set('category', selectedCategory);
+    const { data, isLoading: loading, error: fetchError } = useFetchWithCache(`/api/blog?${params}`);
+    const posts = Array.isArray(data?.posts) ? data.posts : [];
+    const featuredPost = selectedCategory === 'all' ? data?.featuredPost : null;
+    const totalItems = data?.pagination?.totalItems ?? posts.length;
+    const error = fetchError ? t('blog.error') : '';
 
     const categories = {
         'all': t('blog.categories.all'),
@@ -26,36 +28,6 @@ export const BlogSection = ({ theme }) => {
         'tutorial': t('blog.categories.tutorial'),
         'personal': t('blog.categories.personal')
     };
-
-    useEffect(() => {
-        const controller = new AbortController();
-        const fetchPosts = async () => {
-            setLoading(true);
-            setError('');
-            try {
-                const params = new URLSearchParams({
-                    page: String(page),
-                    limit: String(GRID_PAGE_SIZE),
-                    includeFeatured: selectedCategory === 'all' ? 'true' : 'false',
-                });
-                if (selectedCategory !== 'all') params.set('category', selectedCategory);
-                const data = await fetchApi(`/api/blog?${params}`, { signal: controller.signal });
-                if (controller.signal.aborted) return;
-                setPosts(Array.isArray(data.posts) ? data.posts : []);
-                setTotalItems(data.pagination?.totalItems ?? (data.posts?.length || 0));
-                setFeaturedPost(selectedCategory === 'all' ? (data.featuredPost || null) : null);
-            } catch (e) {
-                if (controller.signal.aborted || e?.name === 'AbortError') return;
-                setError(t('blog.error'));
-                setPosts([]);
-                setTotalItems(0);
-            } finally {
-                if (!controller.signal.aborted) setLoading(false);
-            }
-        };
-        fetchPosts();
-        return () => controller.abort();
-    }, [page, selectedCategory, t]);
 
     const selectCategory = (key) => {
         setSelectedCategory(key);

@@ -12,7 +12,8 @@ async function ensureAnalyticsDoc() {
 router.post('/visit', async (req, res) => {
   try {
     if (currentEngine !== 'mongo') {
-      return res.json({ ok: true, pageviews: 0, uniqueVisitors: 0 })
+      res.setHeader('Cache-Control', 'no-store')
+      return res.status(503).json({ available: false, error: 'Metrics temporarily unavailable' })
     }
 
     await ensureAnalyticsDoc()
@@ -89,20 +90,22 @@ router.post('/visit', async (req, res) => {
 
     res.json({ ok: true, pageviews: updated?.pageviews || 0, uniqueVisitors: updated?.uniqueVisitors || 0 })
   } catch (err) {
-    res.status(500).json({ error: err.message })
+    res.setHeader('Cache-Control', 'no-store')
+    res.status(503).json({ available: false, error: 'Metrics temporarily unavailable' })
   }
 })
 
 // GET /api/metrics
 router.get('/', async (_req, res) => {
   try {
-    res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=300, stale-while-revalidate=600')
-    if (currentEngine !== 'mongo') return res.json({ pageviews: 0, uniqueVisitors: 0 })
-    await ensureAnalyticsDoc()
+    res.setHeader('Cache-Control', 'no-store')
+    if (currentEngine !== 'mongo') return res.status(503).json({ available: false, error: 'Metrics temporarily unavailable' })
     const doc = await Analytics.findOne({ key: 'global' }).lean()
-    res.json({ pageviews: doc?.pageviews || 0, uniqueVisitors: doc?.uniqueVisitors || 0 })
+    if (!doc) return res.status(503).json({ available: false, error: 'Metrics temporarily unavailable' })
+    res.json({ available: true, pageviews: doc.pageviews, uniqueVisitors: doc.uniqueVisitors })
   } catch (err) {
-    res.status(500).json({ error: err.message })
+    res.setHeader('Cache-Control', 'no-store')
+    res.status(503).json({ available: false, error: 'Metrics temporarily unavailable' })
   }
 })
 
@@ -123,7 +126,8 @@ router.get('/series', async (req, res) => {
     const series = dates.map(d => ({ date: d, pageviews: byDate.get(d)?.pageviews || 0, uniqueVisitors: byDate.get(d)?.uniqueVisitors || 0 }))
     res.json({ series })
   } catch (err) {
-    res.status(500).json({ error: err.message })
+    res.setHeader('Cache-Control', 'no-store')
+    res.status(503).json({ available: false, error: 'Metrics temporarily unavailable' })
   }
 })
 
@@ -145,7 +149,8 @@ router.get('/paths', async (req, res) => {
     const paths = docs.map(d => ({ path: d._id.replace('path:', ''), pageviews: d.pageviews, uniqueVisitors: d.uniqueVisitors }))
     res.json({ paths })
   } catch (err) {
-    res.status(500).json({ error: err.message })
+    res.setHeader('Cache-Control', 'no-store')
+    res.status(503).json({ available: false, error: 'Metrics temporarily unavailable' })
   }
 })
 

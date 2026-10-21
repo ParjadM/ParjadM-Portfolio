@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { MarkdownContent } from '../components/ui/MarkdownContent.jsx';
@@ -14,7 +14,7 @@ import { LocalizedLink } from '../components/ui/LocalizedLink.jsx';
 import { BlogTableOfContents } from '../components/blog/BlogTableOfContents.jsx';
 import { BlogComments } from '../components/blog/BlogComments.jsx';
 import { SITE_URL, SITE_NAME } from '../config/site.js';
-import { fetchApi } from '../utils/apiClient.js';
+import { useFetchWithCache } from '../utils/useFetchWithCache.js';
 import { getAccent } from '../utils/themeTokens.js';
 
 export const BlogPostPage = ({ theme }) => {
@@ -22,51 +22,10 @@ export const BlogPostPage = ({ theme }) => {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    const [post, setPost] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const [related, setRelated] = useState([]);
-
-    useEffect(() => {
-        const controller = new AbortController();
-        const fetchPost = async () => {
-            setLoading(true);
-            setError('');
-            try {
-                const data = await fetchApi(`/api/blog/${id}`, { signal: controller.signal, ttlMs: 30_000 });
-                if (controller.signal.aborted) return;
-                setPost(data.post);
-            } catch (err) {
-                if (controller.signal.aborted || err?.name === 'AbortError') return;
-                setError('Post not found');
-                setPost(null);
-            } finally {
-                if (!controller.signal.aborted) setLoading(false);
-            }
-        };
-        fetchPost();
-        return () => controller.abort();
-    }, [id]);
-
-    useEffect(() => {
-        if (!post) return undefined;
-        let cancelled = false;
-        const controller = new AbortController();
-        (async () => {
-            try {
-                const data = await fetchApi(`/api/blog/${id}/related?limit=3`, {
-                    signal: controller.signal,
-                });
-                if (!cancelled) setRelated(Array.isArray(data.posts) ? data.posts : []);
-            } catch {
-                if (!cancelled) setRelated([]);
-            }
-        })();
-        return () => {
-            cancelled = true;
-            controller.abort();
-        };
-    }, [post, id]);
+    const { data, isLoading: loading, errorStatus } = useFetchWithCache(`/api/blog/${id}`);
+    const post = data?.post;
+    const { data: relatedData } = useFetchWithCache(post ? `/api/blog/${id}/related?limit=3` : null);
+    const related = Array.isArray(relatedData?.posts) ? relatedData.posts : [];
 
     useEffect(() => {
         if (!post) return undefined;
@@ -83,13 +42,13 @@ export const BlogPostPage = ({ theme }) => {
         );
     }
 
-    if (error || !post) {
+    if (!post) {
         return (
             <section className="article-page min-h-screen flex items-center justify-center py-20 px-4">
                 <SEO titleKey="seo.notFoundTitle" descriptionKey="seo.notFoundDesc" noindex canonicalPath={`/blog/${id}`} englishOnly />
                 <div className="container mx-auto max-w-3xl text-center">
                     <GlassCard className="p-8">
-                        <h2 className="text-2xl font-bold text-white mb-4">{t('blog.notFound')}</h2>
+                        <h2 className="text-2xl font-bold text-white mb-4">{t(errorStatus === 404 ? 'blog.notFound' : 'blog.error')}</h2>
                         <button type="button" onClick={() => navigate('/blog', { replace: true })} className="text-emerald-400 hover:underline">{t('blog.backToBlog').replace('← ', '')}</button>
                     </GlassCard>
                 </div>

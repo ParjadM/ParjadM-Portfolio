@@ -49,7 +49,7 @@ async function fetchShared(url, {
 
   const promise = (async () => {
     const res = await fetch(key)
-    if (!res.ok) throw new Error(`Error: ${res.status} ${res.statusText}`)
+    if (!res.ok) throw Object.assign(new Error(`Error: ${res.status} ${res.statusText}`), { status: res.status })
     const data = await res.json()
     store.set(key, { data, fetchedAt: Date.now() })
     return data

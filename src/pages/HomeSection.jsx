@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Github, Linkedin } from '../components/ui/Icons.jsx';
 import { RippleButton } from '../components/ui/RippleButton.jsx';
@@ -9,7 +9,6 @@ import { SEO } from '../components/SEO.jsx';
 import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { LocalizedLink } from '../components/ui/LocalizedLink.jsx';
 import { useFetchWithCache } from '../utils/useFetchWithCache.js';
-import { fetchApi } from '../utils/apiClient.js';
 import { formatDate } from '../utils/formatDate.js';
 import { getAccent } from '../utils/themeTokens.js';
 import ParjadM from '../Images/ParjadM.webp';
@@ -33,21 +32,8 @@ export const HomeSection = ({ theme }) => {
   const { data: projectsData } = useFetchWithCache('/api/projects?page=1&limit=3');
   const featuredProjects = Array.isArray(projectsData?.projects) ? projectsData.projects : [];
 
-  const [latestPosts, setLatestPosts] = useState([]);
-  useEffect(() => {
-    let cancelled = false;
-    const controller = new AbortController();
-    fetchApi('/api/blog?page=1&limit=2', { signal: controller.signal })
-      .then((data) => {
-        if (cancelled || !data) return;
-        setLatestPosts(Array.isArray(data.posts) ? data.posts : []);
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-      controller.abort();
-    };
-  }, []);
+  const { data: blogData } = useFetchWithCache('/api/blog?page=1&limit=2');
+  const latestPosts = Array.isArray(blogData?.posts) ? blogData.posts : [];
 
   const accentText = accent.text;
   const tagClasses = accent.tag;
