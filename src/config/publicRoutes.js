@@ -95,6 +95,15 @@ export const PUBLIC_STATIC_ROUTES = [
     indexable: true,
   },
   {
+    path: '/explore-world',
+    id: 'exploreWorld',
+    titleKey: 'exploreWorld.seoTitle',
+    descriptionKey: 'exploreWorld.seoDesc',
+    sitemap: true,
+    prerender: false,
+    indexable: true,
+  },
+  {
     path: '/algorithm-memorizer',
     id: 'algoMem',
     titleKey: 'algoMem.seoTitle',
