@@ -8,6 +8,7 @@ import { LocalizedLink } from '../components/ui/LocalizedLink.jsx';
 import { getAccent } from '../utils/themeTokens.js';
 
 const EXPLORE_LINK_KEYS = [
+  { path: '/explore-world', labelKey: 'explore.links.exploreWorld.label', descKey: 'explore.links.exploreWorld.desc' },
   { path: '/cli', labelKey: 'explore.links.cli.label', descKey: 'explore.links.cli.desc' },
   { path: '/os', labelKey: 'explore.links.os.label', descKey: 'explore.links.os.desc' },
   { path: '/algorithm-memorizer', labelKey: 'explore.links.algoMem.label', descKey: 'explore.links.algoMem.desc' },
