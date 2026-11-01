@@ -66,7 +66,7 @@ export const Footer = React.memo(function Footer({ theme }) {
                     </nav>
 
                     {/* Social Links */}
-                    <div className="flex justify-center space-x-6 mb-10">
+                    <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-10">
                         {socialLinks.map(social => (
                             <a
                                 key={social.name}

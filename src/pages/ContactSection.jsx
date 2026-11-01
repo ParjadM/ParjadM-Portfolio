@@ -222,7 +222,7 @@ export const ContactSection = ({ theme }) => {
                                         rel={method.href.startsWith('http') ? 'noopener noreferrer' : ''}
                                         className="flex items-center p-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:border-white/20 transition-all duration-300 group"
                                     >
-                                        <div className={`p-3 rounded-lg bg-white/10 group-hover:bg-white/20 transition-all duration-300 ${accent.text}`}>
+                                        <div className={`shrink-0 p-3 rounded-lg bg-white/10 group-hover:bg-white/20 transition-all duration-300 ${accent.text}`}>
                                             {method.icon}
                                         </div>
                                         <div className="ml-4 flex-1 min-w-0">
