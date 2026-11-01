@@ -1,5 +1,6 @@
 import React from 'react';
 import { reportError } from '../utils/errorReporter.js';
+import { isChunkLoadError, recoverFromStaleChunk } from '../utils/lazyWithRetry.js';
 
 /**
  * Catches React render crashes, reports them, and shows a friendly
@@ -8,11 +9,11 @@ import { reportError } from '../utils/errorReporter.js';
 export class ErrorBoundary extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { hasError: false };
+        this.state = { hasError: false, error: null };
     }
 
-    static getDerivedStateFromError() {
-        return { hasError: true };
+    static getDerivedStateFromError(error) {
+        return { hasError: true, error };
     }
 
     componentDidCatch(error, info) {
@@ -45,7 +46,13 @@ export class ErrorBoundary extends React.Component {
                         An unexpected error occurred. It has been reported automatically — try reloading the page.
                     </p>
                     <button
-                        onClick={() => window.location.reload()}
+                        onClick={async () => {
+                            if (isChunkLoadError(this.state.error)) {
+                                const recovering = await recoverFromStaleChunk({ force: true });
+                                if (recovering) return;
+                            }
+                            window.location.reload();
+                        }}
                         style={{
                             padding: '0.6rem 1.5rem',
                             borderRadius: '9999px',

@@ -46,14 +46,16 @@ function lazyNamed(factory, name) {
 
 // Eager-load the homepage so the LCP portrait is discoverable without a route-chunk waterfall.
 import { HomeSection } from '../../pages/HomeSection.jsx';
+// Keep core content routes in the entry graph so they do not depend on a
+// separate dynamic import surviving a deployment or a cached module failure.
+import { ProjectsSection } from '../../pages/ProjectsSection.jsx';
+import { BlogSection } from '../../pages/BlogSection.jsx';
 import { PUBLIC_STATIC_ROUTES } from '../../config/publicRoutes.js';
 const AboutSection = lazyNamed(() => import('../../pages/AboutSection.jsx'), 'AboutSection');
-const ProjectsSection = lazyNamed(() => import('../../pages/ProjectsSection.jsx'), 'ProjectsSection');
 const LQFTBenchmarkPage = lazyNamed(() => import('../../pages/LQFTBenchmarkPage.jsx'), 'LQFTBenchmarkPage');
 const CameraFxPage = lazyNamed(() => import('../../pages/CameraFxPage.jsx'), 'CameraFxPage');
 const QaLabPage = lazyNamed(() => import('../../pages/QaLabPage.jsx'), 'QaLabPage');
 const StatsPage = lazyNamed(() => import('../../pages/StatsPage.jsx'), 'StatsPage');
-const BlogSection = lazyNamed(() => import('../../pages/BlogSection.jsx'), 'BlogSection');
 const BlogPostPage = lazyNamed(() => import('../../pages/BlogPostPage.jsx'), 'BlogPostPage');
 const ContactSection = lazyNamed(() => import('../../pages/ContactSection.jsx'), 'ContactSection');
 const AdminLoginPage = lazyNamed(() => import('../../pages/admin/AdminLoginPage.jsx'), 'AdminLoginPage');

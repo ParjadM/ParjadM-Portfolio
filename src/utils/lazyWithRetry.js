@@ -46,7 +46,7 @@ async function clearAssetCaches() {
     const keys = await caches.keys();
     await Promise.all(
       keys
-        .filter((key) => /workbox|assets|precache|runtime/i.test(key))
+        .filter((key) => /workbox|assets|precache|runtime|page-navigations/i.test(key))
         .map((key) => caches.delete(key)),
     );
   } catch {
@@ -102,9 +102,9 @@ async function unregisterServiceWorkers() {
  * Recover from a deploy mismatch: old shell/SW referencing deleted hashed chunks.
  * One automatic reload per minute, shared across handlers, to avoid loops.
  */
-function recoverFromStaleChunk() {
+function recoverFromStaleChunk({ force = false } = {}) {
   if (recoveryPromise) return recoveryPromise;
-  if (navigator.onLine === false || attemptedRecovery || recentlyRecovered()) {
+  if (navigator.onLine === false || (!force && (attemptedRecovery || recentlyRecovered()))) {
     return Promise.resolve(false);
   }
   attemptedRecovery = true;

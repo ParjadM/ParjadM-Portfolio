@@ -38,6 +38,25 @@ describe('recoverFromStaleChunk', () => {
 
 
 describe('recovery coordination', () => {
+  it('manual recovery bypasses the automatic cooldown and removes cached HTML', async () => {
+    vi.resetModules();
+    sessionStorage.setItem('chunk-load-reload', String(Date.now()));
+    const replace = vi.fn();
+    const cache = {
+      keys: vi.fn(async () => ['page-navigations', 'assets-js', 'unrelated']),
+      delete: vi.fn(async () => true),
+    };
+    vi.stubGlobal('window', { location: { href: 'https://www.parjadm.ca/blog', replace }, caches: cache });
+    vi.stubGlobal('caches', cache);
+    vi.stubGlobal('navigator', { onLine: true });
+    try {
+      const { recoverFromStaleChunk: recover } = await import('./lazyWithRetry.js');
+      await expect(recover()).resolves.toBe(false);
+      await expect(recover({ force: true })).resolves.toBe(true);
+      expect(cache.delete.mock.calls).toEqual([['page-navigations'], ['assets-js']]);
+      expect(replace).toHaveBeenCalledWith(expect.stringContaining('/blog?_chunkfix='));
+    } finally { vi.unstubAllGlobals(); }
+  });
   it('shares one recovery between simultaneous failures', async () => {
     vi.resetModules();
     sessionStorage.clear();

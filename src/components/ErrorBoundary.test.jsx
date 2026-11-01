@@ -1,8 +1,14 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ErrorBoundary } from './ErrorBoundary.jsx';
 import { reportError } from '../utils/errorReporter.js';
+import { recoverFromStaleChunk } from '../utils/lazyWithRetry.js';
+
+vi.mock('../utils/lazyWithRetry.js', async importOriginal => ({
+    ...await importOriginal(),
+    recoverFromStaleChunk: vi.fn(async () => true),
+}));
 
 vi.mock('../utils/errorReporter.js', () => ({
     reportError: vi.fn(),
@@ -42,5 +48,14 @@ describe('ErrorBoundary', () => {
                 source: 'react-error-boundary',
             })
         );
+    });
+
+    it('clears stale assets when the visitor reloads after a module failure', async () => {
+        const FailedRoute = () => {
+            throw new TypeError('Failed to fetch dynamically imported module: /assets/BlogSection-old.js');
+        };
+        render(<ErrorBoundary><FailedRoute /></ErrorBoundary>);
+        fireEvent.click(screen.getByRole('button', { name: /reload page/i }));
+        await waitFor(() => expect(recoverFromStaleChunk).toHaveBeenCalledWith({ force: true }));
     });
 });
