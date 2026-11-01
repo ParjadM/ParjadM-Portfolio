@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Github, Linkedin } from '../components/ui/Icons.jsx';
+import { Github, Linkedin, Instagram } from '../components/ui/Icons.jsx';
 import { GlassCard } from '../components/ui/GlassCard.jsx';
 import { Reveal } from '../components/Reveal.jsx';
 import { useTranslation } from 'react-i18next';
@@ -66,6 +66,13 @@ export const ContactSection = ({ theme }) => {
             value: "linkedin.com/in/parjadminooei",
             href: "https://www.linkedin.com/in/parjadminooei",
             description: t('contact.info.linkedinDesc')
+        },
+        {
+            icon: <Instagram size={24} />,
+            title: "Instagram",
+            value: "instagram.com/parjad.m",
+            href: "https://www.instagram.com/parjad.m/",
+            description: t('contact.info.instagramDesc')
         }
     ];
 

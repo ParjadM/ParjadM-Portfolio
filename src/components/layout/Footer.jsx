@@ -1,5 +1,5 @@
 import React from 'react';
-import { Github, Linkedin } from '../ui/Icons.jsx';
+import { Github, Linkedin, Instagram } from '../ui/Icons.jsx';
 import { useTranslation } from 'react-i18next';
 import { LocalizedLink } from '../ui/LocalizedLink.jsx';
 
@@ -22,6 +22,11 @@ export const Footer = React.memo(function Footer({ theme }) {
             name: 'LinkedIn', 
             url: 'https://www.linkedin.com/in/parjadminooei',
             icon: <Linkedin size={24} />
+        },
+        {
+            name: 'Instagram',
+            url: 'https://www.instagram.com/parjad.m/',
+            icon: <Instagram size={24} />
         }
     ];
 
