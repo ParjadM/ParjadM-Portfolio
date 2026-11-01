@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Github, Linkedin } from '../components/ui/Icons.jsx';
+import { Github, Linkedin, Instagram } from '../components/ui/Icons.jsx';
 import { RippleButton } from '../components/ui/RippleButton.jsx';
 import { Reveal } from '../components/Reveal.jsx';
 import { useTranslation } from 'react-i18next';
@@ -70,6 +70,7 @@ export const HomeSection = ({ theme }) => {
           <div className="mt-8 flex justify-start space-x-4">
             <a href="https://github.com/ParjadM" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="p-3 rounded-full bg-white/5 border border-white/10 text-gray-200 hover:text-white hover:bg-white/15 hover:border-white/25 transition-all duration-300 hover:-translate-y-0.5"><Github size={26} /></a>
             <a href="https://www.linkedin.com/in/parjadminooei" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="p-3 rounded-full bg-white/5 border border-white/10 text-gray-200 hover:text-white hover:bg-white/15 hover:border-white/25 transition-all duration-300 hover:-translate-y-0.5"><Linkedin size={26} /></a>
+            <a href="https://www.instagram.com/parjad.m/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="p-3 rounded-full bg-white/5 border border-white/10 text-gray-200 hover:text-white hover:bg-white/15 hover:border-white/25 transition-all duration-300 hover:-translate-y-0.5"><Instagram size={26} /></a>
           </div>
           <RippleButton 
             onClick={() => navigate('/contact')} 
